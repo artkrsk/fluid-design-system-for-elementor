@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": true,
+    "strict": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "lib": ["ES2022", "DOM"],
+    "allowUmdGlobalAccess": true
+  },
+  "include": ["src/js/**/*.js"],
+  "exclude": ["src/php/**/*", "node_modules/**/*", "dist/**/*", "__tests__/**/*", "__e2e__/**/*"]
+}

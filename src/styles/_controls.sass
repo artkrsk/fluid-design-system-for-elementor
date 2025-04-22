@@ -1,0 +1,76 @@
+@use 'variables'
+
+// Custom units control styles
+.e-units-fluid.e-units-custom
+	.elementor-control-input-wrapper
+		position: relative
+
+		// Select styles
+		select
+			-webkit-appearance: none
+			-moz-appearance: none
+			appearance: none
+			cursor: pointer
+			flex-basis: 100%
+			font-family: inherit
+			font-size: variables.$control-title-size
+			font-style: inherit
+			font-weight: inherit
+			letter-spacing: inherit
+			line-height: inherit
+			padding-inline-end: 20px
+			padding-inline-start: 5px
+			text-transform: inherit
+
+		// List styles
+		ul
+			width: 100%
+			flex-wrap: wrap
+			gap: variables.$spacing-gap
+
+			li
+				flex: 1 1 calc(50% - variables.$spacing-gap)
+				width: calc(50% - variables.$spacing-gap)
+				max-width: 100%
+				transition: none
+
+				&:focus-within
+					flex: 1 1 calc(50% - variables.$spacing-gap)
+
+				&:last-child
+					flex: 0 1 25%
+					width: 25%
+					margin-left: auto
+					margin-right: auto
+
+		// Link styles
+		.elementor-link-dimensions,
+		.elementor-link-gaps
+			background-color: variables.$bg-default
+			border: variables.$border-bold
+			border-end-end-radius: variables.$border-radius
+			border-end-start-radius: variables.$border-radius
+			border-inline-start: variables.$border-bold
+			border-start-end-radius: variables.$border-radius
+			border-start-start-radius: variables.$border-radius
+			cursor: pointer
+			outline: none
+			padding: 0
+
+			&:not(.unlinked)
+				background-color: variables.$bg-active-bold
+				border-color: variables.$border-color-bold
+				color: variables.$color-txt-accent
+
+	// Selector container styles
+	.elementor-control-fluid-selector-container:after
+		content: "\e8ad"
+		font-family: eicons
+		font-size: 12px
+		pointer-events: none
+		position: absolute
+		right: 5px
+		top: 50%
+		transform: translateY(-50%)
+		width: initial
+		height: initial

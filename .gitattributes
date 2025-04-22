@@ -1,0 +1,46 @@
+# Files and directories to exclude from export (when someone installs the package via Composer)
+
+# Development configuration
+*.code-workspace export-ignore
+.npmrc export-ignore
+.gitignore export-ignore
+.git export-ignore
+.gitattributes export-ignore
+node_modules export-ignore
+dist export-ignore
+scripts export-ignore
+vendor export-ignore
+__build__ export-ignore
+
+# Testing and documentation
+__tests__ export-ignore
+__e2e__ export-ignore
+tests export-ignore
+docs export-ignore
+coverage export-ignore
+
+# Config files
+/*.yml export-ignore
+/*.yaml export-ignore
+/*.xml export-ignore
+/package.json export-ignore
+/package-lock.json export-ignore
+/*.js export-ignore
+/tsconfig*.json export-ignore
+/jsconfig*.json export-ignore
+/.browserslistrc export-ignore
+/.prettierrc export-ignore
+/.prettierignore export-ignore
+/.tsbuildinfo export-ignore
+
+# Source files not needed in the Composer package
+src/ts export-ignore
+src/js export-ignore
+src/styles export-ignore
+
+# WordPress development files
+project.*.js export-ignore
+
+# Markdown files except README.md
+/*.md export-ignore
+!README.md

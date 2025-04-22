@@ -1,0 +1,79 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "9741bbaa021e576850b3e4f62af334d7",
+    "packages": [
+        {
+            "name": "arts/elementor-extension",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "/Users/art/Projects/Framework/packages/ArtsElementorExtension",
+                "reference": "562dc44824e2caf61c72b241fdf34892576df684"
+            },
+            "require": {
+                "arts/utilities": "^1.0",
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Arts\\ElementorExtension\\": "src/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Artem Semkin",
+                    "email": "art.krsk@gmail.com"
+                }
+            ],
+            "transport-options": {
+                "symlink": false,
+                "relative": false
+            }
+        },
+        {
+            "name": "arts/utilities",
+            "version": "1.1.0",
+            "dist": {
+                "type": "path",
+                "url": "/Users/art/Projects/Framework/packages/ArtsUtilities",
+                "reference": "62603e9b98b7db97d8d15b7039d8d7be1a08f9bb"
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Arts\\Utilities\\": "src/wordpress/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Artem Semkin",
+                    "email": "art.krsk@gmail.com"
+                }
+            ],
+            "description": "Collection of utilities that can be used during theme or plugin development.",
+            "transport-options": {
+                "symlink": false,
+                "relative": false
+            }
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.4"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
+}

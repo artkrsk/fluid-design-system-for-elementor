@@ -1,0 +1,28 @@
+@use 'variables'
+
+.select2-result-fluid-spacing-formatted
+	display: flex
+	flex-direction: column
+	gap: variables.$spacing-tiny
+
+	&__header
+		line-height: 1
+		padding-top: variables.$spacing-small
+
+	&__footer
+		font-size: 80%
+		display: flex
+		align-items: center
+		gap: variables.$spacing-small
+		line-height: 1.05
+		color: variables.$color-txt-muted
+
+	&--inherit
+		font-style: italic
+		color: variables.$color-txt-muted
+
+	&__divider:before
+		content: '@'
+
+	&__size-divider:before
+		content: ' ~ '

@@ -1,0 +1,106 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Run workflow on version tags (v1.0.0, v2.1.3, etc.)
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # This is required for creating releases
+      pull-requests: read # This is needed for the changelog generator
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for changelog generation
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+          # Remove the cache setting until we have a package-lock.json file
+
+      - name: Validate version consistency
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          PLUGIN_VERSION=$(grep -m 1 "Version:" src/wordpress-plugin/fluid-design-system-for-elementor.php | awk '{print $3}')
+          README_VERSION=$(grep "Stable tag:" src/wordpress-plugin/readme.txt | awk '{print $3}')
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          echo "Tag version: $TAG_VERSION"
+          echo "Plugin version: $PLUGIN_VERSION"
+          echo "Readme version: $README_VERSION"
+          echo "Package.json version: $PACKAGE_VERSION"
+
+          if [ "$TAG_VERSION" != "$PLUGIN_VERSION" ] || [ "$TAG_VERSION" != "$README_VERSION" ] || [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "❌ Version mismatch detected!"
+            exit 1
+          fi
+
+          echo "✅ All versions match: $TAG_VERSION"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          # If this is the first tag, don't use --since-tag
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+            echo "## 🚀 Initial Release" >> $GITHUB_ENV
+            echo "" >> $GITHUB_ENV
+            echo "* Created Fluid Design System for Elementor plugin" >> $GITHUB_ENV
+            echo "* Added fluid spacing utilities" >> $GITHUB_ENV
+            echo "* Added fluid typography capabilities" >> $GITHUB_ENV
+            echo "* Integrated with Elementor's responsive system" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+            echo "## What's Changed Since $PREVIOUS_TAG" >> $GITHUB_ENV
+            echo "" >> $GITHUB_ENV
+            git log --pretty=format:"* %s" $PREVIOUS_TAG..HEAD | grep -v "Merge" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/fluid-design-system-for-elementor.zip
+          draft: false
+          prerelease: false
+          name: Release ${{ github.ref_name }}
+          body: |
+            # Fluid Design System for Elementor ${{ github.ref_name }}
+
+            ${{ env.CHANGELOG }}
+
+            ## Installation
+            Download the zip file and install via WordPress plugin manager or extract to wp-content/plugins.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify build output (for local testing)
+        if: steps.create_release.outcome != 'success'
+        run: |
+          echo "✅ Build completed successfully. ZIP file created at dist/fluid-design-system-for-elementor.zip"
+          echo "Note: GitHub release step was skipped in local testing."
+
+      # Uncomment this section if you want to deploy to WordPress.org
+      # - name: WordPress Plugin Deploy
+      #   if: success() && !contains(github.ref, '-rc') && !contains(github.ref, '-beta') && !contains(github.ref, '-alpha')
+      #   uses: 10up/action-wordpress-plugin-deploy@stable
+      #   env:
+      #     SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+      #     SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+      #     SLUG: fluid-design-system-for-elementor
