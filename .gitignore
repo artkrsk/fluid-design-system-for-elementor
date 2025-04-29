@@ -70,9 +70,6 @@ next-env.d.ts
 *.tmp
 *.temp
 
-# Assets files
-__assets__
-
 # WordPress specific
 /src/php/libraries/*
 
