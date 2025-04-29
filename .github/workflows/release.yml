@@ -181,7 +181,7 @@ jobs:
 
       # Save the built ZIP file as an artifact for the WordPress deployment job
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: plugin-zip
           path: dist/fluid-design-system-for-elementor.zip
@@ -198,7 +198,7 @@ jobs:
 
       # Download the plugin ZIP artifact from the previous job
       - name: Download plugin ZIP
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: plugin-zip
           path: dist/
