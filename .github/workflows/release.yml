@@ -6,7 +6,62 @@ on:
       - 'v*' # Run workflow on version tags (v1.0.0, v2.1.3, etc.)
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for changelog generation
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Build project
+        run: npm run build
+        env:
+          DEBUG: '1'
+
+      - name: Examine ZIP contents on failure
+        if: ${{ failure() }}
+        run: |
+          echo "Checking if ZIP file exists..."
+          if [ -f "dist/fluid-design-system-for-elementor.zip" ]; then
+            echo "✅ ZIP file exists"
+            echo "Listing ZIP contents:"
+            unzip -l dist/fluid-design-system-for-elementor.zip
+            
+            echo "Extracting ZIP to check structure..."
+            mkdir -p /tmp/zip-check
+            unzip -q dist/fluid-design-system-for-elementor.zip -d /tmp/zip-check
+            
+            echo "Checking for vendor/autoload.php..."
+            if [ -f "/tmp/zip-check/fluid-design-system-for-elementor/vendor/autoload.php" ]; then
+              echo "✅ vendor/autoload.php exists in ZIP"
+            else
+              echo "❌ vendor/autoload.php missing from ZIP"
+              echo "Directory structure:"
+              find /tmp/zip-check -type f | grep -i vendor || echo "No vendor files found"
+            fi
+          else
+            echo "❌ ZIP file not found at dist/fluid-design-system-for-elementor.zip"
+          fi
+
+      - name: Validate plugin structure
+        run: bash __tests__/validate-zip.sh
+        env:
+          DEBUG: '1'
+
   build_and_release:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: write # This is required for creating releases
@@ -21,7 +76,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '23'
-          # Remove the cache setting until we have a package-lock.json file
 
       - name: Validate version consistency
         run: |
@@ -45,8 +99,37 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Build project
         run: npm run build
+
+      - name: Verify vendor directory in ZIP
+        run: |
+          echo "Checking ZIP file contents..."
+          unzip -l dist/fluid-design-system-for-elementor.zip | grep "vendor/autoload.php" || {
+            echo "ERROR: vendor/autoload.php not found in ZIP file!"
+            echo "Listing ZIP contents..."
+            unzip -l dist/fluid-design-system-for-elementor.zip
+            
+            echo "Checking if vendor directory exists in project..."
+            if [ -d "vendor" ]; then
+              echo "Vendor directory exists in project:"
+              ls -la vendor
+              
+              if [ -f "vendor/autoload.php" ]; then
+                echo "vendor/autoload.php exists in project."
+              else
+                echo "vendor/autoload.php DOES NOT exist in project!"
+              fi
+            else
+              echo "Vendor directory DOES NOT exist in project!"
+            fi
+            
+            exit 1
+          }
+          echo "✅ vendor/autoload.php found in ZIP file"
 
       - name: Generate changelog
         id: changelog

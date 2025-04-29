@@ -44,9 +44,9 @@ class Compatibility extends BaseManager {
 	public function elementor_enqueue_editor_scripts() {
 		wp_enqueue_script(
 			$this->handle,
-			esc_url( $this->plugin_dir_url . 'libraries/arts-fluid-design-system/index.umd.js' ),
+			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/arts-fluid-design-system/index.umd.js' ),
 			array(),
-			ARTS_FLUID_DS_PLUGIN_VERSION,
+			defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) ? ARTS_FLUID_DS_PLUGIN_VERSION : false,
 			true
 		);
 
@@ -70,9 +70,9 @@ class Compatibility extends BaseManager {
 	public function elementor_enqueue_editor_styles() {
 		wp_enqueue_style(
 			$this->handle,
-			esc_url( $this->plugin_dir_url . 'libraries/arts-fluid-design-system/index.css' ),
+			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/arts-fluid-design-system/index.css' ),
 			array(),
-			ARTS_FLUID_DS_PLUGIN_VERSION
+			defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) ? ARTS_FLUID_DS_PLUGIN_VERSION : false
 		);
 	}
 

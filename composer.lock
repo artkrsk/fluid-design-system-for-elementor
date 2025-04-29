@@ -4,65 +4,99 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9741bbaa021e576850b3e4f62af334d7",
+    "content-hash": "231377f7664799134cdb348b26c414df",
     "packages": [
         {
             "name": "arts/elementor-extension",
-            "version": "1.0.0",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/artkrsk/arts-elementor-extension.git",
+                "reference": "b2f7cf3e3035283793d83e3cfa878dcb22e25c4c"
+            },
             "dist": {
-                "type": "path",
-                "url": "/Users/art/Projects/Framework/packages/ArtsElementorExtension",
-                "reference": "562dc44824e2caf61c72b241fdf34892576df684"
+                "type": "zip",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/b2f7cf3e3035283793d83e3cfa878dcb22e25c4c",
+                "reference": "b2f7cf3e3035283793d83e3cfa878dcb22e25c4c",
+                "shasum": ""
             },
             "require": {
-                "arts/utilities": "^1.0",
+                "arts/utilities": "*",
                 "php": ">=7.4"
+            },
+            "require-dev": {
+                "brain/monkey": "^2.6",
+                "phpunit/phpunit": "^9.6",
+                "yoast/phpunit-polyfills": "^4.0"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Arts\\ElementorExtension\\": "src/"
+                    "Arts\\ElementorExtension\\": "src/php/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
                     "name": "Artem Semkin",
-                    "email": "art.krsk@gmail.com"
+                    "email": "me@artemsemkin.com"
                 }
             ],
-            "transport-options": {
-                "symlink": false,
-                "relative": false
-            }
+            "description": "WordPress library",
+            "support": {
+                "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
+                "source": "https://github.com/artkrsk/arts-elementor-extension/tree/v1.0.1"
+            },
+            "time": "2025-04-28T13:23:51+00:00"
         },
         {
             "name": "arts/utilities",
-            "version": "1.1.0",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/artkrsk/arts-utilities.git",
+                "reference": "c5c7747f6a45b481e9e2210a26caee9e43c2a8ec"
+            },
             "dist": {
-                "type": "path",
-                "url": "/Users/art/Projects/Framework/packages/ArtsUtilities",
-                "reference": "62603e9b98b7db97d8d15b7039d8d7be1a08f9bb"
+                "type": "zip",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/c5c7747f6a45b481e9e2210a26caee9e43c2a8ec",
+                "reference": "c5c7747f6a45b481e9e2210a26caee9e43c2a8ec",
+                "shasum": ""
             },
             "require": {
-                "php": ">=7.4"
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "antecedent/patchwork": "^2.1",
+                "brain/monkey": "^2.6",
+                "phpunit/phpunit": "^9.6",
+                "yoast/phpunit-polyfills": "^4.0"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Arts\\Utilities\\": "src/wordpress/"
+                    "Arts\\Utilities\\": "src/php/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
                     "name": "Artem Semkin",
-                    "email": "art.krsk@gmail.com"
+                    "email": "me@artemsemkin.com"
                 }
             ],
-            "description": "Collection of utilities that can be used during theme or plugin development.",
-            "transport-options": {
-                "symlink": false,
-                "relative": false
-            }
+            "description": "A comprehensive collection of utility methods for WordPress theme and plugin development, with a focus on Elementor integration.",
+            "support": {
+                "issues": "https://github.com/artkrsk/arts-utilities/issues",
+                "source": "https://github.com/artkrsk/arts-utilities/tree/v1.0.0"
+            },
+            "time": "2025-04-23T13:27:32+00:00"
         }
     ],
     "packages-dev": [],

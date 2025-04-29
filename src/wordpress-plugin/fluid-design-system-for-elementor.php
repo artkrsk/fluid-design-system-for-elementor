@@ -31,16 +31,4 @@ define( 'ARTS_FLUID_DS_PLUGIN_FILE', $plugin_file );
 define( 'ARTS_FLUID_DS_PLUGIN_PATH', untrailingslashit( plugin_dir_path( $plugin_file ) ) );
 define( 'ARTS_FLUID_DS_PLUGIN_URL', untrailingslashit( plugin_dir_url( $plugin_file ) ) );
 
-add_action( 'init', 'arts_fluid_ds_load_textdomain' );
-/**
- * Load the plugin text domain
- *
- * @since 1.0.0
- *
- * @return void
- */
-function arts_fluid_ds_load_textdomain() {
-	load_plugin_textdomain( 'fluid-design-system-for-elementor' );
-}
-
 Plugin::instance();

@@ -20,6 +20,7 @@ class Logger {
     this.level = options.level || LogLevel.INFO
     this.timestamps = options.timestamps !== false
     this.useColors = options.colors !== false
+    this.useLocalTime = options.useLocalTime !== false
   }
 
   /**
@@ -30,9 +31,27 @@ class Logger {
    * @returns {string} Formatted log message
    */
   format(level, message, context) {
-    const timestamp = this.timestamps ? `[${new Date().toISOString()}] ` : ''
+    const timestamp = this.timestamps ? this.getTimestamp() : ''
     const contextStr = context ? `[${context}] ` : ''
     return `${timestamp}${level} ${contextStr}${message}`
+  }
+
+  /**
+   * Get a human-readable timestamp
+   * @returns {string} Formatted timestamp
+   */
+  getTimestamp() {
+    const now = new Date()
+
+    // Format as YYYY-MM-DD HH:MM:SS in local timezone
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+    const seconds = String(now.getSeconds()).padStart(2, '0')
+
+    return `[${year}-${month}-${day} ${hours}:${minutes}:${seconds}] `
   }
 
   /**
@@ -44,7 +63,7 @@ class Logger {
     if (this.level < LogLevel.ERROR) return
 
     const errorMsg = this.format('ERROR', message)
-    console.error(this.useColors ? chalk.red(errorMsg) : errorMsg)
+    console.error(this.useColors ? chalk.red.bold(errorMsg) : errorMsg)
 
     if (error) {
       if (error instanceof Error) {
@@ -90,7 +109,7 @@ class Logger {
     if (this.level < LogLevel.INFO) return
 
     const successMsg = this.format('SUCCESS', message, context)
-    console.info(this.useColors ? chalk.green(successMsg) : successMsg)
+    console.info(this.useColors ? chalk.green.bold(successMsg) : successMsg)
   }
 
   /**
@@ -128,7 +147,7 @@ class Logger {
       return await fn()
     }
 
-    console.group(this.useColors ? chalk.magenta(label) : label)
+    console.group(this.useColors ? chalk.magenta.bold(label) : label)
     try {
       const result = await fn()
       console.groupEnd()
@@ -141,7 +160,9 @@ class Logger {
 }
 
 // Create and export default logger instance
-export const logger = new Logger()
+export const logger = new Logger({
+  useLocalTime: true
+})
 
 // Export the Logger class for custom instantiation
 export { Logger }

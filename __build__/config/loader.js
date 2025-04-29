@@ -19,27 +19,38 @@ export async function loadConfig(projectRoot, env = DEFAULT_ENV) {
   try {
     logger.info(`Loading configuration for ${env} environment...`)
 
+    // Ensure we have absolute paths
+    const absoluteProjectRoot = path.isAbsolute(projectRoot)
+      ? projectRoot
+      : path.resolve(process.cwd(), projectRoot)
+
     // Load base configuration
-    const configPath = path.join(projectRoot, CONFIG_FILENAME)
+    const configPath = path.join(absoluteProjectRoot, CONFIG_FILENAME)
     if (!(await fs.pathExists(configPath))) {
       throw new Error(`Configuration file not found: ${configPath}`)
     }
 
-    const baseConfig = (await import(configPath)).default
+    // Use file:// URL format for dynamic imports to ensure they work with symlinks
+    const configFileUrl = new URL(`file://${configPath}`).href
+    const baseConfig = (await import(configFileUrl)).default
 
     // Load environment-specific configuration
-    const envConfigPath = path.join(projectRoot, `project.${env}.js`)
+    const envConfigPath = path.join(absoluteProjectRoot, `project.${env}.js`)
     if (!(await fs.pathExists(envConfigPath))) {
       throw new Error(`Environment configuration not found: ${envConfigPath}`)
     }
 
-    const envConfig = (await import(envConfigPath)).default
+    const envConfigFileUrl = new URL(`file://${envConfigPath}`).href
+    const envConfig = (await import(envConfigFileUrl)).default
 
     // Apply environment config to base config
     const mergedConfig = envConfig(baseConfig)
 
     // Set environment in config
     mergedConfig.currentEnvironment = env
+
+    // Store the absolute project root in the config for reference
+    mergedConfig._absoluteProjectRoot = absoluteProjectRoot
 
     logger.success(`Loaded configuration for ${env} environment`)
     return mergedConfig

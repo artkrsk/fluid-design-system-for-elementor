@@ -1,8 +1,25 @@
 import path from 'path'
+import process from 'process'
 
 /**
  * Path utility functions for the build system
  */
+
+/**
+ * Resolve a path that might be relative to the project root
+ * @param {Object} config - Project configuration
+ * @param {string} relativePath - Path that may be relative
+ * @returns {string} Absolute path
+ */
+export function resolveProjectPath(config, relativePath) {
+  if (path.isAbsolute(relativePath)) {
+    return relativePath
+  }
+
+  // Use the stored absolute project root if available
+  const projectRoot = config._absoluteProjectRoot || process.cwd()
+  return path.resolve(projectRoot, relativePath)
+}
 
 /**
  * Get the library directory path based on environment
@@ -13,15 +30,36 @@ import path from 'path'
 export function getLibraryDir(config, isDev = config.currentEnvironment === 'development') {
   if (isDev && config.wordpressPlugin.target) {
     // In development, use the WordPress plugin target directory
-    return path.join(config.wordpressPlugin.target, config.paths.library.assets)
+    return path.join(
+      resolveProjectPath(config, config.wordpressPlugin.target),
+      config.paths.library.assets
+    )
   } else {
+    // If direct library path is available, use it
+    if (config.paths.library.directPath) {
+      return resolveProjectPath(config, config.paths.library.directPath)
+    }
+
     // In production, use the dist directory with correct plugin structure
     return path.join(
-      config.paths.dist,
+      resolveProjectPath(config, config.paths.dist),
       config.wordpressPlugin.packageName,
       config.paths.library.assets
     )
   }
+}
+
+/**
+ * Get direct library path for assets
+ * @param {Object} config - Project configuration
+ * @returns {string|null} The direct library path or null if not configured
+ */
+export function getDirectLibraryPath(config) {
+  return path.resolve(
+    resolveProjectPath(config, config.paths.php),
+    config.paths.library.base,
+    config.paths.library.name
+  )
 }
 
 /**
@@ -31,7 +69,7 @@ export function getLibraryDir(config, isDev = config.currentEnvironment === 'dev
  * @returns {string} The path to the plugin file or directory
  */
 export function getPluginPath(config, subpath = '') {
-  return path.join(config.paths.wordpress.plugin, subpath)
+  return path.join(resolveProjectPath(config, config.paths.wordpress.plugin), subpath)
 }
 
 /**
@@ -51,7 +89,16 @@ export function getPluginMainFile(config) {
  * @returns {string} The path to the dist directory or file
  */
 export function getDistPath(config, subpath = '') {
-  return path.join(config.paths.dist, subpath)
+  return path.join(resolveProjectPath(config, config.paths.dist), subpath)
+}
+
+/**
+ * Should create dist folder based on config
+ * @param {Object} config - Project configuration
+ * @returns {boolean} Whether to create the dist folder
+ */
+export function shouldCreateDistFolder(config) {
+  return config.build.createDistFolder !== false
 }
 
 /**
@@ -62,9 +109,12 @@ export function getDistPath(config, subpath = '') {
  */
 export function getPluginDestPath(config, isDev = config.currentEnvironment === 'development') {
   if (isDev && config.wordpressPlugin.target) {
-    return config.wordpressPlugin.target
+    return resolveProjectPath(config, config.wordpressPlugin.target)
   } else {
-    return path.join(config.paths.dist, config.wordpressPlugin.packageName)
+    return path.join(
+      resolveProjectPath(config, config.paths.dist),
+      config.wordpressPlugin.packageName
+    )
   }
 }
 
@@ -80,11 +130,40 @@ export function getOutputFilePath(config, format) {
   return getDistPath(config, outputFileName)
 }
 
+/**
+ * Get direct library output path for JS
+ * @param {Object} config - Project configuration
+ * @returns {string|null} Direct output path or null
+ */
+export function getDirectJsOutputPath(config) {
+  const libraryDir = getDirectLibraryPath(config)
+  return path.join(libraryDir, 'index.umd.js')
+}
+
+/**
+ * Get direct library output path for CSS
+ * @param {Object} config - Project configuration
+ * @returns {string|null} Direct output path or null
+ */
+export function getDirectCssOutputPath(config) {
+  if (config.sass.libraryOutput) {
+    return resolveProjectPath(config, config.sass.libraryOutput)
+  }
+
+  const libraryDir = getDirectLibraryPath(config)
+  return path.join(libraryDir, 'index.css')
+}
+
 export default {
+  resolveProjectPath,
   getLibraryDir,
   getPluginPath,
   getPluginMainFile,
   getDistPath,
   getPluginDestPath,
-  getOutputFilePath
+  getOutputFilePath,
+  getDirectLibraryPath,
+  getDirectJsOutputPath,
+  getDirectCssOutputPath,
+  shouldCreateDistFolder
 }

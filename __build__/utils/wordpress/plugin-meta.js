@@ -37,9 +37,12 @@ export async function updatePluginMeta(config) {
   logger.info('Updating plugin metadata...')
 
   try {
+    // Use project root from config or fall back to current working directory
+    const projectRoot = config._absoluteProjectRoot || process.cwd()
+
     // Read composer.json, package.json
-    const composerFile = path.join(process.cwd(), 'composer.json')
-    const packageFile = path.join(process.cwd(), 'package.json')
+    const composerFile = path.join(projectRoot, 'composer.json')
+    const packageFile = path.join(projectRoot, 'package.json')
 
     if (!(await fs.pathExists(composerFile))) {
       logger.warn('composer.json not found, skipping plugin metadata update')
@@ -254,14 +257,16 @@ async function updateReadmeFile(filePath, metaData) {
  * @returns {Object} - Watcher instance
  */
 export async function watchComposerJson(config) {
-  const composerFile = path.join(process.cwd(), 'composer.json')
-  const composerLockFile = path.join(process.cwd(), 'composer.lock')
+  // Use project root from config or fall back to current working directory
+  const projectRoot = config._absoluteProjectRoot || process.cwd()
+  const composerFile = path.join(projectRoot, 'composer.json')
+  const composerLockFile = path.join(projectRoot, 'composer.lock')
 
   logger.info('Watching composer files for changes...')
 
   // Create debounced update function
   const debouncedUpdate = debounce(async (filePath) => {
-    logger.info(`Composer file changed: ${path.relative(process.cwd(), filePath)}`)
+    logger.info(`Composer file changed: ${path.relative(projectRoot, filePath)}`)
 
     try {
       await updatePluginMeta(config)

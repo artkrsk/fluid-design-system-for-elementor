@@ -6,7 +6,12 @@ import debounce from 'debounce'
 import { logger } from '../../logger/index.js'
 import { generateBanner, wrapAsUmd } from '../common/banner.js'
 import { getPackageMetadata } from '../common/version.js'
-import { getLibraryDir, getOutputFilePath } from '../common/paths.js'
+import {
+  getLibraryDir,
+  getOutputFilePath,
+  getDirectJsOutputPath,
+  shouldCreateDistFolder
+} from '../common/paths.js'
 import { isDevelopment } from '../../config/index.js'
 
 /**
@@ -15,18 +20,37 @@ import { isDevelopment } from '../../config/index.js'
  * @returns {Promise<void>}
  */
 export async function compileJavaScript(config) {
-  logger.info('Compiling JavaScript...')
+  logger.info('🔧 Compiling JavaScript...')
 
   const isDev = isDevelopment(config)
-  const formats = isDev ? ['iife'] : config.build.formats
+  const shouldCreateDist = shouldCreateDistFolder(config)
+
+  // Only include non-IIFE formats if we're creating a dist folder
+  const formats = isDev ? ['iife'] : shouldCreateDist ? config.build.formats : ['iife'] // Only build IIFE format when not creating dist folder
 
   try {
     const packageMetadata = await getPackageMetadata(config)
 
+    // Process each format
     for (const format of formats) {
-      logger.debug(`Building ${format} format...`)
+      logger.debug(`⚙️ Building ${format} format...`)
 
-      const outputFile = getOutputFilePath(config, format)
+      // Skip non-IIFE formats if we're not creating a dist folder
+      if (format !== 'iife' && !shouldCreateDist) {
+        logger.debug(`⏩ Skipping ${format} format (dist folder disabled)`)
+        continue
+      }
+
+      // Determine output file based on format and dist folder setting
+      let outputFile
+      if (format === 'iife') {
+        // Always use direct library path for IIFE builds
+        outputFile = getDirectJsOutputPath(config)
+      } else {
+        // Only use dist path for other formats when dist folder is enabled
+        outputFile = getOutputFilePath(config, format)
+      }
+
       const outputDir = path.dirname(outputFile)
 
       // Ensure output directory exists
@@ -66,19 +90,20 @@ export async function compileJavaScript(config) {
       // For IIFE builds, wrap the output in a UMD wrapper
       if (format === 'iife') {
         await wrapJsAsUmd(outputFile, config, packageMetadata)
-      }
+        logger.success(`✅ JavaScript IIFE build completed: ${outputFile}`)
 
-      logger.success(`JavaScript ${format} build completed: ${outputFile}`)
-
-      // Copy to PHP libraries if it's an IIFE build
-      if (format === 'iife') {
-        await copyUmdToLibrary(outputFile, config, isDev)
+        // Copy to PHP libraries if we're using dist and not already built to direct path
+        if (shouldCreateDist) {
+          await copyUmdToLibrary(outputFile, config, isDev)
+        }
+      } else {
+        logger.success(`✅ JavaScript ${format} build completed: ${outputFile}`)
       }
     }
 
-    logger.success('JavaScript compilation completed')
+    logger.success('🎉 JavaScript compilation completed')
   } catch (error) {
-    logger.error('JavaScript compilation failed:', error)
+    logger.error('❌ JavaScript compilation failed:', error)
     throw error
   }
 }
@@ -109,9 +134,19 @@ async function wrapJsAsUmd(outputFile, config, packageMetadata) {
  * @returns {Promise<void>}
  */
 async function copyUmdToLibrary(outputFile, config, isDev) {
+  // Skip if we're using direct path already
+  const directPath = getDirectJsOutputPath(config)
+  if (outputFile === directPath) {
+    return
+  }
+
   // Get library directory
   const libraryDir = getLibraryDir(config, isDev)
+
+  // Ensure dir exists
   await fs.ensureDir(libraryDir)
+
+  logger.debug(`📂 Copying UMD build to library: ${libraryDir}`)
 
   // Copy main file
   await fs.copyFile(outputFile, path.join(libraryDir, path.basename(outputFile)))
@@ -124,7 +159,7 @@ async function copyUmdToLibrary(outputFile, config, isDev) {
     )
   }
 
-  logger.debug(`Copied UMD build to PHP libraries`)
+  logger.debug(`📂 Copied UMD build to PHP libraries`)
 }
 
 /**
@@ -136,22 +171,23 @@ async function copyUmdToLibrary(outputFile, config, isDev) {
 export async function watchJavaScript(config, liveReloadServer) {
   const jsDir = path.resolve(config.paths.js)
 
-  logger.info(`Watching JavaScript files in ${path.relative(process.cwd(), jsDir)}`)
+  logger.info(`👀 Watching JavaScript files in ${path.relative(process.cwd(), jsDir)}`)
 
   // Create debounced build function
   const debouncedBuild = debounce(async (filePath) => {
-    logger.info(`JavaScript file changed: ${path.relative(process.cwd(), filePath)}`)
+    logger.info(`🔄 JavaScript file changed: ${path.relative(process.cwd(), filePath)}`)
 
     try {
       await compileJavaScript(config)
 
       // Notify live reload server
       if (liveReloadServer) {
-        const iifeFile = getOutputFilePath(config, 'iife')
-        liveReloadServer.notifyChange(iifeFile)
+        // Use direct path for notification
+        const jsFile = getDirectJsOutputPath(config)
+        liveReloadServer.notifyChange(jsFile)
       }
     } catch (error) {
-      logger.error('Failed to rebuild JavaScript files:', error)
+      logger.error('❌ Failed to rebuild JavaScript files:', error)
     }
   }, 300)
 
@@ -164,7 +200,7 @@ export async function watchJavaScript(config, liveReloadServer) {
 
   watcher.on('change', debouncedBuild)
   watcher.on('error', (error) => {
-    logger.error(`JavaScript watcher error:`, error)
+    logger.error(`❌ JavaScript watcher error:`, error)
   })
 
   return watcher

@@ -2,12 +2,11 @@
   "name": "arts/fluid-design-system",
   "description": "Fluid spacing and typography units for Elementor",
   "type": "wordpress-plugin",
-  "version": "1.0.0",
   "license": "GPL-3.0-or-later",
   "authors": [
     {
       "name": "Artem Semkin",
-      "email": "artem@artemsemkin.com",
+      "email": "me@artemsemkin.com",
       "homepage": "https://artemsemkin.com"
     }
   ],
@@ -26,11 +25,13 @@
     "License URI": "https://www.gnu.org/licenses/gpl-3.0"
   },
   "require": {
-    "php": ">=7.4"
+    "php": ">=7.4",
+    "arts/elementor-extension": "*",
+    "arts/utilities": "*"
   },
   "autoload": {
     "psr-4": {
-      "Arts\\FluidDesignSystem\\": "src/php/libraries/arts-fluid-design-system/php/"
+      "Arts\\FluidDesignSystem\\": "src/php/"
     }
   },
   "minimum-stability": "stable"

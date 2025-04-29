@@ -9,24 +9,62 @@ import { isFeatureEnabled } from '../../config/index.js'
  */
 export async function startLiveReloadServer(config) {
   if (!isFeatureEnabled(config, 'liveReload')) {
-    logger.info('Live reload is disabled, skipping')
+    logger.info('🚫 Live reload is disabled, skipping')
     return null
   }
 
-  logger.info('Starting live reload server...')
+  logger.info('🔄 Starting live reload server...')
 
   try {
-    // Create browser-sync instance
+    // Completely silence Browser-Sync console output by redirecting its logging
+    // Save original console methods
+    const originalConsole = {
+      log: console.log,
+      info: console.info,
+      warn: console.warn,
+      error: console.error,
+      debug: console.debug
+    }
+
+    // Create a browser-sync instance
     const bs = browserSync.create()
 
-    // Configure browser-sync
+    // Temporarily silence console during initialization
+    const silenceConsole = () => {
+      console.log = () => {}
+      console.info = () => {}
+      console.warn = () => {}
+      console.debug = () => {}
+      // Keep error for important issues
+      console.error = (...args) => {
+        if (args.length > 0 && typeof args[0] === 'string' && args[0].includes('Browsersync')) {
+          // Still log browser-sync errors to our logger
+          logger.error('❌ Browser-sync error: ' + args.join(' '))
+        }
+      }
+    }
+
+    // Restore console to original state
+    const restoreConsole = () => {
+      console.log = originalConsole.log
+      console.info = originalConsole.info
+      console.warn = originalConsole.warn
+      console.error = originalConsole.error
+      console.debug = originalConsole.debug
+    }
+
+    // Configure browser-sync with minimum possible logging
     const bsConfig = {
-      logLevel: config.liveReload.logLevel || 'silent',
-      logPrefix: 'LiveReload',
+      // Completely silence browser-sync logging
+      logLevel: 'silent',
+      logPrefix: false,
       port: config.liveReload.port || 3000,
       host: config.liveReload.host || 'localhost',
       https: config.liveReload.https || false,
-      notify: config.liveReload.notify !== false,
+
+      // Disable all notifications
+      notify: false,
+
       reloadDebounce: config.liveReload.reloadDebounce || 500,
       reloadThrottle: config.liveReload.reloadThrottle || 1000,
       injectChanges: config.liveReload.injectChanges !== false,
@@ -35,27 +73,60 @@ export async function startLiveReloadServer(config) {
         forms: false,
         scroll: false
       },
+
+      // Disable UI
       ui: false,
-      open: config.liveReload.open || false,
-      snippet: config.liveReload.snippet !== false
+      open: false,
+
+      // Hide all output
+      logSnippet: false,
+      logConnections: false,
+      logFileChanges: false,
+
+      // Debug mode off
+      debug: false,
+
+      // Silence middleware logging
+      middleware: [],
+
+      // Other options to minimize output
+      online: true,
+      tunnel: false
     }
 
-    // Log protocol being used
+    // Override snippet option if specified in config
+    if (config.liveReload.snippet === false) {
+      bsConfig.snippet = false
+    }
+
+    // Add custom notify styles if configured (but still keep notifications off by default)
+    if (config.liveReload.notify === true) {
+      bsConfig.notify = config.liveReload.notify.styles || true
+    }
+
+    // Log protocol being used to our own logger
     const protocol = bsConfig.https ? 'https' : 'http'
-    logger.debug(`Using ${protocol} protocol for live reload`)
+    logger.debug(`📡 Using ${protocol} protocol for live reload`)
 
-    // Add custom notify styles if configured
-    if (config.liveReload.notify && config.liveReload.notify.styles) {
-      bsConfig.notify = {
-        styles: config.liveReload.notify.styles
-      }
-    }
+    // Silence console, initialize browser-sync, then restore console
+    silenceConsole()
 
-    // Initialize browser-sync
-    bs.init(bsConfig, () => {
-      logger.success(
-        `Live reload server started at ${protocol}://${config.liveReload.host}:${config.liveReload.port}`
-      )
+    // Wrap initialization in a promise to ensure we restore console
+    await new Promise((resolve) => {
+      bs.init(bsConfig, () => {
+        // Success callback - restore console, then log success
+        restoreConsole()
+        logger.success(
+          `✅ Live reload server started at ${protocol}://${config.liveReload.host}:${config.liveReload.port}`
+        )
+        resolve()
+      })
+
+      // Safety timeout to restore console even if browser-sync fails to initialize
+      setTimeout(() => {
+        restoreConsole()
+        resolve()
+      }, 2000)
     })
 
     // Create a wrapper for the browser-sync instance
@@ -65,7 +136,10 @@ export async function startLiveReloadServer(config) {
        * @param {string} filePath - Path to the changed file
        */
       notifyChange: (filePath) => {
-        logger.debug(`Notifying live reload server of change: ${filePath}`)
+        logger.debug(`🔄 Live reloading: ${filePath}`)
+
+        // Silence console, reload, then restore
+        silenceConsole()
 
         // Determine reload method based on file extension
         const ext = filePath.split('.').pop().toLowerCase()
@@ -77,6 +151,8 @@ export async function startLiveReloadServer(config) {
           // Full page reload for other file types
           bs.reload()
         }
+
+        restoreConsole()
       },
 
       /**
@@ -84,13 +160,15 @@ export async function startLiveReloadServer(config) {
        */
       close: () => {
         if (bs && bs.active) {
+          silenceConsole()
           bs.exit()
-          logger.info('Live reload server stopped')
+          restoreConsole()
+          logger.info('🔄 Live reload server stopped')
         }
       }
     }
   } catch (error) {
-    logger.error('Failed to start live reload server:', error)
+    logger.error('❌ Failed to start live reload server:', error)
     return null
   }
 }

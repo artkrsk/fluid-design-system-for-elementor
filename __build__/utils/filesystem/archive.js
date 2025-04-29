@@ -3,6 +3,7 @@ import path from 'path'
 import archiver from 'archiver'
 import { logger } from '../../logger/index.js'
 import { isFeatureEnabled } from '../../config/index.js'
+import { shouldCreateDistFolder } from '../common/paths.js'
 
 /**
  * Create a ZIP archive of the WordPress plugin
@@ -12,6 +13,11 @@ import { isFeatureEnabled } from '../../config/index.js'
 export async function createZipArchive(config) {
   if (!isFeatureEnabled(config, 'wordpressPlugin')) {
     logger.info('WordPress plugin packaging is disabled, skipping ZIP creation')
+    return
+  }
+
+  if (!shouldCreateDistFolder(config)) {
+    logger.info('Dist folder creation is disabled, skipping ZIP creation')
     return
   }
 

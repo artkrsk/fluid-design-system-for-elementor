@@ -1,0 +1,140 @@
+name: Deploy to WordPress.org
+on:
+  workflow_run:
+    workflows: ['Create Release']
+    types: [completed]
+    branches:
+      - main
+
+jobs:
+  deploy:
+    # Only run if the release workflow was successful
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history and tags
+
+      # Get the tag name from the previous workflow
+      - name: Get tag name
+        id: get-tag
+        run: |
+          # Get the most recent tag
+          TAG_NAME=$(git describe --tags --abbrev=0)
+          if [[ "$TAG_NAME" == v* ]]; then
+            # Remove the 'v' prefix if present
+            TAG_NAME="${TAG_NAME#v}"
+          fi
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+          echo "Tag name: $TAG_NAME"
+
+      # Ensure the plugin ZIP exists
+      - name: Verify release artifacts
+        run: |
+          # Check if the plugin ZIP file exists
+          if [ ! -f "dist/fluid-design-system-for-elementor.zip" ]; then
+            echo "::error::Plugin ZIP file not found. The release workflow may not have created it correctly."
+            exit 1
+          fi
+          echo "Plugin ZIP file found."
+
+      # Extract the ZIP file
+      - name: Extract plugin
+        run: |
+          mkdir -p /tmp/plugin
+          unzip -q dist/fluid-design-system-for-elementor.zip -d /tmp/plugin
+          ls -la /tmp/plugin
+
+      # Setup SVN
+      - name: Setup SVN
+        run: |
+          # Install SVN if not already installed
+          which svn || apt-get update && apt-get install -y subversion
+
+      # Checkout the SVN repository
+      - name: Checkout SVN repository
+        run: |
+          # Create a clean SVN checkout
+          mkdir -p /tmp/svn
+          svn checkout --non-interactive --trust-server-cert --username=${{ secrets.SVN_USERNAME }} --password=${{ secrets.SVN_PASSWORD }} https://plugins.svn.wordpress.org/fluid-design-system-for-elementor/ /tmp/svn
+
+          # Create directories if they don't exist
+          mkdir -p /tmp/svn/trunk
+          mkdir -p /tmp/svn/assets
+          mkdir -p "/tmp/svn/tags/${{ env.TAG_NAME }}"
+
+      # Update trunk
+      - name: Update trunk
+        run: |
+          echo "Updating trunk..."
+
+          # Empty trunk directory
+          rm -rf /tmp/svn/trunk/*
+
+          # Copy plugin files to trunk
+          cp -R /tmp/plugin/fluid-design-system-for-elementor/* /tmp/svn/trunk/
+
+          echo "Trunk updated."
+
+      # Update the tag
+      - name: Update tag
+        run: |
+          echo "Updating tag ${{ env.TAG_NAME }}..."
+
+          # Delete the tag directory if it exists
+          if [ -d "/tmp/svn/tags/${{ env.TAG_NAME }}" ]; then
+            rm -rf "/tmp/svn/tags/${{ env.TAG_NAME }}"
+          fi
+
+          # Create the tag directory
+          mkdir -p "/tmp/svn/tags/${{ env.TAG_NAME }}"
+
+          # Copy trunk to tag
+          cp -R /tmp/svn/trunk/* "/tmp/svn/tags/${{ env.TAG_NAME }}"
+
+          echo "Tag updated."
+
+      # Update assets
+      - name: Update assets
+        run: |
+          echo "Updating assets..."
+
+          # Check if assets directory exists in the repo
+          if [ -d "__assets__" ]; then
+            # Empty assets directory in SVN
+            rm -rf /tmp/svn/assets/*
+            
+            # Copy assets to SVN assets directory
+            cp -R __assets__/* /tmp/svn/assets/
+            # Remove .DS_Store and other hidden files
+            find /tmp/svn/assets -name ".DS_Store" -delete
+            find /tmp/svn/assets -name ".*" -delete
+            
+            echo "Assets updated."
+          else
+            echo "No assets directory found. Skipping assets update."
+          fi
+
+      # Check changes
+      - name: Check SVN status
+        run: |
+          cd /tmp/svn
+          svn status
+
+      # Commit changes
+      - name: Commit changes to WordPress.org
+        run: |
+          cd /tmp/svn
+
+          # Add all changes
+          svn add --force * --auto-props --parents --depth infinity -q
+
+          # Remove any deleted files
+          svn status | grep '^\!' | sed 's/! *//' | xargs -I% svn rm %@ || true
+
+          # Commit the changes
+          svn commit --non-interactive --trust-server-cert --username=${{ secrets.SVN_USERNAME }} --password=${{ secrets.SVN_PASSWORD }} -m "Deploy version ${{ env.TAG_NAME }} from GitHub"
+
+          echo "Plugin successfully deployed to WordPress.org!"

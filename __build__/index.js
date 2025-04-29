@@ -41,11 +41,19 @@ async function main() {
 }
 
 // Run main function if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error('Fatal error:', error)
-    process.exit(1)
-  })
+if (import.meta.url.startsWith('file:')) {
+  const scriptPath = process.argv[1] || ''
+  const scriptUrl = `file://${scriptPath}`
+
+  // Check if this is the main module, considering symlinks
+  if (import.meta.url === scriptUrl || import.meta.url.endsWith(scriptPath)) {
+    main().catch((error) => {
+      console.error('Fatal error:', error)
+      process.exit(1)
+    })
+  }
 }
+
+// Placeholder to check file existence
 
 export default builder

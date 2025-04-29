@@ -6,7 +6,7 @@ import debounce from 'debounce'
 import { logger } from '../../logger/index.js'
 import { generateBanner } from '../common/banner.js'
 import { getPackageMetadata } from '../common/version.js'
-import { getLibraryDir } from '../common/paths.js'
+import { getLibraryDir, getDirectCssOutputPath, shouldCreateDistFolder } from '../common/paths.js'
 import { isFeatureEnabled, isDevelopment } from '../../config/index.js'
 
 /**
@@ -16,19 +16,16 @@ import { isFeatureEnabled, isDevelopment } from '../../config/index.js'
  */
 export async function compileSass(config) {
   if (!isFeatureEnabled(config, 'sass')) {
-    logger.info('Sass compilation is disabled, skipping')
+    logger.info('🚫 Sass compilation is disabled, skipping')
     return
   }
 
-  logger.info('Compiling Sass files...')
+  logger.info('🎨 Compiling Sass files...')
 
   try {
     const isDev = isDevelopment(config)
+    const shouldCreateDist = shouldCreateDistFolder(config)
     const packageMetadata = await getPackageMetadata(config)
-
-    // Ensure the output directory exists
-    const outputFile = config.sass.output
-    await fs.ensureDir(path.dirname(outputFile))
 
     // Get file contents with banner
     const result = sassCompiler.compile(config.sass.entry, {
@@ -38,23 +35,54 @@ export async function compileSass(config) {
 
     // Add banner
     const banner = generateBanner(packageMetadata)
-
-    // Write CSS file
     const cssContent = `${banner}\n${result.css}`
-    await fs.writeFile(outputFile, cssContent)
-    logger.success(`Sass compiled successfully: ${outputFile}`)
+
+    // Write to direct library path
+    const directOutputPath = getDirectCssOutputPath(config)
+    await fs.ensureDir(path.dirname(directOutputPath))
+    await fs.writeFile(directOutputPath, cssContent)
+    logger.success(`✅ Sass compiled successfully: ${directOutputPath}`)
 
     // Write source map if in development mode
     if (isDev && result.sourceMap) {
-      const sourceMapFile = `${outputFile}.map`
+      const sourceMapFile = `${directOutputPath}.map`
       await fs.writeFile(sourceMapFile, JSON.stringify(result.sourceMap))
-      logger.debug(`Source map generated: ${sourceMapFile}`)
+      logger.debug(`📝 Source map generated: ${sourceMapFile}`)
     }
 
-    // Copy to PHP libraries
-    await copyCssToLibrary(outputFile, cssContent, config, isDev, result.sourceMap)
+    // Write to dist folder only if explicitly enabled
+    if (shouldCreateDist) {
+      logger.debug('📂 Also writing CSS to dist folder')
+
+      // Ensure the output directory exists
+      const outputFile = config.sass.output
+      await fs.ensureDir(path.dirname(outputFile))
+      await fs.writeFile(outputFile, cssContent)
+      logger.success(`✅ Sass compiled to dist: ${outputFile}`)
+
+      // Write source map if in development mode
+      if (isDev && result.sourceMap) {
+        const sourceMapFile = `${outputFile}.map`
+        await fs.writeFile(sourceMapFile, JSON.stringify(result.sourceMap))
+        logger.debug(`📝 Source map generated: ${sourceMapFile}`)
+      }
+
+      // Copy to PHP libraries if not already in the right place
+      await copyCssToLibrary(outputFile, cssContent, config, isDev, result.sourceMap)
+    }
+
+    // Always copy to the production library directory if we're in production mode
+    if (!isDev && !directOutputPath.includes(config.paths.dist)) {
+      const libraryDir = getLibraryDir(config, isDev)
+      const targetFile = path.join(libraryDir, path.basename(config.sass.output))
+
+      await fs.ensureDir(libraryDir)
+      logger.debug(`📂 Ensuring CSS is copied to production library dir: ${libraryDir}`)
+      await fs.writeFile(targetFile, cssContent)
+      logger.success(`✅ CSS copied to production library location: ${targetFile}`)
+    }
   } catch (error) {
-    logger.error('Sass compilation failed:', error)
+    logger.error('❌ Sass compilation failed:', error)
     throw error
   }
 }
@@ -69,12 +97,21 @@ export async function compileSass(config) {
  * @returns {Promise<void>}
  */
 async function copyCssToLibrary(outputFile, cssContent, config, isDev, sourceMap) {
-  // Get library directory
+  // Get library directory - avoid copying if already direct
+  const directPath = getDirectCssOutputPath(config)
   const libraryDir = getLibraryDir(config, isDev)
+  const targetFile = path.join(libraryDir, path.basename(outputFile))
+
+  // Skip if we already wrote to the target path
+  if (directPath === targetFile) {
+    return
+  }
+
+  // Ensure the directory exists
   await fs.ensureDir(libraryDir)
 
   // Copy main CSS file
-  await fs.writeFile(path.join(libraryDir, path.basename(outputFile)), cssContent)
+  await fs.writeFile(targetFile, cssContent)
 
   // Copy sourcemap if in development mode
   if (isDev && sourceMap) {
@@ -84,7 +121,7 @@ async function copyCssToLibrary(outputFile, cssContent, config, isDev, sourceMap
     )
   }
 
-  logger.debug(`Copied compiled CSS to PHP libraries`)
+  logger.debug(`📂 Copied compiled CSS to PHP libraries`)
 }
 
 /**
@@ -95,28 +132,29 @@ async function copyCssToLibrary(outputFile, cssContent, config, isDev, sourceMap
  */
 export async function watchSass(config, liveReloadServer) {
   if (!isFeatureEnabled(config, 'sass')) {
-    logger.info('Sass compilation is disabled, not watching')
+    logger.info('🚫 Sass compilation is disabled, not watching')
     return null
   }
 
   const sassDir = path.resolve(config.paths.styles)
 
-  logger.info(`Watching Sass files in ${path.relative(process.cwd(), sassDir)}`)
+  logger.info(`👀 Watching Sass files in ${path.relative(process.cwd(), sassDir)}`)
 
   // Create debounced build function
   const debouncedBuild = debounce(async (filePath) => {
-    logger.info(`Sass file changed: ${path.relative(process.cwd(), filePath)}`)
+    logger.info(`🔄 Sass file changed: ${path.relative(process.cwd(), filePath)}`)
 
     try {
       await compileSass(config)
 
       // Notify live reload server
       if (liveReloadServer) {
-        const cssFile = path.resolve(config.sass.output)
+        // Use direct path for notification
+        const cssFile = getDirectCssOutputPath(config)
         liveReloadServer.notifyChange(cssFile)
       }
     } catch (error) {
-      logger.error('Failed to rebuild Sass files:', error)
+      logger.error('❌ Failed to rebuild Sass files:', error)
     }
   }, 300)
 
@@ -129,7 +167,7 @@ export async function watchSass(config, liveReloadServer) {
 
   watcher.on('change', debouncedBuild)
   watcher.on('error', (error) => {
-    logger.error(`Sass watcher error:`, error)
+    logger.error(`❌ Sass watcher error:`, error)
   })
 
   return watcher

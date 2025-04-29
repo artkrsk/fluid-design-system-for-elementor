@@ -1,7 +1,12 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { logger } from '../../logger/index.js'
-import { getLibraryDir, getPluginDestPath } from '../common/paths.js'
+import {
+  getLibraryDir,
+  getPluginDestPath,
+  shouldCreateDistFolder,
+  getDirectLibraryPath
+} from '../common/paths.js'
 import { isDevelopment } from '../../config/index.js'
 
 /**
@@ -13,13 +18,10 @@ export async function cleanDirectories(config) {
   const isDev = isDevelopment(config)
 
   // Start with base paths to clean
-  const cleanPaths = [
-    // WordPress plugin languages directory
-    path.join(config.paths.wordpress.languages)
-  ]
+  const cleanPaths = []
 
-  // Add dist directory in production mode
-  if (!isDev) {
+  // Add dist directory in production mode if createDistFolder is not explicitly disabled
+  if (!isDev && shouldCreateDistFolder(config)) {
     cleanPaths.push(config.paths.dist)
   }
 
@@ -33,20 +35,33 @@ export async function cleanDirectories(config) {
     cleanPaths.push(config.wordpressPlugin.target)
   }
 
-  logger.info('Cleaning directories...')
+  // Ensure library directory for direct output
+  const directLibraryPath = getDirectLibraryPath(config)
+  if (directLibraryPath) {
+    await fs.ensureDir(directLibraryPath)
+  }
+
+  logger.info('🧹 Cleaning directories...')
 
   for (const dirPath of cleanPaths) {
     try {
       await cleanDirectory(dirPath)
     } catch (error) {
-      logger.warn(`Failed to clean directory ${dirPath}: ${error.message}`)
+      logger.warn(`⚠️ Failed to clean directory ${dirPath}: ${error.message}`)
     }
   }
 
   // Ensure necessary subdirectories exist
   await ensurePluginDirectories(config)
 
-  logger.success('Directories cleaned successfully')
+  // Ensure the languages directory exists without deleting its contents
+  if (config.i18n?.enabled) {
+    const langDir = path.dirname(config.i18n.dest)
+    await fs.ensureDir(langDir)
+    logger.debug(`📁 Ensured languages directory exists: ${langDir}`)
+  }
+
+  logger.success('✅ Directories cleaned successfully')
 }
 
 /**
@@ -58,6 +73,12 @@ async function ensurePluginDirectories(config) {
   // Get library directory based on environment
   const libraryDir = getLibraryDir(config)
   await fs.ensureDir(libraryDir)
+
+  // Ensure direct library directory exists
+  const directLibraryPath = getDirectLibraryPath(config)
+  if (directLibraryPath) {
+    await fs.ensureDir(directLibraryPath)
+  }
 
   // Ensure WordPress plugin directory exists if target is set
   if (config.wordpressPlugin?.target) {
@@ -75,13 +96,13 @@ export async function cleanDirectory(dirPath) {
   try {
     if (await fs.pathExists(dirPath)) {
       await fs.emptyDir(dirPath)
-      logger.debug(`Cleaned directory: ${dirPath}`)
+      logger.debug(`🧹 Cleaned directory: ${dirPath}`)
     } else {
       await fs.ensureDir(dirPath)
-      logger.debug(`Created directory: ${dirPath}`)
+      logger.debug(`📁 Created directory: ${dirPath}`)
     }
   } catch (error) {
-    logger.warn(`Failed to clean directory ${dirPath}: ${error.message}`)
+    logger.warn(`⚠️ Failed to clean directory ${dirPath}: ${error.message}`)
     throw error
   }
 }

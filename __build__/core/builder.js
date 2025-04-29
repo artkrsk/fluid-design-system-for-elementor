@@ -3,6 +3,12 @@ import { fileURLToPath } from 'url'
 import process from 'process'
 import { logger } from '../logger/index.js'
 import { loadConfig as loadProjectConfig, validateConfig } from '../config/index.js'
+import {
+  getDirectLibraryPath,
+  shouldCreateDistFolder,
+  getLibraryDir
+} from '../utils/common/paths.js'
+import fs from 'fs-extra'
 
 // Core utilities
 import { compileJavaScript, watchJavaScript } from '../utils/assets/javascript.js'
@@ -19,14 +25,19 @@ import { startLiveReloadServer } from '../utils/common/live-reload.js'
  */
 export class Builder {
   constructor() {
+    // Use process.cwd() to get the actual project directory regardless of symlinks
+    // This assumes the build script is always run from the project root
+    const PROJECT_ROOT = process.cwd()
+
+    // Get the actual build directory path by resolving from the current module
     const __dirname = path.dirname(fileURLToPath(import.meta.url))
-    const PROJECT_ROOT = path.resolve(__dirname, '../..')
+    const BUILD_DIR = path.resolve(__dirname, '..')
 
     this.config = null
     this.logger = logger
     this.paths = {
       project: PROJECT_ROOT,
-      build: path.resolve(__dirname, '..')
+      build: BUILD_DIR
     }
     this.liveReloadServer = null
     this.watchers = {}
@@ -40,15 +51,65 @@ export class Builder {
   async loadConfig(env = process.env.NODE_ENV || 'development') {
     try {
       // Load configuration
+      logger.info(`📋 Loading configuration for "${env}" environment...`)
       this.config = await loadProjectConfig(this.paths.project, env)
 
       // Validate configuration
       validateConfig(this.config)
 
+      logger.success(`✅ Configuration loaded for "${env}" environment`)
       return this.config
     } catch (error) {
-      logger.error('Failed to load configuration:', error)
+      logger.error('❌ Failed to load configuration:', error)
       throw error
+    }
+  }
+
+  /**
+   * Ensure the required directories exist
+   * @private
+   */
+  async ensureDirectories() {
+    try {
+      // Ensure library directory exists
+      const directLibraryPath = getDirectLibraryPath(this.config)
+      if (directLibraryPath) {
+        await fs.ensureDir(directLibraryPath)
+        logger.debug(`📁 Created library directory: ${directLibraryPath}`)
+      }
+
+      // Ensure languages directory exists for i18n
+      if (this.config.i18n?.enabled && this.config.i18n?.dest) {
+        const langDir = path.dirname(this.config.i18n.dest)
+        await fs.ensureDir(langDir)
+        logger.debug(`📁 Created languages directory: ${langDir}`)
+      }
+
+      // Only create dist directory if explicitly enabled
+      if (shouldCreateDistFolder(this.config)) {
+        await fs.ensureDir(this.config.paths.dist)
+        logger.debug(`📁 Created dist directory: ${this.config.paths.dist}`)
+      }
+    } catch (error) {
+      logger.warn(`⚠️ Failed to ensure directories: ${error.message}`)
+    }
+  }
+
+  /**
+   * Remove dist folder if it exists and shouldn't be created
+   * @private
+   */
+  async cleanupDistFolder() {
+    if (!shouldCreateDistFolder(this.config) && this.config.paths.dist) {
+      const distPath = this.config.paths.dist
+      if (await fs.pathExists(distPath)) {
+        try {
+          await fs.remove(distPath)
+          logger.debug(`🧹 Removed unnecessary dist folder: ${distPath}`)
+        } catch (error) {
+          logger.warn(`⚠️ Failed to remove dist folder: ${error.message}`)
+        }
+      }
     }
   }
 
@@ -61,32 +122,51 @@ export class Builder {
         await this.loadConfig('production')
       }
 
-      logger.info('Building for production...')
+      logger.info('🚀 Starting production build...')
 
-      // Clean directories
+      // Ensure required directories exist
+      await this.ensureDirectories()
+
+      // Clean directories (will respect createDistFolder setting)
       await cleanDirectories(this.config)
 
-      // Update plugin metadata based on composer.json
-      await updatePluginMeta(this.config)
+      // Update plugin metadata based on composer.json if we're creating dist folder
+      if (shouldCreateDistFolder(this.config)) {
+        await updatePluginMeta(this.config)
+      }
 
-      // Compile JavaScript
+      // Compile JavaScript (will build to direct library or dist based on config)
       await compileJavaScript(this.config)
 
-      // Compile Sass
+      // Compile Sass (will build to direct library or dist based on config)
       await compileSass(this.config)
 
       // Generate POT file
       await generatePot(this.config)
 
-      // Sync files to target directories
+      // Sync files to target directories (if any)
       await syncFiles(this.config, false)
 
-      // Create ZIP archive
-      await createZipArchive(this.config)
+      // Force copy library files to ensure they're in the right place
+      if (shouldCreateDistFolder(this.config)) {
+        logger.info('🔄 Ensuring library files are correctly placed...')
 
-      logger.success('Build completed successfully')
+        const libraryDir = getLibraryDir(this.config, false)
+
+        // Log what we're going to copy for debugging
+        logger.debug(`📂 Making sure library directory exists: ${libraryDir}`)
+        await fs.ensureDir(libraryDir)
+
+        // Create ZIP archive
+        await createZipArchive(this.config)
+      } else {
+        // Make sure no dist folder exists if it shouldn't
+        await this.cleanupDistFolder()
+      }
+
+      logger.success('✨ Build completed successfully!')
     } catch (error) {
-      logger.error('Build failed:', error)
+      logger.error('❌ Build failed:', error)
       throw error
     }
   }
@@ -100,13 +180,18 @@ export class Builder {
         await this.loadConfig('development')
       }
 
-      logger.info('Starting development mode...')
+      logger.info('🔧 Starting development mode...')
+
+      // Ensure required directories exist
+      await this.ensureDirectories()
 
       // Clean directories
       await cleanDirectories(this.config)
 
-      // Update plugin metadata based on composer.json
-      await updatePluginMeta(this.config)
+      // Update plugin metadata based on composer.json if we're using WordPress plugin
+      if (this.config.wordpressPlugin?.target) {
+        await updatePluginMeta(this.config)
+      }
 
       // Initial builds
       await compileJavaScript(this.config)
@@ -119,6 +204,11 @@ export class Builder {
       // Initial sync of files
       await syncFiles(this.config, true)
 
+      // Clean up dist folder if not needed
+      if (!shouldCreateDistFolder(this.config)) {
+        await this.cleanupDistFolder()
+      }
+
       // Set up watchers
       this.watchers.js = await watchJavaScript(this.config, this.liveReloadServer)
       this.watchers.sass = await watchSass(this.config, this.liveReloadServer)
@@ -126,8 +216,8 @@ export class Builder {
       this.watchers.composer = await watchComposerJson(this.config)
       this.watchers.files = await watchForFileChanges(this.config, this.liveReloadServer)
 
-      logger.success('Development mode started')
-      logger.info('Press Ctrl+C to stop')
+      logger.success('✨ Development mode started')
+      logger.info('⛔ Press Ctrl+C to stop')
 
       // Handle graceful shutdown
       process.on('SIGINT', () => {
@@ -135,7 +225,7 @@ export class Builder {
         process.exit(0)
       })
     } catch (error) {
-      logger.error('Development mode failed to start:', error)
+      logger.error('❌ Development mode failed to start:', error)
       throw error
     }
   }
@@ -144,7 +234,7 @@ export class Builder {
    * Shut down all running services
    */
   shutdown() {
-    logger.info('Shutting down...')
+    logger.info('🛑 Shutting down...')
 
     // Close all watchers
     Object.keys(this.watchers).forEach((key) => {
@@ -160,7 +250,7 @@ export class Builder {
       this.liveReloadServer = null
     }
 
-    logger.info('Shutdown complete')
+    logger.info('👋 Shutdown complete')
   }
 }
 
