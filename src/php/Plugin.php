@@ -153,6 +153,11 @@ class Plugin extends BasePlugin {
 	protected function add_filters() {
 		add_filter( 'elementor/files/css/selectors', array( $this->managers->units, 'modify_selectors' ), 10, 3 );
 
+		// Only add plugin action links if the plugin is being used as a WordPress plugin
+		if ( defined( 'ARTS_FLUID_DS_PLUGIN_FILE' ) ) {
+			add_filter( 'plugin_action_links_' . plugin_basename( ARTS_FLUID_DS_PLUGIN_FILE ), array( $this->managers->options, 'add_plugin_action_links' ) );
+		}
+
 		return $this;
 	}
 }

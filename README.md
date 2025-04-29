@@ -230,37 +230,15 @@ function my_theme_add_fluid_support_to_custom_widget() {
 add_action( 'init', 'my_theme_add_fluid_support_to_custom_widget' );
 ```
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## 📜 License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
-
-## 📣 Acknowledgements
-
-- [Elementor](https://elementor.com) - The website builder platform this plugin extends
 
 ## 💖 Support
 
 If you find this plugin useful, consider buying me a coffee:
 
 <a href="https://buymeacoffee.com/artemsemkin" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
-## WordPress.org Integration
-
-This plugin is available on the [WordPress.org Plugin Directory](https://wordpress.org/plugins/fluid-design-system-for-elementor/).
-
-When a new version is released on GitHub (by creating a new tag), the GitHub Actions workflow automatically deploys the plugin to WordPress.org using SVN. See [WordPress SVN Integration](docs/wordpress-svn-integration.md) for more details on how this process works.
-
-**Note:** To use this integration, you need to set up SVN credentials as GitHub repository secrets. These are sensitive credentials that should never be committed to the repository.
 
 ---
 

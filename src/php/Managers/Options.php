@@ -43,4 +43,39 @@ class Options extends BaseManager {
 
 		return $tabs;
 	}
+
+	/**
+	 * Add plugin action links.
+	 *
+	 * Adds a "Settings" link to the plugin's action links in the WordPress admin plugins page.
+	 *
+	 * @since 1.0.1
+	 * @access public
+	 *
+	 * @param array $links Array of plugin action links.
+	 * @return array Modified array of plugin action links.
+	 */
+	public function add_plugin_action_links( $links ) {
+		$recent_edited_post = \Elementor\Utils::get_recently_edited_posts_query(
+			array(
+				'posts_per_page' => 1,
+			)
+		);
+
+		if ( $recent_edited_post->post_count ) {
+			$posts   = $recent_edited_post->get_posts();
+			$post_id = reset( $posts )->ID;
+			$kit_id  = \Elementor\Plugin::$instance->kits_manager->get_active_id();
+
+			$settings_link = sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( admin_url( 'post.php?post=' . $post_id . '&action=elementor&active-document=' . $kit_id . '&active-tab=' . FluidTypographySpacing::TAB_ID ) ),
+				esc_html__( 'Settings', 'fluid-design-system-for-elementor' )
+			);
+
+			array_unshift( $links, $settings_link );
+		}
+
+		return $links;
+	}
 }
