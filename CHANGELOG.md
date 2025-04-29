@@ -7,9 +7,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial release of Fluid Design System for Elementor
-- Fluid spacing utilities for consistent responsive layouts
-- Fluid typography capabilities with min/max breakpoints
-- Preset management system for reusable fluid values
-- Elementor integration with custom UI controls
-- WordPress plugin with admin settings
+- Initial release of Fluid Design System for Elementor plugin: https://wordpress.org/plugins/fluid-design-system-for-elementor/

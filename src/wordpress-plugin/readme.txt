@@ -190,6 +190,12 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 1.0.2 =
+* Fix plugin error when Elementor is not active
+
+= 1.0.1 =
+* Add plugin action links to WordPress admin plugins page
+
 = 1.0.0 =
 * Initial release
 
