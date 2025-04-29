@@ -272,21 +272,68 @@ jobs:
         run: |
           echo "Updating assets..."
 
+          # Create assets directory in SVN
+          mkdir -p /tmp/svn/assets
+
           # Check if assets directory exists in the repo
           if [ -d "__assets__" ]; then
-            # Empty assets directory in SVN
-            rm -rf /tmp/svn/assets/*
-            
-            # Copy assets to SVN assets directory
+            # Local assets directory exists - copy assets to SVN
             cp -R __assets__/* /tmp/svn/assets/
-            # Remove .DS_Store and other hidden files
-            find /tmp/svn/assets -name ".DS_Store" -delete
-            find /tmp/svn/assets -name ".*" -delete
-            
-            echo "Assets updated."
+            echo "Copied assets from local repository."
           else
-            echo "No assets directory found. Skipping assets update."
+            echo "Local assets directory not found. Attempting to preserve existing assets..."
+            
+            # Try to download existing assets from WordPress.org
+            SVN_ASSETS_URL="https://ps.w.org/fluid-design-system-for-elementor/assets"
+            ASSET_FILES=(
+              "banner-772x250.png"
+              "banner-1544x500.png"
+              "icon-128x128.png"
+              "icon-256x256.png"
+            )
+            
+            ASSETS_FOUND=false
+            for asset in "${ASSET_FILES[@]}"; do
+              echo "Checking for $asset..."
+              if curl --output /dev/null --silent --head --fail "$SVN_ASSETS_URL/$asset"; then
+                echo "Found $asset, downloading..."
+                curl -s "$SVN_ASSETS_URL/$asset" -o "/tmp/svn/assets/$asset"
+                ASSETS_FOUND=true
+              fi
+            done
+            
+            # Screenshots (try 1-10)
+            for i in {1..10}; do
+              if curl --output /dev/null --silent --head --fail "$SVN_ASSETS_URL/screenshot-$i.png"; then
+                echo "Found screenshot-$i.png, downloading..."
+                curl -s "$SVN_ASSETS_URL/screenshot-$i.png" -o "/tmp/svn/assets/screenshot-$i.png"
+                ASSETS_FOUND=true
+              fi
+            done
+            
+            if [ "$ASSETS_FOUND" = true ]; then
+              echo "Successfully preserved existing assets from WordPress.org."
+            else
+              echo "No existing assets found. Assets will need to be uploaded manually later."
+              # Create a README file in the assets directory to explain
+              echo "# Plugin Assets" > /tmp/svn/assets/README.txt
+              echo "Please upload plugin assets through the WordPress.org plugin interface:" >> /tmp/svn/assets/README.txt
+              echo "https://wordpress.org/plugins/fluid-design-system-for-elementor/advanced/" >> /tmp/svn/assets/README.txt
+              echo "" >> /tmp/svn/assets/README.txt
+              echo "Required assets include:" >> /tmp/svn/assets/README.txt
+              echo "- banner-772x250.png" >> /tmp/svn/assets/README.txt
+              echo "- banner-1544x500.png" >> /tmp/svn/assets/README.txt
+              echo "- icon-128x128.png" >> /tmp/svn/assets/README.txt
+              echo "- icon-256x256.png" >> /tmp/svn/assets/README.txt
+              echo "- screenshot-1.png, screenshot-2.png, etc." >> /tmp/svn/assets/README.txt
+            fi
           fi
+
+          # Remove any hidden files
+          find /tmp/svn/assets -name ".DS_Store" -delete
+          find /tmp/svn/assets -name ".*" -delete
+
+          echo "Assets directory prepared."
 
       # Check changes
       - name: Check SVN status
