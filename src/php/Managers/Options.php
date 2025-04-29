@@ -56,6 +56,11 @@ class Options extends BaseManager {
 	 * @return array Modified array of plugin action links.
 	 */
 	public function add_plugin_action_links( $links ) {
+		// Check if Elementor is active
+		if ( ! class_exists( '\Elementor\Plugin' ) || ! class_exists( '\Elementor\Utils' ) ) {
+			return $links;
+		}
+
 		$recent_edited_post = \Elementor\Utils::get_recently_edited_posts_query(
 			array(
 				'posts_per_page' => 1,
