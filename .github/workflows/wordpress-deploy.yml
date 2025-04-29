@@ -5,11 +5,19 @@ on:
     types: [completed]
     branches:
       - main
+  # Add manual trigger option
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (without v prefix)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   deploy:
     # Only run if the release workflow was successful
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,15 +25,20 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history and tags
 
-      # Get the tag name from the previous workflow
+      # Get the tag name
       - name: Get tag name
         id: get-tag
         run: |
-          # Get the most recent tag
-          TAG_NAME=$(git describe --tags --abbrev=0)
-          if [[ "$TAG_NAME" == v* ]]; then
-            # Remove the 'v' prefix if present
-            TAG_NAME="${TAG_NAME#v}"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.tag }}" ]; then
+            # Use manually provided tag
+            TAG_NAME="${{ inputs.tag }}"
+          else
+            # Get the most recent tag
+            TAG_NAME=$(git describe --tags --abbrev=0)
+            if [[ "$TAG_NAME" == v* ]]; then
+              # Remove the 'v' prefix if present
+              TAG_NAME="${TAG_NAME#v}"
+            fi
           fi
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           echo "Tag name: $TAG_NAME"
