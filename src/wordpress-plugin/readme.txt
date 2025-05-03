@@ -11,7 +11,7 @@ Text Domain: fluid-design-system-for-elementor
 Donate link: https://buymeacoffee.com/artemsemkin
 GitHub Plugin URI: https://github.com/artkrsk/fluid-design-system-for-elementor
 
-Build visually consistent Elementor websites with fluid typography and spacing that scale smoothly from mobile to desktop. No more manual breakpoints!
+Create fluid typography & spacing presets natively in Elementor — no CSS clamp formulas, no breakpoints, just seamless responsive design.
 
 == Description ==
 
@@ -183,7 +183,7 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 == Screenshots ==
 
 1. Fluid Typography & Spacing settings panel in Elementor Site Settings
-2. Creating a new typography preset
+2. Creating a new "small" fluid spacing preset with min/max values
 3. Applying fluid unit for "padding" control
 4. Applying fluid unit for "typography" control
 5. Applying fluid unit for "gaps" control
