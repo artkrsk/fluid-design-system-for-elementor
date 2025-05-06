@@ -19,8 +19,25 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Clear npm cache and install dependencies
+        run: |
+          echo "Node.js version: $(node -v)"
+          echo "npm version: $(npm -v)"
+
+          echo "Clearing npm cache..."
+          npm cache clean --force
+
+          echo "Checking for package-lock.json..."
+          if [ -f "package-lock.json" ]; then
+            echo "Using npm ci for clean installation..."
+            npm ci
+          else
+            echo "Using npm install..."
+            npm install --no-optional
+          fi
 
       - name: Install jq
         run: sudo apt-get install -y jq
@@ -77,6 +94,26 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Clear npm cache and install dependencies
+        run: |
+          echo "Node.js version: $(node -v)"
+          echo "npm version: $(npm -v)"
+
+          echo "Clearing npm cache..."
+          npm cache clean --force
+
+          echo "Checking for package-lock.json..."
+          if [ -f "package-lock.json" ]; then
+            echo "Using npm ci for clean installation..."
+            npm ci
+          else
+            echo "Using npm install..."
+            npm install --no-optional
+          fi
+
       - name: Validate version consistency
         run: |
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
@@ -95,9 +132,6 @@ jobs:
           fi
 
           echo "✅ All versions match: $TAG_VERSION"
-
-      - name: Install dependencies
-        run: npm install
 
       - name: Install jq
         run: sudo apt-get install -y jq
