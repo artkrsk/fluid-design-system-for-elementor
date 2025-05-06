@@ -18,26 +18,57 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'yarn'
 
-      - name: Update npm
-        run: npm install -g npm@latest
-
-      - name: Clear npm cache and install dependencies
+      - name: Try installing dependencies with Yarn
         run: |
           echo "Node.js version: $(node -v)"
           echo "npm version: $(npm -v)"
 
-          echo "Clearing npm cache..."
-          npm cache clean --force
+          echo "Installing Yarn..."
+          npm install -g yarn
 
-          echo "Checking for package-lock.json..."
-          if [ -f "package-lock.json" ]; then
-            echo "Using npm ci for clean installation..."
-            npm ci
-          else
-            echo "Using npm install..."
-            npm install --no-optional
-          fi
+          echo "Yarn version: $(yarn --version)"
+          echo "Using Yarn to install dependencies..."
+
+          # Add verbose flag for debugging
+          yarn install --verbose
+
+      - name: Fallback to npm if Yarn fails
+        if: ${{ failure() }}
+        run: |
+          echo "Yarn installation failed, trying npm with limited dependencies..."
+
+          # Create a temporary minimal package.json with just essential dependencies
+          echo "Creating a minimal package.json for essential dependencies..."
+          cp package.json package.json.bak
+
+          # Extract just the build scripts and essential dependencies
+          node -e "
+            const pkg = require('./package.json');
+            const minimal = {
+              name: pkg.name,
+              version: pkg.version,
+              scripts: { build: pkg.scripts.build },
+              dependencies: {},
+              devDependencies: {}
+            };
+            // Add only essential dependencies needed for build
+            const essentials = ['webpack', 'webpack-cli', 'babel-loader', '@babel/core', '@babel/preset-env'];
+            essentials.forEach(dep => {
+              if (pkg.dependencies && pkg.dependencies[dep]) minimal.dependencies[dep] = pkg.dependencies[dep];
+              if (pkg.devDependencies && pkg.devDependencies[dep]) minimal.devDependencies[dep] = pkg.devDependencies[dep];
+            });
+            console.log(JSON.stringify(minimal, null, 2));
+          " > minimal-package.json
+
+          mv minimal-package.json package.json
+
+          # Try installing with npm
+          npm install
+
+          # Restore original package.json 
+          mv package.json.bak package.json
 
       - name: Install jq
         run: sudo apt-get install -y jq
@@ -93,26 +124,57 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'yarn'
 
-      - name: Update npm
-        run: npm install -g npm@latest
-
-      - name: Clear npm cache and install dependencies
+      - name: Try installing dependencies with Yarn
         run: |
           echo "Node.js version: $(node -v)"
           echo "npm version: $(npm -v)"
 
-          echo "Clearing npm cache..."
-          npm cache clean --force
+          echo "Installing Yarn..."
+          npm install -g yarn
 
-          echo "Checking for package-lock.json..."
-          if [ -f "package-lock.json" ]; then
-            echo "Using npm ci for clean installation..."
-            npm ci
-          else
-            echo "Using npm install..."
-            npm install --no-optional
-          fi
+          echo "Yarn version: $(yarn --version)"
+          echo "Using Yarn to install dependencies..."
+
+          # Add verbose flag for debugging
+          yarn install --verbose
+
+      - name: Fallback to npm if Yarn fails
+        if: ${{ failure() }}
+        run: |
+          echo "Yarn installation failed, trying npm with limited dependencies..."
+
+          # Create a temporary minimal package.json with just essential dependencies
+          echo "Creating a minimal package.json for essential dependencies..."
+          cp package.json package.json.bak
+
+          # Extract just the build scripts and essential dependencies
+          node -e "
+            const pkg = require('./package.json');
+            const minimal = {
+              name: pkg.name,
+              version: pkg.version,
+              scripts: { build: pkg.scripts.build },
+              dependencies: {},
+              devDependencies: {}
+            };
+            // Add only essential dependencies needed for build
+            const essentials = ['webpack', 'webpack-cli', 'babel-loader', '@babel/core', '@babel/preset-env'];
+            essentials.forEach(dep => {
+              if (pkg.dependencies && pkg.dependencies[dep]) minimal.dependencies[dep] = pkg.dependencies[dep];
+              if (pkg.devDependencies && pkg.devDependencies[dep]) minimal.devDependencies[dep] = pkg.devDependencies[dep];
+            });
+            console.log(JSON.stringify(minimal, null, 2));
+          " > minimal-package.json
+
+          mv minimal-package.json package.json
+
+          # Try installing with npm
+          npm install
+
+          # Restore original package.json 
+          mv package.json.bak package.json
 
       - name: Validate version consistency
         run: |
