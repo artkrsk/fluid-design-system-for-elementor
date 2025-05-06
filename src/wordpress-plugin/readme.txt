@@ -4,7 +4,7 @@ Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 license: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -190,11 +190,14 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 1.0.3 =
+* fixed: PHP Warning "Undefined array key" when saving presets
+
 = 1.0.2 =
-* Fix plugin error when Elementor is not active
+* fixed: plugin error when Elementor is not active
 
 = 1.0.1 =
-* Add plugin action links to WordPress admin plugins page
+* added: plugin action links to WordPress admin plugins page
 
 = 1.0.0 =
 * Initial release

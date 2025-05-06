@@ -26,8 +26,8 @@
   },
   "require": {
     "php": ">=7.4",
-    "arts/elementor-extension": "*",
-    "arts/utilities": "*"
+    "arts/elementor-extension": "@dev",
+    "arts/utilities": "@dev"
   },
   "autoload": {
     "psr-4": {

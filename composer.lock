@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "231377f7664799134cdb348b26c414df",
+    "content-hash": "48920089d6c6d5b40db94feb8aefd091",
     "packages": [
         {
             "name": "arts/elementor-extension",
-            "version": "v1.0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "b2f7cf3e3035283793d83e3cfa878dcb22e25c4c"
+                "reference": "cfcbdf7dc3dd63eeab3fd298afc9d83604a3b4d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/b2f7cf3e3035283793d83e3cfa878dcb22e25c4c",
-                "reference": "b2f7cf3e3035283793d83e3cfa878dcb22e25c4c",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/cfcbdf7dc3dd63eeab3fd298afc9d83604a3b4d7",
+                "reference": "cfcbdf7dc3dd63eeab3fd298afc9d83604a3b4d7",
                 "shasum": ""
             },
             "require": {
-                "arts/utilities": "*",
+                "arts/utilities": "@dev",
                 "php": ">=7.4"
             },
             "require-dev": {
@@ -29,6 +29,7 @@
                 "phpunit/phpunit": "^9.6",
                 "yoast/phpunit-polyfills": "^4.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -48,22 +49,22 @@
             "description": "WordPress library",
             "support": {
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
-                "source": "https://github.com/artkrsk/arts-elementor-extension/tree/v1.0.1"
+                "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2025-04-28T13:23:51+00:00"
+            "time": "2025-05-06T07:57:44+00:00"
         },
         {
             "name": "arts/utilities",
-            "version": "v1.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "c5c7747f6a45b481e9e2210a26caee9e43c2a8ec"
+                "reference": "c36dd573ff9aafc8ab0f8e56f68cc690c9a1c236"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/c5c7747f6a45b481e9e2210a26caee9e43c2a8ec",
-                "reference": "c5c7747f6a45b481e9e2210a26caee9e43c2a8ec",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/c36dd573ff9aafc8ab0f8e56f68cc690c9a1c236",
+                "reference": "c36dd573ff9aafc8ab0f8e56f68cc690c9a1c236",
                 "shasum": ""
             },
             "require": {
@@ -75,6 +76,7 @@
                 "phpunit/phpunit": "^9.6",
                 "yoast/phpunit-polyfills": "^4.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -94,15 +96,18 @@
             "description": "A comprehensive collection of utility methods for WordPress theme and plugin development, with a focus on Elementor integration.",
             "support": {
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
-                "source": "https://github.com/artkrsk/arts-utilities/tree/v1.0.0"
+                "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2025-04-23T13:27:32+00:00"
+            "time": "2025-05-06T08:38:16+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "arts/elementor-extension": 20,
+        "arts/utilities": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

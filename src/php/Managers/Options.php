@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+use \Arts\Utilities\Utilities;
 use \Arts\ElementorExtension\Plugins\BaseManager;
 use \Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
 
@@ -61,20 +62,12 @@ class Options extends BaseManager {
 			return $links;
 		}
 
-		$recent_edited_post = \Elementor\Utils::get_recently_edited_posts_query(
-			array(
-				'posts_per_page' => 1,
-			)
-		);
+		$settings_url = Utilities::get_elementor_editor_site_settings_url( FluidTypographySpacing::TAB_ID );
 
-		if ( $recent_edited_post->post_count ) {
-			$posts   = $recent_edited_post->get_posts();
-			$post_id = reset( $posts )->ID;
-			$kit_id  = \Elementor\Plugin::$instance->kits_manager->get_active_id();
-
+		if ( $settings_url ) {
 			$settings_link = sprintf(
 				'<a href="%s">%s</a>',
-				esc_url( admin_url( 'post.php?post=' . $post_id . '&action=elementor&active-document=' . $kit_id . '&active-tab=' . FluidTypographySpacing::TAB_ID ) ),
+				esc_url( $settings_url ),
 				esc_html__( 'Settings', 'fluid-design-system-for-elementor' )
 			);
 
