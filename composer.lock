@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "cfcbdf7dc3dd63eeab3fd298afc9d83604a3b4d7"
+                "reference": "2e62525449e8d5ed870b2d4e5153a3662338ade1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/cfcbdf7dc3dd63eeab3fd298afc9d83604a3b4d7",
-                "reference": "cfcbdf7dc3dd63eeab3fd298afc9d83604a3b4d7",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/2e62525449e8d5ed870b2d4e5153a3662338ade1",
+                "reference": "2e62525449e8d5ed870b2d4e5153a3662338ade1",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2025-05-06T07:57:44+00:00"
+            "time": "2025-05-07T06:54:54+00:00"
         },
         {
             "name": "arts/utilities",

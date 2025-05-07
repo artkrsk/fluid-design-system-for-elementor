@@ -103,22 +103,6 @@ class Plugin extends BasePlugin {
 	}
 
 	/**
-	 * Actions to perform after the run action has been triggered.
-	 *
-	 * Initializes the Elementor Extension plugin if it hasn't been already.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return Plugin Current plugin instance.
-	 */
-	public function do_after_run_action() {
-		\Arts\ElementorExtension\Plugin::instance();
-
-		return $this;
-	}
-
-	/**
 	 * Register WordPress actions for the plugin.
 	 *
 	 * @since 1.0.0
