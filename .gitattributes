@@ -11,6 +11,8 @@ dist export-ignore
 scripts export-ignore
 vendor export-ignore
 __build__ export-ignore
+__assets__ export-ignore
+.github export-ignore
 
 # Testing and documentation
 __tests__ export-ignore
@@ -18,6 +20,7 @@ __e2e__ export-ignore
 tests export-ignore
 docs export-ignore
 coverage export-ignore
+drafts export-ignore
 
 # Config files
 /*.yml export-ignore
@@ -37,6 +40,7 @@ coverage export-ignore
 src/ts export-ignore
 src/js export-ignore
 src/styles export-ignore
+src/wordpress-plugin export-ignore
 
 # WordPress development files
 project.*.js export-ignore
