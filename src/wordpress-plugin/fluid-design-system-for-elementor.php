@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Fluid Design System for Elementor
  * Description: Provides comprehensive fluid spacing and typography system for Elementor for smoother and consistent responsive design
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Artem Semkin
  * Author URI: https://artemsemkin.com
  * License: GPLv3
