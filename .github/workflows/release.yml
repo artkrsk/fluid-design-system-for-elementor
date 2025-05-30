@@ -19,11 +19,6 @@ jobs:
         with:
           node-version: '23'
 
-      - name: Clean npm cache and remove lockfile/node_modules
-        run: |
-          npm cache clean --force
-          rm -rf node_modules package-lock.json
-
       - name: Install dependencies
         run: npm install
 

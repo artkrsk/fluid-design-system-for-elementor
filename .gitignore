@@ -26,7 +26,6 @@ Thumbs.db
 /.pnp
 .pnp.js
 yarn.lock
-package-lock.json
 .yarn-integrity
 /vendor
 
