@@ -59,12 +59,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "f832d3d893fc5b6a5b5c5ddbd0be0f71a05dfade"
+                "reference": "6707c8062813c6c9d17437ea4274d77bcb86b034"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/f832d3d893fc5b6a5b5c5ddbd0be0f71a05dfade",
-                "reference": "f832d3d893fc5b6a5b5c5ddbd0be0f71a05dfade",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/6707c8062813c6c9d17437ea4274d77bcb86b034",
+                "reference": "6707c8062813c6c9d17437ea4274d77bcb86b034",
                 "shasum": ""
             },
             "require": {
@@ -98,7 +98,7 @@
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
                 "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2025-05-23T12:59:38+00:00"
+            "time": "2025-05-30T08:09:37+00:00"
         }
     ],
     "packages-dev": [],
