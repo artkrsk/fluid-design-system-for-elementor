@@ -155,7 +155,6 @@ export const BaseSliderControlView = {
 
     if (this.isFluidUnit()) {
       this.updatePlaceholderClassState()
-      this.triggerChangeSelectElements()
     }
   }
 }
