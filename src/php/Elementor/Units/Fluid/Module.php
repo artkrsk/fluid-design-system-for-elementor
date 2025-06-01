@@ -135,6 +135,19 @@ class Module extends Module_Base {
 			}
 		}
 
+		/**
+		 * Filter to add custom fluid design system presets.
+		 *
+		 * Allows developers to add custom preset collections to the fluid unit control.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $result             The existing preset collections.
+		 * @param array $breakpoint_settings Global breakpoint settings.
+		 * @param array $data               The AJAX request data.
+		 */
+		$result = apply_filters( 'arts/fluid_design_system/custom_presets', $result, $breakpoint_settings, $data );
+
 		return $result;
 	}
 
