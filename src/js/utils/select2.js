@@ -109,6 +109,28 @@ class Select2Utils {
     const maxUnit = element.getAttribute('data-max-unit')
     const inheritedTitle = element.getAttribute('data-inherited-title')
 
+    // For simple values without min/max sizes
+    if (!minSize || !maxSize) {
+      const simpleHeaderContent = valueDisplay || title
+      const simpleMarkup = Select2Utils.#createBaseTemplate(
+        'select2-result-fluid-spacing-formatted--inherit',
+        Select2Utils.#createHeader(`
+        <span class="select2-result-fluid-spacing-formatted__title">${simpleHeaderContent}</span>
+      `)
+      )
+
+      if (inheritedTitle && simpleHeaderContent !== inheritedTitle) {
+        simpleMarkup.append(
+          Select2Utils.#createFooter(`
+          <span class="select2-result-fluid-spacing-formatted__title">${inheritedTitle}</span>
+        `)
+        )
+      }
+
+      return simpleMarkup
+    }
+
+    // Continue with existing logic for complex values
     const headerContent = isCustomValue
       ? valueDisplay
       : minSize && maxSize
@@ -169,6 +191,17 @@ class Select2Utils {
     isTemplateResult,
     element
   ) {
+    // If we have a title but no min/max sizes, render simple title-only template
+    if (title && (!minSize || !maxSize)) {
+      return Select2Utils.#createBaseTemplate(
+        '',
+        Select2Utils.#createHeader(`
+        <span class="select2-result-fluid-spacing-formatted__title">${title}</span>
+      `)
+      )
+    }
+
+    // If we have title and min/max sizes, render the full complex template
     if (title) {
       const headerContent = `${minSize}${minUnit}<span class="select2-result-fluid-spacing-formatted__size-divider"></span>${maxSize}${maxUnit}`
       const markup = Select2Utils.#createBaseTemplate(
