@@ -191,18 +191,6 @@ export const BaseControlView = {
 
     if (this.isFluidUnit()) {
       this.updatePlaceholderClassState()
-      this.triggerChangeSelectElements()
-    }
-  },
-
-  triggerChangeSelectElements() {
-    if (this.isDestroyed || !this.hasRenderedFluidSelector()) {
-      return
-    }
-
-    // @ts-expect-error - Type assertion for ui access
-    for (const selectEl of this.ui.selectControls) {
-      jQuery(selectEl).trigger('change')
     }
   },
 
