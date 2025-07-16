@@ -338,7 +338,7 @@ class FluidTypographySpacing extends BaseTab {
 			array(
 				'label'              => esc_html__( 'Minimum Value', 'fluid-design-system-for-elementor' ),
 				'type'               => Controls_Manager::SLIDER,
-				'size_units'         => array( 'px', 'rem', '%', 'vw', 'vh' ),
+				'size_units'         => array( 'px', 'rem', 'em', '%', 'vw', 'vh' ),
 				'range'              => array(
 					'px'  => array(
 						'min'  => 0,
@@ -381,7 +381,7 @@ class FluidTypographySpacing extends BaseTab {
 			array(
 				'label'              => esc_html__( 'Maximum Value', 'fluid-design-system-for-elementor' ),
 				'type'               => Controls_Manager::SLIDER,
-				'size_units'         => array( 'px', 'rem', '%', 'vw', 'vh' ),
+				'size_units'         => array( 'px', 'rem', 'em', '%', 'vw', 'vh' ),
 				'range'              => array(
 					'px'  => array(
 						'min'  => 0,
