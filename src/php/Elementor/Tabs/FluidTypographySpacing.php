@@ -583,7 +583,7 @@ class FluidTypographySpacing extends BaseTab {
 		$min_size = '{{' . $min_value . '.size}}{{' . $min_value . '.unit}}';
 		$max_size = '{{' . $max_value . '.size}}{{' . $max_value . '.unit}}';
 
-		// Calculate the difference between max and min values
+		// Calculate the difference between max and min values with explicit parentheses
 		$value_diff = '({{' . $max_value . '.size}} - {{' . $min_value . '.size}})';
 
 		// Use provided values or fall back to CSS variables
@@ -594,10 +594,23 @@ class FluidTypographySpacing extends BaseTab {
 			$max_screen = 'var(' . self::get_css_var_screen_diff() . ')';
 		}
 
+		// Explicit parentheses around viewport calculation
 		$viewport_calc = "(100vw - {$min_screen})";
 
-		// Build the formula
-		$formula = "clamp({$min_size}, calc({$min_size} + ({$value_diff} * {$viewport_calc} / {$max_screen})), {$max_size})";
+		// Explicit parentheses around division operation
+		$scaling_factor = "({$value_diff} * ({$viewport_calc} / {$max_screen}))";
+
+		// Build the formula with proper grouping to handle mixed signs
+		// Use parentheses around the entire addition to ensure proper calculation
+		$preferred_value = "calc(({$min_size}) + ({$scaling_factor}))";
+
+		// Use CSS min() and max() to automatically determine correct bounds
+		// This handles both normal cases (min < max) and inverted cases (min > max)
+		$lower_bound = "min({$min_size}, {$max_size})";
+		$upper_bound = "max({$min_size}, {$max_size})";
+
+		// Build the clamp with dynamic bounds
+		$formula = "clamp({$lower_bound}, {$preferred_value}, {$upper_bound})";
 
 		// Allow filtering of the complete formula
 		return apply_filters(
