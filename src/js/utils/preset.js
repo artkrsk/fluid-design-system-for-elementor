@@ -68,6 +68,31 @@ class PresetUtils {
     return optionEl
   }
 
+  static createCustomPresetOption(preset, currentValue) {
+    const { id, value, title, display_value } = preset
+
+    const optionEl = PresetUtils.#createBaseOption(value, currentValue, {
+      'data-id': id,
+      'data-title': title
+    })
+
+    // Handle display_value logic
+    if (display_value === true) {
+      // Show the actual value
+      optionEl.setAttribute('data-display-value', value)
+      optionEl.textContent = `${value} ${title}`
+    } else if (typeof display_value === 'string') {
+      // Show the custom display string
+      optionEl.setAttribute('data-display-value', display_value)
+      optionEl.textContent = `${display_value} ${title}`
+    } else {
+      // Fallback to current behavior (title only)
+      optionEl.textContent = title
+    }
+
+    return optionEl
+  }
+
   static handleMixedUnitsInheritance(optionEl, inheritanceData) {
     const { inheritedSize, sourceUnit, inheritedFrom, inheritedVia, inheritedDevice } =
       inheritanceData
@@ -228,7 +253,13 @@ class PresetUtils {
         const optionsGroupEl = createElement('optgroup', null, { label: name })
 
         for (const preset of value) {
-          const optionEl = PresetUtils.createPresetOption(preset, currentValue)
+          let optionEl
+          // Check if this is a fluid preset (has min/max values) or custom preset
+          if (preset.min_size !== undefined && preset.max_size !== undefined) {
+            optionEl = PresetUtils.createPresetOption(preset, currentValue)
+          } else {
+            optionEl = PresetUtils.createCustomPresetOption(preset, currentValue)
+          }
           optionsGroupEl.appendChild(optionEl)
         }
 

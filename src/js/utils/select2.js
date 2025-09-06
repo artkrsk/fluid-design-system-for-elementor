@@ -201,6 +201,26 @@ class Select2Utils {
     return markup
   }
 
+  static #createCustomPresetTemplate(displayValue, title) {
+    const markup = Select2Utils.#createBaseTemplate(
+      '',
+      Select2Utils.#createHeader(`
+        <span class="select2-result-fluid-spacing-formatted__size">${displayValue}</span>
+      `)
+    )
+
+    // Add footer with title if it's different from the display value
+    if (title && title !== displayValue) {
+      markup.append(
+        Select2Utils.#createFooter(`
+          <span class="select2-result-fluid-spacing-formatted__title">${title}</span>
+        `)
+      )
+    }
+
+    return markup
+  }
+
   static #createNormalValueTemplate(
     minSize,
     minUnit,
@@ -269,6 +289,7 @@ class Select2Utils {
     const maxSize = element.getAttribute('data-max-size') || ''
     const maxUnit = element.getAttribute('data-max-unit') || ''
     const valueDisplay = element.getAttribute('data-value-display') || ''
+    const customDisplayValue = element.getAttribute('data-display-value') || ''
 
     if (isInheritedValue) {
       return Select2Utils.#createInheritedValueTemplate(element, valueDisplay, title)
@@ -281,6 +302,11 @@ class Select2Utils {
         title,
         element
       )
+    }
+
+    // Handle custom presets with display_value
+    if (customDisplayValue) {
+      return Select2Utils.#createCustomPresetTemplate(customDisplayValue, title)
     }
 
     return Select2Utils.#createNormalValueTemplate(
