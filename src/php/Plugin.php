@@ -123,6 +123,9 @@ class Plugin extends BasePlugin {
 		// Add custom styles to Elementor editor
 		add_action( 'elementor/editor/after_enqueue_styles', array( $this->managers->compatibility, 'elementor_enqueue_editor_styles' ) );
 
+		// Optimize generated CSS to simplify fluid clamp formulas
+		add_action( 'elementor/css-file/post/parse', array( $this->managers->units, 'optimize_fluid_css_post_parse' ) );
+
 		return $this;
 	}
 
