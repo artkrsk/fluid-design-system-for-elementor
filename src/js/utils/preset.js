@@ -2,6 +2,22 @@ import { createElement } from './dom'
 import { dataManager } from '../managers'
 
 class PresetUtils {
+  /**
+   * Formats size display with proper handling of equal values
+   * @param {string} minSize - Minimum size value
+   * @param {string} minUnit - Minimum size unit
+   * @param {string} maxSize - Maximum size value
+   * @param {string} maxUnit - Maximum size unit
+   * @returns {string} Formatted size string
+   */
+  static #formatSizeDisplay(minSize, minUnit, maxSize, maxUnit) {
+    // If min and max are equal with same unit, show single value
+    if (minSize === maxSize && minUnit === maxUnit) {
+      return `${minSize}${minUnit}`
+    }
+    // Otherwise show range
+    return `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
+  }
   static #setElementAttributes(element, attributes) {
     Object.entries(attributes).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -48,7 +64,7 @@ class PresetUtils {
       'data-max-screen-width-unit': max_screen_width_unit
     })
 
-    optionEl.textContent = `${min_size}${min_unit} ~ ${max_size}${max_unit} ${title}`
+    optionEl.textContent = `${PresetUtils.#formatSizeDisplay(min_size, min_unit, max_size, max_unit)} ${title}`
     return optionEl
   }
 
@@ -100,7 +116,7 @@ class PresetUtils {
       'data-max-screen-width-unit': max_screen_width_unit
     })
 
-    optionEl.textContent = `${min_size}${min_unit} ~ ${max_size}${max_unit} ${title}`
+    optionEl.textContent = `${PresetUtils.#formatSizeDisplay(min_size, min_unit, max_size, max_unit)} ${title}`
     return optionEl
   }
 

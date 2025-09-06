@@ -1,6 +1,26 @@
 import { getInheritedPresetSync } from './preset'
 
 class Select2Utils {
+  /**
+   * Formats size display with proper handling of equal values for Select2 templates
+   * @param {string} minSize - Minimum size value
+   * @param {string} minUnit - Minimum size unit
+   * @param {string} maxSize - Maximum size value
+   * @param {string} maxUnit - Maximum size unit
+   * @param {boolean} includeSpan - Whether to include span wrapper for divider
+   * @returns {string} Formatted size HTML string
+   */
+  static #formatSizeDisplayHtml(minSize, minUnit, maxSize, maxUnit, includeSpan = true) {
+    // If min and max are equal with same unit, show single value
+    if (minSize === maxSize && minUnit === maxUnit) {
+      return `${minSize}${minUnit}`
+    }
+    // Otherwise show range with divider span
+    if (includeSpan) {
+      return `${minSize}${minUnit}<span class="select2-result-fluid-spacing-formatted__size-divider"></span>${maxSize}${maxUnit}`
+    }
+    return `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
+  }
   static #createBaseTemplate(className = '', content = '') {
     return jQuery(`
       <span class="select2-result-fluid-spacing-formatted ${className}">
@@ -59,7 +79,7 @@ class Select2Utils {
       'select2-result-fluid-spacing-formatted--inherit',
       `
         ${Select2Utils.#createHeader(`
-          <span class="select2-result-fluid-spacing-formatted__size">${minSize}${minUnit}<span class="select2-result-fluid-spacing-formatted__size-divider"></span>${maxSize}${maxUnit}</span>
+          <span class="select2-result-fluid-spacing-formatted__size">${Select2Utils.#formatSizeDisplayHtml(minSize, minUnit, maxSize, maxUnit)}</span>
         `)}
         ${Select2Utils.#createFooter(`
           <span class="select2-result-fluid-spacing-formatted__title">${name}</span>
@@ -134,7 +154,7 @@ class Select2Utils {
     const headerContent = isCustomValue
       ? valueDisplay
       : minSize && maxSize
-        ? `${minSize}${minUnit}<span class="select2-result-fluid-spacing-formatted__size-divider"></span>${maxSize}${maxUnit}`
+        ? Select2Utils.#formatSizeDisplayHtml(minSize, minUnit, maxSize, maxUnit)
         : valueDisplay || title
 
     const headerMarkup = isCustomValue
@@ -160,7 +180,7 @@ class Select2Utils {
   }
 
   static #createInheritedPresetTemplate(minSize, minUnit, maxSize, maxUnit, title, element) {
-    const headerContent = `${minSize}${minUnit}<span class="select2-result-fluid-spacing-formatted__size-divider"></span>${maxSize}${maxUnit}`
+    const headerContent = Select2Utils.#formatSizeDisplayHtml(minSize, minUnit, maxSize, maxUnit)
     const inheritedTitle = element.getAttribute('data-inherited-title')
 
     const markup = Select2Utils.#createBaseTemplate(
@@ -203,7 +223,7 @@ class Select2Utils {
 
     // If we have title and min/max sizes, render the full complex template
     if (title) {
-      const headerContent = `${minSize}${minUnit}<span class="select2-result-fluid-spacing-formatted__size-divider"></span>${maxSize}${maxUnit}`
+      const headerContent = Select2Utils.#formatSizeDisplayHtml(minSize, minUnit, maxSize, maxUnit)
       const markup = Select2Utils.#createBaseTemplate(
         '',
         Select2Utils.#createHeader(`
