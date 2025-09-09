@@ -86,8 +86,9 @@ class AJAX extends BaseManager {
 	 * @return array Operation result
 	 */
 	private function handle_ajax_update_title() {
-		$group_id = isset( $_POST['group_id'] ) ? sanitize_key( $_POST['group_id'] ) : '';
-		$title    = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+		// Nonce verification is handled in handle_ajax_requests()
+		$group_id = isset( $_POST['group_id'] ) ? sanitize_key( $_POST['group_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$title    = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( empty( $group_id ) || empty( $title ) ) {
 			$this->managers->notices->add_notice(
@@ -153,8 +154,9 @@ class AJAX extends BaseManager {
 	 * @return array Operation result
 	 */
 	private function handle_ajax_update_description() {
-		$group_id    = isset( $_POST['group_id'] ) ? sanitize_key( $_POST['group_id'] ) : '';
-		$description = isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '';
+		// Nonce verification is handled in handle_ajax_requests()
+		$group_id    = isset( $_POST['group_id'] ) ? sanitize_key( $_POST['group_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$description = isset( $_POST['description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['description'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( empty( $group_id ) ) {
 			$this->managers->notices->add_notice(
@@ -211,7 +213,8 @@ class AJAX extends BaseManager {
 	 * @return array Operation result
 	 */
 	private function handle_ajax_reorder_groups() {
-		$group_order = isset( $_POST['group_order'] ) ? array_map( 'sanitize_key', $_POST['group_order'] ) : array();
+		// Nonce verification is handled in handle_ajax_requests()
+		$group_order = isset( $_POST['group_order'] ) ? array_map( 'sanitize_key', $_POST['group_order'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( empty( $group_order ) ) {
 			$this->managers->notices->add_notice(
@@ -277,8 +280,8 @@ class AJAX extends BaseManager {
 			'message'                => $success_message,
 			'main_groups'            => $main_groups,
 			'filter_groups'          => $filter_groups,
-			'main_table_html'        => $this->managers->admin_tabs_groups_view->get_main_groups_table_body_html(),
-			'developer_table_html'   => $this->managers->admin_tabs_groups_view->get_developer_groups_table_body_html(),
+			'main_table_html'        => $this->managers->admin_tabs_groups_view->get_main_groups_table_html(),
+			'developer_table_html'   => $this->managers->admin_tabs_groups_view->get_developer_groups_table_html(),
 			'developer_table_exists' => ! empty( $filter_groups ),
 			'stats'                  => array(
 				'total_groups'       => $group_count,
@@ -297,7 +300,8 @@ class AJAX extends BaseManager {
 	 * @return array Operation result
 	 */
 	private function handle_ajax_save_presets_snapshot() {
-		$snapshot_json = isset( $_POST['snapshot'] ) ? wp_unslash( $_POST['snapshot'] ) : '';
+		// Nonce verification is handled in handle_ajax_requests()
+		$snapshot_json = isset( $_POST['snapshot'] ) ? sanitize_textarea_field( wp_unslash( $_POST['snapshot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( empty( $snapshot_json ) ) {
 			return array(

@@ -93,6 +93,14 @@ class Frontend extends BaseManager {
 			$version
 		);
 
+		wp_enqueue_script(
+			'dompurify',
+			$this->plugin_dir_url . 'admin/js/purify.min.js',
+			array(),
+			'3.0.6',
+			true
+		);
+
 		// Enqueue modular JavaScript files
 		wp_enqueue_script(
 			'fluid-design-system-admin-base',
@@ -131,7 +139,7 @@ class Frontend extends BaseManager {
 		wp_enqueue_script(
 			'fluid-design-system-admin-ajax-manager',
 			$this->plugin_dir_url . 'admin/js/ajax-manager.js',
-			array( 'jquery', 'fluid-design-system-admin-base', 'fluid-design-system-admin-status-notices' ),
+			array( 'jquery', 'dompurify', 'fluid-design-system-admin-base', 'fluid-design-system-admin-status-notices' ),
 			$version,
 			true
 		);
@@ -168,13 +176,17 @@ class Frontend extends BaseManager {
 					'invalidCharacters'            => esc_html__( 'Invalid characters detected. Only letters, numbers, spaces, and basic punctuation are allowed.', 'fluid-design-system-for-elementor' ),
 					'invalidCharactersTitle'       => esc_html__( 'Group name contains invalid characters. Only letters, numbers, spaces, and basic punctuation are allowed.', 'fluid-design-system-for-elementor' ),
 					'invalidCharactersDescription' => esc_html__( 'Description contains invalid characters. Only letters, numbers, spaces, and basic punctuation are allowed.', 'fluid-design-system-for-elementor' ),
+					/* translators: %s: Group name that already exists */
 					'duplicateTitle'               => esc_html__( 'Group name "%s" already exists. Please choose a different name.', 'fluid-design-system-for-elementor' ),
+					/* translators: %1$d: Current character count, %2$d: Maximum allowed character count */
 					'tooLong'                      => esc_html__( 'Group name is too long (%1$d characters). Please keep it under %2$d characters.', 'fluid-design-system-for-elementor' ),
 					'tooShort'                     => esc_html__( 'Group name is too short. Please enter at least 2 characters.', 'fluid-design-system-for-elementor' ),
 					'validationError'              => esc_html__( 'Validation error occurred.', 'fluid-design-system-for-elementor' ),
 
 					// Success messages
+					/* translators: %s: Name of the group that was created */
 					'addingSuccess'                => esc_html__( 'Successfully created "%s" group.', 'fluid-design-system-for-elementor' ),
+					/* translators: %s: Name of the item that was updated */
 					'updatingSuccess'              => esc_html__( 'Successfully updated "%s".', 'fluid-design-system-for-elementor' ),
 
 					// Status messages
@@ -190,6 +202,7 @@ class Frontend extends BaseManager {
 					'undoDeletion'                 => esc_html__( 'Undo deletion', 'fluid-design-system-for-elementor' ),
 
 					// Confirmation messages
+					/* translators: %1$s: Group name, %2$d: Number of presets, %3$s: Plural suffix for presets (empty string or "s") */
 					'deleteGroupConfirm'           => esc_html__( 'Are you sure you want to delete "%1$s"?\n\nThis group contains %2$d preset%3$s that will be permanently removed.', 'fluid-design-system-for-elementor' ),
 
 					// Backend operation messages

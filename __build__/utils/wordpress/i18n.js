@@ -118,7 +118,7 @@ function calculateTranslationHash(potContent) {
   const translationString = translations.map((t) => t.msgid).join('|')
 
   // Generate hash
-  return crypto.createHash('md5').update(translationString).digest('hex')
+  return crypto.createHash('sha256').update(translationString).digest('hex')
 }
 
 /**

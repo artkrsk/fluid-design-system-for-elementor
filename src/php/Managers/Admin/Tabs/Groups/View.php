@@ -172,26 +172,7 @@ class View extends BaseManager {
 	 */
 	public function get_main_groups_table_body_html() {
 		ob_start();
-
-		$groups = GroupsData::get_main_groups();
-
-		if ( ! empty( $groups ) ) {
-			foreach ( $groups as $index => $group ) {
-				$this->render_main_group_row( $group, $index + 1 );
-			}
-		} else {
-			?>
-			<tr class="no-groups-message">
-				<td colspan="6" style="text-align: center; padding: 40px 20px; color: #646970;">
-					<?php esc_html_e( 'No groups found. Create your first group below.', 'fluid-design-system-for-elementor' ); ?>
-				</td>
-			</tr>
-			<?php
-		}
-
-		// Always include the inline add row at the end
-		$this->render_inline_add_row();
-
+		$this->render_main_groups_table_body();
 		return ob_get_clean();
 	}
 
@@ -204,13 +185,47 @@ class View extends BaseManager {
 	 */
 	public function get_developer_groups_table_body_html() {
 		ob_start();
+		$this->render_developer_groups_table_body();
+		return ob_get_clean();
+	}
 
-		$groups = GroupsData::get_filter_groups();
+	/**
+	 * Get complete main groups table HTML for AJAX responses.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string Complete HTML table.
+	 */
+	public function get_main_groups_table_html() {
+		ob_start();
+		?>
+		<table class="wp-list-table widefat fixed" id="fluid-groups-sortable">
+			<?php $this->render_table_header(); ?>
+			<tbody id="fluid-groups-tbody">
+				<?php $this->render_main_groups_table_body(); ?>
+			</tbody>
+		</table>
+		<?php
+		return ob_get_clean();
+	}
 
-		foreach ( $groups as $index => $group ) {
-			$this->render_developer_group_row( $group, $index + 1 );
-		}
-
+	/**
+	 * Get complete developer groups table HTML for AJAX responses.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string Complete HTML table.
+	 */
+	public function get_developer_groups_table_html() {
+		ob_start();
+		?>
+		<table class="wp-list-table widefat fixed" id="fluid-developer-groups-table-list">
+			<?php $this->render_table_header(); ?>
+			<tbody>
+				<?php $this->render_developer_groups_table_body(); ?>
+			</tbody>
+		</table>
+		<?php
 		return ob_get_clean();
 	}
 
@@ -223,58 +238,23 @@ class View extends BaseManager {
 	 * @return void
 	 */
 	private function render_main_groups_table() {
-		// Get main groups (built-in + custom) in correct order
-		$groups = GroupsData::get_main_groups();
-
 		?>
 		<form method="post" id="fluid-groups-form">
 			<?php wp_nonce_field( 'fluid_groups_action', 'fluid_groups_nonce' ); ?>
 			<input type="hidden" name="fluid_groups_action" value="save_all_changes">
 
 			<table class="wp-list-table widefat fixed" id="fluid-groups-sortable">
-				<thead>
-					<tr>
-						<th scope="col" class="manage-column column-order" style="width: 40px;">
-							<?php esc_html_e( '#', 'fluid-design-system-for-elementor' ); ?>
-						</th>
-						<th scope="col" class="manage-column column-name">
-							<?php esc_html_e( 'Name', 'fluid-design-system-for-elementor' ); ?>
-						</th>
-						<th scope="col" class="manage-column column-description">
-							<?php esc_html_e( 'Description', 'fluid-design-system-for-elementor' ); ?>
-						</th>
-						<th scope="col" class="manage-column column-type" style="width: 120px;">
-							<?php esc_html_e( 'Type', 'fluid-design-system-for-elementor' ); ?>
-						</th>
-						<th scope="col" class="manage-column column-presets" style="width: 100px;">
-							<?php esc_html_e( 'Presets', 'fluid-design-system-for-elementor' ); ?>
-						</th>
-						<th scope="col" class="manage-column column-actions" style="width: 100px;">
-							<?php esc_html_e( 'Actions', 'fluid-design-system-for-elementor' ); ?>
-						</th>
-					</tr>
-				</thead>
+				<?php $this->render_table_header(); ?>
 				<tbody id="fluid-groups-tbody">
-					<?php if ( ! empty( $groups ) ) : ?>
-						<?php foreach ( $groups as $index => $group ) : ?>
-							<?php $this->render_main_group_row( $group, $index + 1 ); ?>
-						<?php endforeach; ?>
-					<?php else : ?>
-						<tr class="no-groups-message">
-							<td colspan="6" style="text-align: center; padding: 40px 20px; color: #646970;">
-								<?php esc_html_e( 'No groups found. Create your first group below.', 'fluid-design-system-for-elementor' ); ?>
-							</td>
-						</tr>
-					<?php endif; ?>
-					<?php $this->render_inline_add_row(); ?>
+					<?php $this->render_main_groups_table_body(); ?>
 				</tbody>
-		</table>
+			</table>
 
-		<div class="fluid-save-changes-row">
-			<?php submit_button( esc_html__( 'Save Changes', 'fluid-design-system-for-elementor' ), 'primary', 'save_changes', false ); ?>
-			<div class="fluid-status-area hidden"></div>
-		</div>
-	</form>		
+			<div class="fluid-save-changes-row">
+				<?php submit_button( esc_html__( 'Save Changes', 'fluid-design-system-for-elementor' ), 'primary', 'save_changes', false ); ?>
+				<div class="fluid-status-area hidden"></div>
+			</div>
+		</form>		
 		<?php
 		// Separate delete form to avoid nesting
 		?>
@@ -295,47 +275,104 @@ class View extends BaseManager {
 	 * @return void
 	 */
 	private function render_developer_groups_table() {
-		$groups = GroupsData::get_filter_groups();
-
 		?>
 		<table class="wp-list-table widefat fixed" id="fluid-developer-groups-table-list">
-			<thead>
-				<tr>
-					<th scope="col" class="manage-column column-order" style="width: 40px;">
-						<?php esc_html_e( '#', 'fluid-design-system-for-elementor' ); ?>
-					</th>
-					<th scope="col" class="manage-column column-name">
-						<?php esc_html_e( 'Name', 'fluid-design-system-for-elementor' ); ?>
-					</th>
-					<th scope="col" class="manage-column column-description">
-						<?php esc_html_e( 'Description', 'fluid-design-system-for-elementor' ); ?>
-					</th>
-					<th scope="col" class="manage-column column-type" style="width: 120px;">
-						<?php esc_html_e( 'Type', 'fluid-design-system-for-elementor' ); ?>
-					</th>
-					<th scope="col" class="manage-column column-presets" style="width: 100px;">
-						<?php esc_html_e( 'Presets', 'fluid-design-system-for-elementor' ); ?>
-					</th>
-					<th scope="col" class="manage-column column-actions" style="width: 100px;">
-						<?php esc_html_e( 'Actions', 'fluid-design-system-for-elementor' ); ?>
-					</th>
-				</tr>
-			</thead>
+			<?php $this->render_table_header(); ?>
 			<tbody>
-				<?php if ( ! empty( $groups ) ) : ?>
-					<?php foreach ( $groups as $index => $group ) : ?>
-						<?php $this->render_developer_group_row( $group, $index + 1 ); ?>
-					<?php endforeach; ?>
-				<?php else : ?>
-					<tr class="no-groups-message">
-						<td colspan="6" style="text-align: center; padding: 40px 20px; color: #646970;">
-							<?php esc_html_e( 'No developer groups found.', 'fluid-design-system-for-elementor' ); ?>
-						</td>
-					</tr>
-				<?php endif; ?>
+				<?php $this->render_developer_groups_table_body(); ?>
 			</tbody>
 		</table>
 		<?php
+	}
+
+	/**
+	 * Render table header (shared between main and developer tables).
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @return void
+	 */
+	private function render_table_header() {
+		?>
+		<thead>
+			<tr>
+				<th scope="col" class="manage-column column-order" style="width: 40px;">
+					<?php esc_html_e( '#', 'fluid-design-system-for-elementor' ); ?>
+				</th>
+				<th scope="col" class="manage-column column-name">
+					<?php esc_html_e( 'Name', 'fluid-design-system-for-elementor' ); ?>
+				</th>
+				<th scope="col" class="manage-column column-description">
+					<?php esc_html_e( 'Description', 'fluid-design-system-for-elementor' ); ?>
+				</th>
+				<th scope="col" class="manage-column column-type" style="width: 120px;">
+					<?php esc_html_e( 'Type', 'fluid-design-system-for-elementor' ); ?>
+				</th>
+				<th scope="col" class="manage-column column-presets" style="width: 100px;">
+					<?php esc_html_e( 'Presets', 'fluid-design-system-for-elementor' ); ?>
+				</th>
+				<th scope="col" class="manage-column column-actions" style="width: 100px;">
+					<?php esc_html_e( 'Actions', 'fluid-design-system-for-elementor' ); ?>
+				</th>
+			</tr>
+		</thead>
+		<?php
+	}
+
+	/**
+	 * Render main groups table body content.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @return void
+	 */
+	private function render_main_groups_table_body() {
+		$groups = GroupsData::get_main_groups();
+
+		if ( ! empty( $groups ) ) {
+			foreach ( $groups as $index => $group ) {
+				$this->render_main_group_row( $group, $index + 1 );
+			}
+		} else {
+			?>
+			<tr class="no-groups-message">
+				<td colspan="6" style="text-align: center; padding: 40px 20px; color: #646970;">
+					<?php esc_html_e( 'No groups found. Create your first group below.', 'fluid-design-system-for-elementor' ); ?>
+				</td>
+			</tr>
+			<?php
+		}
+
+		// Always include the inline add row at the end
+		$this->render_inline_add_row();
+	}
+
+	/**
+	 * Render developer groups table body content.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @return void
+	 */
+	private function render_developer_groups_table_body() {
+		$groups = GroupsData::get_filter_groups();
+
+		if ( ! empty( $groups ) ) {
+			foreach ( $groups as $index => $group ) {
+				$this->render_developer_group_row( $group, $index + 1 );
+			}
+		} else {
+			?>
+			<tr class="no-groups-message">
+				<td colspan="6" style="text-align: center; padding: 40px 20px; color: #646970;">
+					<?php esc_html_e( 'No developer groups found.', 'fluid-design-system-for-elementor' ); ?>
+				</td>
+			</tr>
+			<?php
+		}
 	}
 
 	/**
@@ -448,8 +485,8 @@ class View extends BaseManager {
 	private function render_preset_item( $preset, $group ) {
 		// Generate a fallback ID if missing to prevent empty data-preset-id
 		$preset_id = isset( $preset['_id'] ) && ! empty( $preset['_id'] )
-			? $preset['_id']
-			: 'preset_' . md5( serialize( $preset ) );
+		? esc_attr( $preset['_id'] )
+		: 'preset_' . wp_generate_uuid4();
 
 		$preset_title = isset( $preset['title'] ) ? esc_html( $preset['title'] ) : esc_html__( 'Untitled Preset', 'fluid-design-system-for-elementor' );
 

@@ -9,6 +9,128 @@
   'use strict'
 
   /**
+   * Sanitize HTML content to prevent XSS attacks while preserving structure
+   *
+   * @param {string} htmlContent The HTML content to sanitize
+   * @return {string} Sanitized HTML safe for insertion
+   */
+  function sanitizeHTML(htmlContent) {
+    // Return empty string for null/undefined input
+    if (!htmlContent) {
+      return ''
+    }
+
+    // Configure DOMPurify to allow needed elements but prevent scripts
+    const config = {
+      ALLOWED_TAGS: [
+        'table',
+        'thead',
+        'tbody',
+        'tfoot',
+        'tr',
+        'th',
+        'td',
+        'colgroup',
+        'col',
+
+        // Text content
+        'div',
+        'span',
+        'p',
+        'strong',
+        'em',
+        'b',
+        'i',
+        'br',
+        // Headings
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        // Lists
+        'ul',
+        'ol',
+        'li',
+        // Links and buttons
+        'a',
+        'button',
+        // Form elements
+        'input',
+        'select',
+        'textarea',
+        'form',
+        'option',
+        // Semantic elements
+        'details',
+        'summary',
+        'pre',
+        'code',
+        // WordPress/Elementor specific
+        'fieldset',
+        'legend'
+      ],
+      ALLOWED_ATTR: [
+        // Basic attributes
+        'class',
+        'id',
+        'style',
+        'title',
+        'lang',
+        'dir',
+        // Link attributes
+        'href',
+        'target',
+        'rel',
+        // Form attributes
+        'type',
+        'name',
+        'value',
+        'placeholder',
+        'disabled',
+        'checked',
+        'selected',
+        'readonly',
+        'required',
+        'maxlength',
+        'min',
+        'max',
+        'pattern',
+        'step',
+        'autocomplete',
+        'autofocus',
+        // Data attributes
+        'data-*',
+        // ARIA attributes
+        'aria-*',
+        'role',
+        // Table attributes
+        'colspan',
+        'rowspan',
+        'scope',
+        // WordPress/Admin specific
+        'method',
+        'action',
+        'enctype',
+        // For dashicons and eicons
+        'for',
+        'tabindex'
+      ],
+      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel|sms):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
+      ADD_TAGS: ['i'], // For dashicons like <i class="eicon-elementor-square">
+      ADD_ATTR: ['target', 'rel'], // For links that open in new window
+      ALLOW_DATA_ATTR: true, // Critical for your data attributes
+      ALLOW_ARIA_ATTR: true, // For accessibility
+      KEEP_CONTENT: true, // Preserve text content even if tag is removed
+      ALLOW_STYLE_ATTR: true // Allow style attribute but sanitize its content
+    }
+
+    // Use DOMPurify to sanitize
+    return DOMPurify.sanitize(htmlContent, config)
+  }
+
+  /**
    * Send AJAX request
    */
   function sendRequest(action, data, successCallback, errorCallback) {
@@ -239,18 +361,20 @@
    * Update tables with fresh HTML from server (complete refresh)
    */
   function updateTablesWithHtml(data) {
-    // Update main groups table body
+    // Update main groups table (complete table replacement)
     if (data.main_table_html) {
-      const $tbody = $('#fluid-groups-tbody')
+      const $currentTable = $('#fluid-groups-sortable')
 
-      if ($tbody.length > 0) {
+      if ($currentTable.length > 0) {
         // Destroy existing sortable before replacing content
+        const $tbody = $currentTable.find('tbody')
         if ($tbody.hasClass('ui-sortable')) {
           $tbody.sortable('destroy')
         }
 
-        // Replace the entire table body content with fresh HTML
-        $tbody.html(data.main_table_html)
+        // Replace the entire table with fresh HTML
+        const $newTable = $(sanitizeHTML(data.main_table_html))
+        $currentTable.replaceWith($newTable)
 
         // Reinitialize sortable after content replacement
         if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.sortable) {
@@ -259,16 +383,18 @@
       }
     }
 
-    // Update developer groups table body if it exists
+    // Update developer groups table (complete table replacement)
     if (data.developer_table_html !== undefined) {
-      const $developerTable = $('#fluid-developer-groups-table-list tbody')
+      const $currentTable = $('#fluid-developer-groups-table-list')
       const $developerSection = $('#fluid-developer-groups-table')
 
       if (data.developer_table_exists && data.developer_table_html) {
         // Show the developer section and update content
         $developerSection.show()
-        if ($developerTable.length > 0) {
-          $developerTable.html(data.developer_table_html)
+        if ($currentTable.length > 0) {
+          // Replace the entire table with fresh HTML
+          const $newTable = $(sanitizeHTML(data.developer_table_html))
+          $currentTable.replaceWith($newTable)
         }
       } else {
         // Hide the developer section if no developer groups

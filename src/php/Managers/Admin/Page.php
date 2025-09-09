@@ -59,8 +59,8 @@ class Page extends BaseManager {
 		// Handle POST actions first
 		$this->managers->admin_tabs_groups_handlers->handle_group_actions();
 
-		// Get current tab
-		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'groups';
+		// Get current tab (GET parameter for navigation - no nonce needed)
+		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'groups'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		?>
 		<div class="wrap">

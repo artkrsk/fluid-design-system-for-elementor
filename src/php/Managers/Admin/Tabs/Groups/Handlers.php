@@ -23,16 +23,32 @@ class Handlers extends BaseManager {
 		$changes_saved = false;
 
 		// Step 1: Capture the original group order with temporary IDs
-		$original_order       = isset( $_POST['group_order'] ) ? $_POST['group_order'] : array();
-		$temp_group_mapping   = isset( $_POST['temp_group_mapping'] ) ? json_decode( stripslashes( $_POST['temp_group_mapping'] ), true ) : array();
-		$temp_group_positions = isset( $_POST['temp_group_positions'] ) ? json_decode( stripslashes( $_POST['temp_group_positions'] ), true ) : array();
+		// Nonce verification is handled in handle_group_actions()
+		$original_order       = isset( $_POST['group_order'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['group_order'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$temp_group_mapping   = isset( $_POST['temp_group_mapping'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_POST['temp_group_mapping'] ) ), true ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$temp_group_positions = isset( $_POST['temp_group_positions'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_POST['temp_group_positions'] ) ), true ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		// Step 2: Create new groups and build ID mapping
 		$temp_id_to_real_id = array();
 
-		if ( isset( $_POST['new_groups'] ) && is_array( $_POST['new_groups'] ) ) {
-			$new_group_names        = isset( $_POST['new_groups']['name'] ) ? $_POST['new_groups']['name'] : array();
-			$new_group_descriptions = isset( $_POST['new_groups']['description'] ) ? $_POST['new_groups']['description'] : array();
+		if ( isset( $_POST['new_groups'] ) && is_array( $_POST['new_groups'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// Unslash immediately when assigning
+			$new_groups_raw = isset( $_POST['new_groups'] ) ? wp_unslash( $_POST['new_groups'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			$new_group_names        = array();
+			$new_group_descriptions = array();
+
+			if ( isset( $new_groups_raw['name'] ) && is_array( $new_groups_raw['name'] ) ) {
+				foreach ( $new_groups_raw['name'] as $key => $value ) {
+					$new_group_names[ $key ] = sanitize_text_field( $value ); // Already unslashed
+				}
+			}
+
+			if ( isset( $new_groups_raw['description'] ) && is_array( $new_groups_raw['description'] ) ) {
+				foreach ( $new_groups_raw['description'] as $key => $value ) {
+					$new_group_descriptions[ $key ] = sanitize_textarea_field( $value ); // Already unslashed
+				}
+			}
 
 			if ( ! empty( $new_group_names ) ) {
 				$created_count  = 0;
@@ -167,15 +183,20 @@ class Handlers extends BaseManager {
 		}
 
 		// Handle title updates
-		if ( isset( $_POST['group_titles'] ) && is_array( $_POST['group_titles'] ) && ! empty( $_POST['group_titles'] ) ) {
-			$title_updates  = $_POST['group_titles'];
+		if ( isset( $_POST['group_titles'] ) && is_array( $_POST['group_titles'] ) && ! empty( $_POST['group_titles'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// Unslash immediately when assigning
+			$title_updates_raw = isset( $_POST['group_titles'] ) ? wp_unslash( $_POST['group_titles'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$title_updates     = array();
+
+			foreach ( $title_updates_raw as $key => $value ) {
+				$sanitized_key                   = sanitize_key( $key );
+				$title_updates[ $sanitized_key ] = sanitize_text_field( $value ); // Already unslashed
+			}
+
 			$custom_groups  = Data::get_custom_groups();
 			$updated_groups = false;
 
 			foreach ( $title_updates as $group_id => $new_title ) {
-				$group_id  = sanitize_key( $group_id );
-				$new_title = sanitize_text_field( $new_title );
-
 				// Skip temporary groups - they were handled during creation
 				if ( strpos( $group_id, 'temp_' ) === 0 ) {
 					continue;
@@ -223,25 +244,30 @@ class Handlers extends BaseManager {
 		}
 
 		// Handle description updates
-		if ( isset( $_POST['group_descriptions'] ) && is_array( $_POST['group_descriptions'] ) && ! empty( $_POST['group_descriptions'] ) ) {
-			$description_updates = $_POST['group_descriptions'];
-			$custom_groups       = Data::get_custom_groups();
-			$updated_groups      = false;
+		if ( isset( $_POST['group_descriptions'] ) && is_array( $_POST['group_descriptions'] ) && ! empty( $_POST['group_descriptions'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// Unslash immediately when assigning
+			$description_updates_raw = isset( $_POST['group_descriptions'] ) ? wp_unslash( $_POST['group_descriptions'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$description_updates     = array();
+
+			foreach ( $description_updates_raw as $key => $value ) {
+				$sanitized_key                         = sanitize_key( $key );
+				$description_updates[ $sanitized_key ] = sanitize_textarea_field( $value ); // Already unslashed
+			}
+
+			$custom_groups  = Data::get_custom_groups();
+			$updated_groups = false;
 
 			foreach ( $description_updates as $group_id => $new_description ) {
-				$sanitized_group_id    = sanitize_key( $group_id );
-				$sanitized_description = sanitize_textarea_field( $new_description );
-
 				// Skip temporary groups - they were handled during creation
-				if ( strpos( $sanitized_group_id, 'temp_' ) === 0 ) {
+				if ( strpos( $group_id, 'temp_' ) === 0 ) {
 					continue;
 				}
 
 				// Only update if the group exists in custom groups
-				if ( isset( $custom_groups[ $sanitized_group_id ] ) ) {
+				if ( isset( $custom_groups[ $group_id ] ) ) {
 					// Update the description
-					$custom_groups[ $sanitized_group_id ]['description'] = $sanitized_description;
-					$updated_groups                                      = true;
+					$custom_groups[ $group_id ]['description'] = $new_description;
+					$updated_groups                            = true;
 				}
 			}
 
@@ -251,17 +277,22 @@ class Handlers extends BaseManager {
 		}
 
 		// Handle group deletions
-		if ( isset( $_POST['delete_groups'] ) && is_array( $_POST['delete_groups'] ) && ! empty( $_POST['delete_groups'] ) ) {
-			$groups_to_delete = $_POST['delete_groups'];
-			$custom_groups    = Data::get_custom_groups();
-			$deleted_count    = 0;
+		if ( isset( $_POST['delete_groups'] ) && is_array( $_POST['delete_groups'] ) && ! empty( $_POST['delete_groups'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// Unslash immediately when assigning
+			$groups_to_delete_raw = isset( $_POST['delete_groups'] ) ? wp_unslash( $_POST['delete_groups'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$groups_to_delete     = array();
+
+			foreach ( $groups_to_delete_raw as $value ) {
+				$groups_to_delete[] = sanitize_key( $value ); // Already unslashed
+			}
+
+			$custom_groups = Data::get_custom_groups();
+			$deleted_count = 0;
 
 			foreach ( $groups_to_delete as $group_id ) {
-				$sanitized_group_id = sanitize_key( $group_id );
-
 				// Only delete if the group exists in custom groups
-				if ( isset( $custom_groups[ $sanitized_group_id ] ) ) {
-					if ( $this->managers->data->delete_group( $sanitized_group_id ) ) {
+				if ( isset( $custom_groups[ $group_id ] ) ) {
+					if ( $this->managers->data->delete_group( $group_id ) ) {
 						$deleted_count++;
 					}
 				}
@@ -314,13 +345,13 @@ class Handlers extends BaseManager {
 
 		// Handle delete actions with separate nonce
 		if ( 'delete_group' === $action ) {
-			if ( ! isset( $_POST['fluid_delete_nonce'] ) || ! wp_verify_nonce( $_POST['fluid_delete_nonce'], 'fluid_groups_action' ) ) {
+			if ( ! isset( $_POST['fluid_delete_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['fluid_delete_nonce'] ) ), 'fluid_groups_action' ) ) {
 				$this->managers->notices->add_notice( esc_html__( 'Security check failed.', 'fluid-design-system-for-elementor' ), 'error' );
 				return;
 			}
 		} else {
 			// Verify main form nonce for all other actions
-			if ( ! isset( $_POST['fluid_groups_nonce'] ) || ! wp_verify_nonce( $_POST['fluid_groups_nonce'], 'fluid_groups_action' ) ) {
+			if ( ! isset( $_POST['fluid_groups_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['fluid_groups_nonce'] ) ), 'fluid_groups_action' ) ) {
 				$this->managers->notices->add_notice( esc_html__( 'Security check failed.', 'fluid-design-system-for-elementor' ), 'error' );
 				return;
 			}
@@ -350,8 +381,9 @@ class Handlers extends BaseManager {
 	 * @return void
 	 */
 	private function handle_create_group() {
-		$name        = isset( $_POST['group_name'] ) ? sanitize_text_field( $_POST['group_name'] ) : '';
-		$description = isset( $_POST['group_description'] ) ? sanitize_textarea_field( $_POST['group_description'] ) : '';
+		// Nonce verification is handled in handle_group_actions()
+		$name        = isset( $_POST['group_name'] ) ? sanitize_text_field( wp_unslash( $_POST['group_name'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$description = isset( $_POST['group_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['group_description'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( empty( $name ) ) {
 			$this->managers->notices->add_notice( esc_html__( 'Group name is required.', 'fluid-design-system-for-elementor' ), 'error' );
@@ -382,7 +414,8 @@ class Handlers extends BaseManager {
 	 * @return void
 	 */
 	private function handle_delete_group() {
-		$group_id = isset( $_POST['group_id'] ) ? sanitize_key( $_POST['group_id'] ) : '';
+		// Nonce verification is handled in handle_group_actions()
+		$group_id = isset( $_POST['group_id'] ) ? sanitize_key( wp_unslash( $_POST['group_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( empty( $group_id ) ) {
 			$this->managers->notices->add_notice( esc_html__( 'Group could not be deleted - invalid ID.', 'fluid-design-system-for-elementor' ), 'error' );
