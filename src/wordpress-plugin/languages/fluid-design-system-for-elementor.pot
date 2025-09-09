@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Artem Semkin\n"
 "Last-Translator: Artem Semkin\n"
-"POT-Creation-Date: 2025-04-29T03:38:06.508Z"
+"POT-Creation-Date: 2025-09-09T11:00:38.149Z"
 "Report-Msgid-Bugs-To: https://artemsemkin.com\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -16,10 +16,6 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: src/php/Plugin.php:179
-msgid "Settings"
-msgstr ""
 
 #: src/php/Managers/Compatibility.php:92
 msgid "Delete Fluid Preset"
@@ -33,7 +29,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/php/Managers/Compatibility.php:95
+#: src/php/Managers/Compatibility.php:95, src/php/Managers/Admin/Tabs/Groups/View.php:618
 msgid "Cancel"
 msgstr ""
 
@@ -45,7 +41,7 @@ msgstr ""
 msgid "New Preset"
 msgstr ""
 
-#: src/php/Managers/Compatibility.php:100
+#: src/php/Managers/Compatibility.php:100, src/php/Managers/Admin/Tabs/Groups/View.php:274
 msgid "Save Changes"
 msgstr ""
 
@@ -65,82 +61,495 @@ msgstr ""
 msgid "Inherit"
 msgstr ""
 
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:110
-msgid "Fluid Typography & Spacing"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:261
-msgid "Breakpoints"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:270
-msgid "Minimum Screen Width"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:276, src/php/Elementor/Tabs/FluidTypographySpacing.php:451
-msgid "The screen width in pixels where the minimum fluid values will be applied."
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:286
-msgid "Maximum Screen Width"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:292, src/php/Elementor/Tabs/FluidTypographySpacing.php:469
-msgid "The screen width in pixels where the maximum fluid values will be applied."
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:339
-msgid "Minimum Value"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:373
-msgid "The design token value that will be applied at the minimum screen width."
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:382
-msgid "Maximum Value"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:416
-msgid "The design token value that will be applied at the maximum screen width."
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:428
-msgid "Use Custom Screen Width"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:449
-msgid "Custom Minimum Screen Width"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:467
-msgid "Custom Maximum Screen Width"
-msgstr ""
-
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:507
+#: src/php/Managers/ControlRegistry.php:86
 msgid "Spacing Presets"
 msgstr ""
 
-#: src/php/Elementor/Tabs/FluidTypographySpacing.php:543
+#: src/php/Managers/ControlRegistry.php:90
 msgid "Typography Presets"
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:112
+#: src/php/Managers/Options.php:73, src/php/Managers/Admin/Tabs/Groups/View.php:57
+msgid "Edit with Elementor"
+msgstr ""
+
+#: src/php/Managers/Options.php:82
+msgid "Manage"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:50
+msgid "Fluid Typography & Spacing"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:301
+msgid "Breakpoints"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:310
+msgid "Minimum Screen Width"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:316, src/php/Elementor/Tabs/FluidTypographySpacing.php:491
+msgid "The screen width in pixels where the minimum fluid values will be applied."
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:326
+msgid "Maximum Screen Width"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:332, src/php/Elementor/Tabs/FluidTypographySpacing.php:509
+msgid "The screen width in pixels where the maximum fluid values will be applied."
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:379
+msgid "Minimum Value"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:413
+msgid "The design token value that will be applied at the minimum screen width."
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:422
+msgid "Maximum Value"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:456
+msgid "The design token value that will be applied at the maximum screen width."
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:468
+msgid "Use Custom Screen Width"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:489
+msgid "Custom Minimum Screen Width"
+msgstr ""
+
+#: src/php/Elementor/Tabs/FluidTypographySpacing.php:507
+msgid "Custom Maximum Screen Width"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:158
+msgid "An error occurred while processing your request."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:159
+msgid "Saving changes..."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:160, src/php/Managers/Admin/Frontend.php:161, src/php/Managers/Admin/Frontend.php:164, src/php/Managers/Admin/Tabs/Groups/AJAX.php:273, src/php/Managers/Admin/Tabs/Groups/Handlers.php:294
+msgid "Changes saved successfully."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:162
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:163
+msgid "Saving all changes..."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:167
+msgid "Group name cannot be empty. Please enter a name."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:168
+msgid "Invalid characters detected. Only letters, numbers, spaces, and basic punctuation are allowed."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:169
+msgid "Group name contains invalid characters. Only letters, numbers, spaces, and basic punctuation are allowed."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:170
+msgid "Description contains invalid characters. Only letters, numbers, spaces, and basic punctuation are allowed."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:171
+msgid "Group name \"%s\" already exists. Please choose a different name."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:172
+msgid "Group name is too long (%1$d characters). Please keep it under %2$d characters."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:173
+msgid "Group name is too short. Please enter at least 2 characters."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:174
+msgid "Validation error occurred."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:177
+msgid "Successfully created \"%s\" group."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:178
+msgid "Successfully updated \"%s\"."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:181
+msgid "You have unsaved changes"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:184
+msgid "Status notices module not loaded"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:185
+msgid "Status area not found - falling back to dynamic creation"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:186
+msgid "Network error occurred"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:187
+msgid "Changes saved successfully"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:190
+msgid "Undo deletion"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:193
+msgid "Are you sure you want to delete \"%1$s\"?\n\nThis group contains %2$d preset%3$s that will be permanently removed."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:196
+msgid "Operation failed"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:197, src/php/Managers/Admin/Tabs/Groups/AJAX.php:125, src/php/Managers/Admin/Tabs/Groups/AJAX.php:183
+msgid "No changes made"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:200
+msgid "Changes will be saved when you click \"Save Changes\""
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:201
+msgid "Group order will be saved when you click \"Save Changes\""
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:204, src/php/Managers/Admin/Tabs/Groups/View.php:78
+msgid "Developer Groups"
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:205, src/php/Managers/Admin/Tabs/Groups/View.php:80
+msgid "These groups are added programmatically by themes or plugins and cannot be modified."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:206, src/php/Managers/Admin/Tabs/Groups/View.php:186, src/php/Managers/Admin/Tabs/Groups/View.php:265
+msgid "No groups found. Create your first group below."
+msgstr ""
+
+#: src/php/Managers/Admin/Frontend.php:207
+msgid "Failed to save changes. Please try again."
+msgstr ""
+
+#: src/php/Managers/Admin/Page.php:29, src/php/Managers/Admin/Page.php:30
+msgid "Fluid Design System"
+msgstr ""
+
+#: src/php/Managers/Admin/Page.php:49
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: src/php/Managers/Admin/Page.php:54
+msgid "Elementor plugin is required for this functionality."
+msgstr ""
+
+#: src/php/Elementor/Units/Fluid/Module.php:114
 msgid "Access denied."
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:153
+#: src/php/Elementor/Units/Fluid/Module.php:204
 msgid "Default"
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:157
+#: src/php/Elementor/Units/Fluid/Module.php:208
 msgid "0px"
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:190
-msgid "Fluid Spacing Presets"
+#: src/php/Managers/Admin/Tabs/Tabs.php:81
+msgid "Groups"
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:192
-msgid "Fluid Typography Presets"
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:28, src/php/Managers/Admin/Tabs/Groups/Handlers.php:324, src/php/Managers/Admin/Tabs/Groups/Handlers.php:318
+msgid "Security check failed."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:60
+msgid "Unknown action."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:94
+msgid "Title cannot be empty."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:103
+msgid "A group with this name already exists."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:113, src/php/Managers/Admin/Tabs/Groups/AJAX.php:171
+msgid "Group not found."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:140
+msgid "Failed to update title."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:134
+msgid "Title updated successfully."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:161
+msgid "Group ID is required."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:198
+msgid "Failed to update description."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:192
+msgid "Description updated successfully."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:218
+msgid "Group order data is required."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:233
+msgid "Failed to reorder groups."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:227
+msgid "Groups reordered successfully."
+msgstr ""
+
+#. translators: %s: Group name
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:54
+msgid "Group \"%s\" was not created because a group with the same name already exists."
+msgstr ""
+
+#. translators: %d: Number of created groups
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:84
+msgid "%d group created successfully."
+msgid_plural "%d groups created successfully."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: Group title
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:207
+msgid "Group \"%s\" was not renamed because another group with the same name already exists."
+msgstr ""
+
+#. translators: %d: Number of deleted groups
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:275
+msgid "%d group deleted successfully."
+msgid_plural "%d groups deleted successfully."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:297
+msgid "No changes to save."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:357
+msgid "Group name is required."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:363
+msgid "A group with this name already exists. Please choose a different name."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:372
+msgid "Failed to create group."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:370
+msgid "Group created successfully."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:388
+msgid "Group could not be deleted - invalid ID."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:395
+msgid "Failed to delete group."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/Handlers.php:393
+msgid "Group deleted successfully."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:39
+msgid "Ready to Edit Your Fluid Presets?"
+msgstr ""
+
+#. translators: %s: Link to Elementor Site Settings
+#: src/php/Managers/Admin/Tabs/Groups/View.php:44
+msgid "This panel only organizes your preset groups. To actually create and edit the fluid presets in live, visit %s."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:48
+msgid "Elementor Site Settings"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:70
+msgid "User Groups"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:72
+msgid "Create and organize custom preset groups for your design system."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:83
+msgid "Why use Developer Groups?"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:89
+msgid "Developer groups appear alongside built-in and custom groups in the fluid unit selector, giving users access to your existing design system tokens."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:90
+msgid "These are not editable by users and don't appear in Elementor Site Settings."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:96
+msgid "Benefits of Developer Groups:"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:99
+msgid "Ship reusable preset collections with your theme or plugin."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:100
+msgid "Maximum flexibility - define your own CSS rules for presets."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:101
+msgid "Prevent accidental modifications by users."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:105
+msgid "Example Implementation:"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:141
+msgid "Important Notes:"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:144
+msgid "Values must be valid CSS - CSS variables, pixels, rems, percentages, etc."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:145
+msgid "CSS variables require separate CSS generation - this filter only provides the values"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:146
+msgid "Groups appear in fluid unit dropdowns - not in Elementor Site Settings"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:147
+msgid "Use display_value to show user-friendly text instead of CSS variable names"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:151
+msgid "Where to add this code:"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:154
+msgid "In your theme's functions.php file"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:155
+msgid "In a custom plugin for your design system"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:156
+msgid "In a must-use plugin for network-wide consistency"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:238, src/php/Managers/Admin/Tabs/Groups/View.php:305
+msgid "#"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:241, src/php/Managers/Admin/Tabs/Groups/View.php:308
+msgid "Name"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:244, src/php/Managers/Admin/Tabs/Groups/View.php:311
+msgid "Description"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:247, src/php/Managers/Admin/Tabs/Groups/View.php:314
+msgid "Type"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:250, src/php/Managers/Admin/Tabs/Groups/View.php:317
+msgid "Presets"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:253, src/php/Managers/Admin/Tabs/Groups/View.php:320
+msgid "Actions"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:332
+msgid "No developer groups found."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:352, src/php/Managers/Admin/Tabs/Groups/View.php:475
+msgid "Untitled Group"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:362
+msgid "Developer"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:427
+msgid "No presets found."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:429
+msgid "Drag presets here from other groups"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:454
+msgid "Untitled Preset"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:492
+msgid "Built-in"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:500
+msgid "Custom"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:577
+msgid "Delete Group"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:593
+msgid "Add New Group"
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:597
+msgid "Add New Group..."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:598
+msgid "Enter group name..."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:604
+msgid "Enter description (optional)..."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/View.php:615
+msgid "Save Group"
 msgstr ""

@@ -16,6 +16,8 @@ Think of it like color presets — but for padding, font sizes, and layout gaps.
 
 ## ✨ Key Features
 
+### Core Functionality
+
 - Create unlimited fluid typography and spacing presets with custom minimum and maximum values
 - Define global breakpoints or set custom breakpoints for individual presets
 - Real-time preview of changes in the Elementor editor
@@ -23,6 +25,13 @@ Think of it like color presets — but for padding, font sizes, and layout gaps.
 - Compatible with any WordPress theme including Elementor's Hello theme
 - Full support for Elementor's responsive controls and additional breakpoints
 - Mix different units (px, em, rem) in your presets for ultimate flexibility
+
+### Preset Groups Management (since v1.1)
+
+- **Admin Interface**: Comprehensive management panel accessible via Elementor > Fluid Design System
+- **Custom Groups**: Create, edit, and organize your design tokens into custom groups
+- **Cross-Group Management**: Drag and drop presets between groups with real-time synchronization
+- **Developer Integration**: Filter-based groups for theme developers
 
 ## 📋 Requirements
 
@@ -229,6 +238,60 @@ function my_theme_add_fluid_support_to_custom_widget() {
 }
 add_action( 'init', 'my_theme_add_fluid_support_to_custom_widget' );
 ```
+
+### Add Custom Preset Groups
+
+You can add your own preset groups programmatically using the `arts/fluid_design_system/custom_presets` filter. This is useful for themes or plugins that want to provide design tokens, spacing, or typography presets globally.
+
+**Example:**
+
+```php
+add_filter( 'arts/fluid_design_system/custom_presets', function( $groups ) {
+    // Add a custom group for your theme
+    $groups[] = array(
+        'name'        => 'My Theme Design Tokens',
+        'description' => 'Consistent design values for My Theme',
+        'value'       => array(
+            array(
+                'id'    => 'theme-space-xs',
+                'title' => 'Extra Small Space',
+                'value' => 'var(--theme-space-xs)',  // CSS variable
+            ),
+            array(
+                'id'    => 'theme-border-radius',
+                'title' => 'Theme Border Radius',
+                'value' => '8px',  // Border radius value
+            ),
+            array(
+                'id'           => 'theme-gap-large',
+                'title'        => 'Large Gap',
+                'value'        => 'var(--theme-gap-large)',
+                'display_value' => '2rem',  // Show custom text in UI
+            ),
+            array(
+                'id'    => 'header-height',
+                'title' => 'Header Height',
+                'value' => 'var(--header-height)',  // Dynamically set from JS
+            ),
+        ),
+    );
+
+    return $groups;
+});
+```
+
+**Important Notes:**
+
+- Values must be valid CSS - CSS variables, pixels, rems, percentages, etc.
+- CSS variables require separate CSS generation - this filter only provides the values
+- Groups appear in fluid unit dropdowns - not in Elementor Site Settings
+- Use `display_value` to show user-friendly text instead of CSS variable names
+
+**Where to add this code:**
+
+- In your theme's functions.php file
+- In a custom plugin for your design system
+- In a must-use plugin for network-wide consistency
 
 ## 📜 License
 

@@ -16,6 +16,9 @@ use Elementor\Core\Kits\Controls\Repeater as Global_Style_Repeater;
 use \Arts\ElementorExtension\Tabs\BaseTab;
 use \Elementor\Controls_Manager;
 use \Elementor\Repeater;
+use \Arts\FluidDesignSystem\Managers\CSSVariables;
+use \Arts\FluidDesignSystem\Managers\ControlRegistry;
+use \Arts\FluidDesignSystem\Managers\GroupsData;
 
 /**
  * FluidTypographySpacing Class
@@ -34,69 +37,6 @@ class FluidTypographySpacing extends BaseTab {
 	 * @var string
 	 */
 	const TAB_ID = 'arts-fluid-design-system-tab-fluid-typography-spacing';
-
-	/**
-	 * CSS variable prefix for fluid design system.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_PREFIX = 'arts-fluid';
-
-	/**
-	 * CSS variable prefix for fluid presets.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_PRESET_PREFIX = '--' . self::CSS_VAR_PREFIX . '-preset--';
-
-	/**
-	 * CSS variable for minimum screen width.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_MIN_SCREEN = '--' . self::CSS_VAR_PREFIX . '-min-screen';
-
-	/**
-	 * CSS variable for minimum screen width value.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_MIN_SCREEN_VALUE = '--' . self::CSS_VAR_PREFIX . '-min-screen-value';
-
-	/**
-	 * CSS variable for maximum screen width.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_MAX_SCREEN = '--' . self::CSS_VAR_PREFIX . '-max-screen';
-
-	/**
-	 * CSS variable for maximum screen width value.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_MAX_SCREEN_VALUE = '--' . self::CSS_VAR_PREFIX . '-max-screen-value';
-
-	/**
-	 * CSS variable for screen difference calculation.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_SCREEN_DIFF = '--' . self::CSS_VAR_PREFIX . '-screen-diff';
 
 	/**
 	 * Get the title of the tab.
@@ -135,101 +75,116 @@ class FluidTypographySpacing extends BaseTab {
 	}
 
 	/**
-	 * Get CSS variable name for a preset with the specified ID.
+	 * Factory method to create a fluid preset repeater control.
+	 *
+	 * Creates a standardized fluid preset repeater control with consistent
+	 * configuration across all fluid preset types (built-in and custom).
 	 *
 	 * @since 1.0.0
 	 * @access public
-	 * @static
 	 *
-	 * @param string $id The preset ID.
-	 * @return string The CSS variable name.
+	 * @param string   $control_id The control ID.
+	 * @param array    $args       Optional additional control arguments.
+	 * @param Repeater $repeater   Optional custom repeater instance.
+	 * @return array                  The control configuration array.
 	 */
-	public static function get_css_var_preset( $id ) {
-		return apply_filters(
-			'arts/fluid_design_system/css/var_preset',
-			self::CSS_VAR_PRESET_PREFIX . $id,
-			$id
+	public function create_fluid_preset_control( $control_id, $args = array(), $repeater = null ) {
+		// Get the repeater control (use provided or create new)
+		if ( null === $repeater ) {
+			$repeater = $this->get_repeater_control();
+		}
+
+		// Base configuration for all fluid preset controls
+		$base_config = array(
+			'type'                     => Global_Style_Repeater::CONTROL_TYPE,
+			'fields'                   => $repeater->get_controls(),
+			'prevent_empty'            => false,
+			'is_fluid_preset_repeater' => true,
+			'selectors'                => array(
+				':root' => CSSVariables::get_css_var_screen_diff() . ': calc(var(' . CSSVariables::get_css_var_max_screen_value() . ') - var(' . CSSVariables::get_css_var_min_screen_value() . '));',
+			),
+			'frontend_available'       => true,
+			'render_type'              => 'template',
 		);
+
+		// Merge with custom arguments (allows overriding defaults)
+		$config = array_merge( $base_config, $args );
+
+		// Add the control to this instance
+		$this->add_control( $control_id, $config );
+
+		return $config;
 	}
 
 	/**
-	 * Get CSS variable name for minimum screen width.
+	 * Factory method to create a fluid preset section with optional description.
+	 *
+	 * Creates a complete fluid preset section including:
+	 * - Section start with proper labeling
+	 * - Optional description/info control
+	 * - Fluid preset repeater control
+	 * - Section end
 	 *
 	 * @since 1.0.0
 	 * @access public
-	 * @static
 	 *
-	 * @return string The CSS variable name.
+	 * @param string $section_id   The section ID.
+	 * @param string $control_id   The control ID for the repeater.
+	 * @param string $label        The section label.
+	 * @param string $description  Optional description text.
+	 * @param array  $args         Optional additional control arguments.
+	 * @return void
 	 */
-	public static function get_css_var_min_screen() {
-		return apply_filters(
-			'arts/fluid_design_system/css/var_min_screen',
-			self::CSS_VAR_MIN_SCREEN
+	public function create_fluid_preset_section( $section_id, $control_id, $label, $description = '', $args = array() ) {
+		// Start the section
+		$this->start_controls_section(
+			$section_id,
+			array(
+				'label' => $label,
+				'tab'   => $this->get_id(),
+			)
 		);
+
+		// Add description if provided
+		if ( ! empty( $description ) ) {
+			$info_control_id = $control_id . '_info';
+			$this->add_control(
+				$info_control_id,
+				array(
+					'type'            => Controls_Manager::RAW_HTML,
+					'raw'             => esc_html( $description ),
+					'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				)
+			);
+		}
+
+		// Create the fluid preset control
+		$this->create_fluid_preset_control( $control_id, $args );
+
+		// End the section
+		$this->end_controls_section();
 	}
 
 	/**
-	 * Get CSS variable name for minimum screen width value.
+	 * Convenience method to create a custom group section using the factory.
+	 *
+	 * This is a specialized version of create_fluid_preset_section() that
+	 * automatically generates IDs and uses consistent naming patterns for custom groups.
 	 *
 	 * @since 1.0.0
 	 * @access public
-	 * @static
 	 *
-	 * @return string The CSS variable name.
+	 * @param string $group_id     The custom group ID.
+	 * @param string $name         The group display name.
+	 * @param string $description  Optional description text.
+	 * @param array  $args         Optional additional control arguments.
+	 * @return void
 	 */
-	public static function get_css_var_min_screen_value() {
-		return apply_filters(
-			'arts/fluid_design_system/css/var_min_screen_value',
-			self::CSS_VAR_MIN_SCREEN_VALUE
-		);
-	}
+	public function create_custom_group_section( $group_id, $name, $description = '', $args = array() ) {
+		$section_id = ControlRegistry::get_custom_group_section_id( $group_id );
+		$control_id = ControlRegistry::get_custom_group_control_id( $group_id );
 
-	/**
-	 * Get CSS variable name for maximum screen width.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @return string The CSS variable name.
-	 */
-	public static function get_css_var_max_screen() {
-		return apply_filters(
-			'arts/fluid_design_system/css/var_max_screen',
-			self::CSS_VAR_MAX_SCREEN
-		);
-	}
-
-	/**
-	 * Get CSS variable name for maximum screen width value.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @return string The CSS variable name.
-	 */
-	public static function get_css_var_max_screen_value() {
-		return apply_filters(
-			'arts/fluid_design_system/css/var_max_screen_value',
-			self::CSS_VAR_MAX_SCREEN_VALUE
-		);
-	}
-
-	/**
-	 * Get CSS variable name for screen difference.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @return string The CSS variable name.
-	 */
-	public static function get_css_var_screen_diff() {
-		return apply_filters(
-			'arts/fluid_design_system/css/var_screen_diff',
-			self::CSS_VAR_SCREEN_DIFF
-		);
+		$this->create_fluid_preset_section( $section_id, $control_id, $name, $description, $args );
 	}
 
 	/**
@@ -241,9 +196,94 @@ class FluidTypographySpacing extends BaseTab {
 	 * @return void
 	 */
 	protected function register_tab_controls() {
+		// Always register breakpoints first
 		$this->register_section_fluid_breakpoints();
-		$this->register_section_fluid_spacing();
-		$this->register_section_fluid_typography();
+
+		// Register main groups (built-in + custom) in correct order
+		$this->register_main_group_sections();
+	}
+
+	/**
+	 * Register sections for main groups (built-in + custom) in correct order.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @return void
+	 */
+	private function register_main_group_sections() {
+		// Get the main groups in the correct order
+		$main_groups = $this->get_main_groups_from_manager();
+
+		foreach ( $main_groups as $group ) {
+			switch ( $group['type'] ) {
+				case 'builtin':
+					$this->register_builtin_group_section( $group );
+					break;
+
+				case 'custom':
+					$this->register_custom_group_section( $group );
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Get main groups from the groups data manager.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @return array Array of main groups.
+	 */
+	private function get_main_groups_from_manager() {
+		return GroupsData::get_main_groups();
+	}
+
+	/**
+	 * Register a section for a built-in group.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @param array $group Group data.
+	 * @return void
+	 */
+	private function register_builtin_group_section( $group ) {
+		$control_id = $group['id'];
+
+		switch ( $control_id ) {
+			case 'fluid_spacing_presets':
+				$this->register_section_fluid_spacing();
+				break;
+
+			case 'fluid_typography_presets':
+				$this->register_section_fluid_typography();
+				break;
+		}
+	}
+
+	/**
+	 * Register a section for a custom group.
+	 *
+	 * @since 1.0.0
+	 * @access private
+	 *
+	 * @param array $group_data Group data from groups data manager.
+	 * @return void
+	 */
+	private function register_custom_group_section( $group_data ) {
+		// Extract group information from the groups data manager format
+		$group_id    = isset( $group_data['id'] ) ? $group_data['id'] : '';
+		$name        = isset( $group_data['name'] ) ? $group_data['name'] : '';
+		$description = isset( $group_data['description'] ) ? $group_data['description'] : '';
+
+		if ( empty( $group_id ) || empty( $name ) ) {
+			return; // Skip invalid groups
+		}
+
+		// Use convenience method for custom groups
+		$this->create_custom_group_section( $group_id, $name, $description );
 	}
 
 	/**
@@ -256,7 +296,7 @@ class FluidTypographySpacing extends BaseTab {
 	 */
 	private function register_section_fluid_breakpoints() {
 		$this->start_controls_section(
-			'section_fluid_breakpoins',
+			'section_fluid_breakpoints',
 			array(
 				'label' => esc_html__( 'Breakpoints', 'fluid-design-system-for-elementor' ),
 				'tab'   => $this->get_id(),
@@ -275,7 +315,7 @@ class FluidTypographySpacing extends BaseTab {
 				'step'        => 1,
 				'description' => esc_html__( 'The screen width in pixels where the minimum fluid values will be applied.', 'fluid-design-system-for-elementor' ),
 				'selectors'   => array(
-					':root' => self::get_css_var_min_screen() . ': {{VALUE}}px; ' . self::get_css_var_min_screen_value() . ': {{VALUE}};',
+					':root' => CSSVariables::get_css_var_min_screen() . ': {{VALUE}}px; ' . CSSVariables::get_css_var_min_screen_value() . ': {{VALUE}};',
 				),
 			)
 		);
@@ -291,7 +331,7 @@ class FluidTypographySpacing extends BaseTab {
 				'step'        => 1,
 				'description' => esc_html__( 'The screen width in pixels where the maximum fluid values will be applied.', 'fluid-design-system-for-elementor' ),
 				'selectors'   => array(
-					':root' => self::get_css_var_max_screen() . ': {{VALUE}}px; ' . self::get_css_var_max_screen_value() . ': {{VALUE}};',
+					':root' => CSSVariables::get_css_var_max_screen() . ': {{VALUE}}px; ' . CSSVariables::get_css_var_max_screen_value() . ': {{VALUE}};',
 				),
 			)
 		);
@@ -317,7 +357,7 @@ class FluidTypographySpacing extends BaseTab {
 				'label_block'        => true,
 				'required'           => true,
 				'selectors'          => array(
-					':root' => self::get_css_var_preset( '{{_id.VALUE}}' ) . ': ' . self::get_clamp_formula( 'min', 'max' ) . ';',
+					':root' => CSSVariables::get_css_var_preset( '{{_id.VALUE}}' ) . ': ' . CSSVariables::get_clamp_formula( 'min', 'max' ) . ';',
 				),
 				'frontend_available' => true,
 				'render_type'        => 'template',
@@ -432,8 +472,8 @@ class FluidTypographySpacing extends BaseTab {
 				'frontend_available' => true,
 				'render_type'        => 'template',
 				'selectors'          => array(
-					':root' => self::CSS_VAR_PRESET_PREFIX . '{{_id.VALUE}}: ' .
-					self::get_clamp_formula(
+					':root' => CSSVariables::CSS_VAR_PRESET_PREFIX . '{{_id.VALUE}}: ' .
+					CSSVariables::get_clamp_formula(
 						'min',
 						'max',
 						'{{overriden_min_screen_width.size}}px',
@@ -501,31 +541,17 @@ class FluidTypographySpacing extends BaseTab {
 	 * @return void
 	 */
 	private function register_section_fluid_spacing() {
-		$this->start_controls_section(
+		// Get metadata for consistent labeling
+		$metadata         = ControlRegistry::get_builtin_group_metadata();
+		$spacing_metadata = $metadata['spacing'];
+
+		// Use factory method to create the complete section
+		$this->create_fluid_preset_section(
 			'section_fluid_spacing_presets',
-			array(
-				'label' => esc_html__( 'Spacing Presets', 'fluid-design-system-for-elementor' ),
-				'tab'   => $this->get_id(),
-			)
-		);
-
-		$repeater = $this->get_repeater_control();
-
-		$this->add_control(
 			'fluid_spacing_presets',
-			array(
-				'type'               => Global_Style_Repeater::CONTROL_TYPE,
-				'fields'             => $repeater->get_controls(),
-				'prevent_empty'      => false,
-				'selectors'          => array(
-					':root' => self::get_css_var_screen_diff() . ': calc(var(' . self::get_css_var_max_screen_value() . ') - var(' . self::get_css_var_min_screen_value() . '));',
-				),
-				'frontend_available' => true,
-				'render_type'        => 'template',
-			)
+			$spacing_metadata['name'],
+			$spacing_metadata['description']
 		);
-
-		$this->end_controls_section();
 	}
 
 	/**
@@ -537,95 +563,16 @@ class FluidTypographySpacing extends BaseTab {
 	 * @return void
 	 */
 	private function register_section_fluid_typography() {
-		$this->start_controls_section(
+		// Get metadata for consistent labeling
+		$metadata            = ControlRegistry::get_builtin_group_metadata();
+		$typography_metadata = $metadata['typography'];
+
+		// Use factory method to create the complete section
+		$this->create_fluid_preset_section(
 			'section_fluid_typography_presets',
-			array(
-				'label' => esc_html__( 'Typography Presets', 'fluid-design-system-for-elementor' ),
-				'tab'   => $this->get_id(),
-			)
-		);
-
-		$repeater = $this->get_repeater_control();
-
-		$this->add_control(
 			'fluid_typography_presets',
-			array(
-				'type'               => Global_Style_Repeater::CONTROL_TYPE,
-				'fields'             => $repeater->get_controls(),
-				'prevent_empty'      => false,
-				'selectors'          => array(
-					':root' => self::get_css_var_screen_diff() . ': calc(var(' . self::get_css_var_max_screen_value() . ') - var(' . self::get_css_var_min_screen_value() . '));',
-				),
-				'frontend_available' => true,
-				'render_type'        => 'template',
-			)
-		);
-
-		$this->end_controls_section();
-	}
-
-	/**
-	 * Generates a CSS clamp formula for the fluid unit
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @param string      $min_value The control name for minimum value
-	 * @param string      $max_value The control name for maximum value
-	 * @param string|null $min_screen The minimum screen width value or CSS variable
-	 * @param string|null $max_screen The maximum screen width value or CSS variable
-	 *
-	 * @return string The complete clamp formula
-	 */
-	public static function get_clamp_formula( $min_value, $max_value, $min_screen = null, $max_screen = null ) {
-		// Break down the formula into logical parts
-		$min_size = '{{' . $min_value . '.size}}{{' . $min_value . '.unit}}';
-		$max_size = '{{' . $max_value . '.size}}{{' . $max_value . '.unit}}';
-
-		// Calculate the difference between max and min values with explicit parentheses
-		$value_diff = '({{' . $max_value . '.size}} - {{' . $min_value . '.size}})';
-
-		// Use provided values or fall back to CSS variables
-		if ( $min_screen === null ) {
-			$min_screen = 'var(' . self::get_css_var_min_screen() . ')';
-		}
-		if ( $max_screen === null ) {
-			$max_screen = 'var(' . self::get_css_var_screen_diff() . ')';
-		}
-
-		// Explicit parentheses around viewport calculation
-		$viewport_calc = "(100vw - {$min_screen})";
-
-		// Explicit parentheses around division operation
-		$scaling_factor = "({$value_diff} * ({$viewport_calc} / {$max_screen}))";
-
-		// Build the formula with proper grouping to handle mixed signs
-		// Use parentheses around the entire addition to ensure proper calculation
-		$preferred_value = "calc(({$min_size}) + ({$scaling_factor}))";
-
-		// Use CSS min() and max() to automatically determine correct bounds
-		// This handles both normal cases (min < max) and inverted cases (min > max)
-		$lower_bound = "min({$min_size}, {$max_size})";
-		$upper_bound = "max({$min_size}, {$max_size})";
-
-		// Build the clamp with dynamic bounds
-		$formula = "clamp({$lower_bound}, {$preferred_value}, {$upper_bound})";
-
-		// Allow filtering of the complete formula
-		return apply_filters(
-			'arts/fluid_design_system/css/clamp_formula',
-			$formula,
-			array(
-				'min_value'     => $min_value,
-				'max_value'     => $max_value,
-				'min_screen'    => $min_screen,
-				'max_screen'    => $max_screen,
-				'min_size'      => $min_size,
-				'max_size'      => $max_size,
-				'value_diff'    => $value_diff,
-				'viewport_calc' => $viewport_calc,
-			)
+			$typography_metadata['name'],
+			$typography_metadata['description']
 		);
 	}
 }

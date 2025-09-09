@@ -1,0 +1,271 @@
+/**
+ * Inline editing styles for Fluid Design System Admin
+ *
+ * @package Arts\FluidDesignSystem
+ * @since 1.0.0
+ */
+
+/* Inline editing for descriptions */
+.editable-description {
+	position: relative;
+	cursor: pointer;
+	transition: color 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	box-sizing: border-box;
+}
+
+.editable-description:hover {
+	color: #2271b1;
+}
+
+/* Show edit icon when hovering OR when description is empty */
+.editable-description:hover:after,
+.editable-description:not(.editing):after {
+	content: "\f464";
+	font-family: dashicons;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 4px;
+	vertical-align: middle;
+	color: currentColor;
+	opacity: 0.8;
+	animation: fadeIn 0.2s ease-in;
+	flex-shrink: 0;
+	line-height: 1;
+}
+
+/* Hide edit icon when editing */
+.editable-description.editing:after {
+	display: none;
+}
+
+/* When description text is empty, remove left margin from icon */
+.editable-description:not(.editing):after {
+	margin-left: 0;
+}
+
+/* Hide edit icon when there's content and not hovering */
+.editable-description:not(:hover):not(.editing) .description-text:not(:empty)~ :after {
+	display: none;
+}
+
+.editable-description .description-text {
+	display: block;
+	line-height: 1.4;
+	flex: 1;
+	/* Keep exact same dimensions as original */
+}
+
+.editable-description .description-input {
+	display: none;
+	margin: -4px -8px;
+	/* Position to exactly match text position */
+	padding: 4px 8px;
+	/* Nice breathing space */
+	border: 1px solid #c3c4c7;
+	border-radius: 3px;
+	background: #fff;
+	font-size: inherit;
+	font-family: inherit;
+	outline: none;
+	box-shadow: 0 0 0 1px rgba(34, 113, 177, 0);
+	line-height: 1.4;
+	/* Width will be set dynamically by JavaScript */
+	min-width: 120px;
+	max-width: 100%;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.editable-description .description-input:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px rgba(34, 113, 177, 0.3);
+}
+
+.editable-description.editing .description-text {
+	display: none;
+}
+
+.editable-description.editing .description-input {
+	display: block;
+}
+
+.editable-description.editing .description-text {
+	display: none;
+}
+
+/* Error state for descriptions */
+.editable-description.validation-error .description-input {
+	border-color: #d63638 !important;
+	animation: shake 0.3s ease-in-out;
+}
+
+/* Success feedback for descriptions */
+.editable-description.success-feedback {
+	color: #00a32a;
+	border-bottom-color: #00a32a;
+	animation: successPulse 0.8s ease-out;
+}
+
+/* Inline editing styles for titles */
+.editable-title {
+	position: relative;
+	cursor: pointer;
+	transition: color 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	box-sizing: border-box;
+}
+
+[data-editable] {
+	display: inline-flex;
+	align-items: center;
+}
+
+.editable-title:hover {
+	color: #2271b1;
+}
+
+.editable-title:after {
+	content: "\f464";
+	/* WordPress edit icon */
+	font-family: dashicons;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 4px;
+	vertical-align: middle;
+	color: currentColor;
+	opacity: 0.8;
+	animation: fadeIn 0.2s ease-in;
+	line-height: 1;
+}
+
+/* Hide edit icon when editing */
+.editable-title.editing:after {
+	display: none;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateX(-2px);
+	}
+
+	to {
+		opacity: 0.8;
+		transform: translateX(0);
+	}
+}
+
+.editable-description .description-text {
+	border-bottom: 2px dotted transparent;
+}
+
+.editable-description:hover .description-text {
+	border-bottom-color: currentColor;
+}
+
+.editable-title .title-text {
+	display: block;
+	line-height: 1.4;
+	border-bottom: 2px dotted transparent;
+	/* Keep exact same dimensions as original */
+}
+
+.editable-title:hover .title-text {
+	border-bottom-color: currentColor;
+}
+
+.editable-title .title-input {
+	display: none;
+	margin: -6px -8px;
+	/* Position to exactly match text position */
+	padding: 6px 8px;
+	/* Nice breathing space */
+	border: 1px solid #c3c4c7;
+	border-radius: 3px;
+	background: #fff;
+	font-weight: 600;
+	font-size: inherit;
+	font-family: inherit;
+	outline: none;
+	box-shadow: 0 0 0 1px rgba(34, 113, 177, 0);
+	line-height: 1.4;
+	/* Width will be set dynamically by JavaScript */
+	min-width: 120px;
+	max-width: 100%;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.editable-title .title-input:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px rgba(34, 113, 177, 0.3);
+}
+
+.editable-title.editing .title-text {
+	display: none;
+}
+
+.editable-title.editing .title-input {
+	display: block;
+}
+
+.editable-title.editing .title-text {
+	border-bottom-color: transparent;
+}
+
+/* Error state */
+.editable-title.validation-error .title-input {
+	border-color: #d63638 !important;
+	animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+
+	25% {
+		transform: translateX(-1px);
+	}
+
+	75% {
+		transform: translateX(1px);
+	}
+}
+
+/* Enhanced focus styles for accessibility */
+.editable-title input[type="text"]:focus {
+	width: 100%;
+	outline: none;
+}
+
+/* Success feedback animation */
+.editable-title.success-feedback {
+	color: #00a32a;
+	border-bottom-color: #00a32a;
+	animation: successPulse 0.8s ease-out;
+}
+
+@keyframes successPulse {
+	0% {
+		transform: scale(1);
+		background-color: transparent;
+	}
+
+	30% {
+		transform: scale(1.02);
+		background-color: rgba(0, 163, 42, 0.1);
+	}
+
+	100% {
+		transform: scale(1);
+		background-color: transparent;
+	}
+}

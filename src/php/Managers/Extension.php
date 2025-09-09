@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\ElementorExtension\Plugins\BaseManager;
+use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 /**
  * Extension Class

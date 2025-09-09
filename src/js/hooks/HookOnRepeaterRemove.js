@@ -16,10 +16,7 @@ export class HookOnRepeaterRemove extends window.$e.modules.hookUI.Before {
   }
 
   getConditions(args) {
-    return (
-      args.name === FLUID_REPEATER_CONTROLS.SPACING ||
-      args.name === FLUID_REPEATER_CONTROLS.TYPOGRAPHY
-    )
+    return FLUID_REPEATER_CONTROLS.isFluidPresetRepeater(args.name, args.container)
   }
 
   apply(args) {

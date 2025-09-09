@@ -15,10 +15,7 @@ const createGlobalStyleRepeater = () => {
     },
 
     isFluidSpacingTypographyRepeater() {
-      return (
-        this.model.get('name') === 'fluid_spacing_presets' ||
-        this.model.get('name') === 'fluid_typography_presets'
-      )
+      return this.model.get('is_fluid_preset_repeater') === true
     },
 
     // This method will be called after each child view is rendered

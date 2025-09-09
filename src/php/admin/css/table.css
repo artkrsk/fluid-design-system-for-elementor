@@ -1,0 +1,731 @@
+/**
+ * Table styles for Fluid Design System Admin
+ *
+ * @package Arts\FluidDesignSystem
+ * @since 1.0.0
+ */
+
+/* Groups Table */
+#fluid-groups-sortable .wp-list-table {
+	margin-top: 20px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+#fluid-groups-sortable thead th {
+	background-color: #f6f7f7;
+	border-bottom: 1px solid #c3c4c7;
+	padding: 12px 10px;
+	font-weight: 600;
+	color: #50575e;
+}
+
+/* Enhanced table rows for better grabbing */
+#fluid-groups-sortable tbody tr {
+	border-bottom: 1px solid #f0f0f1;
+}
+
+#fluid-groups-sortable tbody tr:last-child {
+	border-bottom: none;
+}
+
+#fluid-groups-sortable tbody tr:hover {
+	background-color: #f8f9fa !important;
+}
+
+#fluid-groups-sortable tbody td {
+	padding: 16px 10px;
+	vertical-align: middle;
+	border-left: none;
+}
+
+/* Make custom rows draggable from anywhere */
+#fluid-groups-sortable tbody tr.sortable-row {
+	cursor: move;
+}
+
+#fluid-groups-sortable tbody tr.sortable-row:hover {
+	background-color: #f0f6fc !important;
+	border-left: 3px solid #2271b1;
+}
+
+/* Order column with circular numbers */
+.column-order {
+	text-align: center !important;
+	vertical-align: middle;
+}
+
+.order-number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background-color: #f0f0f1;
+	color: #50575e;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.order-draggable {
+	background-color: #2271b1;
+	transition: all 0.2s ease;
+	color: #fff;
+}
+
+.sortable-row:hover .order-draggable {
+	background-color: #135e96;
+	transform: scale(1.1);
+}
+
+/* Disable sortable styling when accordion is expanded (main table only) */
+#fluid-groups-sortable .sortable-row.sorting-disabled {
+	cursor: default !important;
+	background-color: #fff !important;
+	/* border-left: none !important; */
+}
+
+#fluid-groups-sortable .sortable-row.sorting-disabled:hover {
+	background-color: #fff !important;
+	/* border-left: none !important; */
+}
+
+#fluid-groups-sortable .sortable-row.sorting-disabled .order-draggable {
+	background-color: #f0f0f1 !important;
+	color: #50575e !important;
+	cursor: default !important;
+}
+
+#fluid-groups-sortable .sortable-row.sorting-disabled:hover .order-draggable {
+	background-color: #f0f0f1 !important;
+	color: #50575e !important;
+	transform: none !important;
+}
+
+/* Column adjustments */
+.column-name {
+	font-weight: 600;
+}
+
+.column-description {
+	color: #666;
+	max-width: 300px;
+}
+
+.column-description:not(.manage-column) {
+	font-style: italic;
+}
+
+.column-description:empty::after {
+	content: "—";
+	color: #ccc;
+}
+
+/* Type Badges */
+.group-type-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.group-type-builtin {
+	background-color: #e1f5fe;
+	color: #0277bd;
+}
+
+.group-type-filter {
+	background-color: #fff3e0;
+	color: #f57c00;
+}
+
+.group-type-custom {
+	background-color: #e8f5e8;
+	color: #2e7d32;
+}
+
+/* Actions Column */
+.column-actions {
+	vertical-align: middle;
+	text-align: left;
+}
+
+.column-actions:empty::after {
+	content: "—";
+	color: #ccc;
+	display: inline-flex;
+	align-items: center;
+	height: 28px;
+	line-height: 1;
+}
+
+/* Enhanced delete button styling */
+.column-actions .button-link,
+.column-actions .fluid-delete-group {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	padding: 0;
+	margin: 0;
+	margin-left: -6px;
+	/* Align with the left edge of dashes */
+}
+
+.column-actions .button-link:hover,
+.column-actions .fluid-delete-group:hover {
+	background-color: rgba(214, 54, 56, 0.1);
+	transform: scale(1.05);
+}
+
+.column-actions .button-link .dashicons,
+.column-actions .fluid-delete-group .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: #666;
+	transition: color 0.2s ease;
+}
+
+.column-actions .button-link:hover .dashicons,
+.column-actions .fluid-delete-group:hover .dashicons {
+	color: #d63638 !important;
+}
+
+/* Sortable styling */
+.ui-sortable-helper {
+	background-color: #fff !important;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+	border-left: 3px solid #2271b1 !important;
+}
+
+.ui-sortable-placeholder {
+	height: 50px;
+	background-color: #f0f6fc;
+	border: 2px dashed #2271b1;
+	margin: 2px 0;
+	border-radius: 4px;
+}
+
+/* Enhanced sortable feedback */
+#fluid-groups-sortable tbody tr.ui-sortable-helper {
+	cursor: move;
+}
+
+#fluid-groups-sortable tbody tr.ui-sortable-helper .order-number {
+	background-color: #135e96;
+	animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+
+	0%,
+	100% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.03);
+	}
+}
+
+/* Developer table styling - matches main table layout but without interactions */
+#fluid-developer-groups-table-list {
+	margin-top: 20px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+#fluid-developer-groups-table-list thead th {
+	background-color: #f6f7f7;
+	border-bottom: 1px solid #c3c4c7;
+	padding: 12px 10px;
+	font-weight: 600;
+	color: #50575e;
+}
+
+#fluid-developer-groups-table-list tbody tr {
+	border-bottom: 1px solid #f0f0f1;
+	cursor: default;
+}
+
+#fluid-developer-groups-table-list tbody tr:last-child {
+	border-bottom: none;
+}
+
+#fluid-developer-groups-table-list tbody td {
+	padding: 16px 10px;
+	vertical-align: middle;
+	border-left: none;
+}
+
+/* Developer table order column styling (no interactivity) */
+#fluid-developer-groups-table-list .column-order {
+	text-align: center !important;
+	vertical-align: middle;
+}
+
+#fluid-developer-groups-table-list .order-number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background-color: #f0f0f1;
+	color: #50575e;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+#fluid-developer-groups-table-list .column-name {
+	font-weight: 600;
+}
+
+#fluid-developer-groups-table-list .column-description {
+	color: #666;
+	max-width: 300px;
+}
+
+#fluid-developer-groups-table-list .column-description:empty::after {
+	content: "—";
+	color: #ccc;
+}
+
+#fluid-developer-groups-table-list .column-actions {
+	vertical-align: middle;
+}
+
+#fluid-developer-groups-table-list .column-actions:empty::after {
+	content: "—";
+	color: #ccc;
+}
+
+/* Built-in groups in main table are sortable */
+#fluid-groups-sortable .group-builtin.sortable-row {
+	cursor: move;
+}
+
+#fluid-groups-sortable .group-builtin.sortable-row:hover {
+	background-color: #f0f6fc;
+	border-left: 3px solid #0073aa;
+}
+
+/* Inline Add Group Row */
+.inline-add-row {
+	background-color: #f9f9f9 !important;
+	border-top: 2px solid #ddd !important;
+	cursor: pointer;
+	height: 50px;
+	/* Consistent height with other rows */
+}
+
+.inline-add-row:hover:not(.editing) {
+	background-color: #f0f6fc !important;
+	border-top: 2px solid #2271b1 !important;
+}
+
+.inline-add-row.editing {
+	background-color: #fff !important;
+	border-top: 2px solid #2271b1 !important;
+	cursor: default;
+}
+
+/* Apply same inline editing styles to add row */
+.editable-add-title,
+.editable-add-description {
+	position: relative;
+	cursor: pointer;
+	transition: color 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	box-sizing: border-box;
+}
+
+.editable-add-title:hover:not(.editing),
+.editable-add-description:hover:not(.editing) {
+	color: #2271b1;
+}
+
+/* Show edit icons when hovering */
+.editable-add-title:hover:not(.editing):after,
+.editable-add-description:hover:not(.editing):after {
+	content: "\f464";
+	font-family: dashicons;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 4px;
+	vertical-align: middle;
+	color: currentColor;
+	opacity: 0.8;
+	animation: fadeIn 0.2s ease-in;
+	flex-shrink: 0;
+	line-height: 1;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateX(-2px);
+	}
+
+	to {
+		opacity: 0.8;
+		transform: translateX(0);
+	}
+}
+
+@keyframes shake {
+
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+
+	25% {
+		transform: translateX(-1px);
+	}
+
+	75% {
+		transform: translateX(1px);
+	}
+}
+
+/* Hide edit icon when editing */
+.editable-add-title.editing:after,
+.editable-add-description.editing:after {
+	display: none;
+}
+
+.add-title-text,
+.add-description-text {
+	display: block;
+	line-height: 1.4;
+	color: #646970;
+	font-style: italic;
+}
+
+/* When description text is empty, show a click hint instead */
+.editable-add-description:not(.editing) .add-description-text:empty:after {
+	content: "Click to add description...";
+	color: #999;
+	font-style: italic;
+	opacity: 0.7;
+}
+
+.editable-add-description:not(.editing):hover .add-description-text:empty:after {
+	color: #2271b1;
+	opacity: 1;
+}
+
+.add-title-input,
+.add-description-input {
+	display: none;
+	margin: -6px -8px;
+	/* Position to exactly match text position */
+	padding: 6px 8px;
+	/* Nice breathing space */
+	border: 1px solid #c3c4c7;
+	border-radius: 3px;
+	background: #fff;
+	font-size: inherit;
+	font-family: inherit;
+	outline: none;
+	box-shadow: 0 0 0 1px rgba(34, 113, 177, 0);
+	line-height: 1.4;
+	min-width: 120px;
+	max-width: 100%;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.add-title-input {
+	font-weight: 600;
+	margin: -6px -8px;
+	padding: 6px 8px;
+}
+
+.add-description-input {
+	margin: -4px -8px;
+	padding: 4px 8px;
+}
+
+.add-title-input:focus,
+.add-description-input:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px rgba(34, 113, 177, 0.3);
+}
+
+.editable-add-title.editing .add-title-text,
+.editable-add-description.editing .add-description-text {
+	display: none;
+}
+
+.editable-add-title.editing .add-title-input,
+.editable-add-description.editing .add-description-input {
+	display: block;
+}
+
+/* Error state for add group inputs */
+.editable-add-title.validation-error .add-title-input,
+.editable-add-description.validation-error .add-description-input {
+	border-color: #d63638 !important;
+	animation: shake 0.3s ease-in-out;
+}
+
+/* Duplicate title highlighting for existing rows */
+.duplicate-highlight {
+	background-color: rgba(255, 193, 7, 0.1) !important;
+	transition: background-color 0.3s ease;
+}
+
+.duplicate-highlight .editable-title {
+	background-color: rgba(255, 193, 7, 0.15);
+	border-radius: 3px;
+	padding: 2px 4px;
+	margin: -2px -4px;
+}
+
+/* Action buttons */
+.add-actions {
+	display: none;
+	align-items: center;
+	gap: 4px;
+	margin-left: -6px;
+	/* Align with icons above */
+}
+
+.inline-add-row.editing .add-actions {
+	display: flex;
+}
+
+.add-group-save,
+.add-group-cancel {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	padding: 0;
+	margin: 0;
+}
+
+.add-group-save .dashicons,
+.add-group-cancel .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	transition: color 0.2s ease;
+}
+
+.add-group-save {
+	color: #666;
+}
+
+.add-group-save:hover {
+	background-color: rgba(0, 163, 42, 0.1);
+	color: #00a32a !important;
+	transform: scale(1.05);
+}
+
+.add-group-cancel {
+	color: #666;
+}
+
+.add-group-cancel:hover {
+	background-color: rgba(214, 54, 56, 0.1);
+	color: #d63638 !important;
+	transform: scale(1.05);
+}
+
+/* Disable all table interactions when adding a group */
+.inline-add-row.editing~tr,
+.inline-add-row.editing+.inline-add-row.editing~* {
+	pointer-events: none !important;
+	opacity: 0.6;
+}
+
+/* Disable sortable functionality completely when editing */
+.table-editing-mode #fluid-groups-tbody {
+	pointer-events: none !important;
+}
+
+/* Re-enable pointer events only for the add row when editing */
+.table-editing-mode .inline-add-row.editing {
+	pointer-events: auto !important;
+	opacity: 1 !important;
+}
+
+/* Specifically disable editable elements when adding a group */
+.inline-add-row.editing~tr .editable-title,
+.inline-add-row.editing~tr .editable-description,
+.inline-add-row.editing~tr .fluid-delete-group,
+.inline-add-row.editing~tr .undo-delete,
+.inline-add-row.editing~tr .order-draggable,
+.inline-add-row.editing~tr .sortable-row {
+	pointer-events: none !important;
+	cursor: not-allowed !important;
+}
+
+.inline-add-row .dashicons-plus-alt2 {
+	color: #2271b1;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+
+
+/* Empty state message */
+.no-groups-message td {
+	font-style: italic;
+	border: none !important;
+}
+
+/* Visual indicators for group types */
+.group-builtin .column-name strong::before {
+	content: "";
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background-color: #00a32a;
+	margin-right: 6px;
+	vertical-align: middle;
+}
+
+/* Removed orange bullet for developer groups - keeping clean neutral appearance */
+
+/* Unsaved temporary groups styling */
+.temp-new-group {
+	background-color: #fef7e0 !important;
+	border-left: 3px solid #f0b849 !important;
+}
+
+.temp-new-group:hover {
+	background-color: #fef0cc !important;
+}
+
+.temp-new-group .temp-delete-group .dashicons {
+	color: #d63638;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.temp-new-group .temp-delete-group:hover .dashicons {
+	color: #8a2424;
+}
+
+/* Accordion Styles for Cross-Group Preset Management */
+
+/* Group name container with chevron */
+.group-name-container {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+}
+
+/* Chevron icon styling */
+.group-chevron {
+	cursor: pointer;
+	transition: transform 0.2s ease;
+	color: #2271b1;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.group-chevron:hover {
+	color: #135e96;
+}
+
+.group-chevron.expanded {
+	transform: rotate(90deg);
+}
+
+/* Accordion content row */
+.group-presets-row {
+	background-color: #f9f9f9;
+	border-top: 1px solid #e0e0e0 !important;
+}
+
+.group-presets-content {
+	overflow: hidden;
+	padding: 0 !important;
+}
+
+/* Animation wrapper for smooth slide effects */
+.group-presets-wrapper {
+	padding: 15px 10px 15px 35px;
+	overflow: hidden;
+	display: none;
+	/* Hidden by default */
+}
+
+/* Preset list container */
+.preset-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+/* Individual preset items */
+.preset-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	background: white;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	cursor: move;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.preset-item:hover {
+	background-color: #f0f6fc;
+	border-color: #2271b1;
+}
+
+/* Remove interactive styling for non-sortable presets (Developer Groups) */
+.preset-list:not(.preset-sortable-list) .preset-item {
+	cursor: default;
+}
+
+.preset-list:not(.preset-sortable-list) .preset-item:hover {
+	background-color: white;
+	border-color: #ddd;
+}
+
+.preset-title {
+	color: #50575e;
+	font-weight: 500;
+}

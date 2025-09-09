@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\ElementorExtension\Plugins\BasePlugin;
+use \Arts\FluidDesignSystem\Base\Plugin as BasePlugin;
 
 /**
  * Plugin Class
@@ -72,10 +72,21 @@ class Plugin extends BasePlugin {
 	 */
 	protected function get_managers_classes() {
 		return array(
-			'extension'     => Managers\Extension::class,
-			'compatibility' => Managers\Compatibility::class,
-			'options'       => Managers\Options::class,
-			'units'         => Managers\Units::class,
+			'extension'                  => Managers\Extension::class,
+			'compatibility'              => Managers\Compatibility::class,
+			'options'                    => Managers\Options::class,
+			'units'                      => Managers\Units::class,
+			'notices'                    => Managers\Notices::class,
+			'admin_frontend'             => Managers\Admin\Frontend::class,
+			'admin_page'                 => Managers\Admin\Page::class,
+			'admin_tabs'                 => Managers\Admin\Tabs\Tabs::class,
+			'admin_tabs_groups_ajax'     => Managers\Admin\Tabs\Groups\AJAX::class,
+			'admin_tabs_groups_handlers' => Managers\Admin\Tabs\Groups\Handlers::class,
+			'admin_tabs_groups_view'     => Managers\Admin\Tabs\Groups\View::class,
+			'data'                       => Managers\Data::class,
+			'groups_data'                => Managers\GroupsData::class,
+			'css_variables'              => Managers\CSSVariables::class,
+			'control_registry'           => Managers\ControlRegistry::class,
 		);
 	}
 
@@ -125,6 +136,16 @@ class Plugin extends BasePlugin {
 
 		// Optimize generated CSS to simplify fluid clamp formulas
 		add_action( 'elementor/css-file/post/parse', array( $this->managers->units, 'optimize_fluid_css_post_parse' ) );
+
+		// Add admin menu for preset groups management
+		// add_action( 'admin_menu', array( $this->managers->admin, 'add_admin_menu' ), 80 );
+		add_action( 'admin_menu', array( $this->managers->admin_page, 'add_admin_menu' ), 80 );
+
+		// Enqueue admin assets
+		add_action( 'admin_enqueue_scripts', array( $this->managers->admin_frontend, 'enqueue_assets' ) );
+
+		// Add AJAX handler for admin operations
+		add_action( 'wp_ajax_fluid_design_system_admin_action', array( $this->managers->admin_tabs_groups_ajax, 'handle_ajax_requests' ) );
 
 		return $this;
 	}

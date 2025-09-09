@@ -13,11 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use \Elementor\Core\Common\Modules\Ajax\Module as Ajax;
-use \Arts\ElementorExtension\Plugins\BaseManager;
+use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use \Arts\FluidDesignSystem\Elementor\Units\Fluid\Module as FluidUnitModule;
 use \Elementor\Controls_Manager;
-use \Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
 use \Elementor\Core\Kits\Controls\Repeater as Global_Style_Repeater;
+use \Arts\FluidDesignSystem\Managers\CSSVariables;
 
 /**
  * Units Class
@@ -227,7 +227,7 @@ class Units extends BaseManager {
 			return;
 		}
 
-		$preset_prefix = FluidTypographySpacing::CSS_VAR_PRESET_PREFIX;
+		$preset_prefix = CSSVariables::CSS_VAR_PRESET_PREFIX;
 
 		// Process each device's rules
 		foreach ( $all_rules as $device => $selectors ) {

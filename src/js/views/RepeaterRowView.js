@@ -8,8 +8,7 @@ const createFluidPresetRepeaterRow = () => {
      * @returns {boolean}
      */
     isFluidPresetRepeater() {
-      const presetName = this._parent?.model?.get('name')
-      return presetName === 'fluid_spacing_presets' || presetName === 'fluid_typography_presets'
+      return this._parent?.model?.get('is_fluid_preset_repeater') === true
     },
 
     /**

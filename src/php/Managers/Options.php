@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use \Arts\Utilities\Utilities;
-use \Arts\ElementorExtension\Plugins\BaseManager;
+use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use \Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
 
 /**
@@ -48,7 +48,7 @@ class Options extends BaseManager {
 	/**
 	 * Add plugin action links.
 	 *
-	 * Adds a "Settings" link to the plugin's action links in the WordPress admin plugins page.
+	 * Adds "Customize Presets" and "Manage Groups" links to the plugin's action links in the WordPress admin plugins page.
 	 *
 	 * @since 1.0.1
 	 * @access public
@@ -58,22 +58,31 @@ class Options extends BaseManager {
 	 */
 	public function add_plugin_action_links( $links ) {
 		// Check if Elementor is active
-		if ( ! class_exists( '\Elementor\Plugin' ) || ! class_exists( '\Elementor\Utils' ) ) {
+		if ( ! Utilities::is_elementor_plugin_active() ) {
 			return $links;
 		}
 
+		$new_links = array();
+
+		// Add "Customize Presets" link (opens in new tab)
 		$settings_url = Utilities::get_elementor_editor_site_settings_url( FluidTypographySpacing::TAB_ID );
-
 		if ( $settings_url ) {
-			$settings_link = sprintf(
-				'<a href="%s">%s</a>',
+			$new_links[] = sprintf(
+				'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
 				esc_url( $settings_url ),
-				esc_html__( 'Settings', 'fluid-design-system-for-elementor' )
+				esc_html__( 'Edit with Elementor', 'fluid-design-system-for-elementor' )
 			);
-
-			array_unshift( $links, $settings_link );
 		}
 
-		return $links;
+		// Add "Manage Groups" link
+		$admin_url   = admin_url( 'admin.php?page=fluid-design-system' );
+		$new_links[] = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( $admin_url ),
+			esc_html__( 'Manage', 'fluid-design-system-for-elementor' )
+		);
+
+		// Prepend our links to the existing ones
+		return array_merge( $new_links, $links );
 	}
 }

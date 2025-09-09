@@ -4,7 +4,7 @@ Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.6
+Stable tag: 1.1.0
 license: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -25,8 +25,9 @@ With just a few clicks, you can:
 - Define minimum and maximum values for typography or spacing.
 - Apply those values using a new "fluid" unit inside any Elementor control.
 - Watch your design scale smoothly—no coding or media queries required.
+- Organize your presets into custom groups (e.g. "Border Radius", "Thumbnail Sizes") for better management.
 
-Say goodbye to manually tweaking every breakpoint. Say hello to automatic, intelligent design scaling.
+Say goodbye to manually tweaking every breakpoint. Say hello to automatic, intelligent design scaling with organized preset management.
 
 == How It Works ==
 
@@ -43,6 +44,7 @@ Instead of setting fixed values for each breakpoint, you define just two—a min
 - One preset handles all screen sizes.
 - You get consistent design and spacing across the entire site.
 - You save time and reduce manual effort.
+- You can organize presets into groups for different projects or design systems.
 
 This plugin introduces **Fluid Units**, powered by CSS `clamp()` and custom presets, allowing your design to scale automatically across all screen sizes.
 
@@ -189,6 +191,15 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 5. Applying fluid unit for "gaps" control
 
 == Changelog ==
+
+= 1.1.0 =
+* added: Admin interface for managing preset groups (Elementor > Fluid Design System)
+* added: Cross-group preset management with drag and drop functionality
+* added: Custom preset groups creation, editing, and deletion
+* added: Developer-friendly filter-based groups with code examples
+* improved: optimize CSS generation for formulas with equal min/max values
+* improved: improve fluid preset display for equal min/max values
+* improved: add display_value support for custom presets added via hooks
 
 = 1.0.6 =
 * added: 'em' unit support to size options in Fluid Typography and Spacing controls

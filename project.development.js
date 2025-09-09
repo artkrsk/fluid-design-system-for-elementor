@@ -22,6 +22,10 @@ export default function (baseConfig) {
   config.liveReload.logLevel = 'debug'
   config.liveReload.reloadOnRestart = true
 
+  config.wordpress.targets = [
+    '/Users/art/Projects/Trigger/DEV/src/wp/plugin/vendor/arts/fluid-design-system/src/php'
+  ]
+
   // Configure WordPress plugin target
   config.wordpressPlugin.target =
     '/Users/art/Local Sites/fluid-ds/app/public/wp-content/plugins/fluid-design-system-for-elementor'

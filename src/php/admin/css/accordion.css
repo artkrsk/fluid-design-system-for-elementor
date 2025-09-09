@@ -1,0 +1,170 @@
+/**
+ * Accordion styles for Fluid Design System Admin
+ *
+ * @package Arts\FluidDesignSystem
+ * @since 1.0.0
+ */
+
+/* Accordion chevron icons */
+.group-chevron {
+	cursor: pointer;
+	transition: transform 0.2s ease;
+	color: #646970;
+}
+
+.group-chevron:hover {
+	color: #2271b1;
+}
+
+.group-chevron.expanded {
+	transform: rotate(90deg);
+}
+
+/* Group presets wrapper for smooth animations */
+.group-presets-wrapper {
+	display: none;
+	padding: 15px 20px;
+	background-color: #f9f9f9;
+	border-top: 1px solid #e0e0e0;
+}
+
+.group-presets-row.accordion-expanded .group-presets-wrapper {
+	display: block;
+}
+
+/* Preset list container */
+.preset-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	min-height: 36px;
+	/* Ensure consistent height */
+}
+
+/* Individual preset items */
+.preset-item {
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	font-size: 13px;
+	line-height: 1.4;
+	color: #50575e;
+	user-select: none;
+	min-height: 40px;
+	/* Consistent height for layout stability */
+	box-sizing: border-box;
+}
+
+.preset-item:hover {
+	background: #f0f6fc;
+	border-color: #2271b1;
+	color: #2271b1;
+}
+
+.preset-item.ui-sortable-helper {
+	background: #fff;
+	border-color: #2271b1;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	z-index: 9999;
+}
+
+/* Placeholder styling - looks like a real preset but with dashed border */
+.preset-item.preset-placeholder {
+	border: 2px dashed #c3c4c7;
+	background: transparent;
+	color: #646970;
+	font-style: italic;
+	cursor: default;
+	opacity: 0.8;
+}
+
+/* No hover effect for placeholder */
+.preset-item.preset-placeholder:hover {
+	background: transparent;
+	border-color: #c3c4c7;
+	color: #646970;
+}
+
+/* Drag state - when something is being dragged */
+body.ui-sortable-helper-active .preset-placeholder {
+	/* border-color: #2271b1; */
+	background: rgba(34, 113, 177, 0.05);
+	/* color: #2271b1; */
+	opacity: 1;
+	animation: pulse-drop-zone 1.5s infinite;
+}
+
+@keyframes pulse-drop-zone {
+
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.7;
+	}
+}
+
+/* Sortable placeholder during drag operations */
+.preset-sortable-placeholder {
+	background: rgba(34, 113, 177, 0.1);
+	border: 2px dashed #2271b1;
+	border-radius: 4px;
+	height: 36px;
+	margin: 0;
+	visibility: visible !important;
+}
+
+/* Hide placeholder when there are real presets */
+.preset-list:has(.preset-item:not(.preset-placeholder)) .preset-placeholder {
+	display: none;
+}
+
+/* Fallback for browsers that don't support :has() */
+.preset-list.has-presets .preset-placeholder {
+	display: none;
+}
+
+/* Sortable list specific styles */
+.preset-sortable-list .preset-item {
+	cursor: move;
+}
+
+.preset-sortable-list .preset-item.preset-placeholder {
+	cursor: default;
+	/* Placeholders are not draggable */
+}
+
+/* During drag operations, make placeholder more prominent as drop target */
+body.ui-sortable-helper-active .preset-sortable-list .preset-item.preset-placeholder {
+	border-style: solid;
+	/* Show copy cursor to indicate it's a drop target */
+	/* Change from dashed to solid during drag */
+}
+
+/* Developer groups - no sortable functionality */
+.preset-list:not(.preset-sortable-list) .preset-item {
+	cursor: default;
+}
+
+/* Empty state handling */
+.empty-preset-drop-zone {
+	display: none;
+	/* Use the new placeholder system instead */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+	.group-presets-wrapper {
+		padding: 10px 15px;
+	}
+
+	.preset-item {
+		font-size: 12px;
+		padding: 4px 8px;
+	}
+}

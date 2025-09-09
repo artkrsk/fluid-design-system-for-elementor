@@ -16,6 +16,8 @@ use \Elementor\Core\Common\Modules\Ajax\Module as Ajax;
 use \Elementor\Core\Base\Module as Module_Base;
 use \Arts\Utilities\Utilities;
 use \Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
+use \Arts\FluidDesignSystem\Managers\CSSVariables;
+use \Arts\FluidDesignSystem\Managers\ControlRegistry;
 
 /**
  * Module Class
@@ -112,6 +114,25 @@ class Module extends Module_Base {
 			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
 		}
 
+		return self::get_all_preset_groups( $data );
+	}
+
+	/**
+	 * Get all preset groups including built-in, filter-based, and custom groups.
+	 *
+	 * This method consolidates all preset groups from various sources:
+	 * - Built-in groups (Typography, Spacing) from Elementor kit settings
+	 * - Filter-based groups added by developers via the custom_presets filter
+	 * - Future: Custom groups stored in database (Milestone 2)
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 * @static
+	 *
+	 * @param array $data Optional data context for filter processing.
+	 * @return array Formatted presets data for the fluid unit control and admin display.
+	 */
+	public static function get_all_preset_groups( $data = array() ) {
 		// Initialize the result with default options
 		$result = self::get_default_preset_options();
 
@@ -139,6 +160,23 @@ class Module extends Module_Base {
 		 * Filter to add custom fluid design system presets.
 		 *
 		 * Allows developers to add custom preset collections to the fluid unit control.
+		 * Each custom preset group should have the following structure:
+		 *
+		 * array(
+		 *     'name'        => 'Group Name',           // Required: Display name for the group
+		 *     'description' => 'Group description',   // Optional: Description shown in admin
+		 *     'value'       => array(                  // Required: Array of presets
+		 *         array(
+		 *             'id'              => 'preset-id',         // Required: Unique preset identifier
+		 *             'value'           => 'var(--css-var)',    // Required: CSS value (CSS var or any valid CSS value)
+		 *             'title'           => 'Preset Title',      // Required: Display name for the preset
+		 *             'display_value'   => true|'Custom Text',  // Optional: Controls value display in UI
+		 *                                                       //   true = show actual value
+		 *                                                       //   string = show custom text
+		 *                                                       //   omitted = show title only
+		 *         ),
+		 *     ),
+		 * )
 		 *
 		 * @since 1.0.0
 		 *
@@ -155,12 +193,12 @@ class Module extends Module_Base {
 	 * Get default preset options that should always be available.
 	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access public
 	 * @static
 	 *
 	 * @return array Array of default preset options.
 	 */
-	private static function get_default_preset_options() {
+	public static function get_default_preset_options() {
 		return array(
 			array(
 				'name'  => esc_html__( 'Default', 'fluid-design-system-for-elementor' ),
@@ -193,18 +231,31 @@ class Module extends Module_Base {
 	 * Get preset collections from Elementor kit.
 	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access public
 	 * @static
 	 *
 	 * @return array Array of preset collections with titles as keys.
 	 */
-	private static function get_preset_collections() {
-		return array(
-			esc_html__( 'Fluid Spacing Presets', 'fluid-design-system-for-elementor' ) =>
+	public static function get_preset_collections() {
+		// Get correct names from ControlRegistry
+		$metadata = ControlRegistry::get_builtin_group_metadata();
+
+		$collections = array(
+			$metadata['spacing']['name']    =>
 				Utilities::get_kit_settings( 'fluid_spacing_presets', array(), false ),
-			esc_html__( 'Fluid Typography Presets', 'fluid-design-system-for-elementor' ) =>
+			$metadata['typography']['name'] =>
 				Utilities::get_kit_settings( 'fluid_typography_presets', array(), false ),
 		);
+
+		// Add custom groups collections
+		$custom_groups = get_option( 'arts_fluid_design_system_custom_groups', array() );
+
+		foreach ( $custom_groups as $group_id => $group_data ) {
+			$control_id                         = ControlRegistry::get_custom_group_control_id( $group_id );
+			$collections[ $group_data['name'] ] = Utilities::get_kit_settings( $control_id, array(), false );
+		}
+
+		return $collections;
 	}
 
 	/**
@@ -221,10 +272,6 @@ class Module extends Module_Base {
 	 * @return array|null               Formatted preset group or null if empty.
 	 */
 	private static function process_preset_collection( $collection_title, $presets, $global_min_width, $global_max_width ) {
-		if ( empty( $presets ) ) {
-			return null;
-		}
-
 		$preset_group = array(
 			'name'  => $collection_title,
 			'value' => array(),
@@ -242,7 +289,7 @@ class Module extends Module_Base {
 			}
 		}
 
-		return empty( $preset_group['value'] ) ? null : $preset_group;
+		return $preset_group;
 	}
 
 	/**
@@ -273,7 +320,7 @@ class Module extends Module_Base {
 		// Extract necessary values from the preset
 		$id    = $preset['_id'];
 		$title = $preset['title'];
-		$value = 'var(' . FluidTypographySpacing::get_css_var_preset( $id ) . ')';
+		$value = 'var(' . CSSVariables::get_css_var_preset( $id ) . ')';
 
 		// Create the formatted preset
 		return array(

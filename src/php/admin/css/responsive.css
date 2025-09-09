@@ -1,0 +1,42 @@
+/**
+ * Responsive styles for Fluid Design System Admin
+ *
+ * @package Arts\FluidDesignSystem
+ * @since 1.0.0
+ */
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+
+	.column-order,
+	.column-type,
+	.column-presets,
+	.column-description {
+		display: none;
+	}
+
+	.group-type-badge {
+		margin-top: 4px;
+		display: block;
+		width: fit-content;
+	}
+
+	#fluid-design-system-tabs-wrapper .nav-tab {
+		font-size: 11px;
+		padding: 6px 10px;
+	}
+
+	/* Show order number in mobile for sortable rows */
+	.sortable-row .column-name::before {
+		content: attr(data-order) ". ";
+		color: #2271b1;
+		font-weight: 600;
+	}
+
+	/* Show order number in mobile for developer groups */
+	#fluid-developer-groups-table-list .group-filter .column-name::before {
+		content: attr(data-order) ". ";
+		color: #f57c00;
+		font-weight: 600;
+	}
+}

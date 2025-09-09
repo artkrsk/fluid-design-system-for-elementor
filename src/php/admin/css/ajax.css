@@ -1,0 +1,128 @@
+/**
+ * AJAX styles for Fluid Design System Admin
+ *
+ * @package Arts\FluidDesignSystem
+ * @since 1.0.0
+ */
+
+/* Success/error feedback for inline edits */
+.success-feedback {
+	background-color: #edfaef !important;
+	border-color: #68de7c !important;
+	transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.success-feedback .title-text,
+.success-feedback .description-text {
+	color: #1e7b3a !important;
+}
+
+.error-feedback {
+	background-color: #fcf0f1 !important;
+	border-color: #f56565 !important;
+	transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.error-feedback .title-text,
+.error-feedback .description-text {
+	color: #8a2424 !important;
+}
+
+/* Remove pencil from add group title */
+.fluid-inline-add-row .editable-add-title:after {
+	display: none !important;
+}
+
+/* Also remove it from any similar add-related elements */
+.editable-add-title:after,
+.editable-add-description:after {
+	display: none !important;
+}
+
+/* Ensure transitions work smoothly */
+.editable-title,
+.editable-description {
+	transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Enhanced Save Changes button */
+.fluid-save-changes-row {
+	margin: 15px 0 20px 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 15px;
+}
+
+.fluid-save-changes-row .button-primary {
+	font-size: 14px;
+	padding: 8px 16px;
+	height: auto;
+	line-height: 1.2;
+	border-radius: 3px;
+	min-width: 120px;
+	flex-shrink: 0;
+}
+
+/* Remove the old loading overlay */
+#fluid-loading-overlay {
+	display: none !important;
+}
+
+/* Remove auto-fade notices since we're handling status differently */
+.fluid-ajax-notices {
+	display: none;
+}
+
+.fluid-ajax-notice {
+	display: none;
+}
+
+/* Pulse animation for unsaved changes (only for destructive operations) */
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+		box-shadow: 0 0 0 0 rgba(0, 112, 23, 0.4);
+	}
+
+	70% {
+		transform: scale(1.02);
+		box-shadow: 0 0 0 5px rgba(0, 112, 23, 0);
+	}
+
+	100% {
+		transform: scale(1);
+		box-shadow: 0 0 0 0 rgba(0, 112, 23, 0);
+	}
+}
+
+.has-unsaved-changes .button-primary {
+	animation: pulse 2s infinite;
+}
+
+/* But NOT for AJAX operations - they save automatically */
+.ajax-operation-pending .button-primary {
+	animation: none;
+}
+
+/* Only disable the Save Changes button during AJAX operations, not all primary buttons */
+.ajax-operation-pending .fluid-save-changes-row .button-primary {
+	opacity: 0.6;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+	.fluid-save-changes-row {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 10px;
+	}
+
+	.fluid-save-changes-row .button-primary {
+		min-width: auto;
+		width: 100%;
+	}
+}
