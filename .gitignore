@@ -74,3 +74,23 @@ next-env.d.ts
 
 # Project specific
 /drafts
+
+# Logs
+logs
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+.vscode
+# OS specific
+
+# Task files
+tasks.json
+tasks/
+
+.claude/
+.cursor/
+.taskmaster/
+.env*
+
+CLAUDE.md
