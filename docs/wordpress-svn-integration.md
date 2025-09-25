@@ -26,8 +26,8 @@ To enable this integration, you need to set up the following secrets in your Git
 3. In the left sidebar, click on "Secrets and variables" > "Actions"
 4. Click on "New repository secret"
 5. Add the following secrets:
-   - Name: `SVN_USERNAME`, Value: `artemsemkin`
-   - Name: `SVN_PASSWORD`, Value: `svn_ZaszIQoLlanS1ls1v5zlrHxrmq2dncBP14dd80aa`
+   - Name: `SVN_USERNAME`, Value: `your-wordpress-username`
+   - Name: `SVN_PASSWORD`, Value: `your-svn-password`
 
 ## Directory Structure
 
