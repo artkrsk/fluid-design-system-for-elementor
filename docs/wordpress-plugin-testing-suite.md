@@ -61,12 +61,10 @@ npm run test -- --setup --debug
 ## Available Tests
 
 1. **ZIP Structure Validation**
-
    - Verifies the plugin ZIP has all required files
    - Checks for essential directories and components
 
 2. **Plugin Activation**
-
    - Tests database connection to Local's MySQL
    - Verifies plugin can be installed
    - Checks PHP syntax validity

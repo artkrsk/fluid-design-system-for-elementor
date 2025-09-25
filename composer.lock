@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "5a93086991f24a0ea4585d33231e594d4c231f3a"
+                "reference": "8af067b472340b75c9934df37ccb3f9e17a64ed6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/5a93086991f24a0ea4585d33231e594d4c231f3a",
-                "reference": "5a93086991f24a0ea4585d33231e594d4c231f3a",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/8af067b472340b75c9934df37ccb3f9e17a64ed6",
+                "reference": "8af067b472340b75c9934df37ccb3f9e17a64ed6",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2025-08-31T02:31:19+00:00"
+            "time": "2025-09-25T02:12:22+00:00"
         },
         {
             "name": "arts/utilities",
@@ -59,12 +59,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "1b5379ed5c276df90a9d7430c13b7e18ac8490ee"
+                "reference": "c3c3faa67f3bd77fe3a1ff3d8f60de0b05581bc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/1b5379ed5c276df90a9d7430c13b7e18ac8490ee",
-                "reference": "1b5379ed5c276df90a9d7430c13b7e18ac8490ee",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/c3c3faa67f3bd77fe3a1ff3d8f60de0b05581bc8",
+                "reference": "c3c3faa67f3bd77fe3a1ff3d8f60de0b05581bc8",
                 "shasum": ""
             },
             "require": {
@@ -96,9 +96,9 @@
             "description": "A comprehensive collection of utility methods for WordPress theme and plugin development, with a focus on Elementor integration.",
             "support": {
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
-                "source": "https://github.com/artkrsk/arts-utilities/tree/v1.0.31"
+                "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2025-09-03T02:22:38+00:00"
+            "time": "2025-09-25T01:47:54+00:00"
         }
     ],
     "packages-dev": [],
