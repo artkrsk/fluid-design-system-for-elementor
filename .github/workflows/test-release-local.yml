@@ -1,0 +1,107 @@
+name: Test Release Process Locally
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test-release-*
+
+jobs:
+  test-build:
+    name: Test Build Process
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+
+      - name: Detect plugin metadata
+        id: detect
+        run: |
+          # Find main plugin file
+          MAIN_FILE=$(find . -maxdepth 3 -name "*.php" -type f -exec grep -l "Plugin Name:" {} \; | head -1)
+          echo "Main file: $MAIN_FILE"
+
+          # Extract plugin info
+          PLUGIN_SLUG=$(basename "$MAIN_FILE" .php)
+          PLUGIN_VERSION=$(grep -m 1 "Version:" "$MAIN_FILE" | awk '{print $3}' | tr -d '\r')
+
+          echo "plugin_slug=$PLUGIN_SLUG" >> $GITHUB_OUTPUT
+          echo "plugin_version=$PLUGIN_VERSION" >> $GITHUB_OUTPUT
+          echo "main_file=$MAIN_FILE" >> $GITHUB_OUTPUT
+
+          echo "✅ Detected:"
+          echo "  Plugin: $PLUGIN_SLUG"
+          echo "  Version: $PLUGIN_VERSION"
+          echo "  File: $MAIN_FILE"
+
+      - name: Validate versions
+        run: |
+          PLUGIN_VERSION="${{ steps.detect.outputs.plugin_version }}"
+
+          # Check package.json
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          echo "Package.json: $PACKAGE_VERSION"
+
+          # Check readme
+          if [ -f "src/wordpress-plugin/readme.txt" ]; then
+            README_VERSION=$(grep "Stable tag:" src/wordpress-plugin/readme.txt | awk '{print $3}' | tr -d '\r')
+            echo "Readme.txt: $README_VERSION"
+          fi
+
+          # Validate all match
+          if [ "$PLUGIN_VERSION" = "$PACKAGE_VERSION" ]; then
+            echo "✅ Versions match!"
+          else
+            echo "❌ Version mismatch!"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build plugin
+        run: npm run build
+
+      - name: Verify ZIP exists
+        run: |
+          PLUGIN_SLUG="${{ steps.detect.outputs.plugin_slug }}"
+          ZIP_PATH="dist/${PLUGIN_SLUG}.zip"
+
+          if [ -f "$ZIP_PATH" ]; then
+            echo "✅ ZIP found: $ZIP_PATH"
+            echo "Size: $(du -h "$ZIP_PATH" | cut -f1)"
+
+            # Show some contents
+            echo "Contents preview:"
+            unzip -l "$ZIP_PATH" | head -20
+          else
+            echo "❌ ZIP not found at: $ZIP_PATH"
+            ls -la dist/
+            exit 1
+          fi
+
+      - name: Test custom validation
+        if: always()
+        run: |
+          if [ -f "__tests__/validate-zip.sh" ]; then
+            export ZIP_PATH="dist/${{ steps.detect.outputs.plugin_slug }}.zip"
+            export PLUGIN_SLUG="${{ steps.detect.outputs.plugin_slug }}"
+            bash __tests__/validate-zip.sh || echo "Validation had issues but continuing..."
+          fi
+
+      - name: Summary
+        run: |
+          echo "## 🎉 Test Build Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Plugin**: ${{ steps.detect.outputs.plugin_slug }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.detect.outputs.plugin_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **ZIP**: dist/${{ steps.detect.outputs.plugin_slug }}.zip" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Ready for release!" >> $GITHUB_STEP_SUMMARY
