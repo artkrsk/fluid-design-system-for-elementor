@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "d4fc193acfb4817d01aa65635c557ce7f131057c"
+                "reference": "22c9c651a1a4d0019df700b78a5d5c6bc07ef50c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/d4fc193acfb4817d01aa65635c557ce7f131057c",
-                "reference": "d4fc193acfb4817d01aa65635c557ce7f131057c",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/22c9c651a1a4d0019df700b78a5d5c6bc07ef50c",
+                "reference": "22c9c651a1a4d0019df700b78a5d5c6bc07ef50c",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2025-11-25T03:54:50+00:00"
+            "time": "2025-12-12T03:57:14+00:00"
         },
         {
             "name": "arts/utilities",
@@ -59,12 +59,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "531ff609bae3533205d8a07e3d082420536ef0f2"
+                "reference": "96574f3ed8b0352872cfcb687ae2ccf63dd1c439"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/531ff609bae3533205d8a07e3d082420536ef0f2",
-                "reference": "531ff609bae3533205d8a07e3d082420536ef0f2",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/96574f3ed8b0352872cfcb687ae2ccf63dd1c439",
+                "reference": "96574f3ed8b0352872cfcb687ae2ccf63dd1c439",
                 "shasum": ""
             },
             "require": {
@@ -98,7 +98,7 @@
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
                 "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2025-12-07T11:37:28+00:00"
+            "time": "2025-12-12T03:51:41+00:00"
         }
     ],
     "packages-dev": [],
