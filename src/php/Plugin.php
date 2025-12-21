@@ -105,7 +105,7 @@ class Plugin extends BasePlugin {
 		add_filter( 'arts/elementor_extension/tabs/tabs', array( $this->managers->options, 'get_elementor_site_settings_tabs' ) );
 
 		// Set up extension configuration
-		add_filter( 'arts/elementor_extension/plugin/config', array( $this->managers->extension, 'get_config' ) );
+		add_filter( 'arts/elementor_extension/plugin/config', array( $this->managers->extension, 'filter_plugin_config' ) );
 
 		// Set up extension strings
 		add_filter( 'arts/elementor_extension/plugin/strings', array( $this->managers->extension, 'get_strings' ) );

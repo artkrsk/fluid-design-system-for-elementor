@@ -24,9 +24,10 @@ use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
  */
 class Extension extends BaseManager {
 	/**
-	 * Get the config for the Elementor extension.
+	 * Filter plugin configuration for the Elementor extension.
 	 *
 	 * Defines required Elementor and PHP versions for the extension.
+	 * Used as a WordPress filter callback.
 	 *
 	 * @since 1.0.0
 	 * @access public
@@ -34,7 +35,7 @@ class Extension extends BaseManager {
 	 * @param array $config The config for the Elementor extension.
 	 * @return array Modified configuration array.
 	 */
-	public function get_config( $config ) {
+	public function filter_plugin_config( $config ) {
 		$config['required_elementor_version'] = '3.27.0';
 		$config['required_php_version']       = '7.4';
 

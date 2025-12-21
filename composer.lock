@@ -7,26 +7,84 @@
     "content-hash": "48920089d6c6d5b40db94feb8aefd091",
     "packages": [
         {
+            "name": "arts/base",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/artkrsk/arts-base.git",
+                "reference": "66194df8ab6be4508888bb9371a99895056e16d1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/artkrsk/arts-base/zipball/66194df8ab6be4508888bb9371a99895056e16d1",
+                "reference": "66194df8ab6be4508888bb9371a99895056e16d1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "captainhook/captainhook": "^5.27",
+                "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+                "ergebnis/composer-normalize": "^2.48",
+                "phpstan/phpstan": "^2.0",
+                "squizlabs/php_codesniffer": "^3.13.4",
+                "szepeviktor/phpstan-wordpress": "^2.0",
+                "wp-coding-standards/wpcs": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Arts\\Base\\": "src/php/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Artem Semkin",
+                    "email": "me@artemsemkin.com"
+                }
+            ],
+            "description": "Framework-agnostic base classes for Arts WordPress plugins",
+            "support": {
+                "issues": "https://github.com/artkrsk/arts-base/issues",
+                "source": "https://github.com/artkrsk/arts-base/tree/v1.0.0"
+            },
+            "time": "2025-12-21T14:18:00+00:00"
+        },
+        {
             "name": "arts/elementor-extension",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "9fe6f9103d7ab7bfa85f1ab877e8958576e19bf8"
+                "reference": "4ee29dc77be733701ab6a3a39608e79806c8d230"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/9fe6f9103d7ab7bfa85f1ab877e8958576e19bf8",
-                "reference": "9fe6f9103d7ab7bfa85f1ab877e8958576e19bf8",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/4ee29dc77be733701ab6a3a39608e79806c8d230",
+                "reference": "4ee29dc77be733701ab6a3a39608e79806c8d230",
                 "shasum": ""
             },
             "require": {
+                "arts/base": "@dev",
                 "arts/utilities": "@dev",
                 "php": ">=7.4"
             },
             "require-dev": {
+                "arts/elementor-stubs": "@dev",
                 "brain/monkey": "^2.6",
+                "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+                "ergebnis/composer-normalize": "^2.48",
+                "php-stubs/acf-pro-stubs": "^6.5",
+                "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^9.6",
+                "squizlabs/php_codesniffer": "^3.13.4",
+                "szepeviktor/phpstan-wordpress": "^2.0",
+                "wp-coding-standards/wpcs": "^3.0",
                 "yoast/phpunit-polyfills": "^4.0"
             },
             "default-branch": true,
@@ -51,7 +109,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2025-12-12T07:55:22+00:00"
+            "time": "2025-12-21T17:50:30+00:00"
         },
         {
             "name": "arts/utilities",
@@ -59,22 +117,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "ad16154fdeb3d0f16e1ad9639e87859a5107d7d7"
+                "reference": "5738ba0075a24764afc304b4210694354f83b2ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/ad16154fdeb3d0f16e1ad9639e87859a5107d7d7",
-                "reference": "ad16154fdeb3d0f16e1ad9639e87859a5107d7d7",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/5738ba0075a24764afc304b4210694354f83b2ea",
+                "reference": "5738ba0075a24764afc304b4210694354f83b2ea",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2"
             },
             "require-dev": {
-                "antecedent/patchwork": "^2.1",
-                "brain/monkey": "^2.6",
-                "phpunit/phpunit": "^9.6",
-                "yoast/phpunit-polyfills": "^4.0"
+                "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+                "ergebnis/composer-normalize": "^2.48",
+                "phpstan/phpstan": "^2.0",
+                "squizlabs/php_codesniffer": "^3.13.4",
+                "szepeviktor/phpstan-wordpress": "^2.0",
+                "wp-coding-standards/wpcs": "^3.0"
             },
             "default-branch": true,
             "type": "library",
@@ -96,9 +156,9 @@
             "description": "A comprehensive collection of utility methods for WordPress theme and plugin development, with a focus on Elementor integration.",
             "support": {
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
-                "source": "https://github.com/artkrsk/arts-utilities/tree/v1.1.4"
+                "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2025-12-12T07:30:15+00:00"
+            "time": "2025-12-20T06:44:33+00:00"
         }
     ],
     "packages-dev": [],
