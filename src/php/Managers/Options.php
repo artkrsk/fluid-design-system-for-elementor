@@ -38,7 +38,6 @@ class Options extends BaseManager {
 	 * @return array<int|string, mixed> Array of Elementor site settings tabs with our custom tab added.
 	 */
 	public function get_elementor_site_settings_tabs( array $tabs ): array {
-		// var_dump('[FDS] Filter callback: get_elementor_site_settings_tabs');
 		$tabs[] = array(
 			'class' => FluidTypographySpacing::class,
 		);
