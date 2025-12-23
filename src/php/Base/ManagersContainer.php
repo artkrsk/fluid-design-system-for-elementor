@@ -6,7 +6,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+use Arts\Base\Containers\ManagersContainer as BaseManagersContainer;
+
 /**
+ * Container for manager instances in the Fluid Design System plugin.
+ *
  * @property \Arts\FluidDesignSystem\Managers\Extension $extension
  * @property \Arts\FluidDesignSystem\Managers\Compatibility $compatibility
  * @property \Arts\FluidDesignSystem\Managers\Options $options
@@ -23,4 +27,4 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property \Arts\FluidDesignSystem\Managers\CSSVariables $css_variables
  * @property \Arts\FluidDesignSystem\Managers\ControlRegistry $control_registry
  */
-abstract class ManagersContainer extends \stdClass {}
+class ManagersContainer extends BaseManagersContainer {}
