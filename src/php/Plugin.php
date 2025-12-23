@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Plugin as BasePlugin;
+use Arts\FluidDesignSystem\Base\Plugin as BasePlugin;
 
 /**
  * Plugin Class
@@ -29,9 +29,9 @@ class Plugin extends BasePlugin {
 	 * @since 1.0.0
 	 * @access protected
 	 *
-	 * @return array Empty array as default configuration.
+	 * @return array<string, mixed> Empty array as default configuration.
 	 */
-	protected function get_default_config() {
+	protected function get_default_config(): array {
 		return array();
 	}
 
@@ -41,9 +41,9 @@ class Plugin extends BasePlugin {
 	 * @since 1.0.0
 	 * @access protected
 	 *
-	 * @return array Empty array as default strings.
+	 * @return array<string, string> Empty array as default strings.
 	 */
-	protected function get_default_strings() {
+	protected function get_default_strings(): array {
 		return array();
 	}
 
@@ -55,7 +55,7 @@ class Plugin extends BasePlugin {
 	 *
 	 * @return string WordPress action name.
 	 */
-	protected function get_default_run_action() {
+	protected function get_default_run_action(): string {
 		return 'init';
 	}
 
@@ -68,9 +68,9 @@ class Plugin extends BasePlugin {
 	 * @since 1.0.0
 	 * @access protected
 	 *
-	 * @return array Associative array of manager keys and their corresponding class names.
+	 * @return array<string, class-string> Associative array of manager keys and their corresponding class names.
 	 */
-	protected function get_managers_classes() {
+	protected function get_managers_classes(): array {
 		return array(
 			'extension'                  => Managers\Extension::class,
 			'compatibility'              => Managers\Compatibility::class,
@@ -98,9 +98,9 @@ class Plugin extends BasePlugin {
 	 * @since 1.0.0
 	 * @access protected
 	 *
-	 * @return Plugin Current plugin instance.
+	 * @return void
 	 */
-	protected function do_after_init_managers() {
+	protected function do_after_init_managers(): void {
 		// Register tabs for Elementor site settings
 		add_filter( 'arts/elementor_extension/tabs/tabs', array( $this->managers->options, 'get_elementor_site_settings_tabs' ) );
 
@@ -109,8 +109,6 @@ class Plugin extends BasePlugin {
 
 		// Set up extension strings
 		add_filter( 'arts/elementor_extension/plugin/strings', array( $this->managers->extension, 'get_strings' ) );
-
-		return $this;
 	}
 
 	/**
@@ -119,9 +117,9 @@ class Plugin extends BasePlugin {
 	 * @since 1.0.0
 	 * @access protected
 	 *
-	 * @return Plugin Current plugin instance.
+	 * @return void
 	 */
-	protected function add_actions() {
+	protected function add_actions(): void {
 		// Add fluid unit to Elementor controls
 		add_action( 'elementor/element/after_section_end', array( $this->managers->units, 'modify_control_settings' ), 10, 3 );
 
@@ -138,7 +136,6 @@ class Plugin extends BasePlugin {
 		add_action( 'elementor/css-file/post/parse', array( $this->managers->units, 'optimize_fluid_css_post_parse' ) );
 
 		// Add admin menu for preset groups management
-		// add_action( 'admin_menu', array( $this->managers->admin, 'add_admin_menu' ), 80 );
 		add_action( 'admin_menu', array( $this->managers->admin_page, 'add_admin_menu' ), 80 );
 
 		// Enqueue admin assets
@@ -146,9 +143,8 @@ class Plugin extends BasePlugin {
 
 		// Add AJAX handler for admin operations
 		add_action( 'wp_ajax_fluid_design_system_admin_action', array( $this->managers->admin_tabs_groups_ajax, 'handle_ajax_requests' ) );
-
-		return $this;
 	}
+
 
 	/**
 	 * Register WordPress filters for the plugin.
@@ -156,16 +152,16 @@ class Plugin extends BasePlugin {
 	 * @since 1.0.0
 	 * @access protected
 	 *
-	 * @return Plugin Current plugin instance.
+	 * @return void
 	 */
-	protected function add_filters() {
+	protected function add_filters(): void {
 		add_filter( 'elementor/files/css/selectors', array( $this->managers->units, 'modify_selectors' ), 10, 3 );
 
 		// Only add plugin action links if the plugin is being used as a WordPress plugin
 		if ( defined( 'ARTS_FLUID_DS_PLUGIN_FILE' ) ) {
-			add_filter( 'plugin_action_links_' . plugin_basename( ARTS_FLUID_DS_PLUGIN_FILE ), array( $this->managers->options, 'add_plugin_action_links' ) );
+			/** @var string $plugin_file */
+			$plugin_file = constant( 'ARTS_FLUID_DS_PLUGIN_FILE' );
+			add_filter( 'plugin_action_links_' . plugin_basename( $plugin_file ), array( $this->managers->options, 'add_plugin_action_links' ) );
 		}
-
-		return $this;
 	}
 }
