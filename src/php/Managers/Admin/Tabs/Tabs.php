@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 class Tabs extends BaseManager {
 	/**
@@ -18,7 +18,7 @@ class Tabs extends BaseManager {
 	 * @param string $current_tab Current active tab.
 	 * @return void
 	 */
-	public function render_tabs( $current_tab ) {
+	public function render_tabs( string $current_tab ): void {
 		$tabs = $this->get_tabs();
 
 		foreach ( $tabs as $tab_id => $tab_data ) {
@@ -44,7 +44,11 @@ class Tabs extends BaseManager {
 	 * @param string $current_tab Current active tab.
 	 * @return void
 	 */
-	public function render_tab_content( $current_tab ) {
+	public function render_tab_content( string $current_tab ): void {
+		if ( $this->managers === null ) {
+			return;
+		}
+
 		$tabs = $this->get_tabs();
 
 		if ( ! isset( $tabs[ $current_tab ] ) ) {
@@ -73,9 +77,9 @@ class Tabs extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @return array Array of tabs data.
+	 * @return array<string, array<string, string>> Array of tabs data.
 	 */
-	public function get_tabs() {
+	public function get_tabs(): array {
 		return array(
 			'groups' => array(
 				'title'       => esc_html__( 'Groups', 'fluid-design-system-for-elementor' ),

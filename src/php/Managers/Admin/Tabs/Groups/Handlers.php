@@ -6,10 +6,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use \Arts\FluidDesignSystem\Managers\Data;
-use \Arts\FluidDesignSystem\Managers\GroupsData;
-use \Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Managers\Data;
+use Arts\FluidDesignSystem\Managers\GroupsData;
+use Arts\Utilities\Utilities;
 
 class Handlers extends BaseManager {
 	/**
@@ -20,13 +20,36 @@ class Handlers extends BaseManager {
 	 * @return void
 	 */
 	public function handle_save_all_changes() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
+			return;
+		}
+
 		$changes_saved = false;
 
 		// Step 1: Capture the original group order with temporary IDs
 		// Nonce verification is handled in handle_group_actions()
-		$original_order       = isset( $_POST['group_order'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['group_order'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$temp_group_mapping   = isset( $_POST['temp_group_mapping'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_POST['temp_group_mapping'] ) ), true ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$temp_group_positions = isset( $_POST['temp_group_positions'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_POST['temp_group_positions'] ) ), true ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$original_order_raw = isset( $_POST['group_order'] ) && is_array( $_POST['group_order'] ) ? wp_unslash( $_POST['group_order'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$original_order     = array();
+		foreach ( $original_order_raw as $item ) {
+			if ( is_string( $item ) ) {
+				$original_order[] = sanitize_key( $item );
+			}
+		}
+
+		$temp_group_mapping_json_raw = isset( $_POST['temp_group_mapping'] ) && is_string( $_POST['temp_group_mapping'] ) ? wp_unslash( $_POST['temp_group_mapping'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$temp_group_mapping_json     = sanitize_textarea_field( $temp_group_mapping_json_raw );
+		$temp_group_mapping          = ! empty( $temp_group_mapping_json ) ? json_decode( $temp_group_mapping_json, true ) : array();
+		if ( ! is_array( $temp_group_mapping ) ) {
+			$temp_group_mapping = array();
+		}
+
+		$temp_group_positions_json_raw = isset( $_POST['temp_group_positions'] ) && is_string( $_POST['temp_group_positions'] ) ? wp_unslash( $_POST['temp_group_positions'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$temp_group_positions_json     = sanitize_textarea_field( $temp_group_positions_json_raw );
+		$temp_group_positions          = ! empty( $temp_group_positions_json ) ? json_decode( $temp_group_positions_json, true ) : array();
+		if ( ! is_array( $temp_group_positions ) ) {
+			$temp_group_positions = array();
+		}
 
 		// Step 2: Create new groups and build ID mapping
 		$temp_id_to_real_id = array();
@@ -40,13 +63,17 @@ class Handlers extends BaseManager {
 
 			if ( isset( $new_groups_raw['name'] ) && is_array( $new_groups_raw['name'] ) ) {
 				foreach ( $new_groups_raw['name'] as $key => $value ) {
-					$new_group_names[ $key ] = sanitize_text_field( $value ); // Already unslashed
+					if ( is_string( $value ) ) {
+						$new_group_names[ $key ] = sanitize_text_field( $value ); // Already unslashed
+					}
 				}
 			}
 
 			if ( isset( $new_groups_raw['description'] ) && is_array( $new_groups_raw['description'] ) ) {
 				foreach ( $new_groups_raw['description'] as $key => $value ) {
-					$new_group_descriptions[ $key ] = sanitize_textarea_field( $value ); // Already unslashed
+					if ( is_string( $value ) ) {
+						$new_group_descriptions[ $key ] = sanitize_textarea_field( $value ); // Already unslashed
+					}
 				}
 			}
 
@@ -78,7 +105,7 @@ class Handlers extends BaseManager {
 					// Create the group
 					$group_id = $this->managers->data->create_group( $name, $description );
 					if ( $group_id ) {
-						$created_count++;
+						++$created_count;
 						$changes_saved        = true;
 						$created_groups[ $i ] = $group_id; // Map array index to real group ID
 					}
@@ -87,7 +114,7 @@ class Handlers extends BaseManager {
 				// Build mapping from temporary IDs to real IDs using both mappings
 				if ( ! empty( $temp_group_mapping ) && ! empty( $created_groups ) ) {
 					foreach ( $temp_group_mapping as $temp_id => $array_index ) {
-						if ( isset( $created_groups[ $array_index ] ) ) {
+						if ( is_string( $temp_id ) && ( is_int( $array_index ) || is_string( $array_index ) ) && isset( $created_groups[ $array_index ] ) ) {
 							$temp_id_to_real_id[ $temp_id ] = $created_groups[ $array_index ];
 						}
 					}
@@ -121,11 +148,14 @@ class Handlers extends BaseManager {
 				$position_to_group = array();
 
 				foreach ( $original_order as $index => $group_id ) {
+					if ( ! is_string( $group_id ) ) {
+						continue;
+					}
 					$sanitized_id = sanitize_key( $group_id );
 					if ( ! empty( $sanitized_id ) ) {
 						if ( strpos( $sanitized_id, 'temp_' ) === 0 ) {
 							// This is a temporary ID - use the position mapping
-							if ( isset( $temp_group_positions[ $sanitized_id ] ) && isset( $temp_id_to_real_id[ $sanitized_id ] ) ) {
+							if ( isset( $temp_group_positions[ $sanitized_id ] ) && is_int( $temp_group_positions[ $sanitized_id ] ) && isset( $temp_id_to_real_id[ $sanitized_id ] ) ) {
 								$position                       = $temp_group_positions[ $sanitized_id ];
 								$position_to_group[ $position ] = $temp_id_to_real_id[ $sanitized_id ];
 							}
@@ -189,8 +219,10 @@ class Handlers extends BaseManager {
 			$title_updates     = array();
 
 			foreach ( $title_updates_raw as $key => $value ) {
-				$sanitized_key                   = sanitize_key( $key );
-				$title_updates[ $sanitized_key ] = sanitize_text_field( $value ); // Already unslashed
+				if ( is_string( $key ) && is_string( $value ) ) {
+					$sanitized_key                   = sanitize_key( $key );
+					$title_updates[ $sanitized_key ] = sanitize_text_field( $value ); // Already unslashed
+				}
 			}
 
 			$custom_groups  = Data::get_custom_groups();
@@ -250,8 +282,10 @@ class Handlers extends BaseManager {
 			$description_updates     = array();
 
 			foreach ( $description_updates_raw as $key => $value ) {
-				$sanitized_key                         = sanitize_key( $key );
-				$description_updates[ $sanitized_key ] = sanitize_textarea_field( $value ); // Already unslashed
+				if ( is_string( $key ) && is_string( $value ) ) {
+					$sanitized_key                         = sanitize_key( $key );
+					$description_updates[ $sanitized_key ] = sanitize_textarea_field( $value ); // Already unslashed
+				}
 			}
 
 			$custom_groups  = Data::get_custom_groups();
@@ -283,7 +317,9 @@ class Handlers extends BaseManager {
 			$groups_to_delete     = array();
 
 			foreach ( $groups_to_delete_raw as $value ) {
-				$groups_to_delete[] = sanitize_key( $value ); // Already unslashed
+				if ( is_string( $value ) ) {
+					$groups_to_delete[] = sanitize_key( $value ); // Already unslashed
+				}
 			}
 
 			$custom_groups = Data::get_custom_groups();
@@ -293,7 +329,7 @@ class Handlers extends BaseManager {
 				// Only delete if the group exists in custom groups
 				if ( isset( $custom_groups[ $group_id ] ) ) {
 					if ( $this->managers->data->delete_group( $group_id ) ) {
-						$deleted_count++;
+						++$deleted_count;
 					}
 				}
 			}
@@ -337,21 +373,29 @@ class Handlers extends BaseManager {
 	 * @return void
 	 */
 	public function handle_group_actions() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
+			return;
+		}
+
 		if ( ! isset( $_POST['fluid_groups_action'] ) ) {
 			return;
 		}
 
-		$action = sanitize_key( $_POST['fluid_groups_action'] );
+		$action_raw = isset( $_POST['fluid_groups_action'] ) && is_string( $_POST['fluid_groups_action'] ) ? wp_unslash( $_POST['fluid_groups_action'] ) : '';
+		$action     = sanitize_key( $action_raw );
 
 		// Handle delete actions with separate nonce
 		if ( 'delete_group' === $action ) {
-			if ( ! isset( $_POST['fluid_delete_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['fluid_delete_nonce'] ) ), 'fluid_groups_action' ) ) {
+			$delete_nonce_raw = isset( $_POST['fluid_delete_nonce'] ) && is_string( $_POST['fluid_delete_nonce'] ) ? wp_unslash( $_POST['fluid_delete_nonce'] ) : '';
+			if ( empty( $delete_nonce_raw ) || ! wp_verify_nonce( sanitize_text_field( $delete_nonce_raw ), 'fluid_groups_action' ) ) {
 				$this->managers->notices->add_notice( esc_html__( 'Security check failed.', 'fluid-design-system-for-elementor' ), 'error' );
 				return;
 			}
 		} else {
 			// Verify main form nonce for all other actions
-			if ( ! isset( $_POST['fluid_groups_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['fluid_groups_nonce'] ) ), 'fluid_groups_action' ) ) {
+			$groups_nonce_raw = isset( $_POST['fluid_groups_nonce'] ) && is_string( $_POST['fluid_groups_nonce'] ) ? wp_unslash( $_POST['fluid_groups_nonce'] ) : '';
+			if ( empty( $groups_nonce_raw ) || ! wp_verify_nonce( sanitize_text_field( $groups_nonce_raw ), 'fluid_groups_action' ) ) {
 				$this->managers->notices->add_notice( esc_html__( 'Security check failed.', 'fluid-design-system-for-elementor' ), 'error' );
 				return;
 			}
@@ -381,9 +425,16 @@ class Handlers extends BaseManager {
 	 * @return void
 	 */
 	private function handle_create_group() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
+			return;
+		}
+
 		// Nonce verification is handled in handle_group_actions()
-		$name        = isset( $_POST['group_name'] ) ? sanitize_text_field( wp_unslash( $_POST['group_name'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$description = isset( $_POST['group_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['group_description'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$name_raw        = isset( $_POST['group_name'] ) && is_string( $_POST['group_name'] ) ? wp_unslash( $_POST['group_name'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$name            = sanitize_text_field( $name_raw );
+		$description_raw = isset( $_POST['group_description'] ) && is_string( $_POST['group_description'] ) ? wp_unslash( $_POST['group_description'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$description     = sanitize_textarea_field( $description_raw );
 
 		if ( empty( $name ) ) {
 			$this->managers->notices->add_notice( esc_html__( 'Group name is required.', 'fluid-design-system-for-elementor' ), 'error' );
@@ -414,8 +465,14 @@ class Handlers extends BaseManager {
 	 * @return void
 	 */
 	private function handle_delete_group() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
+			return;
+		}
+
 		// Nonce verification is handled in handle_group_actions()
-		$group_id = isset( $_POST['group_id'] ) ? sanitize_key( wp_unslash( $_POST['group_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$group_id_raw = isset( $_POST['group_id'] ) && is_string( $_POST['group_id'] ) ? wp_unslash( $_POST['group_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$group_id     = sanitize_key( $group_id_raw );
 
 		if ( empty( $group_id ) ) {
 			$this->managers->notices->add_notice( esc_html__( 'Group could not be deleted - invalid ID.', 'fluid-design-system-for-elementor' ), 'error' );
