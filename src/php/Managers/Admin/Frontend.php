@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 class Frontend extends BaseManager {
 
@@ -19,7 +19,7 @@ class Frontend extends BaseManager {
 	 * @param string $hook_suffix The current admin page hook suffix.
 	 * @return void
 	 */
-	public function enqueue_assets( $hook_suffix ) {
+	public function enqueue_assets( string $hook_suffix ): void {
 		// Only enqueue on our admin pages
 		if ( strpos( $hook_suffix, 'fluid-design-system' ) === false ) {
 			return;
@@ -30,15 +30,24 @@ class Frontend extends BaseManager {
 
 		// Enqueue Elementor icons for the hero button
 		if ( defined( 'ELEMENTOR_ASSETS_URL' ) ) {
+			/** @var string $elementor_assets_url */
+			$elementor_assets_url = constant( 'ELEMENTOR_ASSETS_URL' );
+			$elementor_version    = defined( 'ELEMENTOR_VERSION' ) && is_string( constant( 'ELEMENTOR_VERSION' ) )
+				? constant( 'ELEMENTOR_VERSION' )
+				: '1.0.0';
+
 			wp_enqueue_style(
 				'elementor-icons',
-				ELEMENTOR_ASSETS_URL . 'lib/eicons/css/elementor-icons.min.css',
+				$elementor_assets_url . 'lib/eicons/css/elementor-icons.min.css',
 				array(),
-				defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : '1.0.0'
+				$elementor_version
 			);
 		}
 
-		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) ? ARTS_FLUID_DS_PLUGIN_VERSION : false;
+		/** @var string|false $version */
+		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) && is_string( constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) )
+			? constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' )
+			: false;
 
 		// Enqueue modular CSS files
 		wp_enqueue_style(
@@ -229,9 +238,9 @@ class Frontend extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @return array Control registry mapping data.
+	 * @return array<string, array<string, string>> Control registry mapping data.
 	 */
-	private function get_control_registry_data() {
+	private function get_control_registry_data(): array {
 		$registry_data = array();
 
 		// Add built-in control mappings (group_id => control_id)
@@ -247,13 +256,16 @@ class Frontend extends BaseManager {
 		// Add custom group control IDs
 		$custom_groups = \Arts\FluidDesignSystem\Managers\Data::get_custom_groups();
 		foreach ( $custom_groups as $group_id => $group_data ) {
+			if ( ! is_string( $group_id ) || ! is_array( $group_data ) ) {
+				continue;
+			}
 			$group_key                   = 'custom_' . $group_id;
 			$control_id                  = \Arts\FluidDesignSystem\Managers\ControlRegistry::get_custom_group_control_id( $group_id );
 			$registry_data[ $group_key ] = array(
 				'control_id'  => $control_id,
 				'type'        => 'custom',
-				'name'        => $group_data['name'] ?? '',
-				'description' => $group_data['description'] ?? '',
+				'name'        => isset( $group_data['name'] ) && is_string( $group_data['name'] ) ? $group_data['name'] : '',
+				'description' => isset( $group_data['description'] ) && is_string( $group_data['description'] ) ? $group_data['description'] : '',
 			);
 		}
 

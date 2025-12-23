@@ -6,8 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use \Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\Utilities\Utilities;
 
 class Page extends BaseManager {
 	/**
@@ -18,7 +18,7 @@ class Page extends BaseManager {
 	 *
 	 * @return void
 	 */
-	public function add_admin_menu() {
+	public function add_admin_menu(): void {
 		// Only add menu if Elementor is active
 		if ( ! Utilities::is_elementor_plugin_active() ) {
 			return;
@@ -43,7 +43,7 @@ class Page extends BaseManager {
 	 *
 	 * @return void
 	 */
-	public function render_admin_page() {
+	public function render_admin_page(): void {
 		// Check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'fluid-design-system-for-elementor' ) );
@@ -56,11 +56,16 @@ class Page extends BaseManager {
 
 		do_action( 'arts/fluid_design_system/admin/page/before_render' );
 
+		if ( $this->managers === null ) {
+			return;
+		}
+
 		// Handle POST actions first
 		$this->managers->admin_tabs_groups_handlers->handle_group_actions();
 
 		// Get current tab (GET parameter for navigation - no nonce needed)
-		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'groups'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$current_tab = isset( $_GET['tab'] ) && is_string( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'groups';
 
 		?>
 		<div class="wrap">

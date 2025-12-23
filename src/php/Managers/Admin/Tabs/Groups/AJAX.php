@@ -6,10 +6,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use \Arts\FluidDesignSystem\Managers\Data;
-use \Arts\FluidDesignSystem\Managers\GroupsData;
-use \Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Managers\Data;
+use Arts\FluidDesignSystem\Managers\GroupsData;
+use Arts\Utilities\Utilities;
 
 class AJAX extends BaseManager {
 	/**
@@ -21,6 +21,15 @@ class AJAX extends BaseManager {
 	 * @return void
 	 */
 	public function handle_ajax_requests() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null ) {
+			wp_send_json_error(
+				array(
+					'message' => esc_html__( 'Managers not initialized.', 'fluid-design-system-for-elementor' ),
+				)
+			);
+		}
+
 		// Check security nonce
 		if ( ! check_ajax_referer( 'fluid_design_system_ajax_nonce', 'security', false ) ) {
 			wp_send_json_error(
@@ -31,7 +40,7 @@ class AJAX extends BaseManager {
 			);
 		}
 
-		$action = isset( $_POST['fluid_action'] ) ? sanitize_key( $_POST['fluid_action'] ) : '';
+		$action = isset( $_POST['fluid_action'] ) && is_string( $_POST['fluid_action'] ) ? sanitize_key( wp_unslash( $_POST['fluid_action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$result = array( 'success' => false );
 
 		switch ( $action ) {
@@ -83,12 +92,17 @@ class AJAX extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @return array Operation result
+	 * @return array<string, mixed> Operation result
 	 */
 	private function handle_ajax_update_title() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
+			return array( 'success' => false );
+		}
+
 		// Nonce verification is handled in handle_ajax_requests()
-		$group_id = isset( $_POST['group_id'] ) ? sanitize_key( $_POST['group_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$title    = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$group_id = isset( $_POST['group_id'] ) && is_string( $_POST['group_id'] ) ? sanitize_key( wp_unslash( $_POST['group_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$title    = isset( $_POST['title'] ) && is_string( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( empty( $group_id ) || empty( $title ) ) {
 			$this->managers->notices->add_notice(
@@ -151,12 +165,17 @@ class AJAX extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @return array Operation result
+	 * @return array<string, mixed> Operation result
 	 */
 	private function handle_ajax_update_description() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
+			return array( 'success' => false );
+		}
+
 		// Nonce verification is handled in handle_ajax_requests()
-		$group_id    = isset( $_POST['group_id'] ) ? sanitize_key( $_POST['group_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$description = isset( $_POST['description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['description'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$group_id    = isset( $_POST['group_id'] ) && is_string( $_POST['group_id'] ) ? sanitize_key( wp_unslash( $_POST['group_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$description = isset( $_POST['description'] ) && is_string( $_POST['description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['description'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( empty( $group_id ) ) {
 			$this->managers->notices->add_notice(
@@ -210,11 +229,22 @@ class AJAX extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @return array Operation result
+	 * @return array<string, mixed> Operation result
 	 */
 	private function handle_ajax_reorder_groups() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null ) {
+			return array( 'success' => false );
+		}
+
 		// Nonce verification is handled in handle_ajax_requests()
-		$group_order = isset( $_POST['group_order'] ) ? array_map( 'sanitize_key', $_POST['group_order'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$group_order_raw = isset( $_POST['group_order'] ) && is_array( $_POST['group_order'] ) ? wp_unslash( $_POST['group_order'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$group_order     = array();
+		foreach ( $group_order_raw as $item ) {
+			if ( is_string( $item ) ) {
+				$group_order[] = sanitize_key( $item );
+			}
+		}
 
 		if ( empty( $group_order ) ) {
 			$this->managers->notices->add_notice(
@@ -246,9 +276,14 @@ class AJAX extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @return array Array with success status and optional message.
+	 * @return array<string, mixed> Array with success status and optional message.
 	 */
 	private function handle_ajax_save_all_changes() {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->admin_tabs_groups_handlers === null || $this->managers->admin_tabs_groups_view === null ) {
+			return array( 'success' => false );
+		}
+
 		// Capture the starting time for performance tracking
 		$start_time = microtime( true );
 
@@ -265,10 +300,14 @@ class AJAX extends BaseManager {
 		// Count total presets across all groups (for summary)
 		$total_presets = 0;
 		foreach ( $main_groups as $group ) {
-			$total_presets += $group['preset_count'] ?? 0;
+			if ( isset( $group['preset_count'] ) && is_int( $group['preset_count'] ) ) {
+				$total_presets += $group['preset_count'];
+			}
 		}
 		foreach ( $filter_groups as $group ) {
-			$total_presets += $group['preset_count'] ?? 0;
+			if ( isset( $group['preset_count'] ) && is_int( $group['preset_count'] ) ) {
+				$total_presets += $group['preset_count'];
+			}
 		}
 
 		// Build success message
@@ -297,11 +336,11 @@ class AJAX extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @return array Operation result
+	 * @return array<string, mixed> Operation result
 	 */
 	private function handle_ajax_save_presets_snapshot() {
 		// Nonce verification is handled in handle_ajax_requests()
-		$snapshot_json = isset( $_POST['snapshot'] ) ? sanitize_textarea_field( wp_unslash( $_POST['snapshot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$snapshot_json = isset( $_POST['snapshot'] ) && is_string( $_POST['snapshot'] ) ? sanitize_textarea_field( wp_unslash( $_POST['snapshot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( empty( $snapshot_json ) ) {
 			return array(
@@ -331,8 +370,23 @@ class AJAX extends BaseManager {
 		}
 
 		// Get the kit document
-		$kit    = \Elementor\Plugin::$instance->kits_manager->get_active_kit();
+		$kit = \Elementor\Plugin::$instance->kits_manager->get_active_kit();
+		if ( ! is_object( $kit ) || ! method_exists( $kit, 'get_main_id' ) ) {
+			return array(
+				'success' => false,
+				'error'   => 'kit_not_found',
+				'message' => 'Active kit not found',
+			);
+		}
+
 		$kit_id = $kit->get_main_id();
+		if ( ! is_int( $kit_id ) ) {
+			return array(
+				'success' => false,
+				'error'   => 'invalid_kit_id',
+				'message' => 'Invalid kit ID',
+			);
+		}
 
 		// Get current settings (raw)
 		$meta_key     = \Elementor\Core\Settings\Page\Manager::META_KEY;
@@ -346,9 +400,9 @@ class AJAX extends BaseManager {
 
 		// Collect all existing preset data from current settings
 		foreach ( $kit_settings as $control_id => $presets ) {
-			if ( is_array( $presets ) && strpos( $control_id, '_presets' ) !== false ) {
+			if ( is_array( $presets ) && is_string( $control_id ) && strpos( $control_id, '_presets' ) !== false ) {
 				foreach ( $presets as $preset ) {
-					if ( isset( $preset['_id'] ) ) {
+					if ( is_array( $preset ) && isset( $preset['_id'] ) && is_string( $preset['_id'] ) ) {
 						// Store the COMPLETE preset data, not just id and title
 						$preset_data_map[ $preset['_id'] ] = $preset;
 					}
@@ -365,7 +419,7 @@ class AJAX extends BaseManager {
 			$updated_presets = array();
 
 			foreach ( $presets as $preset ) {
-				if ( isset( $preset['_id'] ) && isset( $preset_data_map[ $preset['_id'] ] ) ) {
+				if ( is_array( $preset ) && isset( $preset['_id'] ) && is_string( $preset['_id'] ) && isset( $preset_data_map[ $preset['_id'] ] ) ) {
 					// Use the FULL preset data from our map
 					$updated_presets[] = $preset_data_map[ $preset['_id'] ];
 				} else {
@@ -374,11 +428,22 @@ class AJAX extends BaseManager {
 				}
 			}
 
-			$kit_settings[ $control_id ] = $updated_presets;
+			if ( is_string( $control_id ) ) {
+				$kit_settings[ $control_id ] = $updated_presets;
+			}
 		}
 
 		// Get the settings manager directly
 		$page_settings_manager = \Elementor\Core\Settings\Manager::get_settings_managers( 'page' );
+
+		// Ensure we have a valid settings manager object
+		if ( ! is_object( $page_settings_manager ) || ! method_exists( $page_settings_manager, 'ajax_before_save_settings' ) || ! method_exists( $page_settings_manager, 'save_settings' ) ) {
+			return array(
+				'success' => false,
+				'error'   => 'settings_manager_not_found',
+				'message' => 'Settings manager not available',
+			);
+		}
 
 		// Run pre-save actions
 		$page_settings_manager->ajax_before_save_settings( $kit_settings, $kit_id );

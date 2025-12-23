@@ -3,8 +3,8 @@ Contributors: artemsemkin
 Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 6.9
-Requires PHP: 7.4
-Stable tag: 1.1.3
+Requires PHP: 8.0
+Stable tag: 1.2.0
 license: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -191,6 +191,11 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 5. Applying fluid unit for "gaps" control
 
 == Changelog ==
+
+= 1.2.0 =
+* improved: enhanced code quality and reliability for better performance
+* improved: updated to modern PHP standards for improved security
+* updated: minimum PHP requirement is now 8.0 (WordPress and Elementor fully support PHP 8.0+)
 
 = 1.1.2 =
 * improved: preset search now shows all presets when group name matches

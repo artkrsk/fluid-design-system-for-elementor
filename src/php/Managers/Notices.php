@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 /**
  * Notices Class
@@ -29,7 +29,7 @@ class Notices extends BaseManager {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @var array
+	 * @var array<int, array<string, mixed>>
 	 */
 	private $notices = array();
 
@@ -53,7 +53,7 @@ class Notices extends BaseManager {
 	 * @param bool   $dismissible Whether the notice is dismissible.
 	 * @return void
 	 */
-	public function add_notice( $message, $type = 'info', $dismissible = true ) {
+	public function add_notice( string $message, string $type = 'info', bool $dismissible = true ): void {
 		$this->notices[] = array(
 			'message'     => $message,
 			'type'        => $this->sanitize_notice_type( $type ),
@@ -73,13 +73,13 @@ class Notices extends BaseManager {
 	 * @param bool   $dismissible Whether the notice is dismissible.
 	 * @return void
 	 */
-	public function add_persistent_notice( $message, $type = 'info', $context = 'admin', $dismissible = true ) {
+	public function add_persistent_notice( string $message, string $type = 'info', string $context = 'admin', bool $dismissible = true ): void {
 		$persistent_notices = get_transient( $this->transient_key );
 		if ( ! is_array( $persistent_notices ) ) {
 			$persistent_notices = array();
 		}
 
-		if ( ! isset( $persistent_notices[ $context ] ) ) {
+		if ( ! isset( $persistent_notices[ $context ] ) || ! is_array( $persistent_notices[ $context ] ) ) {
 			$persistent_notices[ $context ] = array();
 		}
 
@@ -103,7 +103,7 @@ class Notices extends BaseManager {
 	 * @param string $context Context to display notices for (admin, frontend).
 	 * @return void
 	 */
-	public function display_notices( $context = 'admin' ) {
+	public function display_notices( string $context = 'admin' ): void {
 		// Display current request notices
 		foreach ( $this->notices as $notice ) {
 			$this->render_notice( $notice );
@@ -120,28 +120,37 @@ class Notices extends BaseManager {
 	 * @access public
 	 *
 	 * @param string $context Context to get notices for.
-	 * @return array Array of notice data.
+	 * @return list<array<string, mixed>> Array of notice data.
 	 */
-	public function get_notices_for_ajax( $context = 'admin' ) {
+	public function get_notices_for_ajax( string $context = 'admin' ): array {
+		/** @var list<array<string, mixed>> $ajax_notices */
 		$ajax_notices = array();
 
 		// Add current request notices
 		foreach ( $this->notices as $notice ) {
-			$ajax_notices[] = $notice;
+			/** @var array<string, mixed> $typed_notice */
+			$typed_notice   = $notice;
+			$ajax_notices[] = $typed_notice;
 		}
 
 		// Add persistent notices
 		$persistent_notices = get_transient( $this->transient_key );
-		if ( is_array( $persistent_notices ) && isset( $persistent_notices[ $context ] ) ) {
+		if ( is_array( $persistent_notices ) && isset( $persistent_notices[ $context ] ) && is_array( $persistent_notices[ $context ] ) ) {
 			foreach ( $persistent_notices[ $context ] as $notice ) {
-				$ajax_notices[] = $notice;
+				if ( is_array( $notice ) ) {
+					/** @var array<string, mixed> $typed_notice */
+					$typed_notice   = $notice;
+					$ajax_notices[] = $typed_notice;
+				}
 			}
 		}
 
 		// Clear persistent notices after getting them
 		$this->clear_persistent_notices( $context );
 
-		return $ajax_notices;
+		/** @var list<array<string, mixed>> $result */
+		$result = $ajax_notices;
+		return $result;
 	}
 
 	/**
@@ -150,11 +159,11 @@ class Notices extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param string $type    Optional. Check for specific notice type.
+	 * @param string|null $type    Optional. Check for specific notice type.
 	 * @param string $context Context to check for persistent notices.
 	 * @return bool True if notices exist, false otherwise.
 	 */
-	public function has_notices( $type = null, $context = 'admin' ) {
+	public function has_notices( ?string $type = null, string $context = 'admin' ): bool {
 		// Check current request notices
 		if ( ! empty( $this->notices ) ) {
 			if ( $type === null ) {
@@ -169,12 +178,12 @@ class Notices extends BaseManager {
 
 		// Check persistent notices
 		$persistent_notices = get_transient( $this->transient_key );
-		if ( is_array( $persistent_notices ) && isset( $persistent_notices[ $context ] ) ) {
+		if ( is_array( $persistent_notices ) && isset( $persistent_notices[ $context ] ) && is_array( $persistent_notices[ $context ] ) ) {
 			if ( $type === null ) {
 				return ! empty( $persistent_notices[ $context ] );
 			}
 			foreach ( $persistent_notices[ $context ] as $notice ) {
-				if ( $notice['type'] === $type ) {
+				if ( is_array( $notice ) && isset( $notice['type'] ) && $notice['type'] === $type ) {
 					return true;
 				}
 			}
@@ -192,7 +201,7 @@ class Notices extends BaseManager {
 	 * @param string $context Context to clear notices for.
 	 * @return void
 	 */
-	public function clear_notices( $context = 'admin' ) {
+	public function clear_notices( string $context = 'admin' ): void {
 		// Clear current request notices
 		$this->notices = array();
 
@@ -209,14 +218,18 @@ class Notices extends BaseManager {
 	 * @param string $context Context to display notices for.
 	 * @return void
 	 */
-	private function display_and_clear_persistent_notices( $context ) {
+	private function display_and_clear_persistent_notices( string $context ): void {
 		$persistent_notices = get_transient( $this->transient_key );
-		if ( ! is_array( $persistent_notices ) || ! isset( $persistent_notices[ $context ] ) ) {
+		if ( ! is_array( $persistent_notices ) || ! isset( $persistent_notices[ $context ] ) || ! is_array( $persistent_notices[ $context ] ) ) {
 			return;
 		}
 
 		foreach ( $persistent_notices[ $context ] as $notice ) {
-			$this->render_notice( $notice );
+			if ( is_array( $notice ) ) {
+				/** @var array<string, mixed> $typed_notice */
+				$typed_notice = $notice;
+				$this->render_notice( $typed_notice );
+			}
 		}
 
 		// Clear the displayed notices
@@ -232,7 +245,7 @@ class Notices extends BaseManager {
 	 * @param string $context Context to clear notices for.
 	 * @return void
 	 */
-	private function clear_persistent_notices( $context ) {
+	private function clear_persistent_notices( string $context ): void {
 		$persistent_notices = get_transient( $this->transient_key );
 		if ( ! is_array( $persistent_notices ) ) {
 			return;
@@ -253,17 +266,21 @@ class Notices extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @param array $notice Notice data.
+	 * @param array<string, mixed> $notice Notice data.
 	 * @return void
 	 */
-	private function render_notice( $notice ) {
-		$dismissible_class = $notice['dismissible'] ? ' is-dismissible' : '';
+	private function render_notice( array $notice ): void {
+		$type        = isset( $notice['type'] ) && is_string( $notice['type'] ) ? $notice['type'] : 'info';
+		$message     = isset( $notice['message'] ) && is_string( $notice['message'] ) ? $notice['message'] : '';
+		$dismissible = ! empty( $notice['dismissible'] );
+
+		$dismissible_class = $dismissible ? ' is-dismissible' : '';
 
 		printf(
 			'<div class="notice notice-%s%s"><p>%s</p></div>',
-			esc_attr( $notice['type'] ),
+			esc_attr( $type ),
 			esc_attr( $dismissible_class ),
-			esc_html( $notice['message'] )
+			esc_html( $message )
 		);
 	}
 
@@ -276,7 +293,7 @@ class Notices extends BaseManager {
 	 * @param string $type Notice type to sanitize.
 	 * @return string Sanitized notice type.
 	 */
-	private function sanitize_notice_type( $type ) {
+	private function sanitize_notice_type( string $type ): string {
 		$valid_types = array( 'success', 'error', 'warning', 'info' );
 		return in_array( $type, $valid_types, true ) ? $type : 'info';
 	}

@@ -6,9 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use \Arts\FluidDesignSystem\Managers\GroupsData;
-use \Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Managers\GroupsData;
+use Arts\Utilities\Utilities;
 
 class View extends BaseManager {
 	/**
@@ -16,15 +16,20 @@ class View extends BaseManager {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $tab_data Tab data.
+	 * @param array<string, mixed> $tab_data Tab data.
 	 * @return void
 	 */
 	public function render( $tab_data ) {
+		// Check managers availability
+		if ( $this->managers === null || $this->managers->notices === null ) {
+			return;
+		}
+
 		?>
-		<?php if ( isset( $tab_data['title'] ) && ! empty( $tab_data['title'] ) ) : ?>
+		<?php if ( isset( $tab_data['title'] ) && is_string( $tab_data['title'] ) && ! empty( $tab_data['title'] ) ) : ?>
 		<h2><?php echo esc_html( $tab_data['title'] ); ?></h2>
 		<?php endif; ?>
-		<?php if ( isset( $tab_data['description'] ) && ! empty( $tab_data['description'] ) ) : ?>
+		<?php if ( isset( $tab_data['description'] ) && is_string( $tab_data['description'] ) && ! empty( $tab_data['description'] ) ) : ?>
 		<p><?php echo esc_html( $tab_data['description'] ); ?></p>
 		<?php endif; ?>
 
@@ -173,7 +178,8 @@ class View extends BaseManager {
 	public function get_main_groups_table_body_html() {
 		ob_start();
 		$this->render_main_groups_table_body();
-		return ob_get_clean();
+		$output = ob_get_clean();
+		return is_string( $output ) ? $output : '';
 	}
 
 	/**
@@ -186,7 +192,8 @@ class View extends BaseManager {
 	public function get_developer_groups_table_body_html() {
 		ob_start();
 		$this->render_developer_groups_table_body();
-		return ob_get_clean();
+		$output = ob_get_clean();
+		return is_string( $output ) ? $output : '';
 	}
 
 	/**
@@ -206,7 +213,8 @@ class View extends BaseManager {
 			</tbody>
 		</table>
 		<?php
-		return ob_get_clean();
+		$output = ob_get_clean();
+		return is_string( $output ) ? $output : '';
 	}
 
 	/**
@@ -226,7 +234,8 @@ class View extends BaseManager {
 			</tbody>
 		</table>
 		<?php
-		return ob_get_clean();
+		$output = ob_get_clean();
+		return is_string( $output ) ? $output : '';
 	}
 
 	/**
@@ -381,27 +390,31 @@ class View extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @param array $group Group data.
-	 * @param int   $display_order Display order number.
+	 * @param array<string, mixed> $group Group data.
+	 * @param int                  $display_order Display order number.
 	 * @return void
 	 */
 	private function render_developer_group_row( $group, $display_order = 1 ) {
-		$group_name        = esc_html( isset( $group['name'] ) ? $group['name'] : ( isset( $group['title'] ) ? $group['title'] : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' ) ) );
-		$group_description = isset( $group['description'] ) ? esc_html( $group['description'] ) : '';
+		$group_name_raw    = isset( $group['name'] ) ? $group['name'] : ( isset( $group['title'] ) ? $group['title'] : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' ) );
+		$group_name        = is_string( $group_name_raw ) ? esc_html( $group_name_raw ) : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' );
+		$group_description = isset( $group['description'] ) && is_string( $group['description'] ) ? esc_html( $group['description'] ) : '';
 		$preset_count      = isset( $group['value'] ) && is_array( $group['value'] ) ? count( $group['value'] ) : 0;
 
 		// IMPORTANT: Generate a proper group ID for developer groups to prevent empty data-group-id
-		$group_id = isset( $group['id'] ) && ! empty( $group['id'] )
-			? $group['id']
-			: 'developer_' . sanitize_key( $group_name ) . '_' . $display_order;
+		if ( isset( $group['id'] ) && is_string( $group['id'] ) && ! empty( $group['id'] ) ) {
+			$group_id = $group['id'];
+		} else {
+			$fallback_key = is_string( $group_name_raw ) ? sanitize_key( $group_name_raw ) : 'group';
+			$group_id     = 'developer_' . $fallback_key . '_' . (string) $display_order;
+		}
 
 		// Developer groups are read-only, so no interactive elements
 		$type_badge = '<span class="group-type-badge group-type-filter">' . esc_html__( 'Developer', 'fluid-design-system-for-elementor' ) . '</span>';
 
 		?>
-		<tr class="group-row group-filter" data-group-id="<?php echo esc_attr( $group_id ); ?>" data-order="<?php echo esc_attr( $display_order ); ?>">
+		<tr class="group-row group-filter" data-group-id="<?php echo esc_attr( $group_id ); ?>" data-order="<?php echo esc_attr( (string) $display_order ); ?>">
 			<td class="column-order">
-				<span class="order-number"><?php echo esc_html( $display_order ); ?></span>
+				<span class="order-number"><?php echo esc_html( (string) $display_order ); ?></span>
 			</td>
 			<td class="column-name">
 				<div class="group-name-container">
@@ -410,13 +423,13 @@ class View extends BaseManager {
 				</div>
 			</td>
 			<td class="column-description">
-				<?php echo $group_description ?: '—'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo ! empty( $group_description ) ? $group_description : '—'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</td>
 			<td class="column-type">
 				<?php echo $type_badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</td>
 			<td class="column-presets">
-				<?php echo esc_html( $preset_count ); ?>
+				<?php echo esc_html( (string) $preset_count ); ?>
 			</td>
 			<td class="column-actions">
 				—
@@ -437,8 +450,8 @@ class View extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @param array $group Group data.
-	 * @param bool  $is_developer_group Whether this is for a developer group (read-only).
+	 * @param array<string, mixed> $group Group data.
+	 * @param bool                 $is_developer_group Whether this is for a developer group (read-only).
 	 * @return void
 	 */
 	private function render_group_presets( $group, $is_developer_group = false ) {
@@ -454,7 +467,12 @@ class View extends BaseManager {
 		// Always render real presets first
 		if ( ! empty( $presets ) ) {
 			foreach ( $presets as $preset ) {
-				$this->render_preset_item( $preset, $group );
+				// Ensure preset is an array with string keys
+				if ( is_array( $preset ) ) {
+					/** @var array<string, mixed> $validated_preset */
+					$validated_preset = $preset;
+					$this->render_preset_item( $validated_preset, $group );
+				}
 			}
 		}
 
@@ -478,17 +496,18 @@ class View extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @param array $preset Preset data.
-	 * @param array $group Group data.
+	 * @param array<string, mixed> $preset Preset data.
+	 * @param array<string, mixed> $group Group data.
 	 * @return void
 	 */
 	private function render_preset_item( $preset, $group ) {
 		// Generate a fallback ID if missing to prevent empty data-preset-id
-		$preset_id = isset( $preset['_id'] ) && ! empty( $preset['_id'] )
+		$preset_id = isset( $preset['_id'] ) && is_string( $preset['_id'] ) && ! empty( $preset['_id'] )
 		? esc_attr( $preset['_id'] )
 		: 'preset_' . wp_generate_uuid4();
 
-		$preset_title = isset( $preset['title'] ) ? esc_html( $preset['title'] ) : esc_html__( 'Untitled Preset', 'fluid-design-system-for-elementor' );
+		$preset_title_raw = isset( $preset['title'] ) ? $preset['title'] : esc_html__( 'Untitled Preset', 'fluid-design-system-for-elementor' );
+		$preset_title     = is_string( $preset_title_raw ) ? esc_html( $preset_title_raw ) : esc_html__( 'Untitled Preset', 'fluid-design-system-for-elementor' );
 
 		?>
 		<div class="preset-item" data-preset-id="<?php echo esc_attr( $preset_id ); ?>">
@@ -503,14 +522,15 @@ class View extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @param array $group Group data.
-	 * @param int   $display_order Display order number.
+	 * @param array<string, mixed> $group Group data.
+	 * @param int                  $display_order Display order number.
 	 * @return void
 	 */
 	private function render_main_group_row( $group, $display_order = 1 ) {
-		$group_type        = isset( $group['type'] ) ? $group['type'] : 'unknown';
-		$group_name        = esc_html( isset( $group['name'] ) ? $group['name'] : ( isset( $group['title'] ) ? $group['title'] : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' ) ) );
-		$group_description = isset( $group['description'] ) ? esc_html( $group['description'] ) : '';
+		$group_type        = isset( $group['type'] ) && is_string( $group['type'] ) ? $group['type'] : 'unknown';
+		$group_name_raw    = isset( $group['name'] ) ? $group['name'] : ( isset( $group['title'] ) ? $group['title'] : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' ) );
+		$group_name        = is_string( $group_name_raw ) ? esc_html( $group_name_raw ) : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' );
+		$group_description = isset( $group['description'] ) && is_string( $group['description'] ) ? esc_html( $group['description'] ) : '';
 		$preset_count      = isset( $group['value'] ) && is_array( $group['value'] ) ? count( $group['value'] ) : 0;
 
 		// Determine row classes and icons based on type
@@ -527,7 +547,7 @@ class View extends BaseManager {
 			case 'builtin':
 				$row_class     = 'group-builtin sortable-row'; // Built-in groups are now sortable!
 				$type_badge    = '<span class="group-type-badge group-type-builtin">' . esc_html__( 'Built-in', 'fluid-design-system-for-elementor' ) . '</span>';
-				$order_display = '<span class="order-number order-draggable" data-order="' . esc_attr( $display_order ) . '">' . esc_html( $display_order ) . '</span>';
+				$order_display = '<span class="order-number order-draggable" data-order="' . esc_attr( (string) $display_order ) . '">' . esc_html( (string) $display_order ) . '</span>';
 				$actions       = '—';
 				break;
 
@@ -535,12 +555,12 @@ class View extends BaseManager {
 			default:
 				$row_class     = 'group-custom sortable-row';
 				$type_badge    = '<span class="group-type-badge group-type-custom">' . esc_html__( 'Custom', 'fluid-design-system-for-elementor' ) . '</span>';
-				$order_display = '<span class="order-number order-draggable" data-order="' . esc_attr( $display_order ) . '">' . esc_html( $display_order ) . '</span>';
+				$order_display = '<span class="order-number order-draggable" data-order="' . esc_attr( (string) $display_order ) . '">' . esc_html( (string) $display_order ) . '</span>';
 				$actions       = $this->render_custom_group_actions( $group );
 				break;
 		}
 
-		$group_id = isset( $group['id'] ) ? $group['id'] : '';
+		$group_id = isset( $group['id'] ) && is_string( $group['id'] ) ? $group['id'] : '';
 		?>
 		<tr class="group-row <?php echo esc_attr( $row_class ); ?>" data-group-id="<?php echo esc_attr( $group_id ); ?>" data-group-type="<?php echo esc_attr( $group_type ); ?>">
 			<td class="column-order">
@@ -564,21 +584,21 @@ class View extends BaseManager {
 			<td class="column-description">
 				<?php if ( $group_type === 'custom' ) : ?>
 					<div class="editable-description" data-editable="true" data-original-description="<?php echo esc_attr( $group_description ); ?>">
-						<span class="description-text"><?php echo $group_description ?: ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+						<span class="description-text"><?php echo ! empty( $group_description ) ? $group_description : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						<input type="text" class="description-input" value="<?php echo esc_attr( $group_description ); ?>" style="display: none;" />
 					</div>
 					<?php if ( ! empty( $group_id ) ) : ?>
 						<input type="hidden" name="group_descriptions[<?php echo esc_attr( $group_id ); ?>]" value="<?php echo esc_attr( $group_description ); ?>" />
 					<?php endif; ?>
 				<?php else : ?>
-					<?php echo $group_description ?: '—'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php echo ! empty( $group_description ) ? $group_description : '—'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php endif; ?>
 			</td>
 			<td class="column-type">
 				<?php echo $type_badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</td>
 			<td class="column-presets">
-				<?php echo esc_html( $preset_count ); ?>
+				<?php echo esc_html( (string) $preset_count ); ?>
 			</td>
 			<td class="column-actions">
 				<?php echo $actions; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -598,11 +618,11 @@ class View extends BaseManager {
 	 * @since 1.0.0
 	 * @access private
 	 *
-	 * @param array $group Group data.
+	 * @param array<string, mixed> $group Group data.
 	 * @return string HTML for group actions.
 	 */
 	private function render_custom_group_actions( $group ) {
-		if ( ! isset( $group['id'] ) ) {
+		if ( ! isset( $group['id'] ) || ! is_string( $group['id'] ) ) {
 			return '';
 		}
 

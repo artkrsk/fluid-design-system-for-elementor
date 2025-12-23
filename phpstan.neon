@@ -1,0 +1,17 @@
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+	level: max
+	phpVersion: 80000
+
+	paths:
+		- src/php
+
+	bootstrapFiles:
+		- vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+		- vendor/arts/elementor-stubs/elementor-stubs.php
+
+	treatPhpDocTypesAsCertain: false
+
