@@ -12,8 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use \Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\Utilities\Utilities;
 
 /**
  * ControlRegistry Class
@@ -78,9 +78,9 @@ class ControlRegistry extends BaseManager {
 	 * @access public
 	 * @static
 	 *
-	 * @return array Array mapping collection types to display metadata.
+	 * @return array<string, array<string, mixed>> Array mapping collection types to display metadata.
 	 */
-	public static function get_builtin_group_metadata() {
+	public static function get_builtin_group_metadata(): array {
 		$builtin_metadata = array(
 			'spacing'    => array(
 				'name'        => esc_html__( 'Spacing Presets', 'fluid-design-system-for-elementor' ),
@@ -110,27 +110,28 @@ class ControlRegistry extends BaseManager {
 	 * @access public
 	 * @static
 	 *
-	 * @return array Array mapping custom group IDs to display metadata.
+	 * @return array<string, array<string, mixed>> Array mapping custom group IDs to display metadata.
 	 */
-	public static function get_custom_groups_metadata() {
+	public static function get_custom_groups_metadata(): array {
 		// Use WordPress option directly to avoid dependency issues
-		$custom_groups = get_option( 'arts_fluid_design_system_custom_groups', array() );
+		$custom_groups = Utilities::get_array_value( get_option( 'arts_fluid_design_system_custom_groups', array() ) );
 		$metadata      = array();
 
 		foreach ( $custom_groups as $group_id => $group_data ) {
+			$group_array                       = Utilities::get_array_value( $group_data );
 			$metadata[ 'custom_' . $group_id ] = array(
-				'name'        => $group_data['name'],
-				'description' => ! empty( $group_data['description'] ) ? $group_data['description'] : '',
+				'name'        => Utilities::get_string_value( $group_array['name'] ?? '' ),
+				'description' => ! empty( $group_array['description'] ) ? Utilities::get_string_value( $group_array['description'] ) : '',
 				'id'          => $group_id,
 				'type'        => 'custom',
-				'order'       => isset( $group_data['order'] ) ? (int) $group_data['order'] : 999,
+				'order'       => isset( $group_array['order'] ) ? Utilities::get_int_value( $group_array['order'], 999 ) : 999,
 			);
 		}
 
 		// Sort by order field
 		uasort(
 			$metadata,
-			function( $a, $b ) {
+			function ( $a, $b ) {
 				return $a['order'] - $b['order'];
 			}
 		);
@@ -145,9 +146,9 @@ class ControlRegistry extends BaseManager {
 	 * @access public
 	 * @static
 	 *
-	 * @return array Array mapping control IDs to group metadata.
+	 * @return array<string, array<string, mixed>> Array mapping control IDs to group metadata.
 	 */
-	public static function get_builtin_control_mappings() {
+	public static function get_builtin_control_mappings(): array {
 		// Get metadata from this registry
 		$metadata = self::get_builtin_group_metadata();
 
@@ -184,7 +185,8 @@ class ControlRegistry extends BaseManager {
 			return false;
 		}
 
-		$kit_settings = get_post_meta( $kit_id, '_elementor_page_settings', true );
+		$kit_id_int   = Utilities::get_int_value( $kit_id );
+		$kit_settings = get_post_meta( $kit_id_int, '_elementor_page_settings', true );
 		if ( ! is_array( $kit_settings ) ) {
 			return false;
 		}
@@ -211,7 +213,7 @@ class ControlRegistry extends BaseManager {
 	 * @static
 	 *
 	 * @param string $control_id The control ID to parse.
-	 * @return array|false Array with 'type' and 'group_id' keys, or false if invalid.
+	 * @return array<string, string>|false Array with 'type' and 'group_id' keys, or false if invalid.
 	 */
 	public static function parse_control_id( $control_id ) {
 		// Built-in controls
@@ -286,7 +288,7 @@ class ControlRegistry extends BaseManager {
 		// Custom groups need the fluid_custom_ prefix
 		// Remove any existing prefixes to avoid double prefixing
 		$clean_id = preg_replace( '/^fluid_custom_/', '', $group_id );
-		$clean_id = preg_replace( '/_presets$/', '', $clean_id );
+		$clean_id = preg_replace( '/_presets$/', '', $clean_id ?? '' );
 
 		return 'fluid_custom_' . $clean_id . '_presets';
 	}

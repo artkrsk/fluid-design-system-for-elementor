@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\Utilities\Utilities;
 
 /**
  * Data Class
@@ -37,17 +38,21 @@ class Data extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of custom groups.
+	 * @return array<string, array<string, mixed>> Array of custom groups.
 	 */
-	public static function get_custom_groups() {
-		$groups = get_option( self::OPTION_NAME, array() );
+	public static function get_custom_groups(): array {
+		/** @var array<string, array<string, mixed>> $groups */
+		$groups = Utilities::get_array_value( get_option( self::OPTION_NAME, array() ) );
 
 		// Ensure all groups have an order field (migration)
 		$needs_update = false;
 		foreach ( $groups as $id => $group ) {
-			if ( ! isset( $group['order'] ) ) {
-				$groups[ $id ]['order'] = 999; // Put at the end
-				$needs_update           = true;
+			$group_array = Utilities::get_array_value( $group );
+			if ( ! isset( $group_array['order'] ) ) {
+				$group_array['order'] = 999; // Put at the end
+				/** @var array<string, mixed> $group_array */
+				$groups[ $id ] = $group_array;
+				$needs_update  = true;
 			}
 		}
 
@@ -55,6 +60,7 @@ class Data extends BaseManager {
 			update_option( self::OPTION_NAME, $groups );
 		}
 
+		/** @var array<string, array<string, mixed>> $groups */
 		return $groups;
 	}
 
@@ -64,10 +70,10 @@ class Data extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param array $groups Array of custom groups.
+	 * @param array<string, array<string, mixed>> $groups Array of custom groups.
 	 * @return bool True on success, false on failure.
 	 */
-	public function save_custom_groups( $groups ) {
+	public function save_custom_groups( array $groups ): bool {
 		return update_option( self::OPTION_NAME, $groups );
 	}
 
@@ -87,7 +93,8 @@ class Data extends BaseManager {
 		// Check for duplicate names
 		$sanitized_name = sanitize_text_field( $name );
 		foreach ( $groups as $existing_group ) {
-			if ( isset( $existing_group['name'] ) && $existing_group['name'] === $sanitized_name ) {
+			$group_array = Utilities::get_array_value( $existing_group );
+			if ( isset( $group_array['name'] ) && $group_array['name'] === $sanitized_name ) {
 				return false; // Duplicate name found
 			}
 		}
@@ -97,8 +104,12 @@ class Data extends BaseManager {
 		// Get next order position
 		$max_order = 0;
 		foreach ( $groups as $group ) {
-			if ( isset( $group['order'] ) && $group['order'] > $max_order ) {
-				$max_order = $group['order'];
+			$group_array = Utilities::get_array_value( $group );
+			if ( isset( $group_array['order'] ) ) {
+				$order_value = Utilities::get_int_value( $group_array['order'] );
+				if ( $order_value > $max_order ) {
+					$max_order = $order_value;
+				}
 			}
 		}
 
@@ -152,7 +163,7 @@ class Data extends BaseManager {
 	 * @access public
 	 *
 	 * @param string $id Group ID.
-	 * @return array|null Group data or null if not found.
+	 * @return array<string, mixed>|null Group data or null if not found.
 	 */
 	public function get_group( $id ) {
 		$groups = $this->get_custom_groups();
@@ -179,22 +190,25 @@ class Data extends BaseManager {
 				continue;
 			}
 
-			if ( isset( $existing_group['name'] ) && $existing_group['name'] === $sanitized_name ) {
+			$group_array = Utilities::get_array_value( $existing_group );
+			if ( isset( $group_array['name'] ) && $group_array['name'] === $sanitized_name ) {
 				return true;
 			}
 		}
 
 		return false;
-	}   /**
-		 * Reorder custom groups.
-		 *
-		 * @since 1.0.0
-		 * @access public
-		 *
-		 * @param array $order Array of group IDs in new order.
-		 * @return bool True on success, false on failure.
-		 */
-	public function reorder_groups( $order ) {
+	}
+
+	/**
+	 * Reorder custom groups.
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 *
+	 * @param array<int, string> $order Array of group IDs in new order.
+	 * @return bool True on success, false on failure.
+	 */
+	public function reorder_groups( array $order ): bool {
 		$groups = $this->get_custom_groups();
 
 		// Validate that all IDs exist
@@ -226,10 +240,12 @@ class Data extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of group IDs in order. Empty array if no custom order set.
+	 * @return array<int, string> Array of group IDs in order. Empty array if no custom order set.
 	 */
-	public static function get_main_group_order() {
-		return get_option( self::MAIN_GROUP_ORDER_OPTION, array() );
+	public static function get_main_group_order(): array {
+		/** @var array<int, string> $order */
+		$order = Utilities::get_array_value( get_option( self::MAIN_GROUP_ORDER_OPTION, array() ) );
+		return $order;
 	}
 
 	/**
@@ -238,10 +254,10 @@ class Data extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param array $order Array of group IDs in order.
+	 * @param array<int, string> $order Array of group IDs in order.
 	 * @return bool True on success, false on failure.
 	 */
-	public static function save_main_group_order( $order ) {
+	public static function save_main_group_order( array $order ): bool {
 		$sanitized_order = array();
 		foreach ( $order as $group_id ) {
 			$sanitized_id = sanitize_key( $group_id );

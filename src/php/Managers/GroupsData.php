@@ -12,11 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use \Arts\FluidDesignSystem\Elementor\Units\Fluid\Module as FluidUnitModule;
-use \Arts\FluidDesignSystem\Managers\ControlRegistry;
-use \Arts\FluidDesignSystem\Managers\Data;
-use \Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Elementor\Units\Fluid\Module as FluidUnitModule;
+use Arts\FluidDesignSystem\Managers\ControlRegistry;
+use Arts\FluidDesignSystem\Managers\Data;
+use Arts\Utilities\Utilities;
 
 /**
  * GroupsData Class
@@ -34,9 +34,9 @@ class GroupsData extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of groups.
+	 * @return array<int, array<string, mixed>> Array of groups.
 	 */
-	public static function get_all_groups() {
+	public static function get_all_groups(): array {
 		$groups = array();
 
 		// Add main groups (built-in + custom) in correct order
@@ -54,19 +54,22 @@ class GroupsData extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of main groups in order.
+	 * @return array<int, array<string, mixed>> Array of main groups in order.
 	 */
-	public static function get_main_groups() {
+	public static function get_main_groups(): array {
 		// Check if custom ordering is active
 		if ( ! Data::is_main_group_ordering_active() ) {
 			// Backward compatibility: return in original order
 			$builtin_groups = self::get_builtin_groups();
 			$custom_groups  = self::get_custom_groups();
-			return array_merge( $builtin_groups, $custom_groups );
+			/** @var array<int, array<string, mixed>> $merged */
+			$merged = array_merge( $builtin_groups, $custom_groups );
+			return $merged;
 		}
 
 		// Get custom order
-		$ordered_ids          = Data::get_main_group_order();
+		$ordered_ids = Data::get_main_group_order();
+		/** @var array<string, array<string, mixed>> $all_available_groups */
 		$all_available_groups = array();
 
 		// Get all available groups indexed by ID
@@ -75,30 +78,39 @@ class GroupsData extends BaseManager {
 
 		// Index built-in groups by their control ID (which is used as their "ID")
 		foreach ( $builtin_groups as $group ) {
-			if ( isset( $group['id'] ) ) {
-				$all_available_groups[ $group['id'] ] = $group;
+			$group_array = Utilities::get_array_value( $group );
+			if ( isset( $group_array['id'] ) ) {
+				$group_id                          = Utilities::get_string_value( $group_array['id'] );
+				$all_available_groups[ $group_id ] = $group_array;
 			}
 		}
 
 		// Index custom groups by their ID
 		foreach ( $custom_groups as $group ) {
-			if ( isset( $group['id'] ) ) {
-				$all_available_groups[ $group['id'] ] = $group;
+			$group_array = Utilities::get_array_value( $group );
+			if ( isset( $group_array['id'] ) ) {
+				$group_id                          = Utilities::get_string_value( $group_array['id'] );
+				$all_available_groups[ $group_id ] = $group_array;
 			}
 		}
 
 		// Build ordered array
+		/** @var array<int, array<string, mixed>> $ordered_groups */
 		$ordered_groups = array();
 		foreach ( $ordered_ids as $group_id ) {
 			if ( isset( $all_available_groups[ $group_id ] ) ) {
-				$ordered_groups[] = $all_available_groups[ $group_id ];
+				/** @var array<string, mixed> $group_item */
+				$group_item       = $all_available_groups[ $group_id ];
+				$ordered_groups[] = $group_item;
 				unset( $all_available_groups[ $group_id ] );
 			}
 		}
 
 		// Add any remaining groups that weren't in the order (fallback for data integrity)
 		foreach ( $all_available_groups as $group ) {
-			$ordered_groups[] = $group;
+			/** @var array<string, mixed> $group_item */
+			$group_item       = $group;
+			$ordered_groups[] = $group_item;
 		}
 
 		return $ordered_groups;
@@ -110,9 +122,9 @@ class GroupsData extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of built-in groups.
+	 * @return array<int, array<string, mixed>> Array of built-in groups.
 	 */
-	public static function get_builtin_groups() {
+	public static function get_builtin_groups(): array {
 		$groups = array();
 
 		// Get built-in control mappings from tab registrar
@@ -146,9 +158,9 @@ class GroupsData extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of filter-based groups.
+	 * @return array<int, array<string, mixed>> Array of filter-based groups.
 	 */
-	public static function get_filter_groups() {
+	public static function get_filter_groups(): array {
 		// Get all preset groups from the Module (includes filter-based groups)
 		$all_groups = FluidUnitModule::get_all_preset_groups();
 
@@ -192,21 +204,27 @@ class GroupsData extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of built-in group names.
+	 * @return array<int, string> Array of built-in group names.
 	 */
-	public static function get_builtin_names() {
+	public static function get_builtin_names(): array {
 		$builtin_names = array();
 
 		// Get default preset option names
 		$default_options = FluidUnitModule::get_default_preset_options();
 		foreach ( $default_options as $option ) {
-			$builtin_names[] = $option['name'];
+			$option_array = Utilities::get_array_value( $option );
+			if ( isset( $option_array['name'] ) ) {
+				$builtin_names[] = Utilities::get_string_value( $option_array['name'] );
+			}
 		}
 
 		// Get built-in group names from tab registrar
 		$builtin_controls = ControlRegistry::get_builtin_control_mappings();
 		foreach ( $builtin_controls as $group_data ) {
-			$builtin_names[] = $group_data['name'];
+			$group_array = Utilities::get_array_value( $group_data );
+			if ( isset( $group_array['name'] ) ) {
+				$builtin_names[] = Utilities::get_string_value( $group_array['name'] );
+			}
 		}
 
 		return $builtin_names;
@@ -218,31 +236,34 @@ class GroupsData extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @return array Array of custom groups.
+	 * @return array<int, array<string, mixed>> Array of custom groups.
 	 */
-	public static function get_custom_groups() {
+	public static function get_custom_groups(): array {
 		$custom_groups_data = Data::get_custom_groups();
 		$groups             = array();
 
 		foreach ( $custom_groups_data as $id => $group_data ) {
+			$group_array = Utilities::get_array_value( $group_data );
+			$group_id    = Utilities::get_string_value( $id );
+
 			// Get actual presets from Site Settings
-			$control_id = ControlRegistry::get_custom_group_control_id( $id );
+			$control_id = ControlRegistry::get_custom_group_control_id( $group_id );
 			$presets    = Utilities::get_kit_settings( $control_id, array(), false );
 
 			$groups[] = array(
-				'name'        => $group_data['name'],
-				'description' => $group_data['description'],
+				'name'        => Utilities::get_string_value( $group_array['name'] ?? '' ),
+				'description' => Utilities::get_string_value( $group_array['description'] ?? '' ),
 				'type'        => 'custom',
 				'value'       => $presets,
-				'id'          => $id,
-				'order'       => isset( $group_data['order'] ) ? (int) $group_data['order'] : 999,
+				'id'          => $group_id,
+				'order'       => isset( $group_array['order'] ) ? Utilities::get_int_value( $group_array['order'], 999 ) : 999,
 			);
 		}
 
 		// Sort by order field
 		usort(
 			$groups,
-			function( $a, $b ) {
+			function ( $a, $b ) {
 				return $a['order'] - $b['order'];
 			}
 		);

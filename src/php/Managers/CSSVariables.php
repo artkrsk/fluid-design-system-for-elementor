@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 /**
  * CSSVariables Class
@@ -96,12 +96,14 @@ class CSSVariables extends BaseManager {
 	 * @param string $id The preset ID.
 	 * @return string The CSS variable name.
 	 */
-	public static function get_css_var_preset( $id ) {
-		return apply_filters(
+	public static function get_css_var_preset( string $id ): string {
+		/** @var string */
+		$result = apply_filters(
 			'arts/fluid_design_system/css/var_preset',
 			self::CSS_VAR_PRESET_PREFIX . $id,
 			$id
 		);
+		return $result;
 	}
 
 	/**
@@ -112,11 +114,13 @@ class CSSVariables extends BaseManager {
 	 *
 	 * @return string The CSS variable name.
 	 */
-	public static function get_css_var_min_screen() {
-		return apply_filters(
+	public static function get_css_var_min_screen(): string {
+		/** @var string */
+		$result = apply_filters(
 			'arts/fluid_design_system/css/var_min_screen',
 			self::CSS_VAR_MIN_SCREEN
 		);
+		return $result;
 	}
 
 	/**
@@ -127,11 +131,13 @@ class CSSVariables extends BaseManager {
 	 *
 	 * @return string The CSS variable name.
 	 */
-	public static function get_css_var_min_screen_value() {
-		return apply_filters(
+	public static function get_css_var_min_screen_value(): string {
+		/** @var string */
+		$result = apply_filters(
 			'arts/fluid_design_system/css/var_min_screen_value',
 			self::CSS_VAR_MIN_SCREEN_VALUE
 		);
+		return $result;
 	}
 
 	/**
@@ -142,11 +148,13 @@ class CSSVariables extends BaseManager {
 	 *
 	 * @return string The CSS variable name.
 	 */
-	public static function get_css_var_max_screen() {
-		return apply_filters(
+	public static function get_css_var_max_screen(): string {
+		/** @var string */
+		$result = apply_filters(
 			'arts/fluid_design_system/css/var_max_screen',
 			self::CSS_VAR_MAX_SCREEN
 		);
+		return $result;
 	}
 
 	/**
@@ -157,11 +165,13 @@ class CSSVariables extends BaseManager {
 	 *
 	 * @return string The CSS variable name.
 	 */
-	public static function get_css_var_max_screen_value() {
-		return apply_filters(
+	public static function get_css_var_max_screen_value(): string {
+		/** @var string */
+		$result = apply_filters(
 			'arts/fluid_design_system/css/var_max_screen_value',
 			self::CSS_VAR_MAX_SCREEN_VALUE
 		);
+		return $result;
 	}
 
 	/**
@@ -172,11 +182,13 @@ class CSSVariables extends BaseManager {
 	 *
 	 * @return string The CSS variable name.
 	 */
-	public static function get_css_var_screen_diff() {
-		return apply_filters(
+	public static function get_css_var_screen_diff(): string {
+		/** @var string */
+		$result = apply_filters(
 			'arts/fluid_design_system/css/var_screen_diff',
 			self::CSS_VAR_SCREEN_DIFF
 		);
+		return $result;
 	}
 
 	/**
@@ -192,7 +204,7 @@ class CSSVariables extends BaseManager {
 	 *
 	 * @return string The complete clamp formula
 	 */
-	public static function get_clamp_formula( $min_value, $max_value, $min_screen = null, $max_screen = null ) {
+	public static function get_clamp_formula( string $min_value, string $max_value, ?string $min_screen = null, ?string $max_screen = null ): string {
 		// Break down the formula into logical parts
 		$min_size = '{{' . $min_value . '.size}}{{' . $min_value . '.unit}}';
 		$max_size = '{{' . $max_value . '.size}}{{' . $max_value . '.unit}}';
@@ -227,7 +239,8 @@ class CSSVariables extends BaseManager {
 		$formula = "clamp({$lower_bound}, {$preferred_value}, {$upper_bound})";
 
 		// Allow filtering of the complete formula
-		return apply_filters(
+		/** @var string */
+		$result = apply_filters(
 			'arts/fluid_design_system/css/clamp_formula',
 			$formula,
 			array(
@@ -241,5 +254,6 @@ class CSSVariables extends BaseManager {
 				'viewport_calc' => $viewport_calc,
 			)
 		);
+		return $result;
 	}
 }
