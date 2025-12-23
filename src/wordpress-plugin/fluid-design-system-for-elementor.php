@@ -23,12 +23,12 @@ require_once __DIR__ . '/vendor/autoload.php';
 use \Arts\Utilities\Utilities;
 use \Arts\FluidDesignSystem\Plugin;
 
-$plugin_file    = __FILE__;
-$plugin_version = Utilities::get_plugin_version( $plugin_file );
+$arts_fluid_design_system_plugin_file    = __FILE__;
+$arts_fluid_design_system_plugin_version = Utilities::get_plugin_version( $arts_fluid_design_system_plugin_file );
 
-define( 'ARTS_FLUID_DS_PLUGIN_VERSION', $plugin_version );
-define( 'ARTS_FLUID_DS_PLUGIN_FILE', $plugin_file );
-define( 'ARTS_FLUID_DS_PLUGIN_PATH', untrailingslashit( plugin_dir_path( $plugin_file ) ) );
-define( 'ARTS_FLUID_DS_PLUGIN_URL', untrailingslashit( plugin_dir_url( $plugin_file ) ) );
+define( 'ARTS_FLUID_DS_PLUGIN_VERSION', $arts_fluid_design_system_plugin_version );
+define( 'ARTS_FLUID_DS_PLUGIN_FILE', $arts_fluid_design_system_plugin_file );
+define( 'ARTS_FLUID_DS_PLUGIN_PATH', untrailingslashit( plugin_dir_path( $arts_fluid_design_system_plugin_file ) ) );
+define( 'ARTS_FLUID_DS_PLUGIN_URL', untrailingslashit( plugin_dir_url( $arts_fluid_design_system_plugin_file ) ) );
 
 Plugin::instance();

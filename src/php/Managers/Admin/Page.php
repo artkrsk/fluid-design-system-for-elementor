@@ -64,9 +64,8 @@ class Page extends BaseManager {
 		$this->managers->admin_tabs_groups_handlers->handle_group_actions();
 
 		// Get current tab (GET parameter for navigation - no nonce needed)
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$tab_param   = isset( $_GET['tab'] ) && is_string( $_GET['tab'] ) ? $_GET['tab'] : '';
-		$current_tab = $tab_param !== '' ? sanitize_key( $tab_param ) : 'groups';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$current_tab = isset( $_GET['tab'] ) && is_string( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'groups';
 
 		?>
 		<div class="wrap">

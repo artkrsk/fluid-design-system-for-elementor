@@ -37,16 +37,14 @@ class Handlers extends BaseManager {
 			}
 		}
 
-		$temp_group_mapping_json_raw = isset( $_POST['temp_group_mapping'] ) && is_string( $_POST['temp_group_mapping'] ) ? wp_unslash( $_POST['temp_group_mapping'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$temp_group_mapping_json     = sanitize_textarea_field( $temp_group_mapping_json_raw );
-		$temp_group_mapping          = ! empty( $temp_group_mapping_json ) ? json_decode( $temp_group_mapping_json, true ) : array();
+		$temp_group_mapping_json = isset( $_POST['temp_group_mapping'] ) && is_string( $_POST['temp_group_mapping'] ) ? sanitize_textarea_field( wp_unslash( $_POST['temp_group_mapping'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$temp_group_mapping      = ! empty( $temp_group_mapping_json ) ? json_decode( $temp_group_mapping_json, true ) : array();
 		if ( ! is_array( $temp_group_mapping ) ) {
 			$temp_group_mapping = array();
 		}
 
-		$temp_group_positions_json_raw = isset( $_POST['temp_group_positions'] ) && is_string( $_POST['temp_group_positions'] ) ? wp_unslash( $_POST['temp_group_positions'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$temp_group_positions_json     = sanitize_textarea_field( $temp_group_positions_json_raw );
-		$temp_group_positions          = ! empty( $temp_group_positions_json ) ? json_decode( $temp_group_positions_json, true ) : array();
+		$temp_group_positions_json = isset( $_POST['temp_group_positions'] ) && is_string( $_POST['temp_group_positions'] ) ? sanitize_textarea_field( wp_unslash( $_POST['temp_group_positions'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$temp_group_positions      = ! empty( $temp_group_positions_json ) ? json_decode( $temp_group_positions_json, true ) : array();
 		if ( ! is_array( $temp_group_positions ) ) {
 			$temp_group_positions = array();
 		}
@@ -382,19 +380,18 @@ class Handlers extends BaseManager {
 			return;
 		}
 
-		$action_raw = isset( $_POST['fluid_groups_action'] ) && is_string( $_POST['fluid_groups_action'] ) ? wp_unslash( $_POST['fluid_groups_action'] ) : '';
-		$action     = sanitize_key( $action_raw );
+		$action = isset( $_POST['fluid_groups_action'] ) && is_string( $_POST['fluid_groups_action'] ) ? sanitize_key( wp_unslash( $_POST['fluid_groups_action'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		// Handle delete actions with separate nonce
 		if ( 'delete_group' === $action ) {
-			$delete_nonce_raw = isset( $_POST['fluid_delete_nonce'] ) && is_string( $_POST['fluid_delete_nonce'] ) ? wp_unslash( $_POST['fluid_delete_nonce'] ) : '';
+			$delete_nonce_raw = isset( $_POST['fluid_delete_nonce'] ) && is_string( $_POST['fluid_delete_nonce'] ) ? wp_unslash( $_POST['fluid_delete_nonce'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			if ( empty( $delete_nonce_raw ) || ! wp_verify_nonce( sanitize_text_field( $delete_nonce_raw ), 'fluid_groups_action' ) ) {
 				$this->managers->notices->add_notice( esc_html__( 'Security check failed.', 'fluid-design-system-for-elementor' ), 'error' );
 				return;
 			}
 		} else {
 			// Verify main form nonce for all other actions
-			$groups_nonce_raw = isset( $_POST['fluid_groups_nonce'] ) && is_string( $_POST['fluid_groups_nonce'] ) ? wp_unslash( $_POST['fluid_groups_nonce'] ) : '';
+			$groups_nonce_raw = isset( $_POST['fluid_groups_nonce'] ) && is_string( $_POST['fluid_groups_nonce'] ) ? wp_unslash( $_POST['fluid_groups_nonce'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			if ( empty( $groups_nonce_raw ) || ! wp_verify_nonce( sanitize_text_field( $groups_nonce_raw ), 'fluid_groups_action' ) ) {
 				$this->managers->notices->add_notice( esc_html__( 'Security check failed.', 'fluid-design-system-for-elementor' ), 'error' );
 				return;
@@ -431,10 +428,8 @@ class Handlers extends BaseManager {
 		}
 
 		// Nonce verification is handled in handle_group_actions()
-		$name_raw        = isset( $_POST['group_name'] ) && is_string( $_POST['group_name'] ) ? wp_unslash( $_POST['group_name'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$name            = sanitize_text_field( $name_raw );
-		$description_raw = isset( $_POST['group_description'] ) && is_string( $_POST['group_description'] ) ? wp_unslash( $_POST['group_description'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$description     = sanitize_textarea_field( $description_raw );
+		$name        = isset( $_POST['group_name'] ) && is_string( $_POST['group_name'] ) ? sanitize_text_field( wp_unslash( $_POST['group_name'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$description = isset( $_POST['group_description'] ) && is_string( $_POST['group_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['group_description'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( empty( $name ) ) {
 			$this->managers->notices->add_notice( esc_html__( 'Group name is required.', 'fluid-design-system-for-elementor' ), 'error' );
@@ -471,8 +466,7 @@ class Handlers extends BaseManager {
 		}
 
 		// Nonce verification is handled in handle_group_actions()
-		$group_id_raw = isset( $_POST['group_id'] ) && is_string( $_POST['group_id'] ) ? wp_unslash( $_POST['group_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$group_id     = sanitize_key( $group_id_raw );
+		$group_id = isset( $_POST['group_id'] ) && is_string( $_POST['group_id'] ) ? sanitize_key( wp_unslash( $_POST['group_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( empty( $group_id ) ) {
 			$this->managers->notices->add_notice( esc_html__( 'Group could not be deleted - invalid ID.', 'fluid-design-system-for-elementor' ), 'error' );
