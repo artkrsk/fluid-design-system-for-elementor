@@ -61,12 +61,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "1b5ca0814f1c567caa6f9b94e5ee8f608a940510"
+                "reference": "14d859c2f9d6617e0b10342df80c266e6c333ac3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/1b5ca0814f1c567caa6f9b94e5ee8f608a940510",
-                "reference": "1b5ca0814f1c567caa6f9b94e5ee8f608a940510",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/14d859c2f9d6617e0b10342df80c266e6c333ac3",
+                "reference": "14d859c2f9d6617e0b10342df80c266e6c333ac3",
                 "shasum": ""
             },
             "require": {
@@ -109,7 +109,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2025-12-23T01:41:55+00:00"
+            "time": "2025-12-23T07:23:46+00:00"
         },
         {
             "name": "arts/utilities",
@@ -170,11 +170,11 @@
             "dist": {
                 "type": "path",
                 "url": "../elementor-stubs",
-                "reference": "4a993235b89e87a7aa4f0f3915393e4531de38c1"
+                "reference": "5164aad9ef951006e9037c4d032959a57fc7b354"
             },
             "require": {
                 "ergebnis/composer-normalize": "^2.48",
-                "php": ">=7.2",
+                "php": ">=8.0",
                 "php-stubs/woocommerce-stubs": "^10.4",
                 "php-stubs/wordpress-stubs": "^6.9",
                 "php-stubs/wp-cli-stubs": "^2.12"
