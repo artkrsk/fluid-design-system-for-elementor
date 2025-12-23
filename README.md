@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![WordPress](https://img.shields.io/badge/wordpress-6.0%2B-green)
-![PHP](https://img.shields.io/badge/php-7.4%2B-purple)
+![PHP](https://img.shields.io/badge/php-8.0%2B-purple)
 ![Elementor](https://img.shields.io/badge/elementor-compatible-red)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/artemsemkin)
 
@@ -36,7 +36,7 @@ Think of it like color presets — but for padding, font sizes, and layout gaps.
 ## 📋 Requirements
 
 - WordPress 6.0+
-- PHP 7.4+
+- PHP 8.0+
 - Elementor (latest version recommended)
 
 ## 🚀 Getting Started
