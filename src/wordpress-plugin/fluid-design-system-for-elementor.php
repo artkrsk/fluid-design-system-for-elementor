@@ -20,15 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use \Arts\Utilities\Utilities;
-use \Arts\FluidDesignSystem\Plugin;
+use Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Plugin;
 
-$arts_fluid_design_system_plugin_file    = __FILE__;
-$arts_fluid_design_system_plugin_version = Utilities::get_plugin_version( $arts_fluid_design_system_plugin_file );
-
-define( 'ARTS_FLUID_DS_PLUGIN_VERSION', $arts_fluid_design_system_plugin_version );
-define( 'ARTS_FLUID_DS_PLUGIN_FILE', $arts_fluid_design_system_plugin_file );
-define( 'ARTS_FLUID_DS_PLUGIN_PATH', untrailingslashit( plugin_dir_path( $arts_fluid_design_system_plugin_file ) ) );
-define( 'ARTS_FLUID_DS_PLUGIN_URL', untrailingslashit( plugin_dir_url( $arts_fluid_design_system_plugin_file ) ) );
+define( 'ARTS_FLUID_DS_PLUGIN_FILE', __FILE__ );
+define( 'ARTS_FLUID_DS_PLUGIN_VERSION', Utilities::get_plugin_version( ARTS_FLUID_DS_PLUGIN_FILE ) );
+define( 'ARTS_FLUID_DS_PLUGIN_PATH', untrailingslashit( plugin_dir_path( ARTS_FLUID_DS_PLUGIN_FILE ) ) );
+define( 'ARTS_FLUID_DS_PLUGIN_URL', untrailingslashit( plugin_dir_url( ARTS_FLUID_DS_PLUGIN_FILE ) ) );
 
 Plugin::instance();
