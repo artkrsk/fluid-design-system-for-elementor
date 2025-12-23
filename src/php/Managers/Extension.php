@@ -37,7 +37,7 @@ class Extension extends BaseManager {
 	 */
 	public function filter_plugin_config( array $config ): array {
 		$config['required_elementor_version'] = '3.27.0';
-		$config['required_php_version']       = '7.4';
+		$config['required_php_version']       = '8.0';
 
 		return $config;
 	}
