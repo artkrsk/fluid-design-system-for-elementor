@@ -175,9 +175,18 @@ async function syncWordPressPluginFiles(config, isDev) {
  */
 async function syncVendorFiles(config, isDev) {
   const source = config.wordpressPlugin?.vendor?.source || './vendor'
+  const isProductionBuild = !isDev && shouldCreateDistFolder(config)
+  const backupPath = './vendor_dev_backup'
 
-  // Check if vendor directory exists, install if not
-  if (!(await fs.pathExists(source))) {
+  // For production builds, backup vendor and reinstall without dev dependencies
+  if (isProductionBuild && (await fs.pathExists(source))) {
+    logger.info('Production build: backing up vendor directory...')
+    await fs.move(source, backupPath, { overwrite: true })
+  }
+
+  try {
+    // Check if vendor directory exists, install if not
+    if (!(await fs.pathExists(source))) {
     logger.warn(`Vendor directory not found: ${source}, running composer install...`)
 
     try {
@@ -187,7 +196,7 @@ async function syncVendorFiles(config, isDev) {
       // Run composer install if composer.json exists
       if (await fs.pathExists(path.join(projectRoot, 'composer.json'))) {
         const { execSync } = await import('child_process')
-        const cmd = 'composer install --no-dev --optimize-autoloader'
+        const cmd = 'composer install --no-dev --no-scripts --optimize-autoloader'
 
         logger.info(`Running: ${cmd}`)
         execSync(cmd, { cwd: projectRoot, stdio: 'inherit' })
@@ -270,6 +279,16 @@ async function syncVendorFiles(config, isDev) {
     }
   } else {
     logger.success(`Verified autoload.php exists in target: ${autoloadPath}`)
+  }
+  } finally {
+    // Restore development vendor for production builds
+    if (isProductionBuild && (await fs.pathExists(backupPath))) {
+      if (await fs.pathExists(source)) {
+        await fs.remove(source)
+      }
+      await fs.move(backupPath, source)
+      logger.info('Development vendor restored')
+    }
   }
 }
 
