@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-use \Elementor\Core\Common\Modules\Ajax\Module as Ajax;
-use \Elementor\Core\Base\Module as Module_Base;
-use \Arts\Utilities\Utilities;
-use \Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
-use \Arts\FluidDesignSystem\Managers\CSSVariables;
-use \Arts\FluidDesignSystem\Managers\ControlRegistry;
+use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
+use Elementor\Core\Base\Module as Module_Base;
+use Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
+use Arts\FluidDesignSystem\Managers\CSSVariables;
+use Arts\FluidDesignSystem\Managers\ControlRegistry;
 
 /**
  * Module Class
@@ -104,11 +104,11 @@ class Module extends Module_Base {
 	 * @access public
 	 * @static
 	 *
-	 * @param array $data Data received from the AJAX request.
-	 * @return array Formatted presets data for the fluid unit control.
+	 * @param array<string, mixed> $data Data received from the AJAX request.
+	 * @return array<int, array<string, mixed>> Formatted presets data for the fluid unit control.
 	 * @throws \Exception If the user does not have permission to edit posts.
 	 */
-	public static function ajax_fluid_design_system_presets( $data ) {
+	public static function ajax_fluid_design_system_presets( $data ): array {
 		// Verify user permissions
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
@@ -129,10 +129,10 @@ class Module extends Module_Base {
 	 * @access public
 	 * @static
 	 *
-	 * @param array $data Optional data context for filter processing.
-	 * @return array Formatted presets data for the fluid unit control and admin display.
+	 * @param array<string, mixed> $data Optional data context for filter processing.
+	 * @return array<int, array<string, mixed>> Formatted presets data for the fluid unit control and admin display.
 	 */
-	public static function get_all_preset_groups( $data = array() ) {
+	public static function get_all_preset_groups( $data = array() ): array {
 		// Initialize the result with default options
 		$result = self::get_default_preset_options();
 
@@ -184,9 +184,15 @@ class Module extends Module_Base {
 		 * @param array $breakpoint_settings Global breakpoint settings.
 		 * @param array $data               The AJAX request data.
 		 */
-		$result = apply_filters( 'arts/fluid_design_system/custom_presets', $result, $breakpoint_settings, $data );
+		$filtered_result = apply_filters( 'arts/fluid_design_system/custom_presets', $result, $breakpoint_settings, $data );
 
-		return $result;
+		// Ensure filter returns an array
+		if ( ! is_array( $filtered_result ) ) {
+			return $result;
+		}
+
+		/** @var array<int, array<string, mixed>> $filtered_result */
+		return $filtered_result;
 	}
 
 	/**
@@ -196,9 +202,9 @@ class Module extends Module_Base {
 	 * @access public
 	 * @static
 	 *
-	 * @return array Array of default preset options.
+	 * @return array<int, array<string, string>> Array of default preset options.
 	 */
-	public static function get_default_preset_options() {
+	public static function get_default_preset_options(): array {
 		return array(
 			array(
 				'name'  => esc_html__( 'Default', 'fluid-design-system-for-elementor' ),
@@ -218,12 +224,15 @@ class Module extends Module_Base {
 	 * @access private
 	 * @static
 	 *
-	 * @return array Array with min and max screen width values.
+	 * @return array<string, int> Array with min and max screen width values.
 	 */
-	private static function get_breakpoint_settings() {
+	private static function get_breakpoint_settings(): array {
+		$min_width = Utilities::get_kit_settings( 'min_screen_width', 360 );
+		$max_width = Utilities::get_kit_settings( 'max_screen_width', 1920 );
+
 		return array(
-			'min_screen_width' => Utilities::get_kit_settings( 'min_screen_width', 360 ),
-			'max_screen_width' => Utilities::get_kit_settings( 'max_screen_width', 1920 ),
+			'min_screen_width' => is_numeric( $min_width ) ? (int) $min_width : 360,
+			'max_screen_width' => is_numeric( $max_width ) ? (int) $max_width : 1920,
 		);
 	}
 
@@ -234,25 +243,39 @@ class Module extends Module_Base {
 	 * @access public
 	 * @static
 	 *
-	 * @return array Array of preset collections with titles as keys.
+	 * @return array<string, array<int, array<string, mixed>>> Array of preset collections with titles as keys.
 	 */
-	public static function get_preset_collections() {
+	public static function get_preset_collections(): array {
 		// Get correct names from ControlRegistry
 		$metadata = ControlRegistry::get_builtin_group_metadata();
 
+		$spacing_name    = isset( $metadata['spacing']['name'] ) && is_string( $metadata['spacing']['name'] ) ? $metadata['spacing']['name'] : 'Spacing';
+		$typography_name = isset( $metadata['typography']['name'] ) && is_string( $metadata['typography']['name'] ) ? $metadata['typography']['name'] : 'Typography';
+
+		$spacing_presets    = Utilities::get_kit_settings( 'fluid_spacing_presets', array(), false );
+		$typography_presets = Utilities::get_kit_settings( 'fluid_typography_presets', array(), false );
+
+		/** @var array<string, array<int, array<string, mixed>>> $collections */
 		$collections = array(
-			$metadata['spacing']['name']    =>
-				Utilities::get_kit_settings( 'fluid_spacing_presets', array(), false ),
-			$metadata['typography']['name'] =>
-				Utilities::get_kit_settings( 'fluid_typography_presets', array(), false ),
+			$spacing_name    => is_array( $spacing_presets ) ? $spacing_presets : array(),
+			$typography_name => is_array( $typography_presets ) ? $typography_presets : array(),
 		);
 
 		// Add custom groups collections
 		$custom_groups = get_option( 'arts_fluid_design_system_custom_groups', array() );
 
-		foreach ( $custom_groups as $group_id => $group_data ) {
-			$control_id                         = ControlRegistry::get_custom_group_control_id( $group_id );
-			$collections[ $group_data['name'] ] = Utilities::get_kit_settings( $control_id, array(), false );
+		if ( is_array( $custom_groups ) ) {
+			foreach ( $custom_groups as $group_id => $group_data ) {
+				if ( ! is_array( $group_data ) || ! isset( $group_data['name'] ) || ! is_string( $group_data['name'] ) ) {
+					continue;
+				}
+
+				$control_id    = ControlRegistry::get_custom_group_control_id( $group_id );
+				$group_presets = Utilities::get_kit_settings( $control_id, array(), false );
+				/** @var array<int, array<string, mixed>> $validated_presets */
+				$validated_presets                  = is_array( $group_presets ) ? $group_presets : array();
+				$collections[ $group_data['name'] ] = $validated_presets;
+			}
 		}
 
 		return $collections;
@@ -265,13 +288,13 @@ class Module extends Module_Base {
 	 * @access private
 	 * @static
 	 *
-	 * @param string $collection_title  The title of the collection.
-	 * @param array  $presets           Array of preset data.
-	 * @param int    $global_min_width  Global minimum screen width.
-	 * @param int    $global_max_width  Global maximum screen width.
-	 * @return array|null               Formatted preset group or null if empty.
+	 * @param string                               $collection_title  The title of the collection.
+	 * @param array<int, array<string, mixed>>     $presets           Array of preset data.
+	 * @param int                                  $global_min_width  Global minimum screen width.
+	 * @param int                                  $global_max_width  Global maximum screen width.
+	 * @return array<string, mixed>                Formatted preset group.
 	 */
-	private static function process_preset_collection( $collection_title, $presets, $global_min_width, $global_max_width ) {
+	private static function process_preset_collection( $collection_title, $presets, $global_min_width, $global_max_width ): array {
 		$preset_group = array(
 			'name'  => $collection_title,
 			'value' => array(),
@@ -299,14 +322,24 @@ class Module extends Module_Base {
 	 * @access private
 	 * @static
 	 *
-	 * @param array $preset            The preset data.
-	 * @param int   $global_min_width  Global minimum screen width.
-	 * @param int   $global_max_width  Global maximum screen width.
-	 * @return array|null              Formatted preset or null if invalid.
+	 * @param array<string, mixed> $preset            The preset data.
+	 * @param int                  $global_min_width  Global minimum screen width.
+	 * @param int                  $global_max_width  Global maximum screen width.
+	 * @return array<string, mixed>|null              Formatted preset or null if invalid.
 	 */
-	private static function format_preset( $preset, $global_min_width, $global_max_width ) {
+	private static function format_preset( $preset, $global_min_width, $global_max_width ): ?array {
 		// Only process presets with a title and ID
-		if ( empty( $preset['title'] ) || empty( $preset['_id'] ) ) {
+		if ( empty( $preset['title'] ) || ! is_string( $preset['title'] ) || empty( $preset['_id'] ) || ! is_string( $preset['_id'] ) ) {
+			return null;
+		}
+
+		// Validate required nested array structures
+		if ( ! isset( $preset['min'] ) || ! is_array( $preset['min'] ) || ! isset( $preset['max'] ) || ! is_array( $preset['max'] ) ) {
+			return null;
+		}
+
+		// Validate required min/max fields
+		if ( ! isset( $preset['min']['size'] ) || ! isset( $preset['min']['unit'] ) || ! isset( $preset['max']['size'] ) || ! isset( $preset['max']['unit'] ) ) {
 			return null;
 		}
 
@@ -345,19 +378,23 @@ class Module extends Module_Base {
 	 * @access private
 	 * @static
 	 *
-	 * @param array $preset            The preset data.
-	 * @param int   $global_min_width  Global minimum screen width.
-	 * @param int   $global_max_width  Global maximum screen width.
-	 * @return array                   Array with min_width and max_width values.
+	 * @param array<string, mixed> $preset            The preset data.
+	 * @param int                  $global_min_width  Global minimum screen width.
+	 * @param int                  $global_max_width  Global maximum screen width.
+	 * @return array<string, int>                     Array with min_width and max_width values.
 	 */
-	private static function get_preset_breakpoints( $preset, $global_min_width, $global_max_width ) {
+	private static function get_preset_breakpoints( $preset, $global_min_width, $global_max_width ): array {
 		$min_width = $global_min_width;
 		$max_width = $global_max_width;
 
 		// Use custom breakpoints if enabled in the preset
 		if ( ! empty( $preset['override_screen_width_enabled'] ) ) {
-			$min_width = $preset['overriden_min_screen_width'];
-			$max_width = $preset['overriden_max_screen_width'];
+			if ( isset( $preset['overriden_min_screen_width'] ) && is_numeric( $preset['overriden_min_screen_width'] ) ) {
+				$min_width = (int) $preset['overriden_min_screen_width'];
+			}
+			if ( isset( $preset['overriden_max_screen_width'] ) && is_numeric( $preset['overriden_max_screen_width'] ) ) {
+				$max_width = (int) $preset['overriden_max_screen_width'];
+			}
 		}
 
 		return array(
