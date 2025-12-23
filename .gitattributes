@@ -45,9 +45,8 @@ src/wordpress-plugin export-ignore
 # WordPress development files
 project.*.js export-ignore
 
-# Markdown files except README.md
+# Markdown files
 /*.md export-ignore
-!README.md
 .claude export-ignore
 .github export-ignore
 .taskmaster export-ignore
