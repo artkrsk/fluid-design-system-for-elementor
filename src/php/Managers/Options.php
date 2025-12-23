@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\Utilities\Utilities;
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use \Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
+use Arts\Utilities\Utilities;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
 
 /**
  * Options Class
@@ -34,10 +34,11 @@ class Options extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param array $tabs Array of Elementor site settings tabs.
-	 * @return array Array of Elementor site settings tabs with our custom tab added.
+	 * @param array<int|string, mixed> $tabs Array of Elementor site settings tabs.
+	 * @return array<int|string, mixed> Array of Elementor site settings tabs with our custom tab added.
 	 */
-	public function get_elementor_site_settings_tabs( $tabs ) {
+	public function get_elementor_site_settings_tabs( array $tabs ): array {
+		// var_dump('[FDS] Filter callback: get_elementor_site_settings_tabs');
 		$tabs[] = array(
 			'class' => FluidTypographySpacing::class,
 		);
@@ -53,10 +54,10 @@ class Options extends BaseManager {
 	 * @since 1.0.1
 	 * @access public
 	 *
-	 * @param array $links Array of plugin action links.
-	 * @return array Modified array of plugin action links.
+	 * @param array<int, string> $links Array of plugin action links.
+	 * @return array<int, string> Modified array of plugin action links.
 	 */
-	public function add_plugin_action_links( $links ) {
+	public function add_plugin_action_links( array $links ): array {
 		// Check if Elementor is active
 		if ( ! Utilities::is_elementor_plugin_active() ) {
 			return $links;

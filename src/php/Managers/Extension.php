@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 /**
  * Extension Class
@@ -32,10 +32,10 @@ class Extension extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param array $config The config for the Elementor extension.
-	 * @return array Modified configuration array.
+	 * @param array<string, mixed> $config The config for the Elementor extension.
+	 * @return array<string, mixed> Modified configuration array.
 	 */
-	public function filter_plugin_config( $config ) {
+	public function filter_plugin_config( array $config ): array {
 		$config['required_elementor_version'] = '3.27.0';
 		$config['required_php_version']       = '7.4';
 
@@ -50,10 +50,10 @@ class Extension extends BaseManager {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param array $config The config for the Elementor extension.
-	 * @return array Modified strings array.
+	 * @param array<string, mixed> $config The config for the Elementor extension.
+	 * @return array<string, mixed> Modified strings array.
 	 */
-	public function get_strings( $config ) {
+	public function get_strings( array $config ): array {
 		/* This shouldn't be translated */
 		$config['extension_name'] = 'Fluid Design System for Elementor';
 

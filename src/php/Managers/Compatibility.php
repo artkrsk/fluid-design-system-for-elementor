@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use \Arts\FluidDesignSystem\Base\Manager as BaseManager;
+use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 /**
  * Compatibility Class
@@ -41,12 +41,17 @@ class Compatibility extends BaseManager {
 	 * @access public
 	 * @return void
 	 */
-	public function elementor_enqueue_editor_scripts() {
+	public function elementor_enqueue_editor_scripts(): void {
+		/** @var string|false $version */
+		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) && is_string( constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) )
+			? constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' )
+			: false;
+
 		wp_enqueue_script(
 			$this->handle,
 			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/arts-fluid-design-system/index.umd.js' ),
 			array(),
-			defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) ? ARTS_FLUID_DS_PLUGIN_VERSION : false,
+			$version,
 			true
 		);
 
@@ -67,12 +72,17 @@ class Compatibility extends BaseManager {
 	 * @access public
 	 * @return void
 	 */
-	public function elementor_enqueue_editor_styles() {
+	public function elementor_enqueue_editor_styles(): void {
+		/** @var string|false $version */
+		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) && is_string( constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) )
+			? constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' )
+			: false;
+
 		wp_enqueue_style(
 			$this->handle,
 			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/arts-fluid-design-system/index.css' ),
 			array(),
-			defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) ? ARTS_FLUID_DS_PLUGIN_VERSION : false
+			$version
 		);
 	}
 
@@ -84,9 +94,9 @@ class Compatibility extends BaseManager {
 	 *
 	 * @since 1.0.0
 	 * @access private
-	 * @return array Array of translatable strings.
+	 * @return array<string, string> Array of translatable strings.
 	 */
-	private function get_localized_strings() {
+	private function get_localized_strings(): array {
 		return array(
 			// Repeater / Global Style strings
 			'deleteFluidPreset'   => esc_html__( 'Delete Fluid Preset', 'fluid-design-system-for-elementor' ),
