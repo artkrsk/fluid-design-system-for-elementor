@@ -1,6 +1,7 @@
 import { createElement } from '../utils/dom'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
+import { AJAX_ACTION_SAVE_PRESET, AJAX_ACTION_GET_GROUPS } from '../constants/AJAX'
 
 export const BaseSliderControlView = {
   renderFluidSelectElements() {
@@ -77,6 +78,15 @@ export const BaseSliderControlView = {
     container.appendChild(separator)
     container.appendChild(maxInput)
 
+    // Add "Save as Preset" button (Elementor pattern)
+    const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
+      type: 'button',
+      title: 'Save as Preset'
+    })
+    const icon = createElement('i', 'eicon-plus')
+    saveButton.appendChild(icon)
+    container.appendChild(saveButton)
+
     // Attach input event listeners with validation
     minInput.addEventListener('input', () => {
       this._validateSliderInlineInput(minInput)
@@ -87,7 +97,186 @@ export const BaseSliderControlView = {
       this._onSliderInlineInputChange(setting)
     })
 
+    // Attach button click listener (no functionality yet)
+    saveButton.addEventListener('click', (e) => {
+      e.preventDefault()
+      this._onSliderSaveAsPresetClick(setting)
+    })
+
     return container
+  },
+
+  /** Handles Save as Preset button click for slider */
+  async _onSliderSaveAsPresetClick(setting) {
+    const values = this._getSliderInlineInputValues(setting)
+    if (!values) {
+      return
+    }
+
+    const { minSize, minUnit, maxSize, maxUnit } = values
+
+    // Only allow saving if we have valid values
+    if (!minSize || !maxSize) {
+      return
+    }
+
+    // Get inline container and save button
+    const container = this._getSliderInlineContainer(setting)
+    const saveButton = container?.querySelector('.e-fluid-save-preset')
+    const icon = saveButton?.querySelector('i')
+
+    if (!container || !saveButton || !icon) {
+      return
+    }
+
+    // Show loading state
+    container.classList.add('e-fluid-loading')
+    saveButton.disabled = true
+    icon.className = 'eicon-spinner eicon-animation-spin'
+
+    try {
+      // Create confirmation dialog (Elementor pattern)
+      const dialog = await this._createSliderSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting)
+      dialog.show()
+    } finally {
+      // Restore normal state
+      container.classList.remove('e-fluid-loading')
+      saveButton.disabled = false
+      icon.className = 'eicon-plus'
+    }
+  },
+
+  /** Creates the Save as Preset dialog for slider */
+  async _createSliderSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting) {
+    // Create dialog message with input
+    const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
+    const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' })
+      .html('Create a new fluid preset:')
+
+    const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
+
+    // Preview of the values
+    const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
+    const $preview = jQuery('<div>', {
+      class: 'e-fluid-preset-preview',
+      text: previewText
+    })
+
+    // Preset name input
+    const $input = jQuery('<input>', {
+      type: 'text',
+      name: 'preset-name',
+      placeholder: 'Preset Name'
+    }).val(`Custom ${previewText}`)
+
+    // Group selector
+    const $groupSelect = jQuery('<select>', {
+      name: 'preset-group',
+      class: 'e-fluid-group-select'
+    })
+
+    // Populate groups (async)
+    await this._populateSliderGroupOptions($groupSelect)
+
+    $inputWrapper.append($preview, $input, $groupSelect)
+    $message.append($messageText, $inputWrapper)
+
+    // Create dialog
+    const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
+      className: 'e-global__confirm-add',
+      headerMessage: 'Save as Preset',
+      message: $message,
+      strings: {
+        confirm: 'Create',
+        cancel: 'Cancel'
+      },
+      hide: {
+        onBackgroundClick: false
+      },
+      onConfirm: () => this._onSliderConfirmSavePreset($input.val(), $groupSelect.val(), minSize, minUnit, maxSize, maxUnit, setting),
+      onShow: () => {
+        // Initialize Select2 on group selector
+        $groupSelect.select2({
+          minimumResultsForSearch: -1, // Hide search box
+          width: '100%'
+        })
+
+        // Auto-focus and select input text
+        setTimeout(() => {
+          $input.focus().select()
+        }, 50)
+      }
+    })
+
+    return dialog
+  },
+
+  /** Populates group select options by fetching group metadata for slider */
+  async _populateSliderGroupOptions($select) {
+    // Fetch groups with proper IDs
+    return new Promise((resolve) => {
+      window.elementor.ajax.addRequest(AJAX_ACTION_GET_GROUPS, {
+        data: {},
+        success: (groups) => {
+          if (!groups || !Array.isArray(groups)) {
+            // Fallback to default groups
+            $select.append(
+              jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
+              jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+            )
+            resolve()
+            return
+          }
+
+          // Add all groups with proper IDs
+          for (const group of groups) {
+            $select.append(
+              jQuery('<option>', {
+                value: group.id,
+                text: group.name
+              })
+            )
+          }
+          resolve()
+        },
+        error: () => {
+          // Fallback on error
+          $select.append(
+            jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
+            jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+          )
+          resolve()
+        }
+      })
+    })
+  },
+
+  /** Handles dialog confirmation for slider */
+  _onSliderConfirmSavePreset(title, group, minSize, minUnit, maxSize, maxUnit, setting) {
+    // Prepare data for AJAX
+    const ajaxData = {
+      title: title.trim() || `Custom ${minSize}${minUnit} ~ ${maxSize}${maxUnit}`,
+      min_size: minSize,
+      min_unit: minUnit,
+      max_size: maxSize,
+      max_unit: maxUnit,
+      group: group || 'spacing'
+    }
+
+    // Call AJAX endpoint
+    window.elementor.ajax.addRequest(AJAX_ACTION_SAVE_PRESET, {
+      data: ajaxData,
+      success: (response) => {
+        // Phase 4: Will invalidate cache and refresh dropdown here
+      },
+      error: (error) => {
+        // Show error message
+        elementorCommon.dialogsManager.createWidget('alert', {
+          headerMessage: 'Error',
+          message: error || 'Failed to save preset'
+        }).show()
+      }
+    })
   },
 
   /** Validates an inline input and toggles invalid state */
