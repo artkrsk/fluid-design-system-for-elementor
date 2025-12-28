@@ -388,7 +388,7 @@ export const BaseControlView = {
     // Add "Save as Preset" button (Elementor pattern)
     const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
       type: 'button',
-      title: 'Save as Preset'
+      title: window.ArtsFluidDSStrings?.saveAsPreset || 'Save as Preset'
     })
     const icon = createElement('i', 'eicon-plus')
     saveButton.appendChild(icon)
@@ -493,7 +493,7 @@ export const BaseControlView = {
     // Create dialog message with input
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
     const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
-      'Create a new fluid preset:'
+      window.ArtsFluidDSStrings?.createNewPreset || 'Create a new fluid preset:'
     )
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
@@ -509,7 +509,7 @@ export const BaseControlView = {
     const $input = jQuery('<input>', {
       type: 'text',
       name: 'preset-name',
-      placeholder: 'Preset Name'
+      placeholder: window.ArtsFluidDSStrings?.presetName || 'Preset Name'
     }).val(`Custom ${previewText}`)
 
     // Group selector
@@ -527,11 +527,11 @@ export const BaseControlView = {
     // Create dialog
     const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
       className: 'e-fluid-save-preset-dialog',
-      headerMessage: 'Save as Preset',
+      headerMessage: window.ArtsFluidDSStrings?.saveAsPreset || 'Save as Preset',
       message: $message,
       strings: {
-        confirm: 'Create',
-        cancel: 'Cancel'
+        confirm: window.ArtsFluidDSStrings?.create || 'Create',
+        cancel: window.ArtsFluidDSStrings?.cancel || 'Cancel'
       },
       hide: {
         onBackgroundClick: false
@@ -658,8 +658,8 @@ export const BaseControlView = {
         // Show error message
         elementorCommon.dialogsManager
           .createWidget('alert', {
-            headerMessage: 'Error',
-            message: error || 'Failed to save preset'
+            headerMessage: window.ArtsFluidDSStrings?.error || 'Error',
+            message: error || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset'
           })
           .show()
       }

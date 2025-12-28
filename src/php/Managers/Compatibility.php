@@ -114,6 +114,14 @@ class Compatibility extends BaseManager {
 
 			// Select2 strings
 			'inherit'             => esc_html__( 'Inherit', 'fluid-design-system-for-elementor' ),
+
+			// Save as Preset dialog strings
+			'saveAsPreset'        => esc_html__( 'Save as Preset', 'fluid-design-system-for-elementor' ),
+			'createNewPreset'     => esc_html__( 'Create a new fluid preset:', 'fluid-design-system-for-elementor' ),
+			'create'              => esc_html__( 'Create', 'fluid-design-system-for-elementor' ),
+			'presetName'          => esc_html__( 'Preset Name', 'fluid-design-system-for-elementor' ),
+			'error'               => esc_html__( 'Error', 'fluid-design-system-for-elementor' ),
+			'failedToSave'        => esc_html__( 'Failed to save preset', 'fluid-design-system-for-elementor' ),
 		);
 	}
 }
