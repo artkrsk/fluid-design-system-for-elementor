@@ -196,6 +196,24 @@ export const BaseControlView = {
       selectEl.classList.remove('e-select-placeholder')
       selectEl.setAttribute('data-value', value)
 
+      // If linked, show custom on all dimensions
+      if (this.isLinkedDimensions()) {
+        // @ts-expect-error - Type assertion for ui access
+        for (const otherSelectEl of this.ui.selectControls || []) {
+          if (otherSelectEl !== selectEl) {
+            const otherSetting = otherSelectEl.getAttribute('data-setting')
+            if (otherSetting) {
+              // Switch to custom value
+              otherSelectEl.value = CUSTOM_FLUID_VALUE
+              otherSelectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
+              jQuery(otherSelectEl).trigger('change.select2')
+              // Show inline inputs
+              this.toggleInlineInputs(otherSetting, true)
+            }
+          }
+        }
+      }
+
       // Check if there's an existing inline value to restore
       const currentValue = this.getControlValue(dimensionName)
       if (isInlineClampValue(currentValue)) {
@@ -847,12 +865,18 @@ export const BaseControlView = {
             if (otherContainer) {
               const minInput = otherContainer.querySelector('[data-fluid-role="min"]')
               const maxInput = otherContainer.querySelector('[data-fluid-role="max"]')
+
               if (minInput) {
                 minInput.value = `${minSize}${minUnit}`
+                this.validateInlineInput(minInput)
               }
               if (maxInput) {
                 maxInput.value = `${maxSize}${maxUnit}`
+                this.validateInlineInput(maxInput)
               }
+
+              // Update button state for this container
+              this.updateSaveButtonState(otherContainer)
             }
           }
         }
