@@ -266,6 +266,15 @@ export const BaseControlView = {
 
     if (this.isLinkedDimensions()) {
       this.handleLinkedDimensionsChange(selectEl, value, isInheritValue)
+
+      // Hide inline inputs for all linked dimensions when switching away from custom
+      // @ts-expect-error - Type assertion for ui access
+      for (const otherSelectEl of this.ui.selectControls || []) {
+        const otherSetting = otherSelectEl.getAttribute('data-setting')
+        if (otherSetting) {
+          this.toggleInlineInputs(otherSetting, false)
+        }
+      }
     } else {
       this.handleUnlinkedDimensionsChange(dimensionName, value)
     }
