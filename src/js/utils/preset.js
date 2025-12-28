@@ -1,5 +1,7 @@
 import { createElement } from './dom'
 import { dataManager } from '../managers'
+import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
+import { parseClampFormula } from './clamp'
 
 class PresetUtils {
   /**
@@ -150,7 +152,6 @@ class PresetUtils {
     const inheritedPreset = PresetUtils.getInheritedPresetSync(inheritedSize)
 
     optionEl.setAttribute('data-inherited-title', name)
-    if (inheritedSize) optionEl.setAttribute('data-value-display', inheritedSize)
     if (inheritedFrom) optionEl.setAttribute('data-inherited-from', inheritedFrom)
     if (inheritedVia) optionEl.setAttribute('data-inherited-via', inheritedVia)
     if (inheritedDevice) optionEl.setAttribute('data-inherited-device', inheritedDevice)
@@ -160,13 +161,41 @@ class PresetUtils {
         PresetUtils.handleComplexPresetInheritance(optionEl, inheritedPreset)
       } else {
         optionEl.setAttribute('data-inherited-value', 'true')
+        optionEl.setAttribute('data-value-display', inheritedSize)
         optionEl.textContent = inheritedPreset.title
       }
     } else {
-      optionEl.setAttribute('data-inherited-value', 'true')
-      const displayValue = inheritedSize || name
-      optionEl.setAttribute('data-title', displayValue)
-      optionEl.textContent = displayValue
+      // Check if it's an inline clamp formula
+      const parsed = parseClampFormula(inheritedSize)
+      if (parsed) {
+        // Display inline clamp nicely formatted like presets
+        optionEl.setAttribute('data-inherited-value', 'true')
+
+        // Set min/max attributes for Select2 template rendering
+        PresetUtils.#setElementAttributes(optionEl, {
+          'data-min-size': parsed.minSize,
+          'data-min-unit': parsed.minUnit,
+          'data-max-size': parsed.maxSize,
+          'data-max-unit': parsed.maxUnit
+        })
+
+        const displayValue = PresetUtils.#formatSizeDisplay(
+          parsed.minSize,
+          parsed.minUnit,
+          parsed.maxSize,
+          parsed.maxUnit
+        )
+        optionEl.setAttribute('data-title', displayValue)
+        optionEl.setAttribute('data-value-display', displayValue)
+        optionEl.textContent = displayValue
+      } else {
+        // Fallback to raw display for unknown formats
+        optionEl.setAttribute('data-inherited-value', 'true')
+        const displayValue = inheritedSize || name
+        optionEl.setAttribute('data-title', displayValue)
+        optionEl.setAttribute('data-value-display', displayValue)
+        optionEl.textContent = displayValue
+      }
     }
   }
 
@@ -221,6 +250,24 @@ class PresetUtils {
     return optionEl
   }
 
+  /** Creates the "Custom value..." option for inline fluid values */
+  static createCustomValueOption(currentValue) {
+    const isCustomSelected =
+      currentValue === CUSTOM_FLUID_VALUE || (currentValue && currentValue.startsWith('clamp('))
+
+    const optionEl = createElement('option', null, {
+      value: CUSTOM_FLUID_VALUE,
+      'data-is-custom-fluid': 'true'
+    })
+
+    if (isCustomSelected) {
+      optionEl.setAttribute('selected', 'selected')
+    }
+
+    optionEl.textContent = 'Custom value...'
+    return optionEl
+  }
+
   static async buildSelectOptions(selectEl, el) {
     const presetsData = await dataManager.getPresetsData(el)
 
@@ -244,12 +291,21 @@ class PresetUtils {
       inheritedVia: selectEl.getAttribute('data-inherited-via')
     }
 
+    let customOptionAdded = false
+
     for (const { name, value } of presetsData) {
       if (!name) {
         continue
       }
 
       if (typeof value === 'object' && Array.isArray(value)) {
+        // Add "Custom value..." option before first optgroup (after inherit option)
+        if (!customOptionAdded) {
+          const customOption = PresetUtils.createCustomValueOption(currentValue)
+          selectEl.appendChild(customOption)
+          customOptionAdded = true
+        }
+
         const optionsGroupEl = createElement('optgroup', null, { label: name })
 
         for (const preset of value) {
