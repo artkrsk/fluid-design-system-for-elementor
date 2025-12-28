@@ -85,6 +85,10 @@ export const BaseControlView = {
       return
     }
 
+    // Check if dimensions are linked
+    const isLinked = this.isLinkedDimensions()
+    let linkedClampValues = null
+
     // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       const setting = selectEl.getAttribute('data-setting')
@@ -108,6 +112,11 @@ export const BaseControlView = {
           const parsed = parseClampFormula(currentValue)
           if (parsed) {
             this.setInlineInputValues(setting, parsed)
+
+            // Store for linked sync
+            if (isLinked && !linkedClampValues) {
+              linkedClampValues = parsed
+            }
           }
         }
 
@@ -116,6 +125,27 @@ export const BaseControlView = {
           selectEl.value = CUSTOM_FLUID_VALUE
           selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
           jQuery(selectEl).trigger('change.select2')
+        }
+      }
+    }
+
+    // If linked and we found clamp values, sync to all dimensions
+    if (isLinked && linkedClampValues) {
+      // @ts-expect-error - Type assertion for ui access
+      for (const selectEl of this.ui.selectControls) {
+        const setting = selectEl.getAttribute('data-setting')
+        if (setting) {
+          const container = this.getInlineContainer(setting)
+          if (container) {
+            // Show inputs and set values
+            this.toggleInlineInputs(setting, true)
+            this.setInlineInputValues(setting, linkedClampValues)
+
+            // Ensure Custom value is selected
+            selectEl.value = CUSTOM_FLUID_VALUE
+            selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
+            jQuery(selectEl).trigger('change.select2')
+          }
         }
       }
     }
