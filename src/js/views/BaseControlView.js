@@ -4,7 +4,7 @@ import { getSelect2DefaultOptions } from '../utils/select2'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 import { AJAX_ACTION_SAVE_PRESET, AJAX_ACTION_GET_GROUPS } from '../constants/AJAX'
-import { dataManager } from '../managers'
+import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/Styles'
 
 export const BaseControlView = {
@@ -642,6 +642,10 @@ export const BaseControlView = {
     window.elementor.ajax.addRequest(AJAX_ACTION_SAVE_PRESET, {
       data: ajaxData,
       success: async (response) => {
+        // Generate and inject CSS variable into preview immediately
+        const clampFormula = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
+        cssManager.setCssVariable(response.id, clampFormula)
+
         // Invalidate cache to force fresh data fetch
         dataManager.invalidate()
 

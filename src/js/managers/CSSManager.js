@@ -98,6 +98,31 @@ export class CSSManager {
 
     return true
   }
+
+  /**
+   * Set a CSS variable with clamp formula in preview
+   * @param {string} id - The preset ID
+   * @param {string} clampFormula - The clamp CSS formula
+   * @returns {boolean} Success status
+   */
+  setCssVariable(id, clampFormula) {
+    const styleEl = this.createOrGetStyleElement()
+    if (!styleEl) return false
+
+    const cssVarName = `${STYLES.VAR_PREFIX}${id}`
+    const cssRule = `:root { ${cssVarName}: ${clampFormula}; }`
+
+    const currentRules = this.getCurrentRules()
+
+    // Remove any existing rules for this variable
+    const filteredRules = currentRules.filter((rule) => !rule.includes(cssVarName))
+
+    // Add the new rule
+    filteredRules.push(cssRule)
+    this.setRules(filteredRules)
+
+    return true
+  }
 }
 
 // Create a singleton instance
