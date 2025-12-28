@@ -93,20 +93,43 @@ export const BaseSliderControlView = {
     // Attach input event listeners with validation
     minInput.addEventListener('input', () => {
       this._validateSliderInlineInput(minInput)
+      this._updateSliderSaveButtonState(container)
       this._onSliderInlineInputChange(setting)
     })
     maxInput.addEventListener('input', () => {
       this._validateSliderInlineInput(maxInput)
+      this._updateSliderSaveButtonState(container)
       this._onSliderInlineInputChange(setting)
     })
 
-    // Attach button click listener (no functionality yet)
+    // Attach button click listener
     saveButton.addEventListener('click', (e) => {
       e.preventDefault()
       this._onSliderSaveAsPresetClick(setting)
     })
 
+    // Set initial button state
+    this._updateSliderSaveButtonState(container)
+
     return container
+  },
+
+  /** Updates Save button disabled state based on input validity for slider */
+  _updateSliderSaveButtonState(container) {
+    const minInput = container.querySelector('[data-fluid-role="min"]')
+    const maxInput = container.querySelector('[data-fluid-role="max"]')
+    const saveButton = container.querySelector('.e-fluid-save-preset')
+
+    if (!minInput || !maxInput || !saveButton) {
+      return
+    }
+
+    // Check if both inputs have valid values
+    const minValid = !minInput.classList.contains('e-fluid-inline-invalid') && minInput.value.trim()
+    const maxValid = !maxInput.classList.contains('e-fluid-inline-invalid') && maxInput.value.trim()
+
+    // Disable button if either input is invalid or empty
+    saveButton.disabled = !minValid || !maxValid
   },
 
   /** Handles Save as Preset button click for slider */
