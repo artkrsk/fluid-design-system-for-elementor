@@ -1,6 +1,8 @@
 import { createElement } from '../utils/dom'
 import { buildSelectOptions } from '../utils/preset'
 import { getSelect2DefaultOptions } from '../utils/select2'
+import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
+import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 
 export const BaseControlView = {
   isDestroyed: false,
@@ -70,6 +72,35 @@ export const BaseControlView = {
     this.createSelect2()
     await this.populateSelectElements()
     this.attachSelectElementsListeners()
+    this.initializeInlineInputsState()
+  },
+
+  /** Initialize inline inputs visibility based on current value */
+  initializeInlineInputsState() {
+    // @ts-expect-error - Type assertion for ui access
+    for (const selectEl of this.ui.selectControls) {
+      const setting = selectEl.getAttribute('data-setting')
+      const currentValue = this.getControlValue(setting)
+
+      // If current value is an inline clamp formula, show the inputs and populate them
+      if (isInlineClampValue(currentValue)) {
+        // Verify container exists before trying to manipulate it
+        const container = this.getInlineContainer(setting)
+        if (!container) {
+          continue
+        }
+
+        this.toggleInlineInputs(setting, true)
+        const parsed = parseClampFormula(currentValue)
+        if (parsed) {
+          this.setInlineInputValues(setting, parsed)
+        }
+        // Update Select2 selection
+        selectEl.value = CUSTOM_FLUID_VALUE
+        selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
+        jQuery(selectEl).trigger('change.select2')
+      }
+    }
   },
 
   addLoadingOptions() {
@@ -136,7 +167,27 @@ export const BaseControlView = {
   onSelectChange(selectEl) {
     const value = selectEl.value
     const isInheritValue = value === ''
+    const isCustomValue = value === CUSTOM_FLUID_VALUE
     const dimensionName = selectEl.getAttribute('data-setting')
+
+    // Toggle inline inputs visibility
+    this.toggleInlineInputs(dimensionName, isCustomValue)
+
+    // If custom is selected, don't set value yet - wait for inline input
+    if (isCustomValue) {
+      selectEl.classList.remove('e-select-placeholder')
+      selectEl.setAttribute('data-value', value)
+
+      // Check if there's an existing inline value to restore
+      const currentValue = this.getControlValue(dimensionName)
+      if (isInlineClampValue(currentValue)) {
+        const parsed = parseClampFormula(currentValue)
+        if (parsed) {
+          this.setInlineInputValues(dimensionName, parsed)
+        }
+      }
+      return
+    }
 
     const newValue = {
       unit: 'fluid',
@@ -266,7 +317,176 @@ export const BaseControlView = {
     this.ui.selectControls.push(fluidSelector)
 
     dimension.appendChild(fluidSelectorContainer)
+
+    // Create inline inputs container (hidden by default)
+    const inlineContainer = this.createInlineInputsContainer(setting)
+    dimension.appendChild(inlineContainer)
+
     dimension.appendChild(labelEl)
+  },
+
+  /** Creates the inline min/max input container */
+  createInlineInputsContainer(setting) {
+    const container = createElement('div', 'e-fluid-inline-container e-hidden', {
+      'data-setting': setting
+    })
+
+    // Min value input (text input accepting "20px", "1.5rem", etc.)
+    const minInput = createElement('input', 'e-fluid-inline-input', {
+      type: 'text',
+      'data-fluid-role': 'min',
+      placeholder: '0px'
+    })
+
+    // Separator
+    const separator = createElement('span', 'e-fluid-inline-separator')
+    separator.textContent = '~'
+
+    // Max value input
+    const maxInput = createElement('input', 'e-fluid-inline-input', {
+      type: 'text',
+      'data-fluid-role': 'max',
+      placeholder: '0px'
+    })
+
+    container.appendChild(minInput)
+    container.appendChild(separator)
+    container.appendChild(maxInput)
+
+    // Attach input event listeners with validation
+    minInput.addEventListener('input', () => {
+      this.validateInlineInput(minInput)
+      this.onInlineInputChange(setting)
+    })
+    maxInput.addEventListener('input', () => {
+      this.validateInlineInput(maxInput)
+      this.onInlineInputChange(setting)
+    })
+
+    return container
+  },
+
+  /** Validates an inline input and toggles invalid state */
+  validateInlineInput(input) {
+    const value = input.value.trim()
+    // Empty is valid (just not ready yet)
+    if (!value) {
+      input.classList.remove('e-fluid-inline-invalid')
+      return true
+    }
+    const parsed = this.parseValueWithUnit(value)
+    const isValid = parsed !== null
+    input.classList.toggle('e-fluid-inline-invalid', !isValid)
+    return isValid
+  },
+
+  /** Gets the inline container for a specific setting */
+  getInlineContainer(setting) {
+    return this.$el[0].querySelector(`.e-fluid-inline-container[data-setting="${setting}"]`)
+  },
+
+  /** Toggles visibility of inline inputs */
+  toggleInlineInputs(setting, show) {
+    const container = this.getInlineContainer(setting)
+    if (container) {
+      container.classList.toggle('e-hidden', !show)
+    }
+  },
+
+  /** Parses a value with unit like "20px" or "1.5rem" */
+  parseValueWithUnit(value) {
+    // Empty value defaults to 0px
+    if (!value || typeof value !== 'string' || value.trim() === '') {
+      return { size: '0', unit: 'px' }
+    }
+    // Strict validation: only allow specific units (px, rem, em, %, vw, vh)
+    const match = value.trim().match(/^(-?[\d.]+)\s*(px|rem|em|%|vw|vh)?$/i)
+    if (!match) {
+      return null
+    }
+    return {
+      size: match[1],
+      unit: match[2] || 'px' // Default to px if no unit
+    }
+  },
+
+  /** Gets inline input values for a setting */
+  getInlineInputValues(setting) {
+    const container = this.getInlineContainer(setting)
+    if (!container) {
+      return null
+    }
+
+    const minValue = container.querySelector('[data-fluid-role="min"]')?.value
+    const maxValue = container.querySelector('[data-fluid-role="max"]')?.value
+
+    const minParsed = this.parseValueWithUnit(minValue)
+    const maxParsed = this.parseValueWithUnit(maxValue)
+
+    if (!minParsed || !maxParsed) {
+      return null
+    }
+
+    return {
+      minSize: minParsed.size,
+      minUnit: minParsed.unit,
+      maxSize: maxParsed.size,
+      maxUnit: maxParsed.unit
+    }
+  },
+
+  /** Sets inline input values (used when loading existing inline value) */
+  setInlineInputValues(setting, values) {
+    const container = this.getInlineContainer(setting)
+    if (!container || !values) {
+      return
+    }
+
+    const minInput = container.querySelector('[data-fluid-role="min"]')
+    const maxInput = container.querySelector('[data-fluid-role="max"]')
+
+    if (minInput && values.minSize) {
+      minInput.value = `${values.minSize}${values.minUnit || 'px'}`
+      this.validateInlineInput(minInput)
+    }
+    if (maxInput && values.maxSize) {
+      maxInput.value = `${values.maxSize}${values.maxUnit || 'px'}`
+      this.validateInlineInput(maxInput)
+    }
+  },
+
+  /** Handles inline input value changes */
+  onInlineInputChange(setting) {
+    const values = this.getInlineInputValues(setting)
+    if (!values) {
+      return
+    }
+
+    const { minSize, minUnit, maxSize, maxUnit } = values
+
+    // Only generate clamp if we have valid min and max values
+    if (minSize && maxSize) {
+      const clampValue = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
+
+      const newValue = {
+        unit: 'fluid',
+        [setting]: clampValue
+      }
+
+      this.setValue(newValue)
+
+      // Update related input for Elementor's internal tracking
+      // @ts-expect-error - Type assertion for ui access
+      const relatedInputEl = this.ui.controls.filter(`[data-setting="${setting}"]`)
+      relatedInputEl.val(clampValue)
+
+      this.updateDimensions()
+    }
+  },
+
+  /** Checks if a value is a custom inline value */
+  isCustomFluidValue(value) {
+    return value === CUSTOM_FLUID_VALUE || isInlineClampValue(value)
   },
 
   setupInheritanceAttributes(fluidSelector, setting) {
