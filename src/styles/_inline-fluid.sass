@@ -1,0 +1,51 @@
+@use 'variables'
+
+// Inline fluid value input styles (simplified: text inputs like "20px", "1.5rem")
+.e-fluid-inline-container
+	display: flex
+	align-items: center
+	gap: 6px
+	margin-top: 8px
+	width: 100%
+
+	&.e-hidden
+		display: none
+
+.e-fluid-inline-input
+	flex: 1
+	min-width: 0
+	background-color: variables.$bg-default
+	border: variables.$border-bold
+	color: variables.$color-txt
+	font-family: inherit
+	font-size: variables.$control-title-size
+	line-height: 1.5
+	padding: 4px 8px
+	text-align: center
+	transition: border-color 0.2s ease
+
+	// Override Elementor's first-child/last-child border-radius rules
+	border-radius: variables.$border-radius !important
+	border-inline-start: variables.$border-bold !important
+	border-start-start-radius: variables.$border-radius !important
+	border-start-end-radius: variables.$border-radius !important
+	border-end-start-radius: variables.$border-radius !important
+	border-end-end-radius: variables.$border-radius !important
+
+	&:focus
+		border-color: variables.$border-color-bold !important
+		border: 1px solid variables.$border-color-bold !important
+		outline: none
+
+	&::placeholder
+		color: variables.$color-txt-muted
+		font-style: italic
+
+	&.e-fluid-inline-invalid
+		border-color: var(--e-a-color-danger) !important
+		background-color: var(--e-a-bg-danger-idle)
+
+.e-fluid-inline-separator
+	color: variables.$color-txt-muted
+	font-weight: 500
+	flex-shrink: 0

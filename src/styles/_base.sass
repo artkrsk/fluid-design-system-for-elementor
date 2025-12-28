@@ -2,8 +2,8 @@
 
 // Base fluid units styles
 .e-units-fluid
-	input[type="text"],
-	input[type="number"]
+	// Hide original Elementor inputs but NOT our inline fluid inputs
+	input:not(.e-fluid-inline-input)
 		display: none
 
 	.elementor-control-fluid-selector-container
