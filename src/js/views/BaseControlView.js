@@ -9,11 +9,13 @@ import { STYLES } from '../constants/Styles'
 
 export const BaseControlView = {
   isDestroyed: false,
+  abortControllers: new Map(),
 
   initialize() {
     // @ts-expect-error - Type assertion for super access
     this.constructor.__super__.initialize.apply(this, arguments)
     this.isDestroyed = false
+    this.abortControllers = new Map()
   },
 
   ui() {
@@ -37,21 +39,12 @@ export const BaseControlView = {
   onDestroy() {
     this.isDestroyed = true
 
-    // Clean up inline input event listeners to prevent memory leaks
-    // @ts-expect-error - Type assertion for ui access
-    if (this.ui.selectControls && Array.isArray(this.ui.selectControls)) {
-      // @ts-expect-error - Type assertion for ui access
-      for (const selectEl of this.ui.selectControls) {
-        const setting = selectEl.getAttribute('data-setting')
-        if (setting) {
-          const container = this.getInlineContainer(setting)
-          if (container) {
-            // Remove all event listeners by cloning and replacing
-            const newContainer = container.cloneNode(true)
-            container.parentNode?.replaceChild(newContainer, container)
-          }
-        }
+    // Clean up inline input event listeners using AbortController
+    if (this.abortControllers && this.abortControllers.size > 0) {
+      for (const [_setting, controller] of this.abortControllers) {
+        controller.abort()
       }
+      this.abortControllers.clear()
     }
 
     // @ts-expect-error - Type assertion for super access
@@ -487,23 +480,29 @@ export const BaseControlView = {
     saveButton.appendChild(icon)
     container.appendChild(saveButton)
 
-    // Attach input event listeners with validation
+    // Create AbortController for this container's event listeners
+    const abortController = new AbortController()
+    this.abortControllers.set(setting, abortController)
+    const { signal } = abortController
+
+    // Attach input event listeners with validation and AbortController
     minInput.addEventListener('input', () => {
       this.validateInlineInput(minInput)
       this.updateSaveButtonState(container)
       this.onInlineInputChange(setting)
-    })
+    }, { signal })
+
     maxInput.addEventListener('input', () => {
       this.validateInlineInput(maxInput)
       this.updateSaveButtonState(container)
       this.onInlineInputChange(setting)
-    })
+    }, { signal })
 
-    // Attach button click listener
+    // Attach button click listener with AbortController
     saveButton.addEventListener('click', (e) => {
       e.preventDefault()
       this.onSaveAsPresetClick(setting)
-    })
+    }, { signal })
 
     // Set initial button state
     this.updateSaveButtonState(container)
