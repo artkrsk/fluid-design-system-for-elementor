@@ -37,6 +37,23 @@ export const BaseControlView = {
   onDestroy() {
     this.isDestroyed = true
 
+    // Clean up inline input event listeners to prevent memory leaks
+    // @ts-expect-error - Type assertion for ui access
+    if (this.ui.selectControls && Array.isArray(this.ui.selectControls)) {
+      // @ts-expect-error - Type assertion for ui access
+      for (const selectEl of this.ui.selectControls) {
+        const setting = selectEl.getAttribute('data-setting')
+        if (setting) {
+          const container = this.getInlineContainer(setting)
+          if (container) {
+            // Remove all event listeners by cloning and replacing
+            const newContainer = container.cloneNode(true)
+            container.parentNode?.replaceChild(newContainer, container)
+          }
+        }
+      }
+    }
+
     // @ts-expect-error - Type assertion for super access
     this.constructor.__super__.onDestroy.call(this)
   },
@@ -320,6 +337,17 @@ export const BaseControlView = {
 
     if (isNowFluid) {
       this.updatePlaceholderClassState()
+
+      // Show inline inputs if Custom value is selected
+      // @ts-expect-error - Type assertion for ui access
+      for (const selectEl of this.ui.selectControls || []) {
+        if (selectEl.value === CUSTOM_FLUID_VALUE) {
+          const setting = selectEl.getAttribute('data-setting')
+          if (setting) {
+            this.toggleInlineInputs(setting, true)
+          }
+        }
+      }
     }
 
     // Hide inline inputs when switching away from fluid unit
@@ -390,6 +418,14 @@ export const BaseControlView = {
 
   createFluidSelector(dimension, inputEl, labelEl) {
     const setting = inputEl.dataset.setting
+
+    // Check if containers already exist (prevent duplicates during re-render)
+    const existingSelector = dimension.querySelector('.elementor-control-fluid-selector-container')
+    const existingInline = dimension.querySelector('.e-fluid-inline-container')
+    if (existingSelector || existingInline) {
+      return
+    }
+
     const fluidSelectorContainer = createElement(
       'div',
       'elementor-control-fluid-selector-container'

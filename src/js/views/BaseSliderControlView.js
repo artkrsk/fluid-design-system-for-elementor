@@ -705,6 +705,14 @@ export const BaseSliderControlView = {
 
     if (isNowFluid) {
       this.updatePlaceholderClassState()
+
+      // Show inline inputs if Custom value is selected
+      // @ts-expect-error - Type assertion for ui access
+      for (const selectEl of this.ui.selectControls || []) {
+        if (selectEl.value === CUSTOM_FLUID_VALUE) {
+          this._toggleSliderInlineInputs('size', true)
+        }
+      }
     }
 
     // Hide inline inputs when switching away from fluid unit
