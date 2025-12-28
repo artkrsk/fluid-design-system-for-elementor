@@ -704,6 +704,17 @@ export const BaseControlView = {
         setTimeout(() => {
           const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
           this.selectPreset(setting, presetValue)
+
+          // If linked, apply preset to all dimensions
+          if (this.isLinkedDimensions()) {
+            // @ts-expect-error - Type assertion for ui access
+            for (const selectEl of this.ui.selectControls || []) {
+              const otherSetting = selectEl.getAttribute('data-setting')
+              if (otherSetting && otherSetting !== setting) {
+                this.selectPreset(otherSetting, presetValue)
+              }
+            }
+          }
         }, 100)
       },
       error: (error) => {
