@@ -4,6 +4,8 @@ import { getSelect2DefaultOptions } from '../utils/select2'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 import { AJAX_ACTION_SAVE_PRESET, AJAX_ACTION_GET_GROUPS } from '../constants/AJAX'
+import { dataManager } from '../managers'
+import { STYLES } from '../constants/Styles'
 
 export const BaseControlView = {
   isDestroyed: false,
@@ -78,6 +80,11 @@ export const BaseControlView = {
 
   /** Initialize inline inputs visibility based on current value */
   initializeInlineInputsState() {
+    // @ts-expect-error - Type assertion for ui access
+    if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
+      return
+    }
+
     // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       const setting = selectEl.getAttribute('data-setting')
@@ -426,8 +433,9 @@ export const BaseControlView = {
   async createSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting) {
     // Create dialog message with input
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
-    const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' })
-      .html('Create a new fluid preset:')
+    const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
+      'Create a new fluid preset:'
+    )
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
 
@@ -469,7 +477,16 @@ export const BaseControlView = {
       hide: {
         onBackgroundClick: false
       },
-      onConfirm: () => this.onConfirmSavePreset($input.val(), $groupSelect.val(), minSize, minUnit, maxSize, maxUnit, setting),
+      onConfirm: () =>
+        this.onConfirmSavePreset(
+          $input.val(),
+          $groupSelect.val(),
+          minSize,
+          minUnit,
+          maxSize,
+          maxUnit,
+          setting
+        ),
       onShow: () => {
         // Initialize Select2 on group selector
         $groupSelect.select2({
@@ -542,17 +559,79 @@ export const BaseControlView = {
     // Call AJAX endpoint
     window.elementor.ajax.addRequest(AJAX_ACTION_SAVE_PRESET, {
       data: ajaxData,
-      success: (response) => {
-        // Phase 4: Will invalidate cache and refresh dropdown here
+      success: async (response) => {
+        // Invalidate cache to force fresh data fetch
+        dataManager.invalidate()
+
+        // Refresh all preset dropdowns
+        await this.refreshPresetDropdowns()
+
+        // Auto-select the new preset (with small delay for Select2 to update)
+        setTimeout(() => {
+          const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
+          this.selectPreset(setting, presetValue)
+        }, 100)
       },
       error: (error) => {
         // Show error message
-        elementorCommon.dialogsManager.createWidget('alert', {
-          headerMessage: 'Error',
-          message: error || 'Failed to save preset'
-        }).show()
+        elementorCommon.dialogsManager
+          .createWidget('alert', {
+            headerMessage: 'Error',
+            message: error || 'Failed to save preset'
+          })
+          .show()
       }
     })
+  },
+
+  /** Refreshes all preset dropdowns in the control */
+  async refreshPresetDropdowns() {
+    // @ts-expect-error - Type assertion for ui access
+    if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
+      return
+    }
+
+    // @ts-expect-error - Type assertion for ui access
+    for (const selectEl of this.ui.selectControls) {
+      // Clear existing options except loading
+      selectEl.innerHTML = ''
+
+      // Re-populate with fresh data
+      await buildSelectOptions(selectEl, this.el)
+
+      // Refresh Select2
+      jQuery(selectEl).trigger('change.select2')
+    }
+  },
+
+  /** Selects a preset value in the dropdown and updates control */
+  selectPreset(setting, presetValue) {
+    // Find the select element for this setting
+    // @ts-expect-error - Type assertion for ui access
+    const selectEl = this.ui.selectControls.find(
+      (el) => el.getAttribute('data-setting') === setting
+    )
+
+    if (!selectEl) {
+      return
+    }
+
+    // Update select value
+    selectEl.value = presetValue
+    selectEl.setAttribute('data-value', presetValue)
+
+    // Update control value
+    const newValue = {
+      unit: 'fluid',
+      [setting]: presetValue
+    }
+    this.setValue(newValue)
+
+    // Hide inline inputs
+    this.toggleInlineInputs(setting, false)
+
+    // Trigger Select2 update
+    jQuery(selectEl).trigger('change.select2')
   },
 
   /** Validates an inline input and toggles invalid state */

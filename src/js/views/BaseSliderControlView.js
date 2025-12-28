@@ -2,6 +2,9 @@ import { createElement } from '../utils/dom'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 import { AJAX_ACTION_SAVE_PRESET, AJAX_ACTION_GET_GROUPS } from '../constants/AJAX'
+import { dataManager } from '../managers'
+import { buildSelectOptions } from '../utils/preset'
+import { STYLES } from '../constants/Styles'
 
 export const BaseSliderControlView = {
   renderFluidSelectElements() {
@@ -136,7 +139,13 @@ export const BaseSliderControlView = {
 
     try {
       // Create confirmation dialog (Elementor pattern)
-      const dialog = await this._createSliderSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting)
+      const dialog = await this._createSliderSavePresetDialog(
+        minSize,
+        minUnit,
+        maxSize,
+        maxUnit,
+        setting
+      )
       dialog.show()
     } finally {
       // Restore normal state
@@ -150,8 +159,9 @@ export const BaseSliderControlView = {
   async _createSliderSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting) {
     // Create dialog message with input
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
-    const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' })
-      .html('Create a new fluid preset:')
+    const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
+      'Create a new fluid preset:'
+    )
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
 
@@ -193,7 +203,16 @@ export const BaseSliderControlView = {
       hide: {
         onBackgroundClick: false
       },
-      onConfirm: () => this._onSliderConfirmSavePreset($input.val(), $groupSelect.val(), minSize, minUnit, maxSize, maxUnit, setting),
+      onConfirm: () =>
+        this._onSliderConfirmSavePreset(
+          $input.val(),
+          $groupSelect.val(),
+          minSize,
+          minUnit,
+          maxSize,
+          maxUnit,
+          setting
+        ),
       onShow: () => {
         // Initialize Select2 on group selector
         $groupSelect.select2({
@@ -252,7 +271,7 @@ export const BaseSliderControlView = {
   },
 
   /** Handles dialog confirmation for slider */
-  _onSliderConfirmSavePreset(title, group, minSize, minUnit, maxSize, maxUnit, setting) {
+  _onSliderConfirmSavePreset(title, group, minSize, minUnit, maxSize, maxUnit, _setting) {
     // Prepare data for AJAX
     const ajaxData = {
       title: title.trim() || `Custom ${minSize}${minUnit} ~ ${maxSize}${maxUnit}`,
@@ -266,17 +285,71 @@ export const BaseSliderControlView = {
     // Call AJAX endpoint
     window.elementor.ajax.addRequest(AJAX_ACTION_SAVE_PRESET, {
       data: ajaxData,
-      success: (response) => {
-        // Phase 4: Will invalidate cache and refresh dropdown here
+      success: async (response) => {
+
+        // Invalidate cache to force fresh data fetch
+        dataManager.invalidate()
+
+        // Refresh preset dropdown
+        await this._refreshSliderPresetDropdown()
+
+        // Auto-select the new preset
+        const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
+        this._selectSliderPreset(presetValue)
       },
       error: (error) => {
         // Show error message
-        elementorCommon.dialogsManager.createWidget('alert', {
-          headerMessage: 'Error',
-          message: error || 'Failed to save preset'
-        }).show()
+        elementorCommon.dialogsManager
+          .createWidget('alert', {
+            headerMessage: 'Error',
+            message: error || 'Failed to save preset'
+          })
+          .show()
       }
     })
+  },
+
+  /** Refreshes the slider preset dropdown */
+  async _refreshSliderPresetDropdown() {
+    for (const selectEl of this.ui.selectControls) {
+      // Clear existing options
+      selectEl.innerHTML = ''
+
+      // Re-populate with fresh data
+      await buildSelectOptions(selectEl, this.el)
+
+      // Refresh Select2
+      jQuery(selectEl).trigger('change.select2')
+    }
+  },
+
+  /** Selects a preset value in the slider dropdown */
+  _selectSliderPreset(presetValue) {
+    const selectEl = this.ui.selectControls[0]
+
+    if (!selectEl) {
+      return
+    }
+
+    // Update select value
+    selectEl.value = presetValue
+    selectEl.setAttribute('data-value', presetValue)
+
+    // Update control value
+    const newValue = {
+      unit: 'fluid',
+      size: presetValue
+    }
+    this.setValue(newValue)
+
+    // Hide inline inputs
+    this._toggleSliderInlineInputs('size', false)
+
+    // Update UI input
+    this.ui.input.val(presetValue)
+
+    // Trigger Select2 update
+    jQuery(selectEl).trigger('change.select2')
   },
 
   /** Validates an inline input and toggles invalid state */
