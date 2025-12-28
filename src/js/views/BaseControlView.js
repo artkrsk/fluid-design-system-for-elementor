@@ -90,8 +90,11 @@ export const BaseControlView = {
       const setting = selectEl.getAttribute('data-setting')
       const currentValue = this.getControlValue(setting)
 
-      // If current value is an inline clamp formula, show the inputs and populate them
-      if (isInlineClampValue(currentValue)) {
+      // Show inputs if custom value is selected OR if value is inline clamp
+      const isCustomSelected = selectEl.value === CUSTOM_FLUID_VALUE
+      const hasInlineClamp = isInlineClampValue(currentValue)
+
+      if (isCustomSelected || hasInlineClamp) {
         // Verify container exists before trying to manipulate it
         const container = this.getInlineContainer(setting)
         if (!container) {
@@ -99,14 +102,21 @@ export const BaseControlView = {
         }
 
         this.toggleInlineInputs(setting, true)
-        const parsed = parseClampFormula(currentValue)
-        if (parsed) {
-          this.setInlineInputValues(setting, parsed)
+
+        // Populate inputs if there's a clamp formula
+        if (hasInlineClamp) {
+          const parsed = parseClampFormula(currentValue)
+          if (parsed) {
+            this.setInlineInputValues(setting, parsed)
+          }
         }
-        // Update Select2 selection
-        selectEl.value = CUSTOM_FLUID_VALUE
-        selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
-        jQuery(selectEl).trigger('change.select2')
+
+        // Ensure Custom value is selected
+        if (hasInlineClamp) {
+          selectEl.value = CUSTOM_FLUID_VALUE
+          selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
+          jQuery(selectEl).trigger('change.select2')
+        }
       }
     }
   },
@@ -404,12 +414,24 @@ export const BaseControlView = {
       return
     }
 
-    // Check if both inputs have valid values
-    const minValid = !minInput.classList.contains('e-fluid-inline-invalid') && minInput.value.trim()
-    const maxValid = !maxInput.classList.contains('e-fluid-inline-invalid') && maxInput.value.trim()
+    // Parse both values
+    const minParsed = this.parseValueWithUnit(minInput.value)
+    const maxParsed = this.parseValueWithUnit(maxInput.value)
 
-    // Disable button if either input is invalid or empty
-    saveButton.disabled = !minValid || !maxValid
+    // Disable if either fails to parse
+    if (!minParsed || !maxParsed) {
+      saveButton.disabled = true
+      return
+    }
+
+    // Disable if both values are zero (no point in creating 0~0 preset)
+    if (parseFloat(minParsed.size) === 0 && parseFloat(maxParsed.size) === 0) {
+      saveButton.disabled = true
+      return
+    }
+
+    // Enable if all checks pass
+    saveButton.disabled = false
   },
 
   /** Handles Save as Preset button click */
@@ -490,7 +512,7 @@ export const BaseControlView = {
 
     // Create dialog
     const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
-      className: 'e-global__confirm-add',
+      className: 'e-fluid-save-preset-dialog',
       headerMessage: 'Save as Preset',
       message: $message,
       strings: {
@@ -516,6 +538,21 @@ export const BaseControlView = {
           minimumResultsForSearch: -1, // Hide search box
           width: '100%'
         })
+
+        // Get the dialog's Create button
+        const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
+
+        // Validate name input on change
+        $input.on('input', () => {
+          const inputValue = String($input.val() || '')
+          const isNameValid = inputValue.trim().length > 0
+          $confirmButton.prop('disabled', !isNameValid)
+        })
+
+        // Set initial button state
+        const initialValue = String($input.val() || '')
+        const hasInitialName = initialValue.trim().length > 0
+        $confirmButton.prop('disabled', !hasInitialName)
 
         // Auto-focus and select input text
         setTimeout(() => {
@@ -744,6 +781,9 @@ export const BaseControlView = {
       maxInput.value = `${values.maxSize}${values.maxUnit || 'px'}`
       this.validateInlineInput(maxInput)
     }
+
+    // Update button state after setting values
+    this.updateSaveButtonState(container)
   },
 
   /** Handles inline input value changes */
