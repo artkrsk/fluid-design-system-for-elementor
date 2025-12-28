@@ -680,11 +680,13 @@ export const BaseSliderControlView = {
 
   updateUnitChoices() {
     const unit = this.getControlValue('unit')
+    const wasFluid = this.$el.hasClass('e-units-fluid')
+    const isNowFluid = unit === 'fluid'
 
     this.ui.unitSwitcher.attr('data-selected', unit).find('span').html(unit)
 
     this.$el.toggleClass('e-units-custom', this.isCustomUnit())
-    this.$el.toggleClass('e-units-fluid', this.isFluidUnit())
+    this.$el.toggleClass('e-units-fluid', isNowFluid)
 
     const inputType = this.isCustomUnit() ? 'text' : 'number'
 
@@ -698,8 +700,13 @@ export const BaseSliderControlView = {
       this.ui.input.attr('type', inputType)
     }
 
-    if (this.isFluidUnit()) {
+    if (isNowFluid) {
       this.updatePlaceholderClassState()
+    }
+
+    // Hide inline inputs when switching away from fluid unit
+    if (wasFluid && !isNowFluid) {
+      this._toggleSliderInlineInputs('size', false)
     }
   },
 

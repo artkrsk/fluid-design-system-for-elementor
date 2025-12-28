@@ -249,17 +249,31 @@ export const BaseControlView = {
 
   updateUnitChoices() {
     const unit = this.getControlValue('unit')
+    const wasFluid = this.$el.hasClass('e-units-fluid')
+    const isNowFluid = unit === 'fluid'
+
     // @ts-expect-error - Type assertion for ui access
     this.ui.unitSwitcher.attr('data-selected', unit).find('span').html(unit)
     this.$el.toggleClass('e-units-custom', this.isCustomUnit())
-    this.$el.toggleClass('e-units-fluid', this.isFluidUnit())
+    this.$el.toggleClass('e-units-fluid', isNowFluid)
 
     const inputType = this.isCustomUnit() ? 'text' : 'number'
     // @ts-expect-error - Type assertion for ui access
     this.ui.controls.attr('type', inputType)
 
-    if (this.isFluidUnit()) {
+    if (isNowFluid) {
       this.updatePlaceholderClassState()
+    }
+
+    // Hide inline inputs when switching away from fluid unit
+    if (wasFluid && !isNowFluid) {
+      // @ts-expect-error - Type assertion for ui access
+      for (const selectEl of this.ui.selectControls || []) {
+        const setting = selectEl.getAttribute('data-setting')
+        if (setting) {
+          this.toggleInlineInputs(setting, false)
+        }
+      }
     }
   },
 
