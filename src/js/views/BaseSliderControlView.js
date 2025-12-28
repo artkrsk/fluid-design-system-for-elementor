@@ -1,4 +1,6 @@
 import { createElement } from '../utils/dom'
+import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
+import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 
 export const BaseSliderControlView = {
   renderFluidSelectElements() {
@@ -41,6 +43,195 @@ export const BaseSliderControlView = {
     fluidSelectorContainer.appendChild(fluidSelector)
     this.ui.selectControls.push(fluidSelector)
     inputWrapperEl.appendChild(fluidSelectorContainer)
+
+    // Create inline inputs container (hidden by default)
+    const inlineContainer = this._createSliderInlineInputsContainer(setting)
+    inputWrapperEl.appendChild(inlineContainer)
+  },
+
+  /** Creates the inline min/max input container for slider */
+  _createSliderInlineInputsContainer(setting) {
+    const container = createElement('div', 'e-fluid-inline-container e-hidden', {
+      'data-setting': setting
+    })
+
+    // Min value input (text input accepting "20px", "1.5rem", etc.)
+    const minInput = createElement('input', 'e-fluid-inline-input', {
+      type: 'text',
+      'data-fluid-role': 'min',
+      placeholder: '0px'
+    })
+
+    // Separator
+    const separator = createElement('span', 'e-fluid-inline-separator')
+    separator.textContent = '~'
+
+    // Max value input
+    const maxInput = createElement('input', 'e-fluid-inline-input', {
+      type: 'text',
+      'data-fluid-role': 'max',
+      placeholder: '0px'
+    })
+
+    container.appendChild(minInput)
+    container.appendChild(separator)
+    container.appendChild(maxInput)
+
+    // Attach input event listeners with validation
+    minInput.addEventListener('input', () => {
+      this._validateSliderInlineInput(minInput)
+      this._onSliderInlineInputChange(setting)
+    })
+    maxInput.addEventListener('input', () => {
+      this._validateSliderInlineInput(maxInput)
+      this._onSliderInlineInputChange(setting)
+    })
+
+    return container
+  },
+
+  /** Validates an inline input and toggles invalid state */
+  _validateSliderInlineInput(input) {
+    const value = input.value.trim()
+    // Empty is valid (just not ready yet)
+    if (!value) {
+      input.classList.remove('e-fluid-inline-invalid')
+      return true
+    }
+    const parsed = this._parseSliderValueWithUnit(value)
+    const isValid = parsed !== null
+    input.classList.toggle('e-fluid-inline-invalid', !isValid)
+    return isValid
+  },
+
+  /** Gets the inline container for slider */
+  _getSliderInlineContainer(setting) {
+    return this.$el[0].querySelector(`.e-fluid-inline-container[data-setting="${setting}"]`)
+  },
+
+  /** Toggles visibility of inline inputs for slider */
+  _toggleSliderInlineInputs(setting, show) {
+    const container = this._getSliderInlineContainer(setting)
+    if (container) {
+      container.classList.toggle('e-hidden', !show)
+    }
+  },
+
+  /** Parses a value with unit like "20px" or "1.5rem" */
+  _parseSliderValueWithUnit(value) {
+    // Empty value defaults to 0px
+    if (!value || typeof value !== 'string' || value.trim() === '') {
+      return { size: '0', unit: 'px' }
+    }
+    // Strict validation: only allow specific units (px, rem, em, %, vw, vh)
+    const match = value.trim().match(/^(-?[\d.]+)\s*(px|rem|em|%|vw|vh)?$/i)
+    if (!match) {
+      return null
+    }
+    return {
+      size: match[1],
+      unit: match[2] || 'px' // Default to px if no unit
+    }
+  },
+
+  /** Gets inline input values for slider */
+  _getSliderInlineInputValues(setting) {
+    const container = this._getSliderInlineContainer(setting)
+    if (!container) {
+      return null
+    }
+
+    const minValue = container.querySelector('[data-fluid-role="min"]')?.value
+    const maxValue = container.querySelector('[data-fluid-role="max"]')?.value
+
+    const minParsed = this._parseSliderValueWithUnit(minValue)
+    const maxParsed = this._parseSliderValueWithUnit(maxValue)
+
+    if (!minParsed || !maxParsed) {
+      return null
+    }
+
+    return {
+      minSize: minParsed.size,
+      minUnit: minParsed.unit,
+      maxSize: maxParsed.size,
+      maxUnit: maxParsed.unit
+    }
+  },
+
+  /** Sets inline input values for slider */
+  _setSliderInlineInputValues(setting, values) {
+    const container = this._getSliderInlineContainer(setting)
+    if (!container || !values) {
+      return
+    }
+
+    const minInput = container.querySelector('[data-fluid-role="min"]')
+    const maxInput = container.querySelector('[data-fluid-role="max"]')
+
+    if (minInput && values.minSize) {
+      minInput.value = `${values.minSize}${values.minUnit || 'px'}`
+      this._validateSliderInlineInput(minInput)
+    }
+    if (maxInput && values.maxSize) {
+      maxInput.value = `${values.maxSize}${values.maxUnit || 'px'}`
+      this._validateSliderInlineInput(maxInput)
+    }
+  },
+
+  /** Initialize inline inputs state for slider on render */
+  initializeInlineInputsState() {
+    // Override base method for slider-specific behavior
+    if (!this.ui.selectControls || this.ui.selectControls.length === 0) {
+      return
+    }
+
+    for (const selectEl of this.ui.selectControls) {
+      const setting = selectEl.getAttribute('data-setting') || 'size'
+      const currentValue = this.getControlValue('size')
+
+      // If current value is an inline clamp formula, show the inputs and populate them
+      if (isInlineClampValue(currentValue)) {
+        // Verify container exists before trying to manipulate it
+        const container = this._getSliderInlineContainer(setting)
+
+        if (!container) {
+          continue
+        }
+
+        this._toggleSliderInlineInputs(setting, true)
+        const parsed = parseClampFormula(currentValue)
+        if (parsed) {
+          this._setSliderInlineInputValues(setting, parsed)
+        }
+        // Update Select2 selection
+        selectEl.value = CUSTOM_FLUID_VALUE
+        selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
+        jQuery(selectEl).trigger('change.select2')
+      }
+    }
+  },
+
+  /** Handles inline input value changes for slider */
+  _onSliderInlineInputChange(setting) {
+    const values = this._getSliderInlineInputValues(setting)
+    if (!values) {
+      return
+    }
+
+    const { minSize, minUnit, maxSize, maxUnit } = values
+
+    // Only generate clamp if we have valid min and max values
+    if (minSize && maxSize) {
+      const clampValue = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
+
+      // Use Elementor's setValue with key-value pairs
+      this.setValue('size', clampValue)
+      this.setValue('unit', 'fluid')
+
+      // Set UI input to clamp formula
+      this.ui.input.val(clampValue)
+    }
   },
 
   _setupSliderInheritanceAttributes(fluidSelector) {
@@ -119,6 +310,27 @@ export const BaseSliderControlView = {
   onSelectChange(selectEl) {
     const value = selectEl.value
     const isInheritValue = value === ''
+    const isCustomValue = value === CUSTOM_FLUID_VALUE
+    const setting = selectEl.getAttribute('data-setting') || 'size'
+
+    // Toggle inline inputs visibility
+    this._toggleSliderInlineInputs(setting, isCustomValue)
+
+    // If custom is selected, don't set value yet - wait for inline input
+    if (isCustomValue) {
+      selectEl.classList.remove('e-select-placeholder')
+      selectEl.setAttribute('data-value', value)
+
+      // Check if there's an existing inline value to restore
+      const currentValue = this.getControlValue('size')
+      if (isInlineClampValue(currentValue)) {
+        const parsed = parseClampFormula(currentValue)
+        if (parsed) {
+          this._setSliderInlineInputValues(setting, parsed)
+        }
+      }
+      return
+    }
 
     const newValue = {
       unit: 'fluid',
