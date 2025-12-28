@@ -11,6 +11,10 @@
 	&.e-hidden
 		display: none
 
+	&.e-fluid-loading
+		pointer-events: none
+		opacity: 0.6
+
 .e-fluid-inline-input
 	flex: 1
 	min-width: 0
@@ -49,3 +53,43 @@
 	color: variables.$color-txt-muted
 	font-weight: 500
 	flex-shrink: 0
+
+// Save as Preset button (Elementor e-control-tool pattern)
+.e-fluid-save-preset
+	flex-shrink: 0
+	margin: 0
+	display: inline-flex
+	align-items: center
+	justify-content: center
+	i
+		inset-block-start: 0%
+		inset-inline-start: 0%
+		position: relative
+		transform: none
+
+// Dialog preview (shows value being saved)
+.e-fluid-preset-preview
+	background-color: variables.$bg-default
+	border: variables.$border-bold
+	border-radius: variables.$border-radius
+	color: variables.$color-txt
+	font-family: monospace
+	font-size: 13px
+	padding: 6px 10px
+	text-align: center
+	margin-bottom: 8px
+
+// Group selector in dialog
+.e-fluid-group-select
+	width: 100%
+	margin-top: 8px
+	padding: 6px 10px
+	border: variables.$border-bold
+	border-radius: variables.$border-radius
+	background-color: variables.$bg-default
+	color: variables.$color-txt
+	font-size: variables.$control-title-size
+
+	&:focus
+		border-color: variables.$border-color-bold
+		outline: none
