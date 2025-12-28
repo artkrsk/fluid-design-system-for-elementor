@@ -4,7 +4,7 @@
 .e-fluid-inline-container
 	display: flex
 	align-items: center
-	gap: 6px
+	gap: 4px
 	margin-top: 8px
 	width: 100%
 
@@ -73,11 +73,20 @@
 	border: variables.$border-bold
 	border-radius: variables.$border-radius
 	color: variables.$color-txt
+	border-style: dotted
 	font-family: monospace
-	font-size: 13px
-	padding: 6px 10px
+	font-size: 12px
+	padding: 4px 6px
 	text-align: center
-	margin-bottom: 8px
+	white-space: nowrap
+	display: flex
+	align-items: center
+
+.elementor-control-type-slider.e-units-fluid .e-fluid-inline-container:not(.e-hidden)
+	margin-top: 0
+	margin-left: 8px
+	.e-fluid-inline-input
+		line-height: 2
 
 // Group selector in dialog
 .e-fluid-group-select
@@ -93,3 +102,21 @@
 	&:focus
 		border-color: variables.$border-color-bold
 		outline: none
+
+.e-fluid-save-preset-dialog
+	.e-global__confirm-input-wrapper
+		padding: 0
+		border: none
+		display: flex
+		align-items: center
+		gap: 12px
+		*
+			font-size: 12px
+			line-height: 1.3
+		input
+			padding-left: 0
+			padding-right: 0
+			padding-top: 0
+			padding-bottom: 4px
+			border-radius: 0
+			border-bottom: variables.$border-bold
