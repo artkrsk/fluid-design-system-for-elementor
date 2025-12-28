@@ -1,7 +1,7 @@
 {
   "name": "@arts/fluid-design-system",
   "author": "Artem Semkin",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "license": "GPL-3.0-or-later",
   "description": "",
@@ -35,7 +35,7 @@
     "fs-extra": "^11.3.3",
     "glob": "^13.0.0",
     "globals": "^16.5.0",
-    "jsdom": "^27.3.0",
+    "jsdom": "^27.4.0",
     "npm-check-updates": "^19.2.0",
     "prettier": "^3.7.4",
     "sass": "^1.97.1",

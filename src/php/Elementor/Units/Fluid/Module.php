@@ -15,7 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
 use Elementor\Core\Base\Module as Module_Base;
 use Arts\Utilities\Utilities;
-use Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
 use Arts\FluidDesignSystem\Managers\CSSVariables;
 use Arts\FluidDesignSystem\Managers\ControlRegistry;
 
@@ -338,8 +337,14 @@ class Module extends Module_Base {
 			return null;
 		}
 
-		// Validate required min/max fields
+		// Validate required min/max fields exist
 		if ( ! isset( $preset['min']['size'] ) || ! isset( $preset['min']['unit'] ) || ! isset( $preset['max']['size'] ) || ! isset( $preset['max']['unit'] ) ) {
+			return null;
+		}
+
+		// Validate that size values are numeric (not empty strings)
+		// This prevents CSS generation failures when sizes are accidentally saved as empty
+		if ( ! is_numeric( $preset['min']['size'] ) || ! is_numeric( $preset['max']['size'] ) ) {
 			return null;
 		}
 

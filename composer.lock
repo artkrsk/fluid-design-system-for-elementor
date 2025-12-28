@@ -170,10 +170,9 @@
             "dist": {
                 "type": "path",
                 "url": "../elementor-stubs",
-                "reference": "5164aad9ef951006e9037c4d032959a57fc7b354"
+                "reference": "a471e08e25a4d4b713e481d0b2e300c34182ca8d"
             },
             "require": {
-                "ergebnis/composer-normalize": "^2.48",
                 "php": ">=8.0",
                 "php-stubs/woocommerce-stubs": "^10.4",
                 "php-stubs/wordpress-stubs": "^6.9",
@@ -181,6 +180,7 @@
             },
             "require-dev": {
                 "captainhook/captainhook": "^5.27",
+                "ergebnis/composer-normalize": "^2.48",
                 "php-stubs/generator": "^0.8",
                 "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^9.5",
@@ -195,6 +195,9 @@
                 ],
                 "post-update-cmd": [
                     "vendor/bin/captainhook install -f -s"
+                ],
+                "changelog": [
+                    "git-cliff --output CHANGELOG.md"
                 ],
                 "generate": [
                     "php generate.php"
@@ -214,7 +217,7 @@
                     "phpcbf"
                 ],
                 "test:phpstan": [
-                    "phpstan analyze -c tests/phpstan.neon"
+                    "phpstan analyze -c tests/phpstan.neon --memory-limit=2G"
                 ],
                 "test:phpunit": [
                     "phpunit"
@@ -233,11 +236,14 @@
             "keywords": [
                 "elementor",
                 "elementor-pro",
+                "ide-autocomplete",
+                "intellisense",
                 "page-builder",
                 "phpstan",
                 "static-analysis",
                 "stubs",
                 "type-definitions",
+                "type-safety",
                 "wordpress"
             ],
             "transport-options": {

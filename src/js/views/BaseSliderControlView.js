@@ -156,5 +156,63 @@ export const BaseSliderControlView = {
     if (this.isFluidUnit()) {
       this.updatePlaceholderClassState()
     }
+  },
+
+  /**
+   * Check if this slider control is inside a fluid preset repeater.
+   * Uses view hierarchy: Slider → RepeaterRow → GlobalStyleRepeater
+   */
+  _isInFluidPresetRepeater() {
+    try {
+      // Traverse up: slider → repeater row → repeater
+      const repeaterView = this._parent?._parent
+      return repeaterView?.model?.get('is_fluid_preset_repeater') === true
+    } catch {
+      return false
+    }
+  },
+
+  /**
+   * Override handleUnitChange to preserve size value when switching units,
+   * but ONLY for sliders inside fluid preset repeaters.
+   *
+   * This fixes an Elementor core bug where the UI shows a value after unit change
+   * but the model actually has empty string, causing data loss on save.
+   *
+   * For all other sliders, standard Elementor behavior is preserved.
+   */
+  handleUnitChange() {
+    // Only apply the fix for fluid preset repeater sliders
+    if (!this._isInFluidPresetRepeater()) {
+      // Standard Elementor behavior for all other sliders
+      // @ts-expect-error - Type assertion for super access in mixin pattern
+      this.constructor.__super__.handleUnitChange.apply(this, arguments)
+      return
+    }
+
+    // Get current size before any changes
+    const currentSize = this.getControlValue('size')
+
+    // Call parent's handleUnitChange which will reset the size
+    // @ts-expect-error - Type assertion for super access in mixin pattern
+    this.constructor.__super__.handleUnitChange.apply(this, arguments)
+
+    // If we had a valid size, restore it (only for fluid preset repeaters)
+    if (currentSize !== '' && currentSize !== null && currentSize !== undefined) {
+      this.setValue('size', currentSize)
+
+      // Update the input field to show the preserved value
+      if (this.ui.input && this.ui.input.length) {
+        this.ui.input.val(currentSize)
+      }
+
+      // Update slider if initialized
+      if (this.isSliderInitialized && this.isSliderInitialized()) {
+        const slider = this.ui.slider?.[0]?.noUiSlider
+        if (slider) {
+          slider.set(currentSize)
+        }
+      }
+    }
   }
 }
