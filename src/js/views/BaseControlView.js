@@ -549,6 +549,14 @@ export const BaseControlView = {
           $confirmButton.prop('disabled', !isNameValid)
         })
 
+        // Submit on Enter key
+        $input.on('keydown', (e) => {
+          if (e.key === 'Enter' && !$confirmButton.prop('disabled')) {
+            e.preventDefault()
+            $confirmButton.click()
+          }
+        })
+
         // Set initial button state
         const initialValue = String($input.val() || '')
         const hasInitialName = initialValue.trim().length > 0
