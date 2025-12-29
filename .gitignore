@@ -26,6 +26,7 @@ Thumbs.db
 /.pnp
 .pnp.js
 yarn.lock
+pnpm-lock.yaml
 .yarn-integrity
 /vendor
 
