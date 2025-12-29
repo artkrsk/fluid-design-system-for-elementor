@@ -4,7 +4,7 @@ Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.2.1
+Stable tag: 2.0.0
 license: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -124,6 +124,8 @@ Follow these steps to set up and use the Fluid Design System in your Elementor p
 
 = Key Features =
 
+* **Inline fluid values** - Set values directly in controls ("20px ~ 100px") without visiting Site Settings
+* **Save as Preset** - Convert inline values into reusable presets with one click
 * Create unlimited fluid typography and spacing presets with custom minimum and maximum values
 * Define global breakpoints or set custom breakpoints for individual presets
 * Real-time preview of changes in the Elementor editor
@@ -191,6 +193,11 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 5. Applying fluid unit for "gaps" control
 
 == Changelog ==
+
+= 2.0.0 =
+* added: set fluid values directly in controls ("20px ~ 100px") without visiting Site Settings
+* added: save inline values as reusable presets with one click
+* improved: full support for linked dimensions and gaps
 
 = 1.2.1 =
 * fixed: preset min/max values are now preserved when switching between different units

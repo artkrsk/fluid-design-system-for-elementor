@@ -26,3 +26,6 @@ export const FLUID_REPEATER_CONTROLS = {
   // Helper function
   isFluidPresetRepeater
 }
+
+/** Value used to identify custom/inline fluid mode in dropdown */
+export const CUSTOM_FLUID_VALUE = '__custom__'

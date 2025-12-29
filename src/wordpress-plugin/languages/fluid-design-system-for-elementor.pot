@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Artem Semkin\n"
 "Last-Translator: Artem Semkin\n"
-"POT-Creation-Date: 2025-12-23T06:03:31.971Z"
+"POT-Creation-Date: 2025-12-29T03:11:56.307Z"
 "Report-Msgid-Bugs-To: https://artemsemkin.com\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -59,6 +59,30 @@ msgstr ""
 
 #: src/php/Managers/Compatibility.php:116
 msgid "Inherit"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:119
+msgid "Save as Preset"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:120
+msgid "Create a new fluid preset:"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:121
+msgid "Create"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:122
+msgid "Preset Name..."
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:123
+msgid "Error"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:124
+msgid "Failed to save preset"
 msgstr ""
 
 #: src/php/Managers/ControlRegistry.php:86
@@ -266,16 +290,29 @@ msgstr ""
 msgid "Elementor plugin is required for this functionality."
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:114
+#: src/php/Elementor/Units/Fluid/Module.php:133, src/php/Elementor/Units/Fluid/Module.php:445, src/php/Elementor/Units/Fluid/Module.php:514
 msgid "Access denied."
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:210
+#: src/php/Elementor/Units/Fluid/Module.php:229
 msgid "Default"
 msgstr ""
 
-#: src/php/Elementor/Units/Fluid/Module.php:214
+#: src/php/Elementor/Units/Fluid/Module.php:233
 msgid "0px"
+msgstr ""
+
+#. translators: %s: Field name
+#: src/php/Elementor/Units/Fluid/Module.php:453
+msgid "Missing required field: %s"
+msgstr ""
+
+#: src/php/Elementor/Units/Fluid/Module.php:460
+msgid "Could not get active Kit."
+msgstr ""
+
+#: src/php/Elementor/Units/Fluid/Module.php:465
+msgid "Invalid Kit instance."
 msgstr ""
 
 #: src/php/Managers/Admin/Tabs/Tabs.php:85

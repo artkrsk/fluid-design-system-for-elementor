@@ -47,6 +47,24 @@ class Module extends Module_Base {
 	const ACTION_GET_PRESETS = 'arts_fluid_design_system_presets';
 
 	/**
+	 * AJAX action identifier for saving new presets.
+	 *
+	 * @since 1.2.2
+	 * @access public
+	 * @var string
+	 */
+	const ACTION_SAVE_PRESET = 'arts_fluid_design_system_save_preset';
+
+	/**
+	 * AJAX action identifier for retrieving group list.
+	 *
+	 * @since 1.2.2
+	 * @access public
+	 * @var string
+	 */
+	const ACTION_GET_GROUPS = 'arts_fluid_design_system_get_groups';
+
+	/**
 	 * Get module instance.
 	 *
 	 * Ensures only one instance of the module is loaded or can be loaded.
@@ -92,6 +110,8 @@ class Module extends Module_Base {
 	 */
 	public function register_ajax_actions( Ajax $ajax_manager ) {
 		$ajax_manager->register_ajax_action( self::ACTION_GET_PRESETS, array( self::class, 'ajax_fluid_design_system_presets' ) );
+		$ajax_manager->register_ajax_action( self::ACTION_SAVE_PRESET, array( self::class, 'ajax_save_fluid_preset' ) );
+		$ajax_manager->register_ajax_action( self::ACTION_GET_GROUPS, array( self::class, 'ajax_get_groups' ) );
 	}
 
 	/**
@@ -406,5 +426,117 @@ class Module extends Module_Base {
 			'min_width' => $min_width,
 			'max_width' => $max_width,
 		);
+	}
+
+	/**
+	 * AJAX handler for saving a new fluid preset.
+	 *
+	 * @since 1.2.2
+	 * @access public
+	 * @static
+	 *
+	 * @param array<string, mixed> $data Data received from the AJAX request.
+	 * @return array<string, mixed> Response data.
+	 * @throws \Exception If validation fails or save fails.
+	 */
+	public static function ajax_save_fluid_preset( $data ): array {
+		// Verify user permissions
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		// Validate required fields (use isset to allow '0' values)
+		$required_fields = array( 'title', 'min_size', 'min_unit', 'max_size', 'max_unit' );
+		foreach ( $required_fields as $field ) {
+			if ( ! isset( $data[ $field ] ) || $data[ $field ] === '' ) {
+				/* translators: %s: Field name */
+				throw new \Exception( sprintf( esc_html__( 'Missing required field: %s', 'fluid-design-system-for-elementor' ), $field ) );
+			}
+		}
+
+		// Get active Kit
+		$kit = \Elementor\Plugin::$instance->kits_manager->get_active_kit();
+		if ( ! $kit ) {
+			throw new \Exception( esc_html__( 'Could not get active Kit.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		// Ensure $kit is Kit object (PHPStan)
+		if ( ! $kit instanceof \Elementor\Core\Kits\Documents\Kit ) {
+			throw new \Exception( esc_html__( 'Invalid Kit instance.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		// Generate unique ID
+		$preset_id = ! empty( $data['id'] ) && is_string( $data['id'] ) ? sanitize_key( $data['id'] ) : 'fluid-' . wp_generate_uuid4();
+
+		// Build preset object (with type validation)
+		$preset_item = array(
+			'_id'   => $preset_id,
+			'title' => is_string( $data['title'] ) ? sanitize_text_field( $data['title'] ) : '',
+			'min'   => array(
+				'size' => is_numeric( $data['min_size'] ) ? floatval( $data['min_size'] ) : 0,
+				'unit' => is_string( $data['min_unit'] ) ? sanitize_text_field( $data['min_unit'] ) : 'px',
+			),
+			'max'   => array(
+				'size' => is_numeric( $data['max_size'] ) ? floatval( $data['max_size'] ) : 0,
+				'unit' => is_string( $data['max_unit'] ) ? sanitize_text_field( $data['max_unit'] ) : 'px',
+			),
+		);
+
+		// Use group as control_id directly (frontend sends full control_id)
+		$control_id = ! empty( $data['group'] ) && is_string( $data['group'] ) ? sanitize_key( $data['group'] ) : 'fluid_spacing_presets';
+
+		// Add preset to Kit
+		$kit->add_repeater_row( $control_id, $preset_item );
+
+		// Return success response
+		return array(
+			'success'    => true,
+			'id'         => $preset_id,
+			'title'      => $preset_item['title'],
+			'control_id' => $control_id,
+		);
+	}
+
+	/**
+	 * AJAX handler for retrieving group list with metadata.
+	 *
+	 * @since 1.2.2
+	 * @access public
+	 * @static
+	 *
+	 * @param array<string, mixed> $data Data received from the AJAX request.
+	 * @return array<int, array<string, mixed>> Array of groups with id, name, type.
+	 * @throws \Exception If the user does not have permission to edit posts.
+	 */
+	public static function ajax_get_groups( $data ): array {
+		// Verify user permissions
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		// Get main groups (built-in + custom) with proper IDs
+		$groups = \Arts\FluidDesignSystem\Managers\GroupsData::get_main_groups();
+
+		// Simplify response - return control_id for use in save
+		$simplified = array();
+		foreach ( $groups as $group ) {
+			$group_id   = isset( $group['id'] ) && is_string( $group['id'] ) ? $group['id'] : '';
+			$group_type = isset( $group['type'] ) && is_string( $group['type'] ) ? $group['type'] : 'builtin';
+
+			// Determine control_id
+			if ( $group_type === 'custom' && $group_id !== '' ) {
+				$control_id = ControlRegistry::get_custom_group_control_id( $group_id );
+			} else {
+				$control_id = $group_id; // Built-in groups already have full control_id as ID
+			}
+
+			$simplified[] = array(
+				'id'   => $control_id, // Full control_id for saving
+				'name' => isset( $group['name'] ) && is_string( $group['name'] ) ? $group['name'] : '',
+				'type' => $group_type,
+			);
+		}
+
+		return $simplified;
 	}
 }
