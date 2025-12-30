@@ -933,19 +933,15 @@ export const BaseControlView = {
         [setting]: clampValue
       }
 
-      this.setValue(newValue)
-
-      // Update related input for Elementor's internal tracking
-      // @ts-expect-error - Type assertion for ui access
-      const relatedInputEl = this.ui.controls.filter(`[data-setting="${setting}"]`)
-      relatedInputEl.val(clampValue)
-
-      // Handle linked dimensions/gaps - sync all inputs to same value
+      // Handle linked dimensions/gaps - sync all values and inputs
       if (this.isLinkedDimensions()) {
         // @ts-expect-error - Type assertion for ui access
         for (const selectEl of this.ui.selectControls || []) {
           const otherSetting = selectEl.getAttribute('data-setting')
           if (otherSetting && otherSetting !== setting) {
+            // Add linked dimension value to the model update
+            newValue[otherSetting] = clampValue
+
             const otherContainer = this.getInlineContainer(otherSetting)
             if (otherContainer) {
               const minInput = otherContainer.querySelector('[data-fluid-role="min"]')
@@ -962,10 +958,22 @@ export const BaseControlView = {
 
               // Update button state for this container
               this.updateSaveButtonState(otherContainer)
+
+              // Update related input for Elementor's internal tracking
+              // @ts-expect-error - Type assertion for ui access
+              const linkedInputEl = this.ui.controls.filter(`[data-setting="${otherSetting}"]`)
+              linkedInputEl.val(clampValue)
             }
           }
         }
       }
+
+      this.setValue(newValue)
+
+      // Update related input for Elementor's internal tracking
+      // @ts-expect-error - Type assertion for ui access
+      const relatedInputEl = this.ui.controls.filter(`[data-setting="${setting}"]`)
+      relatedInputEl.val(clampValue)
 
       this.updateDimensions()
     }
