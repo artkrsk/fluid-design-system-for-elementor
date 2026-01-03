@@ -63,6 +63,10 @@ next-env.d.ts
 .eslintcache
 .stylelintcache
 
+# VitePress documentation
+docs/.vitepress/dist
+docs/.vitepress/cache
+
 # Temporary files
 *.swp
 *.swo

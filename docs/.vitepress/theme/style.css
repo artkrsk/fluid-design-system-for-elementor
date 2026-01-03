@@ -1,0 +1,76 @@
+/**
+ * Customize default theme styling
+ * https://vitepress.dev/guide/custom-theme
+ */
+
+:root {
+  --vp-c-brand-1: #646cff;
+  --vp-c-brand-2: #747bff;
+  --vp-c-brand-3: #535bf2;
+}
+
+.dark {
+  --vp-c-brand-1: #747bff;
+  --vp-c-brand-2: #646cff;
+  --vp-c-brand-3: #535bf2;
+}
+
+/* Plugin name component styling */
+.plugin-name {
+  font-family: var(--vp-font-family-mono);
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+}
+
+/* Video player styling */
+.video-player {
+  margin: 2rem 0;
+}
+
+.video-player video {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .video-player video {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.video-caption {
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--vp-c-text-2);
+  margin-top: 0.5rem;
+}
+
+/* Screenshot gallery styling */
+.screenshot-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.screenshot-item img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.dark .screenshot-item img {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.screenshot-item img:hover {
+  transform: translateY(-2px);
+}
+
+.screenshot-caption {
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--vp-c-text-2);
+  margin-top: 0.5rem;
+}
