@@ -8,6 +8,8 @@
 
 Build visually consistent Elementor websites with fluid typography and spacing that scale smoothly from mobile to desktop. No more manual breakpoints!
 
+🎥 **[View Documentation](https://artkrsk.github.io/fluid-design-system-for-elementor/guide)** - Complete guide with video tutorials
+
 ## 🎯 About The Plugin
 
 Fluid Design System for Elementor is a small yet powerful add-on that brings fluid typography and spacing presets directly into Elementor's interface — helping you create fully responsive designs that scale naturally across every screen size, from tiny phones to ultra-wide desktops.

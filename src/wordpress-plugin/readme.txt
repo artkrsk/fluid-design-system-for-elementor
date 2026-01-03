@@ -21,6 +21,8 @@ Fluid Design System for Elementor is a small yet powerful add-on that brings flu
 
 🎯 *Think of it like color presets — but for padding, font sizes, and layout gaps.*
 
+🎥 **[Video Tutorials](https://artkrsk.github.io/fluid-design-system-for-elementor/guide)**
+
 With just a few clicks, you can:
 - Define minimum and maximum values for typography or spacing.
 - Apply those values using a new "fluid" unit inside any Elementor control.
