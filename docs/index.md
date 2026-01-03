@@ -7,10 +7,10 @@ hero:
   tagline: Create fluid typography & spacing presets natively in Elementor — no CSS clamp formulas, no breakpoints, just seamless responsive design.
   actions:
     - theme: brand
-      text: Get Started
+      text: Read Guide
       link: /guide
     - theme: alt
-      text: View on WordPress.org
+      text: Download Plugin
       link: https://wordpress.org/plugins/fluid-design-system-for-elementor/
 
 features:

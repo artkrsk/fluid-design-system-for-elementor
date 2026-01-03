@@ -159,8 +159,8 @@ function my_theme_add_fluid_support() {
 add_action('init', 'my_theme_add_fluid_support');
 ```
 
-## Resources
+## Need Help?
 
-- [GitHub Repository](https://github.com/artkrsk/fluid-design-system-for-elementor)
-- [WordPress.org Plugin](https://wordpress.org/plugins/fluid-design-system-for-elementor/)
-- [Report Issues](https://github.com/artkrsk/fluid-design-system-for-elementor/issues)
+- 📖 [User Guide](/guide)
+- 💬 [WordPress.org Support](https://wordpress.org/support/plugin/fluid-design-system-for-elementor/)
+- 🐛 [GitHub Issues](https://github.com/artkrsk/fluid-design-system-for-elementor/issues)

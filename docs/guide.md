@@ -13,6 +13,7 @@ Install from [WordPress.org Plugin Directory](https://wordpress.org/plugins/flui
 ## What is Fluid Design?
 
 Traditional Elementor design requires setting separate values for each breakpoint (mobile, tablet, desktop). This is:
+
 - **Rigid**: Only specific screen widths are styled
 - **Time-consuming**: Manual updates across multiple breakpoints
 
@@ -20,106 +21,75 @@ Traditional Elementor design requires setting separate values for each breakpoin
 
 ## Quick Start
 
-### 1. Access Site Settings
+Watch this quick walkthrough of creating fluid presets in Elementor:
 
-1. Open Elementor editor (any page)
-2. Click **☰ menu** (top left)
-3. Select **Site Settings**
-4. Go to **Fluid Typography & Spacing** tab
+<CaptionedVideo src="fds-site-settings.mp4" caption="Creating typography and spacing presets in Site Settings" />
 
-### 2. Create Your First Preset
+### Creating Presets
 
-**Typography Preset**:
-- **Label**: "Heading Large"
-- **Min**: 24px (mobile)
-- **Max**: 72px (desktop)
-- Click **Update**
+1. **Open Site Settings**: Click the **☰ menu** (top left) → **Site Settings** → **Fluid Typography & Spacing** tab
 
-**Spacing Preset**:
-- **Label**: "Section Padding"
-- **Min**: 40px
-- **Max**: 120px
-- Click **Update**
+2. **Create a Typography Preset**:
+   - Click **Add Item** under Typography Presets
+   - Label: "Heading Large"
+   - Min: 24px (mobile), Max: 72px (desktop)
+   - Click `Save Changes`
 
-### 3. Use in Elementor
+3. **Create a Spacing Preset**:
+   - Click **Add Item** under Spacing Presets
+   - Label: "Section Padding"
+   - Min: 60px (mobile), Max: 200px (desktop)
+   - Click `Save Changes`
 
-1. Select any element
-2. Find a typography or spacing control
-3. Click the **unit dropdown**
-4. Select **fluid**
-5. Choose your preset
+### Using Your Presets
 
-The element now scales smoothly from mobile to desktop!
+Now let's apply the presets we just created:
+
+<CaptionedVideo src="fds-using-presets.mp4" caption="Applying fluid presets to heading typography and section padding" />
+
+As shown in the video:
+
+1. Select any element (e.g., a heading or section)
+2. Go to the typography or spacing control
+3. Click the **unit dropdown** → Select **fluid**
+4. Choose your preset (e.g., "Heading Large" or "Section Padding")
+
+Your element now scales smoothly across all screen sizes!
 
 ## Inline Fluid Values
 
-Set fluid values directly in controls without creating presets.
+**Why use inline values?** Going back-and-forth to Site Settings is tedious when you just want to experiment with values and see how they look on your design. Inline values let you test fluid values instantly — and if you like the result, save it as a preset immediately.
 
-### How to Use
+<CaptionedVideo src="fds-inline-values.mp4" caption="Using inline fluid values (16px ~ 108px) without creating presets" />
+
+As shown in the video:
 
 1. Select **fluid** unit in any control
-2. Enter **minimum value** in the first field (e.g., `20px`)
-3. Enter **maximum value** in the second field (e.g., `100px`)
+2. Enter **minimum value** in the first field (e.g., `16px`)
+3. Enter **maximum value** in the second field (e.g., `108px`)
 4. The value scales immediately
 
 The tilde (`~`) between fields is a visual separator showing the relationship between min and max values.
 
-### Save as Preset
-
-Convert inline values to reusable presets:
-1. Enter inline value (e.g., `24px ~ 64px`)
-2. Click **Save as Preset** button
-3. Enter preset name
-4. Click **Save**
-
-The preset is instantly available everywhere!
-
-### Linked Dimensions
-
-Works with linked padding/margins:
-- Enable link icon ⛓️
-- Enter `40px ~ 120px` in one field
-- All sides use the same fluid value
+::: tip Save as Preset
+Want to reuse this value? Click the **+** button, enter a name, and click Save. Your inline value becomes a preset instantly available everywhere in Elementor.
+:::
 
 ## Custom Groups (Admin Panel)
 
-Organize presets into custom groups for better management.
+**Why use custom groups?** As your design system grows, you'll have many presets for different purposes. The default "Typography Presets" and "Spacing Presets" groups become cluttered quickly. Custom groups let you organize presets by purpose — "Section Space", "Grid Gaps", "Border Radius", "Thumbnail Sizes" — keeping everything organized instead of throwing random presets into the default groups.
 
-### Access Admin Panel
+<CaptionedVideo src="fds-creating-groups-admin-panel.mp4" caption="Creating custom groups and reordering them in the admin panel" />
 
-Navigate to **Elementor > Fluid Design System** in WordPress admin.
+As shown in the video:
 
-### Features
+1. Navigate to **Elementor > Fluid Design System** in WordPress admin
+2. Click **Add New Group** to create custom groups
+3. Drag-and-drop to **reorder groups** (e.g., "Section Space", "Border Radius")
+4. Drag-and-drop to **move presets between groups**
+5. Use search to find specific presets quickly
 
-- Create custom groups (e.g., "Border Radius", "Gaps")
-- Drag-and-drop presets between groups
-- Search for specific presets
-- Delete or rename groups
-
-## Common Use Cases
-
-### Typography Scale
-
-| Preset | Min | Max | Use |
-|--------|-----|-----|-----|
-| Display | 36px | 96px | Hero headings |
-| H1 | 28px | 64px | Page titles |
-| Body | 16px | 18px | Body text |
-
-### Spacing Scale
-
-| Preset | Min | Max | Use |
-|--------|-----|-----|-----|
-| XL | 80px | 200px | Major sections |
-| L | 40px | 120px | Section padding |
-| M | 24px | 64px | Element spacing |
-
-## Tips
-
-- **Start small**: 5-8 essential presets
-- **Use consistent scales**: 1.25x, 1.5x, 2x ratios
-- **Test responsively**: Check at different viewport sizes
-- **Mix units**: Can use `1.5rem ~ 4rem` or `3em ~ 160px`
+<CaptionedImage src="custom-groups-site-settings.png" caption="Custom groups integrated into Site Settings panel"/>
 
 ## Need Help?
 
