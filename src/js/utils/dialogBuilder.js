@@ -25,14 +25,14 @@ export class DialogBuilder {
   /**
    * Creates preset name input field
    * @param {string} defaultValue - Default input value
-   * @param {string} placeholder - Input placeholder text
+   * @param {string} placeholder - Input placeholder text (defaults to translation)
    * @returns {jQuery} Input element
    */
-  static createNameInput(defaultValue = '', placeholder = 'Preset Name') {
+  static createNameInput(defaultValue = '', placeholder = null) {
     return jQuery('<input>', {
       type: 'text',
       name: 'preset-name',
-      placeholder,
+      placeholder: placeholder || window.ArtsFluidDSStrings?.presetName,
       value: defaultValue
     })
   }
@@ -61,8 +61,8 @@ export class DialogBuilder {
       if (!groups || !Array.isArray(groups) || groups.length === 0) {
         // Fallback to default groups
         $select.append(
-          jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-          jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+          jQuery('<option>', { value: 'fluid_spacing_presets', text: window.ArtsFluidDSStrings?.spacingPresets }),
+          jQuery('<option>', { value: 'fluid_typography_presets', text: window.ArtsFluidDSStrings?.typographyPresets })
         )
         return
       }
@@ -84,8 +84,8 @@ export class DialogBuilder {
     } catch {
       // Fallback on error
       $select.append(
-        jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-        jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+        jQuery('<option>', { value: 'fluid_spacing_presets', text: window.ArtsFluidDSStrings?.spacingPresets }),
+        jQuery('<option>', { value: 'fluid_typography_presets', text: window.ArtsFluidDSStrings?.typographyPresets })
       )
     }
   }

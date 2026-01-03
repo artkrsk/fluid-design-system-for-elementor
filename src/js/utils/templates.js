@@ -58,7 +58,7 @@ export class TemplateRenderer {
           <span class="select2-result-fluid-spacing-formatted__value">${valueDisplay}</span>
         `)}
         ${TemplateRenderer.createFooter(`
-          <span class="select2-result-fluid-spacing-formatted__title">Inherit</span>
+          <span class="select2-result-fluid-spacing-formatted__title">${window.ArtsFluidDSStrings?.inherit}</span>
         `)}
       `
     )
@@ -74,8 +74,7 @@ export class TemplateRenderer {
     const inheritedTitle =
       element.getAttribute('data-inherited-title') ||
       text ||
-      window.ArtsFluidDSStrings?.inherit ||
-      'Inherit'
+      window.ArtsFluidDSStrings?.inherit
 
     return TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',

@@ -42,7 +42,7 @@ export class InlineInputManager {
     // Add "Save as Preset" button (Elementor pattern)
     const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
       type: 'button',
-      title: window.ArtsFluidDSStrings?.saveAsPreset || 'Save as Preset'
+      title: window.ArtsFluidDSStrings?.saveAsPreset
     })
     const icon = createElement('i', 'eicon-plus')
     saveButton.appendChild(icon)

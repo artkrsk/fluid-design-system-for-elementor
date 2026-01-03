@@ -249,7 +249,7 @@ class PresetUtils {
       optionEl.setAttribute('selected', 'selected')
     }
 
-    optionEl.textContent = 'Custom value...'
+    optionEl.textContent = window.ArtsFluidDSStrings?.customValue
     return optionEl
   }
 

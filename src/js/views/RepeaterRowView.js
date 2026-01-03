@@ -34,7 +34,7 @@ const createFluidPresetRepeaterRow = () => {
 
       if (this.ui.removeButton.length) {
         this.ui.removeButton.data('e-global-type', 'fluid-preset').tipsy({
-          title: () => window.ArtsFluidDSStrings?.deleteFluidPreset || 'Delete Fluid Preset',
+          title: () => window.ArtsFluidDSStrings?.deleteFluidPreset,
           gravity: () => 's'
         })
       }
@@ -49,17 +49,15 @@ const createFluidPresetRepeaterRow = () => {
         return this.constructor.__super__.onRemoveButtonClick.apply(this, arguments)
       }
 
-      const translatedMessage =
-        window.ArtsFluidDSStrings?.deletePresetMessage ||
-        "You're about to delete a fluid preset. Note that if it's being used anywhere on your site, it will inherit default values."
+      const translatedMessage = window.ArtsFluidDSStrings?.deletePresetMessage
 
       this.confirmDeleteModal = elementorCommon.dialogsManager.createWidget('confirm', {
         className: 'e-global__confirm-delete',
-        headerMessage: window.ArtsFluidDSStrings?.deleteFluidPreset || 'Delete Fluid Preset',
+        headerMessage: window.ArtsFluidDSStrings?.deleteFluidPreset,
         message: '<i class="eicon-info-circle"></i> ' + translatedMessage,
         strings: {
-          confirm: window.ArtsFluidDSStrings?.delete || 'Delete',
-          cancel: window.ArtsFluidDSStrings?.cancel || 'Cancel'
+          confirm: window.ArtsFluidDSStrings?.delete,
+          cancel: window.ArtsFluidDSStrings?.cancel
         },
         hide: {
           onBackgroundClick: false

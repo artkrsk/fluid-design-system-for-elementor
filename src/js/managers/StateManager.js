@@ -66,17 +66,15 @@ export class StateManager {
     if (!this.saveChangesDialog) {
       this.saveChangesDialog = window.elementorCommon.dialogsManager.createWidget('confirm', {
         id: 'elementor-fluid-spacing-save-changes-dialog',
-        headerMessage: window.ArtsFluidDSStrings?.saveChanges || 'Save Changes',
-        message:
-          window.ArtsFluidDSStrings?.saveChangesMessage ||
-          "Would you like to save the changes you've made?",
+        headerMessage: window.ArtsFluidDSStrings?.saveChanges,
+        message: window.ArtsFluidDSStrings?.saveChangesMessage,
         position: {
           my: 'center center',
           at: 'center center'
         },
         strings: {
-          confirm: window.ArtsFluidDSStrings?.save || 'Save',
-          cancel: window.ArtsFluidDSStrings?.discard || 'Discard'
+          confirm: window.ArtsFluidDSStrings?.save,
+          cancel: window.ArtsFluidDSStrings?.discard
         }
       })
     }

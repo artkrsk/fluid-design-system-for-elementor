@@ -512,7 +512,7 @@ export const BaseControlView = {
     // Create dialog message with input
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
     const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
-      window.ArtsFluidDSStrings?.createNewPreset || 'Create a new fluid preset:'
+      window.ArtsFluidDSStrings?.createNewPreset
     )
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
@@ -521,8 +521,7 @@ export const BaseControlView = {
     const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
     const $preview = DialogBuilder.createPreviewDisplay(minSize, minUnit, maxSize, maxUnit)
     const $input = DialogBuilder.createNameInput(
-      `Custom ${previewText}`,
-      window.ArtsFluidDSStrings?.presetName || 'Preset Name'
+      `Custom ${previewText}`
     )
     const $groupSelect = DialogBuilder.createGroupSelector()
 
@@ -535,11 +534,11 @@ export const BaseControlView = {
     // Create dialog
     const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
       className: 'e-fluid-save-preset-dialog',
-      headerMessage: window.ArtsFluidDSStrings?.saveAsPreset || 'Save as Preset',
+      headerMessage: window.ArtsFluidDSStrings?.saveAsPreset,
       message: $message,
       strings: {
-        confirm: window.ArtsFluidDSStrings?.create || 'Create',
-        cancel: window.ArtsFluidDSStrings?.cancel || 'Cancel'
+        confirm: window.ArtsFluidDSStrings?.create,
+        cancel: window.ArtsFluidDSStrings?.cancel
       },
       hide: {
         onBackgroundClick: false
@@ -647,8 +646,8 @@ export const BaseControlView = {
       // Show error message
       elementorCommon.dialogsManager
         .createWidget('alert', {
-          headerMessage: window.ArtsFluidDSStrings?.error || 'Error',
-          message: error || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset'
+          headerMessage: window.ArtsFluidDSStrings?.error,
+          message: error || window.ArtsFluidDSStrings?.failedToSave
         })
         .show()
     }
