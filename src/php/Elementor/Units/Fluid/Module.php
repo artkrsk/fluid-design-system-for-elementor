@@ -162,12 +162,19 @@ class Module extends Module_Base {
 		$preset_collections = self::get_preset_collections();
 
 		// Process each preset collection
-		foreach ( $preset_collections as $collection_title => $presets ) {
+		foreach ( $preset_collections as $control_id => $collection_data ) {
+			// Validate collection structure
+			if ( ! is_array( $collection_data ) || ! isset( $collection_data['title'] ) || ! isset( $collection_data['presets'] ) || ! isset( $collection_data['control_id'] ) ) {
+				continue;
+			}
+
+			/** @var array{title: string, control_id: string, presets: array<int, array<string, mixed>>} $collection_data */
 			$preset_group = self::process_preset_collection(
-				$collection_title,
-				$presets,
+				$collection_data['title'],
+				$collection_data['presets'],
 				$breakpoint_settings['min_screen_width'],
-				$breakpoint_settings['max_screen_width']
+				$breakpoint_settings['max_screen_width'],
+				$collection_data['control_id']
 			);
 
 			if ( ! empty( $preset_group ) ) {
@@ -208,6 +215,25 @@ class Module extends Module_Base {
 		// Ensure filter returns an array
 		if ( ! is_array( $filtered_result ) ) {
 			return $result;
+		}
+
+		// Mark filter-added presets as not editable
+		$num_kit_groups = count( $result );
+		for ( $i = $num_kit_groups; $i < count( $filtered_result ); $i++ ) {
+			if ( ! isset( $filtered_result[ $i ] ) || ! is_array( $filtered_result[ $i ] ) ) {
+				continue;
+			}
+
+			if ( ! isset( $filtered_result[ $i ]['value'] ) || ! is_array( $filtered_result[ $i ]['value'] ) ) {
+				continue;
+			}
+
+			foreach ( $filtered_result[ $i ]['value'] as $key => &$preset ) {
+				if ( is_array( $preset ) ) {
+					$preset['editable']                     = false;
+					$filtered_result[ $i ]['value'][ $key ] = $preset;
+				}
+			}
 		}
 
 		/** @var array<int, array<string, mixed>> $filtered_result */
@@ -262,7 +288,7 @@ class Module extends Module_Base {
 	 * @access public
 	 * @static
 	 *
-	 * @return array<string, array<int, array<string, mixed>>> Array of preset collections with titles as keys.
+	 * @return array<string, array{title: string, control_id: string, presets: array<int, array<string, mixed>>}> Array of preset collections with control_id as keys.
 	 */
 	public static function get_preset_collections(): array {
 		// Get correct names from ControlRegistry
@@ -271,13 +297,26 @@ class Module extends Module_Base {
 		$spacing_name    = isset( $metadata['spacing']['name'] ) && is_string( $metadata['spacing']['name'] ) ? $metadata['spacing']['name'] : 'Spacing';
 		$typography_name = isset( $metadata['typography']['name'] ) && is_string( $metadata['typography']['name'] ) ? $metadata['typography']['name'] : 'Typography';
 
-		$spacing_presets    = Utilities::get_kit_settings( 'fluid_spacing_presets', array(), false );
-		$typography_presets = Utilities::get_kit_settings( 'fluid_typography_presets', array(), false );
+		$spacing_presets_raw    = Utilities::get_kit_settings( 'fluid_spacing_presets', array(), false );
+		$typography_presets_raw = Utilities::get_kit_settings( 'fluid_typography_presets', array(), false );
 
-		/** @var array<string, array<int, array<string, mixed>>> $collections */
+		/** @var array<int, array<string, mixed>> $spacing_presets */
+		$spacing_presets = is_array( $spacing_presets_raw ) ? $spacing_presets_raw : array();
+
+		/** @var array<int, array<string, mixed>> $typography_presets */
+		$typography_presets = is_array( $typography_presets_raw ) ? $typography_presets_raw : array();
+
 		$collections = array(
-			$spacing_name    => is_array( $spacing_presets ) ? $spacing_presets : array(),
-			$typography_name => is_array( $typography_presets ) ? $typography_presets : array(),
+			'fluid_spacing_presets'    => array(
+				'title'      => $spacing_name,
+				'control_id' => 'fluid_spacing_presets',
+				'presets'    => $spacing_presets,
+			),
+			'fluid_typography_presets' => array(
+				'title'      => $typography_name,
+				'control_id' => 'fluid_typography_presets',
+				'presets'    => $typography_presets,
+			),
 		);
 
 		// Add custom groups collections
@@ -291,9 +330,17 @@ class Module extends Module_Base {
 
 				$control_id    = ControlRegistry::get_custom_group_control_id( $group_id );
 				$group_presets = Utilities::get_kit_settings( $control_id, array(), false );
-				/** @var array<int, array<string, mixed>> $validated_presets */
-				$validated_presets                  = is_array( $group_presets ) ? $group_presets : array();
-				$collections[ $group_data['name'] ] = $validated_presets;
+
+				if ( ! is_array( $group_presets ) ) {
+					$group_presets = array();
+				}
+
+				/** @var array<int, array<string, mixed>> $group_presets */
+				$collections[ $control_id ] = array(
+					'title'      => $group_data['name'],
+					'control_id' => $control_id,
+					'presets'    => $group_presets,
+				);
 			}
 		}
 
@@ -311,12 +358,14 @@ class Module extends Module_Base {
 	 * @param array<int, array<string, mixed>>     $presets           Array of preset data.
 	 * @param int                                  $global_min_width  Global minimum screen width.
 	 * @param int                                  $global_max_width  Global maximum screen width.
+	 * @param string|null                          $control_id        Control ID for the group (e.g., 'fluid_spacing_presets').
 	 * @return array<string, mixed>                Formatted preset group.
 	 */
-	private static function process_preset_collection( $collection_title, $presets, $global_min_width, $global_max_width ): array {
+	private static function process_preset_collection( $collection_title, $presets, $global_min_width, $global_max_width, $control_id = null ): array {
 		$preset_group = array(
-			'name'  => $collection_title,
-			'value' => array(),
+			'name'       => $collection_title,
+			'control_id' => $control_id,
+			'value'      => array(),
 		);
 
 		foreach ( $presets as $preset ) {
@@ -327,7 +376,9 @@ class Module extends Module_Base {
 			);
 
 			if ( $formatted_preset ) {
-				$preset_group['value'][] = $formatted_preset;
+				// Mark Kit presets as editable
+				$formatted_preset['editable'] = true;
+				$preset_group['value'][]      = $formatted_preset;
 			}
 		}
 
