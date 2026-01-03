@@ -4,8 +4,9 @@ import { getSelect2DefaultOptions } from '../utils/select2'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
 import { ValidationService } from '../utils/validation.js'
 import { InlineInputManager } from '../utils/inlineInputs.js'
+import { PresetDropdownManager } from '../utils/presetDropdown.js'
+import { PresetAPIService } from '../services/presetAPI.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
-import { AJAX_ACTION_SAVE_PRESET, AJAX_ACTION_GET_GROUPS } from '../constants/AJAX'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/Styles'
 
@@ -604,46 +605,38 @@ export const BaseControlView = {
 
   /** Populates group select options by fetching group metadata */
   async populateGroupOptions($select) {
-    // Fetch groups with proper IDs
-    return new Promise((resolve) => {
-      window.elementor.ajax.addRequest(AJAX_ACTION_GET_GROUPS, {
-        data: {},
-        success: (groups) => {
-          if (!groups || !Array.isArray(groups)) {
-            // Fallback to default groups
-            $select.append(
-              jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-              jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-            )
-            resolve()
-            return
-          }
+    try {
+      const groups = await PresetAPIService.fetchGroups()
 
-          // Add all groups with proper IDs
-          for (const group of groups) {
-            $select.append(
-              jQuery('<option>', {
-                value: group.id,
-                text: group.name
-              })
-            )
-          }
-          resolve()
-        },
-        error: () => {
-          // Fallback on error
-          $select.append(
-            jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-            jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-          )
-          resolve()
-        }
-      })
-    })
+      if (!groups || !Array.isArray(groups) || groups.length === 0) {
+        // Fallback to default groups
+        $select.append(
+          jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
+          jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+        )
+        return
+      }
+
+      // Add all groups with proper IDs
+      for (const group of groups) {
+        $select.append(
+          jQuery('<option>', {
+            value: group.id,
+            text: group.name
+          })
+        )
+      }
+    } catch {
+      // Fallback on error
+      $select.append(
+        jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
+        jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+      )
+    }
   },
 
   /** Handles dialog confirmation */
-  onConfirmSavePreset(title, group, minSize, minUnit, maxSize, maxUnit, setting) {
+  async onConfirmSavePreset(title, group, minSize, minUnit, maxSize, maxUnit, setting) {
     // Prepare data for AJAX
     const ajaxData = {
       title: title.trim() || `Custom ${minSize}${minUnit} ~ ${maxSize}${maxUnit}`,
@@ -654,67 +647,50 @@ export const BaseControlView = {
       group: group || 'spacing'
     }
 
-    // Call AJAX endpoint
-    window.elementor.ajax.addRequest(AJAX_ACTION_SAVE_PRESET, {
-      data: ajaxData,
-      success: async (response) => {
-        // Generate and inject CSS variable into preview immediately
-        const clampFormula = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
-        cssManager.setCssVariable(response.id, clampFormula)
+    try {
+      const response = await PresetAPIService.savePreset(ajaxData)
 
-        // Invalidate cache to force fresh data fetch
-        dataManager.invalidate()
+      // Generate and inject CSS variable into preview immediately
+      const clampFormula = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
+      cssManager.setCssVariable(response.id, clampFormula)
 
-        // Refresh all preset dropdowns
-        await this.refreshPresetDropdowns()
+      // Invalidate cache to force fresh data fetch
+      dataManager.invalidate()
 
-        // Auto-select the new preset (with small delay for Select2 to update)
-        setTimeout(() => {
-          const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
-          this.selectPreset(setting, presetValue)
+      // Refresh all preset dropdowns
+      await this.refreshPresetDropdowns()
 
-          // If linked, apply preset to all dimensions
-          if (this.isLinkedDimensions()) {
-            // @ts-expect-error - Type assertion for ui access
-            for (const selectEl of this.ui.selectControls || []) {
-              const otherSetting = selectEl.getAttribute('data-setting')
-              if (otherSetting && otherSetting !== setting) {
-                this.selectPreset(otherSetting, presetValue)
-              }
+      // Auto-select the new preset (with small delay for Select2 to update)
+      setTimeout(() => {
+        const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
+        this.selectPreset(setting, presetValue)
+
+        // If linked, apply preset to all dimensions
+        if (this.isLinkedDimensions()) {
+          // @ts-expect-error - Type assertion for ui access
+          for (const selectEl of this.ui.selectControls || []) {
+            const otherSetting = selectEl.getAttribute('data-setting')
+            if (otherSetting && otherSetting !== setting) {
+              this.selectPreset(otherSetting, presetValue)
             }
           }
-        }, 100)
-      },
-      error: (error) => {
-        // Show error message
-        elementorCommon.dialogsManager
-          .createWidget('alert', {
-            headerMessage: window.ArtsFluidDSStrings?.error || 'Error',
-            message: error || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset'
-          })
-          .show()
-      }
-    })
+        }
+      }, 100)
+    } catch (error) {
+      // Show error message
+      elementorCommon.dialogsManager
+        .createWidget('alert', {
+          headerMessage: window.ArtsFluidDSStrings?.error || 'Error',
+          message: error || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset'
+        })
+        .show()
+    }
   },
 
   /** Refreshes all preset dropdowns in the control */
   async refreshPresetDropdowns() {
     // @ts-expect-error - Type assertion for ui access
-    if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
-      return
-    }
-
-    // @ts-expect-error - Type assertion for ui access
-    for (const selectEl of this.ui.selectControls) {
-      // Clear existing options except loading
-      selectEl.innerHTML = ''
-
-      // Re-populate with fresh data
-      await buildSelectOptions(selectEl, this.el)
-
-      // Refresh Select2
-      jQuery(selectEl).trigger('change.select2')
-    }
+    await PresetDropdownManager.refreshDropdowns(this.ui.selectControls, this.el)
   },
 
   /** Selects a preset value in the dropdown and updates control */
@@ -729,9 +705,8 @@ export const BaseControlView = {
       return
     }
 
-    // Update select value
-    selectEl.value = presetValue
-    selectEl.setAttribute('data-value', presetValue)
+    // Update select element value and trigger Select2
+    PresetDropdownManager.updateSelectValue(selectEl, presetValue)
 
     // Update control value
     const newValue = {
@@ -742,9 +717,6 @@ export const BaseControlView = {
 
     // Hide inline inputs
     this.toggleInlineInputs(setting, false)
-
-    // Trigger Select2 update
-    jQuery(selectEl).trigger('change.select2')
   },
 
   /** Validates an inline input and toggles invalid state */
