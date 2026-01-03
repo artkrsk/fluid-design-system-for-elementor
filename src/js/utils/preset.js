@@ -35,7 +35,8 @@ class PresetUtils {
       min_screen_width_size,
       max_screen_width_size,
       min_screen_width_unit,
-      max_screen_width_unit
+      max_screen_width_unit,
+      editable = false
     } = preset
 
     const optionEl = PresetUtils.#createBaseOption(value, currentValue, {
@@ -48,7 +49,8 @@ class PresetUtils {
       'data-min-screen-width-size': min_screen_width_size,
       'data-max-screen-width-size': max_screen_width_size,
       'data-min-screen-width-unit': min_screen_width_unit,
-      'data-max-screen-width-unit': max_screen_width_unit
+      'data-max-screen-width-unit': max_screen_width_unit,
+      'data-editable': editable ? 'true' : 'false'
     })
 
     optionEl.textContent = `${ValueFormatter.formatSizeRange(min_size, min_unit, max_size, max_unit)} ${title}`
@@ -278,7 +280,9 @@ class PresetUtils {
 
     let customOptionAdded = false
 
-    for (const { name, value } of presetsData) {
+    for (const group of presetsData) {
+      const { name, value, control_id } = group
+
       if (!name) {
         continue
       }
@@ -301,6 +305,12 @@ class PresetUtils {
           } else {
             optionEl = PresetUtils.createCustomPresetOption(preset, currentValue)
           }
+
+          // Add group control_id to each option
+          if (control_id) {
+            optionEl.setAttribute('data-group-id', control_id)
+          }
+
           optionsGroupEl.appendChild(optionEl)
         }
 

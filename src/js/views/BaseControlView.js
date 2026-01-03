@@ -208,6 +208,18 @@ export const BaseControlView = {
         .on('change', () => {
           this.onSelectChange(selectEl)
         })
+
+      // Delegate edit icon clicks to prevent memory leaks
+      const $container = jQuery(selectEl).next('.select2-container')
+      if ($container.length) {
+        $container.on('click', '.e-fluid-preset-edit-icon', (e) => {
+          e.stopPropagation()
+          e.preventDefault()
+
+          const presetId = jQuery(e.currentTarget).data('preset-id')
+          this.onEditPresetClick(selectEl, presetId)
+        })
+      }
     }
   },
 

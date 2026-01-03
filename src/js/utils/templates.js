@@ -338,6 +338,18 @@ export class TemplateRenderer {
         markup.append(TemplateRenderer.createFooter(footerContent))
       }
 
+      // Add edit icon for editable presets (only in dropdown results, not selection)
+      if (isTemplateResult && element.getAttribute('data-editable') === 'true') {
+        const presetId = element.getAttribute('data-id')
+        const $editIcon = jQuery('<i>', {
+          class: 'eicon-edit e-fluid-preset-edit-icon',
+          'data-preset-id': presetId,
+          title: window.ArtsFluidDSStrings?.editPreset || 'Edit Preset'
+        })
+
+        markup.append($editIcon)
+      }
+
       return markup
     }
 
