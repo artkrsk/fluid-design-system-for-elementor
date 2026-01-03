@@ -1,4 +1,4 @@
-import { AJAX_ACTION, AJAX_DATA } from '../constants/AJAX'
+import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants/API'
 import { showControlSpinner, hideControlSpinner } from '../utils'
 
 export class DataManager {
@@ -33,8 +33,8 @@ export class DataManager {
     this.isPending = true
 
     this.request = new Promise((resolve, reject) => {
-      window.elementor.ajax.addRequest(AJAX_ACTION, {
-        data: AJAX_DATA,
+      window.elementor.ajax.addRequest(AJAX_ACTIONS.FETCH_PRESETS, {
+        data: AJAX_DEFAULTS.FETCH_PRESETS,
         success: (response) => {
           this.presets = response
           resolve(response)

@@ -1,6 +1,7 @@
 import { stateManager, cssManager } from '../managers'
 import { getItemId } from '../utils'
-import { COMMANDS, HOOK_IDS, CONTAINER_TYPES, FLUID_REPEATER_CONTROLS } from '../constants'
+import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
+import { isFluidPresetRepeater } from '../utils/controls'
 
 export class HookOnRepeaterReorder extends window.$e.modules.hookUI.After {
   getCommand() {
@@ -16,7 +17,7 @@ export class HookOnRepeaterReorder extends window.$e.modules.hookUI.After {
   }
 
   getConditions(args) {
-    return FLUID_REPEATER_CONTROLS.isFluidPresetRepeater(args.name, args.container)
+    return isFluidPresetRepeater(args.name, args.container)
   }
 
   apply(args) {

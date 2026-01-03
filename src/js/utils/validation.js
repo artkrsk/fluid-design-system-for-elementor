@@ -1,3 +1,5 @@
+import { VALUE_WITH_UNIT_PATTERN } from '../constants/VALUES'
+
 /**
  * Input validation utilities for fluid design system
  */
@@ -24,8 +26,7 @@ export class ValidationService {
     }
 
     // Strict validation: only allow specific units (px, rem, em, %, vw, vh)
-    // Allow single optional space between number and unit, reject multiple spaces
-    const match = value.trim().match(/^(-?[\d.]+)\s?(px|rem|em|%|vw|vh)?$/i)
+    const match = value.trim().match(VALUE_WITH_UNIT_PATTERN)
     if (!match) {
       return null
     }

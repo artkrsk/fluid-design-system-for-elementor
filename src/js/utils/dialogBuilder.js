@@ -1,4 +1,5 @@
 import { PresetAPIService } from '../services/presetAPI.js'
+import { SELECT2_CONFIG } from '../constants/VALUES'
 
 /**
  * Dialog building utilities for preset dialogs
@@ -97,7 +98,7 @@ export class DialogBuilder {
    */
   static initializeSelect2($select, options = {}) {
     const defaultOptions = {
-      minimumResultsForSearch: -1, // Hide search box
+      minimumResultsForSearch: SELECT2_CONFIG.HIDE_SEARCH_BOX,
       width: '100%'
     }
     $select.select2({ ...defaultOptions, ...options })

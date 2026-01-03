@@ -1,6 +1,6 @@
 import { createElement } from './dom'
 import { dataManager } from '../managers'
-import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
+import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { parseClampFormula } from './clamp'
 import { ValueFormatter } from './formatters.js'
 

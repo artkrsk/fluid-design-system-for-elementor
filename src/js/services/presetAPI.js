@@ -1,4 +1,4 @@
-import { AJAX_ACTION_GET_GROUPS, AJAX_ACTION_SAVE_PRESET } from '../constants/AJAX'
+import { AJAX_ACTIONS } from '../constants/API'
 
 /**
  * Wraps Elementor AJAX request in a Promise
@@ -27,7 +27,7 @@ export class PresetAPIService {
    * @throws {Error} If AJAX request fails
    */
   static async fetchGroups() {
-    const groups = await elementorAjaxRequest(AJAX_ACTION_GET_GROUPS)
+    const groups = await elementorAjaxRequest(AJAX_ACTIONS.GET_GROUPS)
     return groups || []
   }
 
@@ -38,6 +38,6 @@ export class PresetAPIService {
    * @throws {Error} If AJAX request fails
    */
   static async savePreset(presetData) {
-    return await elementorAjaxRequest(AJAX_ACTION_SAVE_PRESET, presetData)
+    return await elementorAjaxRequest(AJAX_ACTIONS.SAVE_PRESET, presetData)
   }
 }

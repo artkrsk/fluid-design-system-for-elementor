@@ -6,9 +6,9 @@ import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { DialogBuilder } from '../utils/dialogBuilder.js'
-import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
+import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
-import { STYLES } from '../constants/Styles'
+import { STYLES } from '../constants/STYLES'
 
 export const BaseSliderControlView = {
   renderFluidSelectElements() {

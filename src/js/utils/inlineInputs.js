@@ -1,5 +1,6 @@
 import { createElement } from './dom.js'
 import { ValidationService } from './validation.js'
+import { UI_DEFAULTS } from '../constants/VALUES'
 
 /**
  * Manages inline min/max input fields for custom fluid values
@@ -21,7 +22,7 @@ export class InlineInputManager {
     const minInput = createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'min',
-      placeholder: '0px'
+      placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER
     })
 
     // Separator
@@ -32,7 +33,7 @@ export class InlineInputManager {
     const maxInput = createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'max',
-      placeholder: '0px'
+      placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER
     })
 
     container.appendChild(minInput)
