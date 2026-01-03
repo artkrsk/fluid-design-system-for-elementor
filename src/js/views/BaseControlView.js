@@ -497,7 +497,13 @@ export const BaseControlView = {
 
     try {
       // Create confirmation dialog (Elementor pattern)
-      const dialog = await this.createSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting)
+      const dialog = await this.openPresetDialog('create', {
+        setting,
+        minSize: String(minSize),
+        minUnit,
+        maxSize: String(maxSize),
+        maxUnit
+      })
       dialog.show()
     } finally {
       // Restore normal state
@@ -507,9 +513,44 @@ export const BaseControlView = {
     }
   },
 
-  /** Creates the Save as Preset dialog */
-  async createSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting) {
-    // Create dialog message with input
+  /**
+   * Gets mode-specific dialog configuration
+   * @private
+   */
+  _getDialogConfig(mode, data) {
+    const configs = {
+      create: {
+        headerMessage: window.ArtsFluidDSStrings?.saveAsPreset,
+        confirmButton: window.ArtsFluidDSStrings?.create,
+        showDelete: false,
+        defaultName: `Custom ${data.minSize}${data.minUnit} ~ ${data.maxSize}${data.maxUnit}`,
+        defaultMin: `${data.minSize}${data.minUnit}`,
+        defaultMax: `${data.maxSize}${data.maxUnit}`,
+        onConfirm: (name, group, minVal, maxVal) => {
+          this.onConfirmCreatePreset(name, group, minVal, maxVal, data.setting)
+        }
+      },
+      edit: {
+        headerMessage: window.ArtsFluidDSStrings?.editPreset,
+        confirmButton: window.ArtsFluidDSStrings?.save,
+        showDelete: true,
+        defaultName: data.presetTitle || '',
+        defaultMin: `${data.minSize}${data.minUnit}`,
+        defaultMax: `${data.maxSize}${data.maxUnit}`,
+        onConfirm: (name, group, minVal, maxVal) => {
+          this.onConfirmUpdatePreset(data.presetId, name, group || data.groupId, minVal, maxVal)
+        }
+      }
+    }
+
+    return configs[mode]
+  },
+
+  /**
+   * Creates dialog message DOM with inputs
+   * @private
+   */
+  _createDialogMessage(config) {
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
     const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
       window.ArtsFluidDSStrings?.createNewPreset
@@ -517,59 +558,188 @@ export const BaseControlView = {
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
 
-    // Use DialogBuilder helpers for element creation
-    const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
-    const $preview = DialogBuilder.createPreviewDisplay(minSize, minUnit, maxSize, maxUnit)
-    const $input = DialogBuilder.createNameInput(
-      `Custom ${previewText}`
-    )
+    // Min/Max value inputs (editable, replaces preview display)
+    const $valuesRow = jQuery('<div>', { class: 'e-fluid-dialog-values-row' })
+
+    const $minInput = jQuery('<input>', {
+      type: 'text',
+      class: 'e-fluid-inline-input e-fluid-dialog-input',
+      'data-fluid-role': 'min',
+      placeholder: '0px',
+      value: config.defaultMin
+    })
+
+    const $separator = jQuery('<span>', {
+      class: 'e-fluid-inline-separator',
+      text: '~'
+    })
+
+    const $maxInput = jQuery('<input>', {
+      type: 'text',
+      class: 'e-fluid-inline-input e-fluid-dialog-input',
+      'data-fluid-role': 'max',
+      placeholder: '0px',
+      value: config.defaultMax
+    })
+
+    $valuesRow.append($minInput, $separator, $maxInput)
+
+    // Use DialogBuilder helpers for name input
+    const $input = DialogBuilder.createNameInput(config.defaultName)
+
+    // Use DialogBuilder helper for group selector
     const $groupSelect = DialogBuilder.createGroupSelector()
 
-    // Populate groups (async)
-    await DialogBuilder.populateGroupSelector($groupSelect)
-
-    $inputWrapper.append($preview, $input, $groupSelect)
+    $inputWrapper.append($valuesRow, $input, $groupSelect)
     $message.append($messageText, $inputWrapper)
+
+    return { $message, $input, $minInput, $maxInput, $groupSelect }
+  },
+
+  /**
+   * Initializes dialog UI
+   * @private
+   */
+  async _initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $confirmButton, data) {
+    // Use DialogBuilder helpers for group selector initialization
+    await DialogBuilder.populateGroupSelector($groupSelect, data.groupId)
+    DialogBuilder.initializeSelect2($groupSelect)
+
+    // Use DialogBuilder helpers for name input
+    DialogBuilder.attachEnterKeyHandler($input, $confirmButton)
+    DialogBuilder.autoFocusInput($input)
+
+    // Combined validation (name + min/max)
+    const validateAll = () => {
+      // Name validation
+      const name = String($input.val() || '').trim()
+      const isNameValid = name.length > 0
+
+      // Min/Max validation
+      const minParsed = ValidationService.parseValueWithUnit($minInput.val())
+      const maxParsed = ValidationService.parseValueWithUnit($maxInput.val())
+
+      $minInput.toggleClass('e-fluid-inline-invalid', !minParsed)
+      $maxInput.toggleClass('e-fluid-inline-invalid', !maxParsed)
+
+      const areValuesValid = minParsed && maxParsed
+
+      // Update button state
+      $confirmButton.prop('disabled', !(isNameValid && areValuesValid))
+    }
+
+    // Attach validation to all inputs
+    $input.on('input', validateAll)
+    $minInput.on('input', validateAll)
+    $maxInput.on('input', validateAll)
+
+    // Set initial state
+    validateAll()
+  },
+
+  /**
+   * Attaches live preview listeners (edit mode only)
+   * @private
+   */
+  _attachLivePreviewListeners($minInput, $maxInput, presetId) {
+    if (!presetId) {
+      return
+    }
+
+    const updatePreview = () => {
+      const minValue = String($minInput.val() || '')
+      const maxValue = String($maxInput.val() || '')
+
+      const minParsed = ValidationService.parseValueWithUnit(minValue)
+      const maxParsed = ValidationService.parseValueWithUnit(maxValue)
+
+      // Only update if both values are valid
+      if (minParsed && maxParsed) {
+        const formula = generateClampFormula(
+          minParsed.size,
+          minParsed.unit,
+          maxParsed.size,
+          maxParsed.unit
+        )
+        cssManager.setCssVariable(presetId, formula)
+      }
+    }
+
+    $minInput.on('input', updatePreview)
+    $maxInput.on('input', updatePreview)
+  },
+
+  /** Creates unified preset dialog for create or edit */
+  async openPresetDialog(mode, data) {
+    // Validate mode
+    if (mode !== 'create' && mode !== 'edit') {
+      throw new Error(`Invalid mode: ${mode}. Expected 'create' or 'edit'.`)
+    }
+
+    // Mode-specific configuration
+    const config = this._getDialogConfig(mode, data)
+
+    // Store original formula for cancel restoration (edit mode only)
+    let originalFormula = null
+    let confirmed = false
+
+    if (mode === 'edit' && data.presetId) {
+      originalFormula = generateClampFormula(data.minSize, data.minUnit, data.maxSize, data.maxUnit)
+    }
+
+    // Create dialog UI
+    const { $message, $input, $minInput, $maxInput, $groupSelect } = this._createDialogMessage(config)
 
     // Create dialog
     const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
       className: 'e-fluid-save-preset-dialog',
-      headerMessage: window.ArtsFluidDSStrings?.saveAsPreset,
+      headerMessage: config.headerMessage,
       message: $message,
       strings: {
-        confirm: window.ArtsFluidDSStrings?.create,
+        confirm: config.confirmButton,
         cancel: window.ArtsFluidDSStrings?.cancel
       },
       hide: {
         onBackgroundClick: false
       },
-      onConfirm: () =>
-        this.onConfirmSavePreset(
-          $input.val(),
-          $groupSelect.val(),
-          minSize,
-          minUnit,
-          maxSize,
-          maxUnit,
-          setting
-        ),
-      onShow: () => {
-        // Get the dialog's Create button
+      onConfirm: () => {
+        confirmed = true
+        config.onConfirm($input.val(), $groupSelect.val(), $minInput.val(), $maxInput.val())
+      },
+      onShow: async () => {
         const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
+        await this._initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $confirmButton, data)
 
-        // Use DialogBuilder helpers for initialization
-        DialogBuilder.initializeSelect2($groupSelect)
-        DialogBuilder.attachNameValidation($input, $confirmButton)
-        DialogBuilder.attachEnterKeyHandler($input, $confirmButton)
-        DialogBuilder.setInitialButtonState($input, $confirmButton)
-        DialogBuilder.autoFocusInput($input)
+        // Attach live preview for edit mode
+        if (mode === 'edit' && data.presetId) {
+          this._attachLivePreviewListeners($minInput, $maxInput, data.presetId)
+        }
+      },
+      onHide: () => {
+        // Restore original CSS if cancelled in edit mode
+        if (mode === 'edit' && !confirmed && originalFormula && data.presetId) {
+          cssManager.setCssVariable(data.presetId, originalFormula)
+        }
       }
     })
+
+    // Add Delete button for edit mode
+    if (config.showDelete && data.presetId && data.groupId) {
+      dialog.addButton({
+        name: 'delete',
+        text: window.ArtsFluidDSStrings?.delete,
+        classes: 'e-fluid-delete-preset-button',
+        callback: () => {
+          dialog.hide()
+          this.onDeletePreset(data.presetId, data.groupId)
+        }
+      })
+    }
 
     return dialog
   },
 
-  /** Populates group select options by fetching group metadata */
+  /** Populates group select options by fetching group metadata (deprecated, use DialogBuilder) */
   async populateGroupOptions($select) {
     try {
       const groups = await PresetAPIService.fetchGroups()
@@ -601,15 +771,23 @@ export const BaseControlView = {
     }
   },
 
-  /** Handles dialog confirmation */
-  async onConfirmSavePreset(title, group, minSize, minUnit, maxSize, maxUnit, setting) {
+  /** Handles preset create confirmation */
+  async onConfirmCreatePreset(title, group, minValue, maxValue, setting) {
+    // Parse combined input values
+    const minParsed = ValidationService.parseValueWithUnit(minValue)
+    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
+
+    if (!minParsed || !maxParsed) {
+      return
+    }
+
     // Prepare data for AJAX
     const ajaxData = {
-      title: title.trim() || `Custom ${minSize}${minUnit} ~ ${maxSize}${maxUnit}`,
-      min_size: minSize,
-      min_unit: minUnit,
-      max_size: maxSize,
-      max_unit: maxUnit,
+      title: title.trim() || `Custom ${minParsed.size}${minParsed.unit} ~ ${maxParsed.size}${maxParsed.unit}`,
+      min_size: minParsed.size,
+      min_unit: minParsed.unit,
+      max_size: maxParsed.size,
+      max_unit: maxParsed.unit,
       group: group || 'spacing'
     }
 
@@ -617,7 +795,12 @@ export const BaseControlView = {
       const response = await PresetAPIService.savePreset(ajaxData)
 
       // Generate and inject CSS variable into preview immediately
-      const clampFormula = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
+      const clampFormula = generateClampFormula(
+        minParsed.size,
+        minParsed.unit,
+        maxParsed.size,
+        maxParsed.unit
+      )
       cssManager.setCssVariable(response.id, clampFormula)
 
       // Invalidate cache to force fresh data fetch
@@ -648,6 +831,54 @@ export const BaseControlView = {
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
           message: error || window.ArtsFluidDSStrings?.failedToSave
+        })
+        .show()
+    }
+  },
+
+  /** Handles preset update confirmation (edit mode) */
+  async onConfirmUpdatePreset(presetId, title, groupId, minValue, maxValue) {
+    // Parse combined input values
+    const minParsed = ValidationService.parseValueWithUnit(minValue)
+    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
+
+    if (!minParsed || !maxParsed) {
+      return
+    }
+
+    const presetData = {
+      preset_id: presetId,
+      title: title.trim(),
+      min_size: minParsed.size,
+      min_unit: minParsed.unit,
+      max_size: maxParsed.size,
+      max_unit: maxParsed.unit,
+      group: groupId
+    }
+
+    try {
+      const response = await PresetAPIService.updatePreset(presetData)
+
+      // Preset updated in Kit
+      // CSS already updated via live preview
+
+      // Invalidate cache
+      dataManager.invalidate()
+
+      // Refresh dropdowns to show updated values
+      await this.refreshPresetDropdowns()
+
+      console.log('Preset updated:', response)
+    } catch (error) {
+      // Restore original CSS on error
+      if (presetId) {
+        cssManager.restoreCssVariable(presetId)
+      }
+
+      elementorCommon.dialogsManager
+        .createWidget('alert', {
+          headerMessage: window.ArtsFluidDSStrings?.error,
+          message: error || 'Failed to update preset'
         })
         .show()
     }
