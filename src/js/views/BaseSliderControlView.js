@@ -429,6 +429,37 @@ export const BaseSliderControlView = {
     }
   },
 
+  /**
+   * Handles edit icon click on a preset (slider)
+   * Extracts preset data from option element and opens edit dialog
+   */
+  async onEditPresetClick(selectEl, presetId) {
+    const setting = selectEl.getAttribute('data-setting')
+
+    // Find the option element with preset data
+    const option = selectEl.querySelector(`option[data-id="${presetId}"]`)
+    if (!option) {
+      console.error('Preset option not found:', presetId)
+      return
+    }
+
+    // Extract all data from option attributes
+    const presetData = {
+      presetId: presetId,
+      presetTitle: option.dataset.title || '',
+      minSize: option.dataset.minSize || '0',
+      minUnit: option.dataset.minUnit || 'px',
+      maxSize: option.dataset.maxSize || '0',
+      maxUnit: option.dataset.maxUnit || 'px',
+      groupId: option.dataset.groupId || 'fluid_spacing_presets',
+      setting: setting
+    }
+
+    // Open unified dialog in edit mode
+    const dialog = await this.openPresetDialog('edit', presetData)
+    dialog.show()
+  },
+
   /** Handles preset update confirmation (edit mode) for slider */
   async onConfirmUpdatePreset(presetId, title, groupId, minValue, maxValue) {
     // Parse combined input values
