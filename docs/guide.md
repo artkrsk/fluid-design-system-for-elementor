@@ -55,19 +55,14 @@ The element now scales smoothly from mobile to desktop!
 
 Set fluid values directly in controls without creating presets.
 
-### Syntax
-
-```
-20px ~ 100px
-```
-
-Use the tilde (`~`) to separate min and max values.
-
 ### How to Use
 
 1. Select **fluid** unit in any control
-2. Type: `20px ~ 100px`
-3. The value scales immediately
+2. Enter **minimum value** in the first field (e.g., `20px`)
+3. Enter **maximum value** in the second field (e.g., `100px`)
+4. The value scales immediately
+
+The tilde (`~`) between fields is a visual separator showing the relationship between min and max values.
 
 ### Save as Preset
 
