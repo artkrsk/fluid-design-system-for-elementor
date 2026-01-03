@@ -139,7 +139,7 @@ export const BaseSliderControlView = {
       edit: {
         headerMessage: window.ArtsFluidDSStrings?.editPreset,
         confirmButton: window.ArtsFluidDSStrings?.save,
-        showDelete: true,
+        showDelete: false,
         defaultName: data.presetTitle || '',
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
@@ -328,19 +328,6 @@ export const BaseSliderControlView = {
         }
       }
     })
-
-    // Add Delete button for edit mode
-    if (config.showDelete && data.presetId && data.groupId) {
-      dialog.addButton({
-        name: 'delete',
-        text: window.ArtsFluidDSStrings?.delete,
-        classes: 'e-fluid-delete-preset-button',
-        callback: () => {
-          dialog.hide()
-          this.onDeletePreset(data.presetId, data.groupId)
-        }
-      })
-    }
 
     return dialog
   },
