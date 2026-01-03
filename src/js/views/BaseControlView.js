@@ -8,9 +8,9 @@ import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { DialogBuilder } from '../utils/dialogBuilder.js'
-import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
+import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
-import { STYLES } from '../constants/Styles'
+import { STYLES } from '../constants/STYLES'
 
 export const BaseControlView = {
   isDestroyed: false,
@@ -210,6 +210,7 @@ export const BaseControlView = {
         })
         .on('select2:selecting', (e) => {
           // Intercept selection to check if click was on edit icon
+          // Note: This doesn't fire for currently selected items
           const clickEvent = e.params.args.originalEvent
           if (clickEvent && clickEvent.target) {
             // Check if click was on edit icon
@@ -222,11 +223,48 @@ export const BaseControlView = {
               // Prevent Select2 from selecting the option
               e.preventDefault()
 
-              // Trigger edit handler
+              // Extract preset ID
               const presetId = $icon.data('preset-id')
-              this.onEditPresetClick(selectEl, presetId)
+
+              // Close dropdown first, then open dialog after close completes
+              jQuery(selectEl).one('select2:close', () => {
+                // Open dialog after dropdown closes to avoid conflicts
+                setTimeout(() => {
+                  this.onEditPresetClick(selectEl, presetId)
+                }, 50)
+              })
+
+              // Manually close dropdown
+              jQuery(selectEl).select2('close')
             }
           }
+        })
+        .on('select2:open', () => {
+          // Handle edit icon clicks on currently selected item
+          // select2:selecting doesn't fire for current selection, so use mousedown
+          setTimeout(() => {
+            const $dropdown = jQuery('.select2-dropdown')
+            $dropdown.on('mousedown.fluidEdit', '.e-fluid-preset-edit-icon', (e) => {
+              e.stopPropagation()
+              e.stopImmediatePropagation()
+              e.preventDefault()
+
+              const presetId = jQuery(e.currentTarget).data('preset-id')
+
+              // Close dropdown first, then open dialog
+              jQuery(selectEl).one('select2:close', () => {
+                setTimeout(() => {
+                  this.onEditPresetClick(selectEl, presetId)
+                }, 50)
+              })
+
+              jQuery(selectEl).select2('close')
+            })
+          }, 10)
+        })
+        .on('select2:close', () => {
+          // Clean up mousedown handler
+          jQuery('.select2-dropdown').off('mousedown.fluidEdit')
         })
     }
   },
@@ -723,22 +761,34 @@ export const BaseControlView = {
         onBackgroundClick: false
       },
       onConfirm: () => {
+        console.log('[FluidDS] Dialog onConfirm triggered')
         confirmed = true
         config.onConfirm($input.val(), $groupSelect.val(), $minInput.val(), $maxInput.val())
       },
       onShow: async () => {
-        const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
-        await this._initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $confirmButton, data)
+        console.log('[FluidDS] Dialog onShow triggered, mode:', mode)
+        try {
+          const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
+          console.log('[FluidDS] Confirm button found:', $confirmButton.length)
 
-        // Attach live preview for edit mode
-        if (mode === 'edit' && data.presetId) {
-          this._attachLivePreviewListeners($minInput, $maxInput, data.presetId)
+          await this._initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $confirmButton, data)
+          console.log('[FluidDS] Dialog UI initialized')
+
+          // Attach live preview for edit mode
+          if (mode === 'edit' && data.presetId) {
+            this._attachLivePreviewListeners($minInput, $maxInput, data.presetId)
+            console.log('[FluidDS] Live preview listeners attached')
+          }
+        } catch (error) {
+          console.error('[FluidDS] Error in onShow:', error)
         }
       },
       onHide: () => {
+        console.log('[FluidDS] Dialog onHide triggered, confirmed:', confirmed)
         // Restore original CSS if cancelled in edit mode
         if (mode === 'edit' && !confirmed && originalFormula && data.presetId) {
           cssManager.setCssVariable(data.presetId, originalFormula)
+          console.log('[FluidDS] CSS restored to original')
         }
       }
     })
