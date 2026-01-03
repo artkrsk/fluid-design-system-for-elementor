@@ -7,6 +7,7 @@ import { InlineInputManager } from '../utils/inlineInputs.js'
 import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
+import { DialogBuilder } from '../utils/dialogBuilder.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/Styles'
@@ -516,28 +517,17 @@ export const BaseControlView = {
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
 
-    // Preview of the values
+    // Use DialogBuilder helpers for element creation
     const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
-    const $preview = jQuery('<div>', {
-      class: 'e-fluid-preset-preview',
-      text: previewText
-    })
-
-    // Preset name input
-    const $input = jQuery('<input>', {
-      type: 'text',
-      name: 'preset-name',
-      placeholder: window.ArtsFluidDSStrings?.presetName || 'Preset Name'
-    }).val(`Custom ${previewText}`)
-
-    // Group selector
-    const $groupSelect = jQuery('<select>', {
-      name: 'preset-group',
-      class: 'e-fluid-group-select'
-    })
+    const $preview = DialogBuilder.createPreviewDisplay(minSize, minUnit, maxSize, maxUnit)
+    const $input = DialogBuilder.createNameInput(
+      `Custom ${previewText}`,
+      window.ArtsFluidDSStrings?.presetName || 'Preset Name'
+    )
+    const $groupSelect = DialogBuilder.createGroupSelector()
 
     // Populate groups (async)
-    await this.populateGroupOptions($groupSelect)
+    await DialogBuilder.populateGroupSelector($groupSelect)
 
     $inputWrapper.append($preview, $input, $groupSelect)
     $message.append($messageText, $inputWrapper)
@@ -565,39 +555,15 @@ export const BaseControlView = {
           setting
         ),
       onShow: () => {
-        // Initialize Select2 on group selector
-        $groupSelect.select2({
-          minimumResultsForSearch: -1, // Hide search box
-          width: '100%'
-        })
-
         // Get the dialog's Create button
         const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
 
-        // Validate name input on change
-        $input.on('input', () => {
-          const inputValue = String($input.val() || '')
-          const isNameValid = inputValue.trim().length > 0
-          $confirmButton.prop('disabled', !isNameValid)
-        })
-
-        // Submit on Enter key
-        $input.on('keydown', (e) => {
-          if (e.key === 'Enter' && !$confirmButton.prop('disabled')) {
-            e.preventDefault()
-            $confirmButton.click()
-          }
-        })
-
-        // Set initial button state
-        const initialValue = String($input.val() || '')
-        const hasInitialName = initialValue.trim().length > 0
-        $confirmButton.prop('disabled', !hasInitialName)
-
-        // Auto-focus and select input text
-        setTimeout(() => {
-          $input.focus().select()
-        }, 50)
+        // Use DialogBuilder helpers for initialization
+        DialogBuilder.initializeSelect2($groupSelect)
+        DialogBuilder.attachNameValidation($input, $confirmButton)
+        DialogBuilder.attachEnterKeyHandler($input, $confirmButton)
+        DialogBuilder.setInitialButtonState($input, $confirmButton)
+        DialogBuilder.autoFocusInput($input)
       }
     })
 
