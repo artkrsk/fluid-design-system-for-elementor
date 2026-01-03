@@ -3,6 +3,16 @@
  */
 export class ValidationService {
   /**
+   * Checks if both parsed values are zero
+   * @param {{size: string, unit: string}} minParsed - Parsed minimum value
+   * @param {{size: string, unit: string}} maxParsed - Parsed maximum value
+   * @returns {boolean}
+   */
+  static isBothValuesZero(minParsed, maxParsed) {
+    return parseFloat(minParsed.size) === 0 && parseFloat(maxParsed.size) === 0
+  }
+
+  /**
    * Parses a value with unit like "20px" or "1.5rem"
    * @param {string} value - Value to parse
    * @returns {{size: string, unit: string}|null} Parsed value or null if invalid
@@ -40,8 +50,7 @@ export class ValidationService {
       return { valid: false, error: 'Invalid value format' }
     }
 
-    // Check if both values are zero
-    if (parseFloat(minParsed.size) === 0 && parseFloat(maxParsed.size) === 0) {
+    if (this.isBothValuesZero(minParsed, maxParsed)) {
       return { valid: false, error: 'Cannot create 0~0 preset' }
     }
 

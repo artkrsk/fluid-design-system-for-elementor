@@ -1,6 +1,22 @@
 import { AJAX_ACTION_GET_GROUPS, AJAX_ACTION_SAVE_PRESET } from '../constants/AJAX'
 
 /**
+ * Wraps Elementor AJAX request in a Promise
+ * @param {string} action - AJAX action name
+ * @param {Object} data - Data to send with request
+ * @returns {Promise<any>} Promise that resolves with response or rejects with error
+ */
+function elementorAjaxRequest(action, data = {}) {
+  return new Promise((resolve, reject) => {
+    window.elementor.ajax.addRequest(action, {
+      data,
+      success: resolve,
+      error: reject
+    })
+  })
+}
+
+/**
  * Service for preset-related API calls
  * Wraps Elementor AJAX with Promise-based interface
  */
@@ -11,17 +27,8 @@ export class PresetAPIService {
    * @throws {Error} If AJAX request fails
    */
   static async fetchGroups() {
-    return new Promise((resolve, reject) => {
-      window.elementor.ajax.addRequest(AJAX_ACTION_GET_GROUPS, {
-        data: {},
-        success: (groups) => {
-          resolve(groups || [])
-        },
-        error: (error) => {
-          reject(error)
-        }
-      })
-    })
+    const groups = await elementorAjaxRequest(AJAX_ACTION_GET_GROUPS)
+    return groups || []
   }
 
   /**
@@ -31,16 +38,6 @@ export class PresetAPIService {
    * @throws {Error} If AJAX request fails
    */
   static async savePreset(presetData) {
-    return new Promise((resolve, reject) => {
-      window.elementor.ajax.addRequest(AJAX_ACTION_SAVE_PRESET, {
-        data: presetData,
-        success: (response) => {
-          resolve(response)
-        },
-        error: (error) => {
-          reject(error)
-        }
-      })
-    })
+    return await elementorAjaxRequest(AJAX_ACTION_SAVE_PRESET, presetData)
   }
 }
