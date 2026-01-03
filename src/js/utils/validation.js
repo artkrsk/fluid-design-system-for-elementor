@@ -14,7 +14,8 @@ export class ValidationService {
     }
 
     // Strict validation: only allow specific units (px, rem, em, %, vw, vh)
-    const match = value.trim().match(/^(-?[\d.]+)\s*(px|rem|em|%|vw|vh)?$/i)
+    // Allow single optional space between number and unit, reject multiple spaces
+    const match = value.trim().match(/^(-?[\d.]+)\s?(px|rem|em|%|vw|vh)?$/i)
     if (!match) {
       return null
     }
