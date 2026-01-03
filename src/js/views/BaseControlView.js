@@ -6,6 +6,7 @@ import { ValidationService } from '../utils/validation.js'
 import { InlineInputManager } from '../utils/inlineInputs.js'
 import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
+import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/Styles'
@@ -816,47 +817,12 @@ export const BaseControlView = {
   },
 
   setupInheritanceAttributes(fluidSelector, setting) {
-    const controlName = this.model.get('name')
-    const isResponsiveControl = controlName && /_(?!.*_)(.+)$/.test(controlName)
-
-    if (isResponsiveControl) {
-      const inheritedControl = this.getParentControlValue()
-      if (inheritedControl) {
-        this.setInheritanceAttributes(fluidSelector, inheritedControl, setting)
-      }
-    }
-  },
-
-  setInheritanceAttributes(fluidSelector, inheritedControl, setting) {
-    const inheritedSize = inheritedControl[setting]
-    const inheritedUnit = inheritedControl.unit
-    const inheritedFrom = inheritedControl.__inheritedFrom || 'parent'
-    const directParentDevice = inheritedControl.__directParentDevice
-    const sourceUnit = inheritedControl.__sourceUnit
-
-    if (inheritedSize !== undefined) {
-      fluidSelector.setAttribute('data-inherited-size', inheritedSize)
-    }
-    if (inheritedUnit) {
-      fluidSelector.setAttribute('data-inherited-unit', inheritedUnit)
-    }
-    if (sourceUnit) {
-      fluidSelector.setAttribute('data-source-unit', sourceUnit)
-    }
-
-    fluidSelector.setAttribute('data-inherited-from', inheritedFrom)
-
-    if (directParentDevice && directParentDevice !== inheritedFrom) {
-      fluidSelector.setAttribute('data-inherited-via', directParentDevice)
-    }
-
-    let deviceName = inheritedFrom.charAt(0).toUpperCase() + inheritedFrom.slice(1)
-
-    if (deviceName === 'Desktop') {
-      deviceName = 'Default'
-    }
-
-    fluidSelector.setAttribute('data-inherited-device', deviceName)
+    InheritanceAttributeManager.setupAttributes(
+      fluidSelector,
+      setting,
+      this.model,
+      () => this.getParentControlValue()
+    )
   },
 
   getParentControlValue() {

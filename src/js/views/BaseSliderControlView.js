@@ -4,6 +4,7 @@ import { ValidationService } from '../utils/validation.js'
 import { InlineInputManager } from '../utils/inlineInputs.js'
 import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
+import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/Styles'
@@ -415,68 +416,12 @@ export const BaseSliderControlView = {
   },
 
   _setupSliderInheritanceAttributes(fluidSelector) {
-    const controlName = this.model.get('name')
-    const isResponsiveControl = controlName && /_(?!.*_)(.+)$/.test(controlName)
-
-    if (isResponsiveControl) {
-      const inheritedControl = this.getParentControlValue()
-      if (inheritedControl) {
-        this._setSliderInheritanceAttributes(fluidSelector, inheritedControl)
-      }
-    }
-  },
-
-  _setSliderInheritanceAttributes(fluidSelector, inheritedControl) {
-    const inheritedSize = inheritedControl.size
-    const inheritedUnit = inheritedControl.unit
-    const sourceUnit = inheritedControl.__sourceUnit || inheritedUnit
-    const inheritedFrom = inheritedControl.__inheritedFrom || 'parent'
-
-    if (inheritedSize !== undefined) {
-      fluidSelector.setAttribute('data-inherited-size', inheritedSize)
-    }
-
-    if (inheritedUnit) {
-      fluidSelector.setAttribute('data-inherited-unit', inheritedUnit)
-    }
-
-    if (sourceUnit) {
-      fluidSelector.setAttribute('data-source-unit', sourceUnit)
-    }
-
-    fluidSelector.setAttribute('data-inherited-from', inheritedFrom)
-
-    if (
-      inheritedControl.__directParentDevice &&
-      inheritedControl.__directParentDevice !== inheritedFrom
-    ) {
-      fluidSelector.setAttribute('data-inherited-via', inheritedControl.__directParentDevice)
-    }
-
-    let deviceName = inheritedFrom.charAt(0).toUpperCase() + inheritedFrom.slice(1)
-    if (deviceName === 'Desktop') {
-      deviceName = 'Default'
-    }
-
-    fluidSelector.setAttribute('data-inherited-device', deviceName)
-
-    if (inheritedSize !== undefined) {
-      let displayValue
-
-      if (sourceUnit === 'custom' || sourceUnit === 'fluid') {
-        displayValue = inheritedSize
-      } else {
-        displayValue = `${inheritedSize}${sourceUnit}`
-        fluidSelector.setAttribute('data-mixed-units', 'true')
-      }
-
-      fluidSelector.setAttribute('data-value-display', displayValue)
-      fluidSelector.setAttribute('data-title', displayValue)
-
-      if (inheritedControl.__inheritPath?.length > 0) {
-        fluidSelector.setAttribute('data-inherit-path', inheritedControl.__inheritPath.join(','))
-      }
-    }
+    InheritanceAttributeManager.setupAttributes(
+      fluidSelector,
+      'size',
+      this.model,
+      () => this.getParentControlValue()
+    )
   },
 
   isEmptyValue(value) {
