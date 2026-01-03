@@ -120,6 +120,9 @@ class Compatibility extends BaseManager {
 			'createNewPreset'     => esc_html__( 'Create a new fluid preset:', 'fluid-design-system-for-elementor' ),
 			'create'              => esc_html__( 'Create', 'fluid-design-system-for-elementor' ),
 			'presetName'          => esc_html__( 'Preset Name...', 'fluid-design-system-for-elementor' ),
+			'customValue'         => esc_html__( 'Custom value...', 'fluid-design-system-for-elementor' ),
+			'spacingPresets'      => esc_html__( 'Spacing Presets', 'fluid-design-system-for-elementor' ),
+			'typographyPresets'   => esc_html__( 'Typography Presets', 'fluid-design-system-for-elementor' ),
 			'error'               => esc_html__( 'Error', 'fluid-design-system-for-elementor' ),
 			'failedToSave'        => esc_html__( 'Failed to save preset', 'fluid-design-system-for-elementor' ),
 		);

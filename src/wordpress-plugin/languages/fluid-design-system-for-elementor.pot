@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Fluid Design System for Elementor
+# Copyright (C) 2026 Fluid Design System for Elementor
 # This file is distributed under the same license as the Fluid Design System for Elementor package.
 msgid ""
 msgstr ""
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Artem Semkin\n"
 "Last-Translator: Artem Semkin\n"
-"POT-Creation-Date: 2025-12-29T03:11:56.307Z"
+"POT-Creation-Date: 2026-01-03T17:47:57.269Z"
 "Report-Msgid-Bugs-To: https://artemsemkin.com\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -78,19 +78,23 @@ msgid "Preset Name..."
 msgstr ""
 
 #: src/php/Managers/Compatibility.php:123
-msgid "Error"
+msgid "Custom value..."
 msgstr ""
 
-#: src/php/Managers/Compatibility.php:124
-msgid "Failed to save preset"
-msgstr ""
-
-#: src/php/Managers/ControlRegistry.php:86
+#: src/php/Managers/Compatibility.php:124, src/php/Managers/ControlRegistry.php:86
 msgid "Spacing Presets"
 msgstr ""
 
-#: src/php/Managers/ControlRegistry.php:90
+#: src/php/Managers/Compatibility.php:125, src/php/Managers/ControlRegistry.php:90
 msgid "Typography Presets"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:126
+msgid "Error"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:127
+msgid "Failed to save preset"
 msgstr ""
 
 #: src/php/Managers/Options.php:73, src/php/Managers/Admin/Tabs/Groups/View.php:62
