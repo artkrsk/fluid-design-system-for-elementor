@@ -2,6 +2,8 @@ import { createElement } from '../utils/dom'
 import { buildSelectOptions } from '../utils/preset'
 import { getSelect2DefaultOptions } from '../utils/select2'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
+import { ValidationService } from '../utils/validation.js'
+import { InlineInputManager } from '../utils/inlineInputs.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
 import { AJAX_ACTION_SAVE_PRESET, AJAX_ACTION_GET_GROUPS } from '../constants/AJAX'
 import { dataManager, cssManager } from '../managers'
@@ -445,99 +447,21 @@ export const BaseControlView = {
 
   /** Creates the inline min/max input container */
   createInlineInputsContainer(setting) {
-    const container = createElement('div', 'e-fluid-inline-container e-hidden', {
-      'data-setting': setting
-    })
+    const { container, abortController } = InlineInputManager.createContainer(
+      setting,
+      () => this.onInlineInputChange(setting),
+      () => this.onSaveAsPresetClick(setting)
+    )
 
-    // Min value input (text input accepting "20px", "1.5rem", etc.)
-    const minInput = createElement('input', 'e-fluid-inline-input', {
-      type: 'text',
-      'data-fluid-role': 'min',
-      placeholder: '0px'
-    })
-
-    // Separator
-    const separator = createElement('span', 'e-fluid-inline-separator')
-    separator.textContent = '~'
-
-    // Max value input
-    const maxInput = createElement('input', 'e-fluid-inline-input', {
-      type: 'text',
-      'data-fluid-role': 'max',
-      placeholder: '0px'
-    })
-
-    container.appendChild(minInput)
-    container.appendChild(separator)
-    container.appendChild(maxInput)
-
-    // Add "Save as Preset" button (Elementor pattern)
-    const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
-      type: 'button',
-      title: window.ArtsFluidDSStrings?.saveAsPreset || 'Save as Preset'
-    })
-    const icon = createElement('i', 'eicon-plus')
-    saveButton.appendChild(icon)
-    container.appendChild(saveButton)
-
-    // Create AbortController for this container's event listeners
-    const abortController = new AbortController()
+    // Store AbortController for cleanup
     this.abortControllers.set(setting, abortController)
-    const { signal } = abortController
-
-    // Attach input event listeners with validation and AbortController
-    minInput.addEventListener('input', () => {
-      this.validateInlineInput(minInput)
-      this.updateSaveButtonState(container)
-      this.onInlineInputChange(setting)
-    }, { signal })
-
-    maxInput.addEventListener('input', () => {
-      this.validateInlineInput(maxInput)
-      this.updateSaveButtonState(container)
-      this.onInlineInputChange(setting)
-    }, { signal })
-
-    // Attach button click listener with AbortController
-    saveButton.addEventListener('click', (e) => {
-      e.preventDefault()
-      this.onSaveAsPresetClick(setting)
-    }, { signal })
-
-    // Set initial button state
-    this.updateSaveButtonState(container)
 
     return container
   },
 
   /** Updates Save button disabled state based on input validity */
   updateSaveButtonState(container) {
-    const minInput = container.querySelector('[data-fluid-role="min"]')
-    const maxInput = container.querySelector('[data-fluid-role="max"]')
-    const saveButton = container.querySelector('.e-fluid-save-preset')
-
-    if (!minInput || !maxInput || !saveButton) {
-      return
-    }
-
-    // Parse both values
-    const minParsed = this.parseValueWithUnit(minInput.value)
-    const maxParsed = this.parseValueWithUnit(maxInput.value)
-
-    // Disable if either fails to parse
-    if (!minParsed || !maxParsed) {
-      saveButton.disabled = true
-      return
-    }
-
-    // Disable if both values are zero (no point in creating 0~0 preset)
-    if (parseFloat(minParsed.size) === 0 && parseFloat(maxParsed.size) === 0) {
-      saveButton.disabled = true
-      return
-    }
-
-    // Enable if all checks pass
-    saveButton.disabled = false
+    InlineInputManager.updateSaveButtonState(container)
   },
 
   /** Handles Save as Preset button click */
@@ -825,16 +749,7 @@ export const BaseControlView = {
 
   /** Validates an inline input and toggles invalid state */
   validateInlineInput(input) {
-    const value = input.value.trim()
-    // Empty is valid (just not ready yet)
-    if (!value) {
-      input.classList.remove('e-fluid-inline-invalid')
-      return true
-    }
-    const parsed = this.parseValueWithUnit(value)
-    const isValid = parsed !== null
-    input.classList.toggle('e-fluid-inline-invalid', !isValid)
-    return isValid
+    return ValidationService.validateInputElement(input)
   },
 
   /** Gets the inline container for a specific setting */
@@ -845,74 +760,24 @@ export const BaseControlView = {
   /** Toggles visibility of inline inputs */
   toggleInlineInputs(setting, show) {
     const container = this.getInlineContainer(setting)
-    if (container) {
-      container.classList.toggle('e-hidden', !show)
-    }
+    InlineInputManager.toggleVisibility(container, show)
   },
 
   /** Parses a value with unit like "20px" or "1.5rem" */
   parseValueWithUnit(value) {
-    // Empty value defaults to 0px
-    if (!value || typeof value !== 'string' || value.trim() === '') {
-      return { size: '0', unit: 'px' }
-    }
-    // Strict validation: only allow specific units (px, rem, em, %, vw, vh)
-    const match = value.trim().match(/^(-?[\d.]+)\s*(px|rem|em|%|vw|vh)?$/i)
-    if (!match) {
-      return null
-    }
-    return {
-      size: match[1],
-      unit: match[2] || 'px' // Default to px if no unit
-    }
+    return ValidationService.parseValueWithUnit(value)
   },
 
   /** Gets inline input values for a setting */
   getInlineInputValues(setting) {
     const container = this.getInlineContainer(setting)
-    if (!container) {
-      return null
-    }
-
-    const minValue = container.querySelector('[data-fluid-role="min"]')?.value
-    const maxValue = container.querySelector('[data-fluid-role="max"]')?.value
-
-    const minParsed = this.parseValueWithUnit(minValue)
-    const maxParsed = this.parseValueWithUnit(maxValue)
-
-    if (!minParsed || !maxParsed) {
-      return null
-    }
-
-    return {
-      minSize: minParsed.size,
-      minUnit: minParsed.unit,
-      maxSize: maxParsed.size,
-      maxUnit: maxParsed.unit
-    }
+    return InlineInputManager.getInputValues(container)
   },
 
   /** Sets inline input values (used when loading existing inline value) */
   setInlineInputValues(setting, values) {
     const container = this.getInlineContainer(setting)
-    if (!container || !values) {
-      return
-    }
-
-    const minInput = container.querySelector('[data-fluid-role="min"]')
-    const maxInput = container.querySelector('[data-fluid-role="max"]')
-
-    if (minInput && values.minSize) {
-      minInput.value = `${values.minSize}${values.minUnit || 'px'}`
-      this.validateInlineInput(minInput)
-    }
-    if (maxInput && values.maxSize) {
-      maxInput.value = `${values.maxSize}${values.maxUnit || 'px'}`
-      this.validateInlineInput(maxInput)
-    }
-
-    // Update button state after setting values
-    this.updateSaveButtonState(container)
+    InlineInputManager.setInputValues(container, values)
   },
 
   /** Handles inline input value changes */
@@ -935,6 +800,8 @@ export const BaseControlView = {
 
       // Handle linked dimensions/gaps - sync all values and inputs
       if (this.isLinkedDimensions()) {
+        const linkedContainers = []
+
         // @ts-expect-error - Type assertion for ui access
         for (const selectEl of this.ui.selectControls || []) {
           const otherSetting = selectEl.getAttribute('data-setting')
@@ -944,20 +811,7 @@ export const BaseControlView = {
 
             const otherContainer = this.getInlineContainer(otherSetting)
             if (otherContainer) {
-              const minInput = otherContainer.querySelector('[data-fluid-role="min"]')
-              const maxInput = otherContainer.querySelector('[data-fluid-role="max"]')
-
-              if (minInput) {
-                minInput.value = `${minSize}${minUnit}`
-                this.validateInlineInput(minInput)
-              }
-              if (maxInput) {
-                maxInput.value = `${maxSize}${maxUnit}`
-                this.validateInlineInput(maxInput)
-              }
-
-              // Update button state for this container
-              this.updateSaveButtonState(otherContainer)
+              linkedContainers.push(otherContainer)
 
               // Update related input for Elementor's internal tracking
               // @ts-expect-error - Type assertion for ui access
@@ -965,6 +819,11 @@ export const BaseControlView = {
               linkedInputEl.val(clampValue)
             }
           }
+        }
+
+        // Sync all linked containers at once
+        if (linkedContainers.length > 0) {
+          InlineInputManager.syncLinkedContainers(linkedContainers, { minSize, minUnit, maxSize, maxUnit })
         }
       }
 
