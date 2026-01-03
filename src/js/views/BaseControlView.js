@@ -208,20 +208,25 @@ export const BaseControlView = {
         .on('change', () => {
           this.onSelectChange(selectEl)
         })
-        .on('select2:open', () => {
-          // Attach edit icon handler when dropdown opens
-          // Dropdown is appended to body, not inside container
-          jQuery(document.body).on('click.fluidPresetEdit', '.e-fluid-preset-edit-icon', (e) => {
-            e.stopPropagation()
-            e.preventDefault()
+        .on('select2:selecting', (e) => {
+          // Intercept selection to check if click was on edit icon
+          const clickEvent = e.params.args.originalEvent
+          if (clickEvent && clickEvent.target) {
+            // Check if click was on edit icon
+            const $clicked = jQuery(clickEvent.target)
+            const $icon = $clicked.hasClass('e-fluid-preset-edit-icon')
+              ? $clicked
+              : $clicked.closest('.e-fluid-preset-edit-icon')
 
-            const presetId = jQuery(e.currentTarget).data('preset-id')
-            this.onEditPresetClick(selectEl, presetId)
-          })
-        })
-        .on('select2:close', () => {
-          // Remove handler when dropdown closes to prevent memory leaks
-          jQuery(document.body).off('click.fluidPresetEdit')
+            if ($icon.length) {
+              // Prevent Select2 from selecting the option
+              e.preventDefault()
+
+              // Trigger edit handler
+              const presetId = $icon.data('preset-id')
+              this.onEditPresetClick(selectEl, presetId)
+            }
+          }
         })
     }
   },
