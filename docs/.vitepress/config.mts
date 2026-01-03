@@ -35,9 +35,8 @@ export default defineConfig({
 
     // Navigation
     nav: [
-      { text: 'Guide', link: '/getting-started' },
-      { text: 'Examples', link: '/examples/fluid-typography' },
-      { text: 'Developers', link: '/developers/' },
+      { text: 'Guide', link: '/guide' },
+      { text: 'Developers', link: '/developers' },
       {
         text: `v${pkg.version}`,
         items: [
@@ -46,25 +45,6 @@ export default defineConfig({
         ]
       }
     ],
-
-    // Auto-generated sidebar
-    sidebar: generateSidebar({
-      documentRootPath: '/docs',
-      collapsed: false,
-      capitalizeFirst: true,
-      capitalizeEachWords: true,
-      useTitleFromFileHeading: true,
-      useTitleFromFrontmatter: true,
-      sortMenusByFrontmatterOrder: true,
-      excludeFiles: ['index.md'],
-      excludeFolders: ['.vitepress'],
-      manualSortFileNameByPriority: [
-        'getting-started.md',
-        'guides',
-        'examples',
-        'developers'
-      ]
-    }),
 
     // Social links
     socialLinks: [
