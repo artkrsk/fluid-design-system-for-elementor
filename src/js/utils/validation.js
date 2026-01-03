@@ -43,14 +43,14 @@ export class ValidationService {
    * @returns {{valid: boolean, error?: string, values?: Object}} Validation result
    */
   static validateMinMax(minValue, maxValue) {
-    const minParsed = this.parseValueWithUnit(minValue)
-    const maxParsed = this.parseValueWithUnit(maxValue)
+    const minParsed = ValidationService.parseValueWithUnit(minValue)
+    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
 
     if (!minParsed || !maxParsed) {
       return { valid: false, error: 'Invalid value format' }
     }
 
-    if (this.isBothValuesZero(minParsed, maxParsed)) {
+    if (ValidationService.isBothValuesZero(minParsed, maxParsed)) {
       return { valid: false, error: 'Cannot create 0~0 preset' }
     }
 
@@ -71,7 +71,7 @@ export class ValidationService {
       return true
     }
 
-    const parsed = this.parseValueWithUnit(value)
+    const parsed = ValidationService.parseValueWithUnit(value)
     const isValid = parsed !== null
     input.classList.toggle('e-fluid-inline-invalid', !isValid)
     return isValid
