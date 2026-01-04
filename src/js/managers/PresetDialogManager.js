@@ -16,7 +16,7 @@ export class PresetDialogManager {
    * @param {Function} callbacks.onCreate - Called when creating preset
    * @param {Function} callbacks.onUpdate - Called when updating preset
    * @param {Function} callbacks.getInlineContainer - Gets inline input container (create mode)
-   * @returns {Promise<Dialog>} Elementor dialog instance
+   * @returns {Promise<any>} Elementor dialog instance
    */
   static async open(mode, data, callbacks) {
     // Validate mode

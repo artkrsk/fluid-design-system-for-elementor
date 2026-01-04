@@ -17,6 +17,7 @@ use Elementor\Core\Base\Module as Module_Base;
 use Arts\Utilities\Utilities;
 use Arts\FluidDesignSystem\Managers\CSSVariables;
 use Arts\FluidDesignSystem\Managers\ControlRegistry;
+use Arts\FluidDesignSystem\Services\KitRepeaterService;
 
 /**
  * Module Class
@@ -650,8 +651,8 @@ class Module extends Module_Base {
 			),
 		);
 
-		// Update in Kit (handles autosaves internally)
-		self::update_kit_repeater_item( $kit, $control_id, $preset_id, $updated_fields );
+		// Update in Kit using service (handles autosaves internally)
+		KitRepeaterService::update_item( $kit, $control_id, $preset_id, $updated_fields );
 
 		// Return success
 		return array(
@@ -660,77 +661,5 @@ class Module extends Module_Base {
 			'title'      => $updated_fields['title'],
 			'control_id' => $control_id,
 		);
-	}
-
-	/**
-	 * Updates a repeater item in Kit by ID.
-	 * Preserves existing fields not included in $updated_fields.
-	 * Handles autosaves recursively.
-	 *
-	 * @since 2.1.0
-	 * @access private
-	 * @static
-	 *
-	 * @param \Elementor\Core\Kits\Documents\Kit $kit           Kit document instance.
-	 * @param string                              $control_id    Repeater control ID.
-	 * @param string                              $item_id       Item _id to update.
-	 * @param array<string, mixed>                $updated_fields Fields to update.
-	 * @return void
-	 * @throws \Exception If preset not found or update fails.
-	 */
-	private static function update_kit_repeater_item( $kit, $control_id, $item_id, $updated_fields ) {
-		// Get current kit settings
-		$meta_key          = \Elementor\Core\Settings\Page\Manager::META_KEY;
-		$document_settings = $kit->get_meta( $meta_key );
-
-		if ( ! is_array( $document_settings ) ) {
-			throw new \Exception( esc_html__( 'Invalid Kit settings.', 'fluid-design-system-for-elementor' ) );
-		}
-
-		/** @var array<string, mixed> $document_settings */
-
-		if ( ! isset( $document_settings[ $control_id ] ) || ! is_array( $document_settings[ $control_id ] ) ) {
-			throw new \Exception( esc_html__( 'Preset group not found.', 'fluid-design-system-for-elementor' ) );
-		}
-
-		/** @var array<int, array<string, mixed>> $presets */
-		$presets = $document_settings[ $control_id ];
-
-		// Find and update the item (preserving other fields)
-		$found = false;
-		foreach ( $presets as $index => $existing_item ) {
-			if ( ! is_array( $existing_item ) ) {
-				continue;
-			}
-
-			if ( isset( $existing_item['_id'] ) && $existing_item['_id'] === $item_id ) {
-				// Use array_merge to preserve fields not in $updated_fields
-				// This maintains custom_screen_width and other metadata
-				$document_settings[ $control_id ][ $index ] = array_merge( $existing_item, $updated_fields );
-				$found                                      = true;
-				break;
-			}
-		}
-
-		if ( ! $found ) {
-			throw new \Exception( esc_html__( 'Preset not found.', 'fluid-design-system-for-elementor' ) );
-		}
-
-		// Save settings using Page Settings Manager
-		$page_settings_manager = \Elementor\Core\Settings\Manager::get_settings_managers( 'page' );
-
-		if ( $page_settings_manager instanceof \Elementor\Core\Settings\Base\Manager ) {
-			/** @var array<string, mixed> $document_settings */
-			$kit_id = $kit->get_id();
-			if ( is_int( $kit_id ) ) {
-				$page_settings_manager->save_settings( $document_settings, $kit_id );
-			}
-		}
-
-		// Handle autosave recursively
-		$autosave = $kit->get_autosave();
-		if ( $autosave instanceof \Elementor\Core\Kits\Documents\Kit ) {
-			self::update_kit_repeater_item( $autosave, $control_id, $item_id, $updated_fields );
-		}
 	}
 }

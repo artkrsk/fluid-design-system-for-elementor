@@ -192,6 +192,7 @@ export class InlineInputManager {
     }
 
     // Update separator after setting values
+    /** @type {HTMLElement|null} */
     const separator = container.querySelector('.e-fluid-inline-separator')
     if (minInput && maxInput && separator) {
       InlineInputManager.updateSeparator(minInput, maxInput, separator)
@@ -242,6 +243,7 @@ export class InlineInputManager {
       }
 
       // Update separator after setting values
+      /** @type {HTMLElement|null} */
       const separator = container.querySelector('.e-fluid-inline-separator')
       if (minInput && maxInput && separator) {
         InlineInputManager.updateSeparator(minInput, maxInput, separator)
