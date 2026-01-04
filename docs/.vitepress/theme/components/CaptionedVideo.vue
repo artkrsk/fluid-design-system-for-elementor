@@ -30,6 +30,7 @@ const videoSrc = computed(() => {
       :loop="loop"
       :muted="muted"
       playsinline
+      data-lightbox
     >
       Your browser doesn't support HTML5 video.
     </video>
@@ -50,6 +51,12 @@ const videoSrc = computed(() => {
   height: auto;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
   border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.captioned-video video:hover {
+  transform: scale(1.01);
 }
 
 .captioned-video figcaption {

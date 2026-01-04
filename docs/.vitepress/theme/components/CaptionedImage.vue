@@ -34,6 +34,12 @@ const imageSrc = computed(() => {
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.captioned-image img:hover {
+  transform: scale(1.01);
 }
 
 .captioned-image figcaption {

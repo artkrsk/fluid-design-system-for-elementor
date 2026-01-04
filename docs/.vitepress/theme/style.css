@@ -74,3 +74,17 @@
   color: var(--vp-c-text-2);
   margin-top: 0.5rem;
 }
+
+ /* Medium-zoom customization */
+ .medium-zoom-overlay {
+   z-index: 100;
+   background-color: #000 !important;
+ }
+
+ .medium-zoom-image {
+   width: 100%;
+ }
+
+ .medium-zoom-image--opened {
+   z-index: 101;
+ }
