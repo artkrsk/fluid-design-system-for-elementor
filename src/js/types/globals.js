@@ -120,3 +120,11 @@ var Backbone = window.Backbone || {}
 var _ = window._ || {}
 
 var ArtsFluidDSStrings = window.ArtsFluidDSStrings || {}
+
+/**
+ * @typedef {Object} ArtsFluidDesignSystem
+ * @property {any} dataManager - Data manager instance
+ */
+
+/** @type {ArtsFluidDesignSystem} */
+var artsFluidDesignSystem = window.artsFluidDesignSystem || {}
