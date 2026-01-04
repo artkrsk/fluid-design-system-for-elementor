@@ -58,6 +58,7 @@ export class InlineInputManager {
       ValidationService.validateInputElement(minInput)
       ValidationService.validateInputElement(maxInput)
       InlineInputManager.updateSaveButtonState(container)
+      InlineInputManager.updateSeparator(minInput, maxInput, separator)
       if (onInputChange) {
         onInputChange(setting)
       }
@@ -65,6 +66,9 @@ export class InlineInputManager {
 
     minInput.addEventListener('input', handleInputChange, { signal })
     maxInput.addEventListener('input', handleInputChange, { signal })
+
+    // Set initial separator state
+    InlineInputManager.updateSeparator(minInput, maxInput, separator)
 
     // Attach button click listener with AbortController
     saveButton.addEventListener(
@@ -82,6 +86,32 @@ export class InlineInputManager {
     InlineInputManager.updateSaveButtonState(container)
 
     return { container, abortController }
+  }
+
+  /**
+   * Updates separator text based on value equality
+   * @param {HTMLInputElement} minInput - Min input element
+   * @param {HTMLInputElement} maxInput - Max input element
+   * @param {HTMLElement} separator - Separator element
+   */
+  static updateSeparator(minInput, maxInput, separator) {
+    const minParsed = ValidationService.parseValueWithUnit(minInput.value)
+    const maxParsed = ValidationService.parseValueWithUnit(maxInput.value)
+
+    if (minParsed && maxParsed) {
+      const minValue = parseFloat(minParsed.size)
+      const maxValue = parseFloat(maxParsed.size)
+      const isSameUnit = minParsed.unit === maxParsed.unit
+      const isSameValue = minValue === maxValue
+      const isNonZero = minValue !== 0 || maxValue !== 0
+
+      // Show "=" only for non-zero equal values with same unit
+      // Keep "~" for: 0→0, empty, different values, different units
+      const shouldShowEquals = isSameValue && isSameUnit && isNonZero
+      separator.textContent = shouldShowEquals ? '=' : '~'
+    } else {
+      separator.textContent = '~'
+    }
   }
 
   /**
@@ -161,6 +191,12 @@ export class InlineInputManager {
       ValidationService.validateInputElement(maxInput)
     }
 
+    // Update separator after setting values
+    const separator = container.querySelector('.e-fluid-inline-separator')
+    if (minInput && maxInput && separator) {
+      InlineInputManager.updateSeparator(minInput, maxInput, separator)
+    }
+
     // Update button state after setting values
     InlineInputManager.updateSaveButtonState(container)
   }
@@ -203,6 +239,12 @@ export class InlineInputManager {
       if (maxInput) {
         maxInput.value = `${values.maxSize}${values.maxUnit}`
         ValidationService.validateInputElement(maxInput)
+      }
+
+      // Update separator after setting values
+      const separator = container.querySelector('.e-fluid-inline-separator')
+      if (minInput && maxInput && separator) {
+        InlineInputManager.updateSeparator(minInput, maxInput, separator)
       }
 
       InlineInputManager.updateSaveButtonState(container)

@@ -36,7 +36,7 @@ export class PresetDialogManager {
     }
 
     // Create dialog UI
-    const { $message, $input, $minInput, $maxInput, $groupSelect } = this._createDialogMessage(
+    const { $message, $input, $minInput, $maxInput, $groupSelect, $separator } = this._createDialogMessage(
       config,
       mode
     )
@@ -66,6 +66,7 @@ export class PresetDialogManager {
             $minInput,
             $maxInput,
             $groupSelect,
+            $separator,
             $confirmButton,
             data
           )
@@ -179,14 +180,14 @@ export class PresetDialogManager {
 
     $message.append($messageText, $inputWrapper)
 
-    return { $message, $input, $minInput, $maxInput, $groupSelect }
+    return { $message, $input, $minInput, $maxInput, $groupSelect, $separator }
   }
 
   /**
    * Initializes dialog UI
    * @private
    */
-  static async _initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $confirmButton, data) {
+  static async _initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $separator, $confirmButton, data) {
     // Populate and initialize group selector (only exists in create mode)
     if ($groupSelect && $groupSelect.length) {
       await DialogBuilder.populateGroupSelector($groupSelect, data.groupId)
@@ -197,7 +198,26 @@ export class PresetDialogManager {
     DialogBuilder.attachEnterKeyHandler($input, $confirmButton)
     DialogBuilder.autoFocusInput($input)
 
-    // Combined validation (name + min/max)
+    // Update separator based on value equality
+    const updateSeparator = () => {
+      const minParsed = ValidationService.parseValueWithUnit($minInput.val())
+      const maxParsed = ValidationService.parseValueWithUnit($maxInput.val())
+
+      if (minParsed && maxParsed) {
+        const minValue = parseFloat(minParsed.size)
+        const maxValue = parseFloat(maxParsed.size)
+        const isSameUnit = minParsed.unit === maxParsed.unit
+        const isSameValue = minValue === maxValue
+        const isNonZero = minValue !== 0 || maxValue !== 0
+
+        // Show "=" only for non-zero equal values with same unit
+        // Keep "~" for: 0→0, empty, different values, different units
+        const shouldShowEquals = isSameValue && isSameUnit && isNonZero
+        $separator.text(shouldShowEquals ? '=' : '~')
+      }
+    }
+
+    // Combined validation (name + min/max + separator)
     const validateAll = () => {
       // Name validation
       const name = String($input.val() || '').trim()
@@ -211,6 +231,9 @@ export class PresetDialogManager {
       $maxInput.toggleClass('e-fluid-inline-invalid', !maxParsed)
 
       const areValuesValid = minParsed && maxParsed
+
+      // Update separator (~ for range, = for same value)
+      updateSeparator()
 
       // Update button state
       $confirmButton.prop('disabled', !(isNameValid && areValuesValid))
