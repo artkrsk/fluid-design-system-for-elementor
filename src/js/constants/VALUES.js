@@ -28,7 +28,10 @@ export const UI_TIMING = {
   DROPDOWN_RENDER_DELAY: 10,
 
   /** Delay before opening dialog after dropdown close (avoids conflicts) */
-  DIALOG_OPEN_DELAY: 50
+  DIALOG_OPEN_DELAY: 50,
+
+  /** Delay for Select2 to process dropdown refresh before auto-selecting */
+  PRESET_AUTO_SELECT_DELAY: 100
 }
 
 /** Select2 dropdown configuration constants */

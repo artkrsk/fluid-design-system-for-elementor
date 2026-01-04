@@ -9,7 +9,7 @@ import { PresetAPIService } from '../services/presetAPI.js'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { PresetDialogManager } from '../managers/PresetDialogManager.js'
 import { EditIconHandler } from '../utils/editIconHandler.js'
-import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
+import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/STYLES'
 
@@ -601,7 +601,7 @@ export const BaseControlView = {
       // Refresh all preset dropdowns
       await this.refreshPresetDropdowns()
 
-      // Auto-select the new preset (with small delay for Select2 to update)
+      // Auto-select the new preset (with delay for Select2 to process refresh)
       setTimeout(() => {
         const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
         this.selectPreset(setting, presetValue)
@@ -616,7 +616,7 @@ export const BaseControlView = {
             }
           }
         }
-      }, 100)
+      }, UI_TIMING.PRESET_AUTO_SELECT_DELAY)
     } catch (error) {
       // Show error message
       elementorCommon.dialogsManager
