@@ -22,6 +22,15 @@ export const UI_DEFAULTS = {
   INLINE_INPUT_PLACEHOLDER: '0px'
 }
 
+/** UI timing constants (milliseconds) */
+export const UI_TIMING = {
+  /** Delay for Select2 dropdown render completion */
+  DROPDOWN_RENDER_DELAY: 10,
+
+  /** Delay before opening dialog after dropdown close (avoids conflicts) */
+  DIALOG_OPEN_DELAY: 50
+}
+
 /** Select2 dropdown configuration constants */
 export const SELECT2_CONFIG = {
   /** When set to -1, hides the search box in dropdown */

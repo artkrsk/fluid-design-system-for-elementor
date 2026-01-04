@@ -36,4 +36,26 @@ export class ValueFormatter {
   static formatInheritedValue(inheritedSize, sourceUnit) {
     return sourceUnit === 'custom' ? inheritedSize : `${inheritedSize}${sourceUnit}`
   }
+
+  /**
+   * Calculates separator text based on value equality
+   * @param {{size: string, unit: string}|null} minParsed - Parsed minimum value
+   * @param {{size: string, unit: string}|null} maxParsed - Parsed maximum value
+   * @returns {'~' | '='} Separator character
+   */
+  static calculateSeparator(minParsed, maxParsed) {
+    if (!minParsed || !maxParsed) {
+      return '~'
+    }
+
+    const minValue = parseFloat(minParsed.size)
+    const maxValue = parseFloat(maxParsed.size)
+    const isSameUnit = minParsed.unit === maxParsed.unit
+    const isSameValue = minValue === maxValue
+    const isNonZero = minValue !== 0 || maxValue !== 0
+
+    // Show "=" only for non-zero equal values with same unit
+    // Keep "~" for: ranges, different units, or zero values
+    return isSameValue && isSameUnit && isNonZero ? '=' : '~'
+  }
 }

@@ -1,3 +1,5 @@
+import { UI_TIMING } from '../constants/VALUES.js'
+
 /**
  * Handles edit icon click events in Select2 dropdowns
  * Encapsulates event lifecycle for testability and clarity
@@ -62,7 +64,7 @@ export class EditIconHandler {
     jQuery(this.selectEl).one('select2:close', () => {
       setTimeout(() => {
         this.onEdit(presetId)
-      }, 50)
+      }, UI_TIMING.DIALOG_OPEN_DELAY)
     })
 
     // Manually close dropdown
@@ -92,7 +94,7 @@ export class EditIconHandler {
         jQuery(this.selectEl).one('select2:close', () => {
           setTimeout(() => {
             this.onEdit(presetId)
-          }, 50)
+          }, UI_TIMING.DIALOG_OPEN_DELAY)
         })
 
         jQuery(this.selectEl).select2('close')
@@ -100,7 +102,7 @@ export class EditIconHandler {
 
       // Attach handler
       $dropdown.on('mousedown.fluidEdit', '.e-fluid-preset-edit-icon', this.mousedownHandler)
-    }, 10)
+    }, UI_TIMING.DROPDOWN_RENDER_DELAY)
   }
 
   /**

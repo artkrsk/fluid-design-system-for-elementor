@@ -1,5 +1,6 @@
 import { createElement } from './dom.js'
 import { ValidationService } from './validation.js'
+import { ValueFormatter } from './formatters.js'
 import { UI_DEFAULTS } from '../constants/VALUES'
 
 /**
@@ -98,20 +99,7 @@ export class InlineInputManager {
     const minParsed = ValidationService.parseValueWithUnit(minInput.value)
     const maxParsed = ValidationService.parseValueWithUnit(maxInput.value)
 
-    if (minParsed && maxParsed) {
-      const minValue = parseFloat(minParsed.size)
-      const maxValue = parseFloat(maxParsed.size)
-      const isSameUnit = minParsed.unit === maxParsed.unit
-      const isSameValue = minValue === maxValue
-      const isNonZero = minValue !== 0 || maxValue !== 0
-
-      // Show "=" only for non-zero equal values with same unit
-      // Keep "~" for: 0→0, empty, different values, different units
-      const shouldShowEquals = isSameValue && isSameUnit && isNonZero
-      separator.textContent = shouldShowEquals ? '=' : '~'
-    } else {
-      separator.textContent = '~'
-    }
+    separator.textContent = ValueFormatter.calculateSeparator(minParsed, maxParsed)
   }
 
   /**

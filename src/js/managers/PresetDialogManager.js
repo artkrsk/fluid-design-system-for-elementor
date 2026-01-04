@@ -1,6 +1,8 @@
 import { ValidationService } from '../utils/validation.js'
 import { DialogBuilder } from '../utils/dialogBuilder.js'
 import { generateClampFormula } from '../utils/clamp.js'
+import { UI_DEFAULTS } from '../constants/VALUES.js'
+import { ValueFormatter } from '../utils/formatters.js'
 import cssManager from './CSSManager.js'
 
 /**
@@ -146,7 +148,7 @@ export class PresetDialogManager {
       type: 'text',
       class: 'e-fluid-inline-input e-fluid-dialog-input',
       'data-fluid-role': 'min',
-      placeholder: '0px',
+      placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER,
       value: config.defaultMin
     })
 
@@ -159,7 +161,7 @@ export class PresetDialogManager {
       type: 'text',
       class: 'e-fluid-inline-input e-fluid-dialog-input',
       'data-fluid-role': 'max',
-      placeholder: '0px',
+      placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER,
       value: config.defaultMax
     })
 
@@ -203,18 +205,7 @@ export class PresetDialogManager {
       const minParsed = ValidationService.parseValueWithUnit($minInput.val())
       const maxParsed = ValidationService.parseValueWithUnit($maxInput.val())
 
-      if (minParsed && maxParsed) {
-        const minValue = parseFloat(minParsed.size)
-        const maxValue = parseFloat(maxParsed.size)
-        const isSameUnit = minParsed.unit === maxParsed.unit
-        const isSameValue = minValue === maxValue
-        const isNonZero = minValue !== 0 || maxValue !== 0
-
-        // Show "=" only for non-zero equal values with same unit
-        // Keep "~" for: 0→0, empty, different values, different units
-        const shouldShowEquals = isSameValue && isSameUnit && isNonZero
-        $separator.text(shouldShowEquals ? '=' : '~')
-      }
+      $separator.text(ValueFormatter.calculateSeparator(minParsed, maxParsed))
     }
 
     // Combined validation (name + min/max + separator)
