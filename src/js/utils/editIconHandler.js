@@ -37,8 +37,7 @@ export class EditIconHandler {
    * @private
    */
   _handleSelecting(e) {
-    // @ts-expect-error - Select2 event params type
-    const clickEvent = e.params.args.originalEvent
+    const clickEvent = e.params?.args?.originalEvent
     if (!clickEvent || !clickEvent.target) {
       return
     }
