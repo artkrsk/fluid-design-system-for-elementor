@@ -127,6 +127,7 @@ export const BaseSliderControlView = {
     const configs = {
       create: {
         headerMessage: window.ArtsFluidDSStrings?.saveAsPreset,
+        messageText: window.ArtsFluidDSStrings?.createNewPreset,
         confirmButton: window.ArtsFluidDSStrings?.create,
         showDelete: false,
         defaultName: `Custom ${data.minSize}${data.minUnit} ~ ${data.maxSize}${data.maxUnit}`,
@@ -138,6 +139,7 @@ export const BaseSliderControlView = {
       },
       edit: {
         headerMessage: window.ArtsFluidDSStrings?.editPreset,
+        messageText: window.ArtsFluidDSStrings?.editPresetMessage,
         confirmButton: window.ArtsFluidDSStrings?.save,
         showDelete: false,
         defaultName: data.presetTitle || '',
@@ -156,10 +158,10 @@ export const BaseSliderControlView = {
    * Creates dialog message DOM with inputs
    * @private
    */
-  _createDialogMessage(config) {
+  _createDialogMessage(config, mode) {
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
     const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
-      window.ArtsFluidDSStrings?.createNewPreset
+      config.messageText
     )
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
@@ -190,13 +192,19 @@ export const BaseSliderControlView = {
 
     $valuesRow.append($minInput, $separator, $maxInput)
 
-    // Use DialogBuilder helpers for name input
+    // Use DialogBuilder helper for name input
     const $input = DialogBuilder.createNameInput(config.defaultName)
 
-    // Use DialogBuilder helper for group selector
-    const $groupSelect = DialogBuilder.createGroupSelector()
+    // Group selector (only in create mode)
+    const $groupSelect = mode === 'create' ? DialogBuilder.createGroupSelector() : jQuery('<select>')
 
-    $inputWrapper.append($valuesRow, $input, $groupSelect)
+    $inputWrapper.append($valuesRow, $input)
+
+    // Only add group selector in create mode
+    if (mode === 'create') {
+      $inputWrapper.append($groupSelect)
+    }
+
     $message.append($messageText, $inputWrapper)
 
     return { $message, $input, $minInput, $maxInput, $groupSelect }
@@ -207,9 +215,11 @@ export const BaseSliderControlView = {
    * @private
    */
   async _initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $confirmButton, data) {
-    // Use DialogBuilder helpers for group selector initialization
-    await DialogBuilder.populateGroupSelector($groupSelect, data.groupId)
-    DialogBuilder.initializeSelect2($groupSelect)
+    // Populate and initialize group selector (only exists in create mode)
+    if ($groupSelect && $groupSelect.length) {
+      await DialogBuilder.populateGroupSelector($groupSelect, data.groupId)
+      DialogBuilder.initializeSelect2($groupSelect)
+    }
 
     // Use DialogBuilder helpers for name input
     DialogBuilder.attachEnterKeyHandler($input, $confirmButton)
@@ -244,7 +254,7 @@ export const BaseSliderControlView = {
   },
 
   /**
-   * Attaches live preview listeners (edit mode only)
+   * Attaches live preview listeners for edit mode (updates CSS variable)
    * @private
    */
   _attachLivePreviewListeners($minInput, $maxInput, presetId) {
@@ -275,6 +285,39 @@ export const BaseSliderControlView = {
     $maxInput.on('input', updatePreview)
   },
 
+  /**
+   * Attaches live preview for create mode (mirrors to inline inputs)
+   * @private
+   */
+  _attachCreateModeLivePreview($minInput, $maxInput, setting) {
+    const updateInlineInputs = () => {
+      // Find inline input container
+      const container = this._getSliderInlineContainer(setting)
+      if (!container) {
+        return
+      }
+
+      // Get inline input elements
+      const inlineMinInput = container.querySelector('[data-fluid-role="min"]')
+      const inlineMaxInput = container.querySelector('[data-fluid-role="max"]')
+
+      if (!inlineMinInput || !inlineMaxInput) {
+        return
+      }
+
+      // Mirror dialog values to inline inputs
+      inlineMinInput.value = String($minInput.val() || '')
+      inlineMaxInput.value = String($maxInput.val() || '')
+
+      // Trigger input event on inline inputs
+      // This fires _onSliderInlineInputChange() → setValue() → Live preview!
+      inlineMinInput.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    $minInput.on('input', updateInlineInputs)
+    $maxInput.on('input', updateInlineInputs)
+  },
+
   /** Creates unified preset dialog for create or edit */
   async openPresetDialog(mode, data) {
     // Validate mode
@@ -294,11 +337,12 @@ export const BaseSliderControlView = {
     }
 
     // Create dialog UI
-    const { $message, $input, $minInput, $maxInput, $groupSelect } = this._createDialogMessage(config)
+    const { $message, $input, $minInput, $maxInput, $groupSelect } = this._createDialogMessage(config, mode)
 
-    // Create dialog
+    // Create dialog with mode-specific class
+    const modeClass = mode === 'create' ? 'e-fluid-create-preset-dialog' : 'e-fluid-edit-preset-dialog'
     const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
-      className: 'e-fluid-save-preset-dialog',
+      className: `e-fluid-save-preset-dialog ${modeClass}`,
       headerMessage: config.headerMessage,
       message: $message,
       strings: {
@@ -316,9 +360,13 @@ export const BaseSliderControlView = {
         const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
         await this._initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $confirmButton, data)
 
-        // Attach live preview for edit mode
+        // Attach live preview based on mode
         if (mode === 'edit' && data.presetId) {
+          // Edit mode: Update CSS variable directly
           this._attachLivePreviewListeners($minInput, $maxInput, data.presetId)
+        } else if (mode === 'create' && data.setting) {
+          // Create mode: Mirror to inline inputs (triggers existing onChange)
+          this._attachCreateModeLivePreview($minInput, $maxInput, data.setting)
         }
       },
       onHide: () => {
@@ -432,14 +480,14 @@ export const BaseSliderControlView = {
 
     // Extract all data from option attributes
     const presetData = {
-      presetId: presetId,
+      presetId,
       presetTitle: option.dataset.title || '',
       minSize: option.dataset.minSize || '0',
       minUnit: option.dataset.minUnit || 'px',
       maxSize: option.dataset.maxSize || '0',
       maxUnit: option.dataset.maxUnit || 'px',
       groupId: option.dataset.groupId || 'fluid_spacing_presets',
-      setting: setting
+      setting
     }
 
     // Open unified dialog in edit mode
@@ -457,6 +505,15 @@ export const BaseSliderControlView = {
       return
     }
 
+    // Generate and inject CSS immediately (before AJAX) to prevent flash of old values
+    const clampFormula = generateClampFormula(
+      minParsed.size,
+      minParsed.unit,
+      maxParsed.size,
+      maxParsed.unit
+    )
+    cssManager.setCssVariable(presetId, clampFormula)
+
     const presetData = {
       preset_id: presetId,
       title: title.trim(),
@@ -468,23 +525,16 @@ export const BaseSliderControlView = {
     }
 
     try {
-      const response = await PresetAPIService.updatePreset(presetData)
-
-      // Preset updated in Kit
-      // CSS already updated via live preview
+      await PresetAPIService.updatePreset(presetData)
 
       // Invalidate cache
       dataManager.invalidate()
 
       // Refresh dropdowns to show updated values
       await this._refreshSliderPresetDropdown()
-
-      console.log('Preset updated:', response)
     } catch (error) {
       // Restore original CSS on error
-      if (presetId) {
-        cssManager.restoreCssVariable(presetId)
-      }
+      cssManager.restoreCssVariable(presetId)
 
       elementorCommon.dialogsManager
         .createWidget('alert', {
