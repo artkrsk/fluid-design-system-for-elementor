@@ -6,6 +6,9 @@ export const AJAX_ACTIONS = {
   /** Save a new fluid preset to database */
   SAVE_PRESET: 'arts_fluid_design_system_save_preset',
 
+  /** Update an existing fluid preset in database */
+  UPDATE_PRESET: 'arts_fluid_design_system_update_preset',
+
   /** Fetch preset group metadata */
   GET_GROUPS: 'arts_fluid_design_system_get_groups'
 }

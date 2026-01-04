@@ -65,6 +65,15 @@ class Module extends Module_Base {
 	const ACTION_GET_GROUPS = 'arts_fluid_design_system_get_groups';
 
 	/**
+	 * AJAX action identifier for updating existing presets.
+	 *
+	 * @since 2.1.0
+	 * @access public
+	 * @var string
+	 */
+	const ACTION_UPDATE_PRESET = 'arts_fluid_design_system_update_preset';
+
+	/**
 	 * Get module instance.
 	 *
 	 * Ensures only one instance of the module is loaded or can be loaded.
@@ -112,6 +121,7 @@ class Module extends Module_Base {
 		$ajax_manager->register_ajax_action( self::ACTION_GET_PRESETS, array( self::class, 'ajax_fluid_design_system_presets' ) );
 		$ajax_manager->register_ajax_action( self::ACTION_SAVE_PRESET, array( self::class, 'ajax_save_fluid_preset' ) );
 		$ajax_manager->register_ajax_action( self::ACTION_GET_GROUPS, array( self::class, 'ajax_get_groups' ) );
+		$ajax_manager->register_ajax_action( self::ACTION_UPDATE_PRESET, array( self::class, 'ajax_update_fluid_preset' ) );
 	}
 
 	/**
@@ -589,5 +599,138 @@ class Module extends Module_Base {
 		}
 
 		return $simplified;
+	}
+
+	/**
+	 * AJAX handler for updating an existing fluid preset.
+	 *
+	 * @since 2.1.0
+	 * @access public
+	 * @static
+	 *
+	 * @param array<string, mixed> $data Data received from the AJAX request.
+	 * @return array<string, mixed> Response data.
+	 * @throws \Exception If validation fails or update fails.
+	 */
+	public static function ajax_update_fluid_preset( $data ): array {
+		// Verify permissions
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		// Validate required fields
+		$required = array( 'preset_id', 'title', 'min_size', 'min_unit', 'max_size', 'max_unit', 'group' );
+		foreach ( $required as $field ) {
+			if ( ! isset( $data[ $field ] ) || $data[ $field ] === '' ) {
+				/* translators: %s: Field name */
+				throw new \Exception( sprintf( esc_html__( 'Missing required field: %s', 'fluid-design-system-for-elementor' ), $field ) );
+			}
+		}
+
+		// Get active Kit
+		$kit = \Elementor\Plugin::$instance->kits_manager->get_active_kit();
+		if ( ! $kit instanceof \Elementor\Core\Kits\Documents\Kit ) {
+			throw new \Exception( esc_html__( 'Invalid Kit instance.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		$preset_id  = isset( $data['preset_id'] ) && is_string( $data['preset_id'] ) ? sanitize_key( $data['preset_id'] ) : '';
+		$control_id = isset( $data['group'] ) && is_string( $data['group'] ) ? sanitize_key( $data['group'] ) : '';
+
+		// Build updated preset object (only fields we're updating)
+		$updated_fields = array(
+			'_id'   => $preset_id,
+			'title' => isset( $data['title'] ) && is_string( $data['title'] ) ? sanitize_text_field( $data['title'] ) : '',
+			'min'   => array(
+				'size' => isset( $data['min_size'] ) && is_numeric( $data['min_size'] ) ? floatval( $data['min_size'] ) : 0,
+				'unit' => isset( $data['min_unit'] ) && is_string( $data['min_unit'] ) ? sanitize_text_field( $data['min_unit'] ) : 'px',
+			),
+			'max'   => array(
+				'size' => isset( $data['max_size'] ) && is_numeric( $data['max_size'] ) ? floatval( $data['max_size'] ) : 0,
+				'unit' => isset( $data['max_unit'] ) && is_string( $data['max_unit'] ) ? sanitize_text_field( $data['max_unit'] ) : 'px',
+			),
+		);
+
+		// Update in Kit (handles autosaves internally)
+		self::update_kit_repeater_item( $kit, $control_id, $preset_id, $updated_fields );
+
+		// Return success
+		return array(
+			'success'    => true,
+			'id'         => $preset_id,
+			'title'      => $updated_fields['title'],
+			'control_id' => $control_id,
+		);
+	}
+
+	/**
+	 * Updates a repeater item in Kit by ID.
+	 * Preserves existing fields not included in $updated_fields.
+	 * Handles autosaves recursively.
+	 *
+	 * @since 2.1.0
+	 * @access private
+	 * @static
+	 *
+	 * @param \Elementor\Core\Kits\Documents\Kit $kit           Kit document instance.
+	 * @param string                              $control_id    Repeater control ID.
+	 * @param string                              $item_id       Item _id to update.
+	 * @param array<string, mixed>                $updated_fields Fields to update.
+	 * @return void
+	 * @throws \Exception If preset not found or update fails.
+	 */
+	private static function update_kit_repeater_item( $kit, $control_id, $item_id, $updated_fields ) {
+		// Get current kit settings
+		$meta_key          = \Elementor\Core\Settings\Page\Manager::META_KEY;
+		$document_settings = $kit->get_meta( $meta_key );
+
+		if ( ! is_array( $document_settings ) ) {
+			throw new \Exception( esc_html__( 'Invalid Kit settings.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		/** @var array<string, mixed> $document_settings */
+
+		if ( ! isset( $document_settings[ $control_id ] ) || ! is_array( $document_settings[ $control_id ] ) ) {
+			throw new \Exception( esc_html__( 'Preset group not found.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		/** @var array<int, array<string, mixed>> $presets */
+		$presets = $document_settings[ $control_id ];
+
+		// Find and update the item (preserving other fields)
+		$found = false;
+		foreach ( $presets as $index => $existing_item ) {
+			if ( ! is_array( $existing_item ) ) {
+				continue;
+			}
+
+			if ( isset( $existing_item['_id'] ) && $existing_item['_id'] === $item_id ) {
+				// Use array_merge to preserve fields not in $updated_fields
+				// This maintains custom_screen_width and other metadata
+				$document_settings[ $control_id ][ $index ] = array_merge( $existing_item, $updated_fields );
+				$found                                      = true;
+				break;
+			}
+		}
+
+		if ( ! $found ) {
+			throw new \Exception( esc_html__( 'Preset not found.', 'fluid-design-system-for-elementor' ) );
+		}
+
+		// Save settings using Page Settings Manager
+		$page_settings_manager = \Elementor\Core\Settings\Manager::get_settings_managers( 'page' );
+
+		if ( $page_settings_manager instanceof \Elementor\Core\Settings\Base\Manager ) {
+			/** @var array<string, mixed> $document_settings */
+			$kit_id = $kit->get_id();
+			if ( is_int( $kit_id ) ) {
+				$page_settings_manager->save_settings( $document_settings, $kit_id );
+			}
+		}
+
+		// Handle autosave recursively
+		$autosave = $kit->get_autosave();
+		if ( $autosave instanceof \Elementor\Core\Kits\Documents\Kit ) {
+			self::update_kit_repeater_item( $autosave, $control_id, $item_id, $updated_fields );
+		}
 	}
 }

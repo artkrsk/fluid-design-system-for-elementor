@@ -40,4 +40,14 @@ export class PresetAPIService {
   static async savePreset(presetData) {
     return await elementorAjaxRequest(AJAX_ACTIONS.SAVE_PRESET, presetData)
   }
+
+  /**
+   * Updates an existing fluid preset
+   * @param {{preset_id: string, title: string, min_size: string, min_unit: string, max_size: string, max_unit: string, group: string}} presetData - Preset data to update
+   * @returns {Promise<{id: string, title: string, control_id: string}>} Updated preset info
+   * @throws {Error} If AJAX request fails
+   */
+  static async updatePreset(presetData) {
+    return await elementorAjaxRequest(AJAX_ACTIONS.UPDATE_PRESET, presetData)
+  }
 }
