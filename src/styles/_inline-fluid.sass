@@ -15,7 +15,7 @@
 		pointer-events: none
 		opacity: 0.6
 
-.e-fluid-inline-input
+.e-fluid-inline-input, .e-global__confirm-input-wrapper .e-fluid-inline-input
 	flex: 1
 	min-width: 0
 	background-color: variables.$bg-default
@@ -103,12 +103,16 @@
 		border-color: variables.$border-color-bold
 		outline: none
 
+
 .e-fluid-save-preset-dialog
+	&.e-fluid-create-preset-dialog
+		.dialog-confirm-widget-content
+			width: 500px
 	.e-global__confirm-input-wrapper
 		padding: 0
 		border: none
 		display: flex
-		align-items: center
+		flex-direction: row
 		gap: 12px
 		*
 			font-size: 12px
@@ -116,8 +120,19 @@
 		input
 			padding-left: 0
 			padding-right: 0
-			padding-top: 0
+			padding-top: 4px
 			padding-bottom: 4px
 			border-radius: 0
 			border-bottom: variables.$border-bold
 			line-height: 1.6
+
+	// Min/Max values row
+	.e-fluid-dialog-values-row
+		display: flex
+		align-items: center
+		gap: 8px
+		width: 100%
+
+	.e-fluid-dialog-input
+		flex: 1
+		min-width: 0
