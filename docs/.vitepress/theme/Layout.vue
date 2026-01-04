@@ -106,7 +106,7 @@ watch(
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--vp-c-bg);
+  background: #000;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -120,7 +120,7 @@ watch(
   right: 1rem;
   background: transparent;
   border: none;
-  color: var(--vp-c-text-1);
+  color: #fff;
   font-size: 3rem;
   line-height: 1;
   cursor: pointer;
