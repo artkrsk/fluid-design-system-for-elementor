@@ -11,7 +11,7 @@ import { PresetDialogManager } from '../managers/PresetDialogManager.js'
 import { EditIconHandler } from '../utils/editIconHandler.js'
 import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
-import { STYLES } from '../constants/Styles'
+import { STYLES } from '../constants/STYLES'
 
 export const BaseControlView = {
   isDestroyed: false,

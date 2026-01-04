@@ -8,7 +8,7 @@ import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { PresetDialogManager } from '../managers/PresetDialogManager.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
-import { STYLES } from '../constants/Styles'
+import { STYLES } from '../constants/STYLES'
 
 export const BaseSliderControlView = {
   renderFluidSelectElements() {
