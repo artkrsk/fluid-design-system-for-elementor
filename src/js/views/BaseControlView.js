@@ -8,6 +8,7 @@ import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { PresetDialogManager } from '../managers/PresetDialogManager.js'
+import { EditIconHandler } from '../utils/editIconHandler.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/STYLES'
@@ -208,65 +209,12 @@ export const BaseControlView = {
         .on('change', () => {
           this.onSelectChange(selectEl)
         })
-        .on('select2:selecting', (e) => {
-          // Intercept selection to check if click was on edit icon
-          // Note: This doesn't fire for currently selected items
-          // @ts-expect-error - Select2 event params type
-          const clickEvent = e.params.args.originalEvent
-          if (clickEvent && clickEvent.target) {
-            // Check if click was on edit icon
-            const $clicked = jQuery(clickEvent.target)
-            const $icon = $clicked.hasClass('e-fluid-preset-edit-icon')
-              ? $clicked
-              : $clicked.closest('.e-fluid-preset-edit-icon')
 
-            if ($icon.length) {
-              // Prevent Select2 from selecting the option
-              e.preventDefault()
-
-              // Extract preset ID
-              const presetId = $icon.data('preset-id')
-
-              // Close dropdown first, then open dialog after close completes
-              jQuery(selectEl).one('select2:close', () => {
-                // Open dialog after dropdown closes to avoid conflicts
-                setTimeout(() => {
-                  this.onEditPresetClick(selectEl, presetId)
-                }, 50)
-              })
-
-              // Manually close dropdown
-              jQuery(selectEl).select2('close')
-            }
-          }
-        })
-        .on('select2:open', () => {
-          // Handle edit icon clicks on currently selected item
-          // select2:selecting doesn't fire for current selection, so use mousedown
-          setTimeout(() => {
-            const $dropdown = jQuery('.select2-dropdown')
-            $dropdown.on('mousedown.fluidEdit', '.e-fluid-preset-edit-icon', (e) => {
-              e.stopPropagation()
-              e.stopImmediatePropagation()
-              e.preventDefault()
-
-              const presetId = jQuery(e.currentTarget).data('preset-id')
-
-              // Close dropdown first, then open dialog
-              jQuery(selectEl).one('select2:close', () => {
-                setTimeout(() => {
-                  this.onEditPresetClick(selectEl, presetId)
-                }, 50)
-              })
-
-              jQuery(selectEl).select2('close')
-            })
-          }, 10)
-        })
-        .on('select2:close', () => {
-          // Clean up mousedown handler
-          jQuery('.select2-dropdown').off('mousedown.fluidEdit')
-        })
+      // Attach edit icon handler for inline preset editing
+      const editIconHandler = new EditIconHandler(selectEl, (presetId) =>
+        this.onEditPresetClick(selectEl, presetId)
+      )
+      editIconHandler.attach()
     }
   },
 
