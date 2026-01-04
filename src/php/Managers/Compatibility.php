@@ -109,16 +109,18 @@ class Compatibility extends BaseManager {
 			// StateManager strings
 			'saveChanges'         => esc_html__( 'Save Changes', 'fluid-design-system-for-elementor' ),
 			'saveChangesMessage'  => esc_html__( "Would you like to save the changes you've made?", 'fluid-design-system-for-elementor' ),
-			'save'                => esc_html__( 'Save', 'fluid-design-system-for-elementor' ),
 			'discard'             => esc_html__( 'Discard', 'fluid-design-system-for-elementor' ),
 
 			// Select2 strings
 			'inherit'             => esc_html__( 'Inherit', 'fluid-design-system-for-elementor' ),
 
-			// Save as Preset dialog strings
+			// Preset dialog strings
 			'saveAsPreset'        => esc_html__( 'Save as Preset', 'fluid-design-system-for-elementor' ),
-			'createNewPreset'     => esc_html__( 'Create a new fluid preset:', 'fluid-design-system-for-elementor' ),
+			'createNewPreset'     => esc_html__( 'Preset will be available across your entire site', 'fluid-design-system-for-elementor' ),
+			'editPreset'          => esc_html__( 'Edit Preset', 'fluid-design-system-for-elementor' ),
+			'editPresetMessage'   => esc_html__( 'Changes will apply to all elements using this preset', 'fluid-design-system-for-elementor' ),
 			'create'              => esc_html__( 'Create', 'fluid-design-system-for-elementor' ),
+			'save'                => esc_html__( 'Save', 'fluid-design-system-for-elementor' ),
 			'presetName'          => esc_html__( 'Preset Name...', 'fluid-design-system-for-elementor' ),
 			'customValue'         => esc_html__( 'Custom value...', 'fluid-design-system-for-elementor' ),
 			'spacingPresets'      => esc_html__( 'Spacing Presets', 'fluid-design-system-for-elementor' ),
