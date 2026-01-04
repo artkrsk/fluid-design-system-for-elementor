@@ -26,7 +26,7 @@ export default function (baseConfig) {
 
   // Configure WordPress plugin target
   config.wordpressPlugin.target =
-    '/Users/art/Local Sites/dev/app/public/wp-content/plugins/fluid-design-system-for-elementor'
+    '/Users/art/Local Sites/fluid-ds/app/public/wp-content/plugins/fluid-design-system-for-elementor'
   config.wordpressPlugin.debug = true
 
   // Enable debug logging

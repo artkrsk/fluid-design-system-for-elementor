@@ -7,6 +7,27 @@ export class CSSManager {
   }
 
   /**
+   * Parses CSS text into an array of rule strings
+   * @param {string} cssText - Raw CSS text from style element
+   * @returns {string[]} Array of trimmed CSS rules
+   */
+  static parseRulesFromText(cssText) {
+    return cssText
+      .split('}')
+      .map((rule) => rule.trim())
+      .filter((rule) => rule.length > 0)
+  }
+
+  /**
+   * Formats CSS rules for stylesheet insertion
+   * @param {string[]} rules - Array of CSS rules
+   * @returns {string} Formatted CSS text
+   */
+  static formatRulesForStylesheet(rules) {
+    return rules.map((rule) => (rule.endsWith('}') ? rule : `${rule}}`)).join('')
+  }
+
+  /**
    * Create or get the style element in the Elementor preview frame
    * @returns {HTMLElement|null} Style element or null if unavailable
    */
@@ -46,10 +67,7 @@ export class CSSManager {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) return []
 
-    return styleEl.textContent
-      .split('}')
-      .map((rule) => rule.trim())
-      .filter((rule) => rule.length > 0)
+    return CSSManager.parseRulesFromText(styleEl.textContent)
   }
 
   /**
@@ -60,7 +78,7 @@ export class CSSManager {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) return
 
-    styleEl.textContent = rules.map((rule) => (rule.endsWith('}') ? rule : `${rule}}`)).join('')
+    styleEl.textContent = CSSManager.formatRulesForStylesheet(rules)
   }
 
   /**

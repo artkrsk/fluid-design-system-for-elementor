@@ -1,10 +1,14 @@
 import { createElement } from '../utils/dom'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
-import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
-import { AJAX_ACTION_SAVE_PRESET, AJAX_ACTION_GET_GROUPS } from '../constants/AJAX'
+import { ValidationService } from '../utils/validation.js'
+import { InlineInputManager } from '../utils/inlineInputs.js'
+import { PresetDropdownManager } from '../utils/presetDropdown.js'
+import { PresetAPIService } from '../services/presetAPI.js'
+import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
+import { PresetDialogManager } from '../managers/PresetDialogManager.js'
+import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
-import { buildSelectOptions } from '../utils/preset'
-import { STYLES } from '../constants/Styles'
+import { STYLES } from '../constants/STYLES'
 
 export const BaseSliderControlView = {
   renderFluidSelectElements() {
@@ -55,93 +59,18 @@ export const BaseSliderControlView = {
 
   /** Creates the inline min/max input container for slider */
   _createSliderInlineInputsContainer(setting) {
-    const container = createElement('div', 'e-fluid-inline-container e-hidden', {
-      'data-setting': setting
-    })
-
-    // Min value input (text input accepting "20px", "1.5rem", etc.)
-    const minInput = createElement('input', 'e-fluid-inline-input', {
-      type: 'text',
-      'data-fluid-role': 'min',
-      placeholder: '0px'
-    })
-
-    // Separator
-    const separator = createElement('span', 'e-fluid-inline-separator')
-    separator.textContent = '~'
-
-    // Max value input
-    const maxInput = createElement('input', 'e-fluid-inline-input', {
-      type: 'text',
-      'data-fluid-role': 'max',
-      placeholder: '0px'
-    })
-
-    container.appendChild(minInput)
-    container.appendChild(separator)
-    container.appendChild(maxInput)
-
-    // Add "Save as Preset" button (Elementor pattern)
-    const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
-      type: 'button',
-      title: window.ArtsFluidDSStrings?.saveAsPreset || 'Save as Preset'
-    })
-    const icon = createElement('i', 'eicon-plus')
-    saveButton.appendChild(icon)
-    container.appendChild(saveButton)
-
-    // Attach input event listeners with validation
-    minInput.addEventListener('input', () => {
-      this._validateSliderInlineInput(minInput)
-      this._updateSliderSaveButtonState(container)
-      this._onSliderInlineInputChange(setting)
-    })
-    maxInput.addEventListener('input', () => {
-      this._validateSliderInlineInput(maxInput)
-      this._updateSliderSaveButtonState(container)
-      this._onSliderInlineInputChange(setting)
-    })
-
-    // Attach button click listener
-    saveButton.addEventListener('click', (e) => {
-      e.preventDefault()
-      this._onSliderSaveAsPresetClick(setting)
-    })
-
-    // Set initial button state
-    this._updateSliderSaveButtonState(container)
+    const { container } = InlineInputManager.createContainer(
+      setting,
+      () => this._onSliderInlineInputChange(setting),
+      () => this._onSliderSaveAsPresetClick(setting)
+    )
 
     return container
   },
 
   /** Updates Save button disabled state based on input validity for slider */
   _updateSliderSaveButtonState(container) {
-    const minInput = container.querySelector('[data-fluid-role="min"]')
-    const maxInput = container.querySelector('[data-fluid-role="max"]')
-    const saveButton = container.querySelector('.e-fluid-save-preset')
-
-    if (!minInput || !maxInput || !saveButton) {
-      return
-    }
-
-    // Parse both values
-    const minParsed = this._parseSliderValueWithUnit(minInput.value)
-    const maxParsed = this._parseSliderValueWithUnit(maxInput.value)
-
-    // Disable if either fails to parse
-    if (!minParsed || !maxParsed) {
-      saveButton.disabled = true
-      return
-    }
-
-    // Disable if both values are zero (no point in creating 0~0 preset)
-    if (parseFloat(minParsed.size) === 0 && parseFloat(maxParsed.size) === 0) {
-      saveButton.disabled = true
-      return
-    }
-
-    // Enable if all checks pass
-    saveButton.disabled = false
+    InlineInputManager.updateSaveButtonState(container)
   },
 
   /** Handles Save as Preset button click for slider */
@@ -174,15 +103,15 @@ export const BaseSliderControlView = {
 
     try {
       // Create confirmation dialog (Elementor pattern)
-      const dialog = await this._createSliderSavePresetDialog(
-        minSize,
+      const dialog = await this.openPresetDialog('create', {
+        setting,
+        minSize: String(minSize),
         minUnit,
-        maxSize,
-        maxUnit,
-        setting
-      )
+        maxSize: String(maxSize),
+        maxUnit
+      })
       dialog.show()
-    } finally {
+    } finally{
       // Restore normal state
       container.classList.remove('e-fluid-loading')
       saveButton.disabled = false
@@ -190,198 +119,175 @@ export const BaseSliderControlView = {
     }
   },
 
-  /** Creates the Save as Preset dialog for slider */
-  async _createSliderSavePresetDialog(minSize, minUnit, maxSize, maxUnit, setting) {
-    // Create dialog message with input
-    const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
-    const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
-      window.ArtsFluidDSStrings?.createNewPreset || 'Create a new fluid preset:'
-    )
-
-    const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
-
-    // Preview of the values
-    const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
-    const $preview = jQuery('<div>', {
-      class: 'e-fluid-preset-preview',
-      text: previewText
+  /** Opens unified preset dialog (delegates to PresetDialogManager) */
+  async openPresetDialog(mode, data) {
+    return PresetDialogManager.open(mode, data, {
+      onCreate: (name, group, minVal, maxVal, setting) =>
+        this.onConfirmCreatePreset(name, group, minVal, maxVal, setting),
+      onUpdate: (presetId, name, group, minVal, maxVal) =>
+        this.onConfirmUpdatePreset(presetId, name, group, minVal, maxVal),
+      getInlineContainer: (setting) => this._getSliderInlineContainer(setting)
     })
-
-    // Preset name input
-    const $input = jQuery('<input>', {
-      type: 'text',
-      name: 'preset-name',
-      placeholder: window.ArtsFluidDSStrings?.presetName || 'Preset Name'
-    }).val(`Custom ${previewText}`)
-
-    // Group selector
-    const $groupSelect = jQuery('<select>', {
-      name: 'preset-group',
-      class: 'e-fluid-group-select'
-    })
-
-    // Populate groups (async)
-    await this._populateSliderGroupOptions($groupSelect)
-
-    $inputWrapper.append($preview, $input, $groupSelect)
-    $message.append($messageText, $inputWrapper)
-
-    // Create dialog
-    const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
-      className: 'e-fluid-save-preset-dialog',
-      headerMessage: window.ArtsFluidDSStrings?.saveAsPreset || 'Save as Preset',
-      message: $message,
-      strings: {
-        confirm: window.ArtsFluidDSStrings?.create || 'Create',
-        cancel: window.ArtsFluidDSStrings?.cancel || 'Cancel'
-      },
-      hide: {
-        onBackgroundClick: false
-      },
-      onConfirm: () =>
-        this._onSliderConfirmSavePreset(
-          $input.val(),
-          $groupSelect.val(),
-          minSize,
-          minUnit,
-          maxSize,
-          maxUnit,
-          setting
-        ),
-      onShow: () => {
-        // Initialize Select2 on group selector
-        $groupSelect.select2({
-          minimumResultsForSearch: -1, // Hide search box
-          width: '100%'
-        })
-
-        // Get the dialog's Create button
-        const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
-
-        // Validate name input on change
-        $input.on('input', () => {
-          const inputValue = String($input.val() || '')
-          const isNameValid = inputValue.trim().length > 0
-          $confirmButton.prop('disabled', !isNameValid)
-        })
-
-        // Submit on Enter key
-        $input.on('keydown', (e) => {
-          if (e.key === 'Enter' && !$confirmButton.prop('disabled')) {
-            e.preventDefault()
-            $confirmButton.click()
-          }
-        })
-
-        // Set initial button state
-        const initialValue = String($input.val() || '')
-        const hasInitialName = initialValue.trim().length > 0
-        $confirmButton.prop('disabled', !hasInitialName)
-
-        // Auto-focus and select input text
-        setTimeout(() => {
-          $input.focus().select()
-        }, 50)
-      }
-    })
-
-    return dialog
   },
 
-  /** Populates group select options by fetching group metadata for slider */
+  /** Populates group select options by fetching group metadata for slider (deprecated, use DialogBuilder) */
   async _populateSliderGroupOptions($select) {
-    // Fetch groups with proper IDs
-    return new Promise((resolve) => {
-      window.elementor.ajax.addRequest(AJAX_ACTION_GET_GROUPS, {
-        data: {},
-        success: (groups) => {
-          if (!groups || !Array.isArray(groups)) {
-            // Fallback to default groups
-            $select.append(
-              jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-              jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-            )
-            resolve()
-            return
-          }
+    try {
+      const groups = await PresetAPIService.fetchGroups()
 
-          // Add all groups with proper IDs
-          for (const group of groups) {
-            $select.append(
-              jQuery('<option>', {
-                value: group.id,
-                text: group.name
-              })
-            )
-          }
-          resolve()
-        },
-        error: () => {
-          // Fallback on error
-          $select.append(
-            jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-            jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-          )
-          resolve()
-        }
-      })
-    })
+      if (!groups || !Array.isArray(groups) || groups.length === 0) {
+        // Fallback to default groups
+        $select.append(
+          jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
+          jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+        )
+        return
+      }
+
+      // Add all groups with proper IDs
+      for (const group of groups) {
+        $select.append(
+          jQuery('<option>', {
+            value: group.id,
+            text: group.name
+          })
+        )
+      }
+    } catch {
+      // Fallback on error
+      $select.append(
+        jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
+        jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
+      )
+    }
   },
 
-  /** Handles dialog confirmation for slider */
-  _onSliderConfirmSavePreset(title, group, minSize, minUnit, maxSize, maxUnit, _setting) {
+  /** Handles preset create confirmation for slider */
+  async onConfirmCreatePreset(title, group, minValue, maxValue, _setting) {
+    // Parse combined input values
+    const minParsed = ValidationService.parseValueWithUnit(minValue)
+    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
+
+    if (!minParsed || !maxParsed) {
+      return
+    }
+
     // Prepare data for AJAX
     const ajaxData = {
-      title: title.trim() || `Custom ${minSize}${minUnit} ~ ${maxSize}${maxUnit}`,
-      min_size: minSize,
-      min_unit: minUnit,
-      max_size: maxSize,
-      max_unit: maxUnit,
+      title: title.trim() || `Custom ${minParsed.size}${minParsed.unit} ~ ${maxParsed.size}${maxParsed.unit}`,
+      min_size: minParsed.size,
+      min_unit: minParsed.unit,
+      max_size: maxParsed.size,
+      max_unit: maxParsed.unit,
       group: group || 'spacing'
     }
 
-    // Call AJAX endpoint
-    window.elementor.ajax.addRequest(AJAX_ACTION_SAVE_PRESET, {
-      data: ajaxData,
-      success: async (response) => {
-        // Generate and inject CSS variable into preview immediately
-        const clampFormula = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
-        cssManager.setCssVariable(response.id, clampFormula)
+    try {
+      const response = await PresetAPIService.savePreset(ajaxData)
 
-        // Invalidate cache to force fresh data fetch
-        dataManager.invalidate()
+      // Generate and inject CSS variable into preview immediately
+      const clampFormula = generateClampFormula(
+        minParsed.size,
+        minParsed.unit,
+        maxParsed.size,
+        maxParsed.unit
+      )
+      cssManager.setCssVariable(response.id, clampFormula)
 
-        // Refresh preset dropdown
-        await this._refreshSliderPresetDropdown()
+      // Invalidate cache to force fresh data fetch
+      dataManager.invalidate()
 
-        // Auto-select the new preset
-        const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
-        this._selectSliderPreset(presetValue)
-      },
-      error: (error) => {
-        // Show error message
-        elementorCommon.dialogsManager
-          .createWidget('alert', {
-            headerMessage: window.ArtsFluidDSStrings?.error || 'Error',
-            message: error || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset'
-          })
-          .show()
-      }
-    })
+      // Refresh preset dropdown
+      await this._refreshSliderPresetDropdown()
+
+      // Auto-select the new preset
+      const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
+      this._selectSliderPreset(presetValue)
+    } catch (error) {
+      // Show error message
+      elementorCommon.dialogsManager
+        .createWidget('alert', {
+          headerMessage: window.ArtsFluidDSStrings?.error,
+          message: error || window.ArtsFluidDSStrings?.failedToSave
+        })
+        .show()
+    }
+  },
+
+  /**
+   * Handles edit icon click on a preset (slider)
+   */
+  async onEditPresetClick(selectEl, presetId) {
+    const setting = selectEl.getAttribute('data-setting')
+
+    // Find the option element with preset data
+    const option = selectEl.querySelector(`option[data-id="${presetId}"]`)
+    if (!option) {
+      console.error('Preset option not found:', presetId)
+      return
+    }
+
+    // Extract preset data using manager
+    const presetData = PresetDialogManager.extractPresetData(option, presetId, setting)
+
+    // Open dialog in edit mode
+    const dialog = await this.openPresetDialog('edit', presetData)
+    dialog.show()
+  },
+
+  /** Handles preset update confirmation (edit mode) for slider */
+  async onConfirmUpdatePreset(presetId, title, groupId, minValue, maxValue) {
+    // Parse combined input values
+    const minParsed = ValidationService.parseValueWithUnit(minValue)
+    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
+
+    if (!minParsed || !maxParsed) {
+      return
+    }
+
+    // Generate and inject CSS immediately (before AJAX) to prevent flash of old values
+    const clampFormula = generateClampFormula(
+      minParsed.size,
+      minParsed.unit,
+      maxParsed.size,
+      maxParsed.unit
+    )
+    cssManager.setCssVariable(presetId, clampFormula)
+
+    const presetData = {
+      preset_id: presetId,
+      title: title.trim(),
+      min_size: minParsed.size,
+      min_unit: minParsed.unit,
+      max_size: maxParsed.size,
+      max_unit: maxParsed.unit,
+      group: groupId
+    }
+
+    try {
+      await PresetAPIService.updatePreset(presetData)
+
+      // Invalidate cache
+      dataManager.invalidate()
+
+      // Refresh dropdowns to show updated values
+      await this._refreshSliderPresetDropdown()
+    } catch (error) {
+      // Restore original CSS on error
+      cssManager.restoreCssVariable(presetId)
+
+      elementorCommon.dialogsManager
+        .createWidget('alert', {
+          headerMessage: window.ArtsFluidDSStrings?.error,
+          message: error || 'Failed to update preset'
+        })
+        .show()
+    }
   },
 
   /** Refreshes the slider preset dropdown */
   async _refreshSliderPresetDropdown() {
-    for (const selectEl of this.ui.selectControls) {
-      // Clear existing options
-      selectEl.innerHTML = ''
-
-      // Re-populate with fresh data
-      await buildSelectOptions(selectEl, this.el)
-
-      // Refresh Select2
-      jQuery(selectEl).trigger('change.select2')
-    }
+    await PresetDropdownManager.refreshDropdowns(this.ui.selectControls, this.el)
   },
 
   /** Selects a preset value in the slider dropdown */
@@ -392,9 +298,8 @@ export const BaseSliderControlView = {
       return
     }
 
-    // Update select value
-    selectEl.value = presetValue
-    selectEl.setAttribute('data-value', presetValue)
+    // Update select element value and trigger Select2
+    PresetDropdownManager.updateSelectValue(selectEl, presetValue)
 
     // Update control value
     const newValue = {
@@ -408,23 +313,11 @@ export const BaseSliderControlView = {
 
     // Update UI input
     this.ui.input.val(presetValue)
-
-    // Trigger Select2 update
-    jQuery(selectEl).trigger('change.select2')
   },
 
   /** Validates an inline input and toggles invalid state */
   _validateSliderInlineInput(input) {
-    const value = input.value.trim()
-    // Empty is valid (just not ready yet)
-    if (!value) {
-      input.classList.remove('e-fluid-inline-invalid')
-      return true
-    }
-    const parsed = this._parseSliderValueWithUnit(value)
-    const isValid = parsed !== null
-    input.classList.toggle('e-fluid-inline-invalid', !isValid)
-    return isValid
+    return ValidationService.validateInputElement(input)
   },
 
   /** Gets the inline container for slider */
@@ -435,74 +328,24 @@ export const BaseSliderControlView = {
   /** Toggles visibility of inline inputs for slider */
   _toggleSliderInlineInputs(setting, show) {
     const container = this._getSliderInlineContainer(setting)
-    if (container) {
-      container.classList.toggle('e-hidden', !show)
-    }
+    InlineInputManager.toggleVisibility(container, show)
   },
 
   /** Parses a value with unit like "20px" or "1.5rem" */
   _parseSliderValueWithUnit(value) {
-    // Empty value defaults to 0px
-    if (!value || typeof value !== 'string' || value.trim() === '') {
-      return { size: '0', unit: 'px' }
-    }
-    // Strict validation: only allow specific units (px, rem, em, %, vw, vh)
-    const match = value.trim().match(/^(-?[\d.]+)\s*(px|rem|em|%|vw|vh)?$/i)
-    if (!match) {
-      return null
-    }
-    return {
-      size: match[1],
-      unit: match[2] || 'px' // Default to px if no unit
-    }
+    return ValidationService.parseValueWithUnit(value)
   },
 
   /** Gets inline input values for slider */
   _getSliderInlineInputValues(setting) {
     const container = this._getSliderInlineContainer(setting)
-    if (!container) {
-      return null
-    }
-
-    const minValue = container.querySelector('[data-fluid-role="min"]')?.value
-    const maxValue = container.querySelector('[data-fluid-role="max"]')?.value
-
-    const minParsed = this._parseSliderValueWithUnit(minValue)
-    const maxParsed = this._parseSliderValueWithUnit(maxValue)
-
-    if (!minParsed || !maxParsed) {
-      return null
-    }
-
-    return {
-      minSize: minParsed.size,
-      minUnit: minParsed.unit,
-      maxSize: maxParsed.size,
-      maxUnit: maxParsed.unit
-    }
+    return InlineInputManager.getInputValues(container)
   },
 
   /** Sets inline input values for slider */
   _setSliderInlineInputValues(setting, values) {
     const container = this._getSliderInlineContainer(setting)
-    if (!container || !values) {
-      return
-    }
-
-    const minInput = container.querySelector('[data-fluid-role="min"]')
-    const maxInput = container.querySelector('[data-fluid-role="max"]')
-
-    if (minInput && values.minSize) {
-      minInput.value = `${values.minSize}${values.minUnit || 'px'}`
-      this._validateSliderInlineInput(minInput)
-    }
-    if (maxInput && values.maxSize) {
-      maxInput.value = `${values.maxSize}${values.maxUnit || 'px'}`
-      this._validateSliderInlineInput(maxInput)
-    }
-
-    // Update button state after setting values
-    this._updateSliderSaveButtonState(container)
+    InlineInputManager.setInputValues(container, values)
   },
 
   /** Initialize inline inputs state for slider on render */
@@ -571,68 +414,12 @@ export const BaseSliderControlView = {
   },
 
   _setupSliderInheritanceAttributes(fluidSelector) {
-    const controlName = this.model.get('name')
-    const isResponsiveControl = controlName && /_(?!.*_)(.+)$/.test(controlName)
-
-    if (isResponsiveControl) {
-      const inheritedControl = this.getParentControlValue()
-      if (inheritedControl) {
-        this._setSliderInheritanceAttributes(fluidSelector, inheritedControl)
-      }
-    }
-  },
-
-  _setSliderInheritanceAttributes(fluidSelector, inheritedControl) {
-    const inheritedSize = inheritedControl.size
-    const inheritedUnit = inheritedControl.unit
-    const sourceUnit = inheritedControl.__sourceUnit || inheritedUnit
-    const inheritedFrom = inheritedControl.__inheritedFrom || 'parent'
-
-    if (inheritedSize !== undefined) {
-      fluidSelector.setAttribute('data-inherited-size', inheritedSize)
-    }
-
-    if (inheritedUnit) {
-      fluidSelector.setAttribute('data-inherited-unit', inheritedUnit)
-    }
-
-    if (sourceUnit) {
-      fluidSelector.setAttribute('data-source-unit', sourceUnit)
-    }
-
-    fluidSelector.setAttribute('data-inherited-from', inheritedFrom)
-
-    if (
-      inheritedControl.__directParentDevice &&
-      inheritedControl.__directParentDevice !== inheritedFrom
-    ) {
-      fluidSelector.setAttribute('data-inherited-via', inheritedControl.__directParentDevice)
-    }
-
-    let deviceName = inheritedFrom.charAt(0).toUpperCase() + inheritedFrom.slice(1)
-    if (deviceName === 'Desktop') {
-      deviceName = 'Default'
-    }
-
-    fluidSelector.setAttribute('data-inherited-device', deviceName)
-
-    if (inheritedSize !== undefined) {
-      let displayValue
-
-      if (sourceUnit === 'custom' || sourceUnit === 'fluid') {
-        displayValue = inheritedSize
-      } else {
-        displayValue = `${inheritedSize}${sourceUnit}`
-        fluidSelector.setAttribute('data-mixed-units', 'true')
-      }
-
-      fluidSelector.setAttribute('data-value-display', displayValue)
-      fluidSelector.setAttribute('data-title', displayValue)
-
-      if (inheritedControl.__inheritPath?.length > 0) {
-        fluidSelector.setAttribute('data-inherit-path', inheritedControl.__inheritPath.join(','))
-      }
-    }
+    InheritanceAttributeManager.setupAttributes(
+      fluidSelector,
+      'size',
+      this.model,
+      () => this.getParentControlValue()
+    )
   },
 
   isEmptyValue(value) {
@@ -707,7 +494,6 @@ export const BaseSliderControlView = {
       this.updatePlaceholderClassState()
 
       // Show inline inputs if Custom value is selected
-      // @ts-expect-error - Type assertion for ui access
       for (const selectEl of this.ui.selectControls || []) {
         if (selectEl.value === CUSTOM_FLUID_VALUE) {
           this._toggleSliderInlineInputs('size', true)

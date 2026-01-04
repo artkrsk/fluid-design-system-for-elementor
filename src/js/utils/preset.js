@@ -1,25 +1,10 @@
 import { createElement } from './dom'
 import { dataManager } from '../managers'
-import { CUSTOM_FLUID_VALUE } from '../constants/Controls'
+import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { parseClampFormula } from './clamp'
+import { ValueFormatter } from './formatters.js'
 
 class PresetUtils {
-  /**
-   * Formats size display with proper handling of equal values
-   * @param {string} minSize - Minimum size value
-   * @param {string} minUnit - Minimum size unit
-   * @param {string} maxSize - Maximum size value
-   * @param {string} maxUnit - Maximum size unit
-   * @returns {string} Formatted size string
-   */
-  static #formatSizeDisplay(minSize, minUnit, maxSize, maxUnit) {
-    // If min and max are equal with same unit, show single value
-    if (minSize === maxSize && minUnit === maxUnit) {
-      return `${minSize}${minUnit}`
-    }
-    // Otherwise show range
-    return `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
-  }
   static #setElementAttributes(element, attributes) {
     Object.entries(attributes).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
@@ -50,7 +35,8 @@ class PresetUtils {
       min_screen_width_size,
       max_screen_width_size,
       min_screen_width_unit,
-      max_screen_width_unit
+      max_screen_width_unit,
+      editable = false
     } = preset
 
     const optionEl = PresetUtils.#createBaseOption(value, currentValue, {
@@ -63,10 +49,11 @@ class PresetUtils {
       'data-min-screen-width-size': min_screen_width_size,
       'data-max-screen-width-size': max_screen_width_size,
       'data-min-screen-width-unit': min_screen_width_unit,
-      'data-max-screen-width-unit': max_screen_width_unit
+      'data-max-screen-width-unit': max_screen_width_unit,
+      'data-editable': editable ? 'true' : 'false'
     })
 
-    optionEl.textContent = `${PresetUtils.#formatSizeDisplay(min_size, min_unit, max_size, max_unit)} ${title}`
+    optionEl.textContent = `${ValueFormatter.formatSizeRange(min_size, min_unit, max_size, max_unit)} ${title}`
     return optionEl
   }
 
@@ -143,7 +130,7 @@ class PresetUtils {
       'data-max-screen-width-unit': max_screen_width_unit
     })
 
-    optionEl.textContent = `${PresetUtils.#formatSizeDisplay(min_size, min_unit, max_size, max_unit)} ${title}`
+    optionEl.textContent = `${ValueFormatter.formatSizeRange(min_size, min_unit, max_size, max_unit)} ${title}`
     return optionEl
   }
 
@@ -179,7 +166,7 @@ class PresetUtils {
           'data-max-unit': parsed.maxUnit
         })
 
-        const displayValue = PresetUtils.#formatSizeDisplay(
+        const displayValue = ValueFormatter.formatSizeRange(
           parsed.minSize,
           parsed.minUnit,
           parsed.maxSize,
@@ -264,7 +251,7 @@ class PresetUtils {
       optionEl.setAttribute('selected', 'selected')
     }
 
-    optionEl.textContent = 'Custom value...'
+    optionEl.textContent = window.ArtsFluidDSStrings?.customValue
     return optionEl
   }
 
@@ -293,7 +280,9 @@ class PresetUtils {
 
     let customOptionAdded = false
 
-    for (const { name, value } of presetsData) {
+    for (const group of presetsData) {
+      const { name, value, control_id } = group
+
       if (!name) {
         continue
       }
@@ -316,6 +305,12 @@ class PresetUtils {
           } else {
             optionEl = PresetUtils.createCustomPresetOption(preset, currentValue)
           }
+
+          // Add group control_id to each option
+          if (control_id) {
+            optionEl.setAttribute('data-group-id', control_id)
+          }
+
           optionsGroupEl.appendChild(optionEl)
         }
 

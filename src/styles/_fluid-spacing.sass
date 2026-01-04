@@ -1,6 +1,7 @@
 @use 'variables'
 
 .select2-result-fluid-spacing-formatted
+	position: relative
 	display: flex
 	flex-direction: column
 	gap: variables.$spacing-tiny
@@ -26,3 +27,18 @@
 
 	&__size-divider:before
 		content: ' ~ '
+	.e-fluid-preset-edit-icon
+		position: absolute
+		top: 50%
+		right: 0
+		transform: translateY(-50%)
+		z-index: 500
+		cursor: pointer
+		display: inline-flex
+		justify-content: center
+		align-items: center
+		width: 24px
+		height: 24px
+		transition: color 0.2s ease
+		&:hover
+			color: var(--e-a-color-primary-bold)

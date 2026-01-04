@@ -1,4 +1,15 @@
 export class StateManager {
+  /**
+   * Checks if a timestamp has exceeded the reorder detection window
+   * @param {number} timestamp - Removal timestamp
+   * @param {number} currentTime - Current time
+   * @param {number} windowMs - Detection window in milliseconds
+   * @returns {boolean}
+   */
+  static isRemovalExpired(timestamp, currentTime, windowMs) {
+    return currentTime - timestamp > windowMs
+  }
+
   constructor() {
     // Track removed items for undo operations
     this.removedItems = new Map()
@@ -44,7 +55,7 @@ export class StateManager {
   cleanupRecentRemovals() {
     const now = Date.now()
     this.recentRemovals.forEach((timestamp, id) => {
-      if (now - timestamp > this.REORDER_DETECTION_WINDOW) {
+      if (StateManager.isRemovalExpired(timestamp, now, this.REORDER_DETECTION_WINDOW)) {
         this.recentRemovals.delete(id)
       }
     })
@@ -66,17 +77,15 @@ export class StateManager {
     if (!this.saveChangesDialog) {
       this.saveChangesDialog = window.elementorCommon.dialogsManager.createWidget('confirm', {
         id: 'elementor-fluid-spacing-save-changes-dialog',
-        headerMessage: window.ArtsFluidDSStrings?.saveChanges || 'Save Changes',
-        message:
-          window.ArtsFluidDSStrings?.saveChangesMessage ||
-          "Would you like to save the changes you've made?",
+        headerMessage: window.ArtsFluidDSStrings?.saveChanges,
+        message: window.ArtsFluidDSStrings?.saveChangesMessage,
         position: {
           my: 'center center',
           at: 'center center'
         },
         strings: {
-          confirm: window.ArtsFluidDSStrings?.save || 'Save',
-          cancel: window.ArtsFluidDSStrings?.discard || 'Discard'
+          confirm: window.ArtsFluidDSStrings?.save,
+          cancel: window.ArtsFluidDSStrings?.discard
         }
       })
     }
