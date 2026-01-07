@@ -1,20 +1,21 @@
 import { callSuper } from '../utils/backbone'
 import { createElement } from '../utils/dom'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
-import { ValidationService } from '../utils/validation.js'
-import { InlineInputManager } from '../utils/inlineInputs.js'
-import { PresetDropdownManager } from '../utils/presetDropdown.js'
-import { PresetAPIService } from '../services/presetAPI.js'
-import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
-import { PresetDialogManager } from '../managers/PresetDialogManager.js'
-import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData.js'
-import { isCustomUnit } from '../utils/controls.js'
+import { ValidationService } from '../utils/validation'
+import { InlineInputManager } from '../utils/inlineInputs'
+import { PresetDropdownManager } from '../utils/presetDropdown'
+import { PresetAPIService } from '../services/presetAPI'
+import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
+import { PresetDialogManager } from '../managers/PresetDialogManager'
+import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData'
+import { isCustomUnit } from '../utils/controls'
 import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/STYLES'
+import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
 
-export const BaseSliderControlView = {
-  renderFluidSelectElements() {
+export const BaseSliderControlView: Record<string, unknown> = {
+  renderFluidSelectElements(this: any): void {
     if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
       this.ui.selectControls = []
     }
@@ -39,8 +40,8 @@ export const BaseSliderControlView = {
     }
   },
 
-  _createSliderFluidSelector(inputWrapperEl, inputEl) {
-    const setting = inputEl.dataset.setting
+  _createSliderFluidSelector(this: any, inputWrapperEl: Element, inputEl: HTMLInputElement): void {
+    const setting = inputEl.dataset.setting ?? ''
     const fluidSelectorContainer = createElement(
       'div',
       'elementor-control-fluid-selector-container'
@@ -61,7 +62,7 @@ export const BaseSliderControlView = {
   },
 
   /** Creates the inline min/max input container for slider */
-  _createSliderInlineInputsContainer(setting) {
+  _createSliderInlineInputsContainer(this: any, setting: string): HTMLElement {
     const { container } = InlineInputManager.createContainer(
       setting,
       () => this._onSliderInlineInputChange(setting),
@@ -72,12 +73,12 @@ export const BaseSliderControlView = {
   },
 
   /** Updates Save button disabled state based on input validity for slider */
-  _updateSliderSaveButtonState(container) {
+  _updateSliderSaveButtonState(this: any, container: HTMLElement): void {
     InlineInputManager.updateSaveButtonState(container)
   },
 
   /** Handles Save as Preset button click for slider */
-  async _onSliderSaveAsPresetClick(setting) {
+  async _onSliderSaveAsPresetClick(this: any, setting: string): Promise<void> {
     const values = this._getSliderInlineInputValues(setting)
     if (!values) {
       return
@@ -92,7 +93,7 @@ export const BaseSliderControlView = {
 
     // Get inline container and save button
     const container = this._getSliderInlineContainer(setting)
-    const saveButton = container?.querySelector('.e-fluid-save-preset')
+    const saveButton = container?.querySelector('.e-fluid-save-preset') as HTMLButtonElement | null
     const icon = saveButton?.querySelector('i')
 
     if (!container || !saveButton || !icon) {
@@ -112,9 +113,9 @@ export const BaseSliderControlView = {
         minUnit,
         maxSize: String(maxSize),
         maxUnit
-      })
-      dialog.show()
-    } finally{
+      } as IPresetDialogData)
+      ;(dialog as { show: () => void }).show()
+    } finally {
       // Restore normal state
       container.classList.remove('e-fluid-loading')
       saveButton.disabled = false
@@ -123,18 +124,18 @@ export const BaseSliderControlView = {
   },
 
   /** Opens unified preset dialog (delegates to PresetDialogManager) */
-  async openPresetDialog(mode, data) {
+  async openPresetDialog(this: any, mode: 'create' | 'edit', data: IPresetDialogData): Promise<unknown> {
     return PresetDialogManager.open(mode, data, {
-      onCreate: (name, group, minVal, maxVal, setting) =>
+      onCreate: (name: string, group: string, minVal: string, maxVal: string, setting: string) =>
         this.onConfirmCreatePreset(name, group, minVal, maxVal, setting),
-      onUpdate: (presetId, name, group, minVal, maxVal) =>
+      onUpdate: (presetId: string, name: string, group: string, minVal: string, maxVal: string) =>
         this.onConfirmUpdatePreset(presetId, name, group, minVal, maxVal),
-      getInlineContainer: (setting) => this._getSliderInlineContainer(setting)
+      getInlineContainer: (setting: string) => this._getSliderInlineContainer(setting)
     })
   },
 
   /** Populates group select options by fetching group metadata for slider (deprecated, use DialogBuilder) */
-  async _populateSliderGroupOptions($select) {
+  async _populateSliderGroupOptions(this: any, $select: JQuery): Promise<void> {
     try {
       const groups = await PresetAPIService.fetchGroups()
 
@@ -166,7 +167,14 @@ export const BaseSliderControlView = {
   },
 
   /** Handles preset create confirmation for slider */
-  async onConfirmCreatePreset(title, group, minValue, maxValue, _setting) {
+  async onConfirmCreatePreset(
+    this: any,
+    title: string,
+    group: string,
+    minValue: string,
+    maxValue: string,
+    _setting: string
+  ): Promise<void> {
     // Parse combined input values
     const minParsed = ValidationService.parseValueWithUnit(minValue)
     const maxParsed = ValidationService.parseValueWithUnit(maxValue)
@@ -203,17 +211,15 @@ export const BaseSliderControlView = {
       window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
-          message: error || window.ArtsFluidDSStrings?.failedToSave
+          message: (error as string) || window.ArtsFluidDSStrings?.failedToSave
         })
         .show()
     }
   },
 
-  /**
-   * Handles edit icon click on a preset (slider)
-   */
-  async onEditPresetClick(selectEl, presetId) {
-    const setting = selectEl.getAttribute('data-setting')
+  /** Handles edit icon click on a preset (slider) */
+  async onEditPresetClick(this: any, selectEl: HTMLSelectElement, presetId: string): Promise<void> {
+    const setting = selectEl.getAttribute('data-setting') ?? 'size'
 
     // Find the option element with preset data
     const option = selectEl.querySelector(`option[data-id="${presetId}"]`)
@@ -222,15 +228,22 @@ export const BaseSliderControlView = {
     }
 
     // Extract preset data using manager
-    const presetData = PresetDialogManager.extractPresetData(option, presetId, setting)
+    const presetData = PresetDialogManager.extractPresetData(option as HTMLOptionElement, presetId, setting)
 
     // Open dialog in edit mode
     const dialog = await this.openPresetDialog('edit', presetData)
-    dialog.show()
+    ;(dialog as { show: () => void }).show()
   },
 
   /** Handles preset update confirmation (edit mode) for slider */
-  async onConfirmUpdatePreset(presetId, title, groupId, minValue, maxValue) {
+  async onConfirmUpdatePreset(
+    this: any,
+    presetId: string,
+    title: string,
+    groupId: string,
+    minValue: string,
+    maxValue: string
+  ): Promise<void> {
     // Parse combined input values
     const minParsed = ValidationService.parseValueWithUnit(minValue)
     const maxParsed = ValidationService.parseValueWithUnit(maxValue)
@@ -265,19 +278,19 @@ export const BaseSliderControlView = {
       window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
-          message: error || 'Failed to update preset'
+          message: (error as string) || 'Failed to update preset'
         })
         .show()
     }
   },
 
   /** Refreshes the slider preset dropdown */
-  async _refreshSliderPresetDropdown() {
+  async _refreshSliderPresetDropdown(this: any): Promise<void> {
     await PresetDropdownManager.refreshDropdowns(this.ui.selectControls, this.el)
   },
 
   /** Selects a preset value in the slider dropdown */
-  _selectSliderPreset(presetValue) {
+  _selectSliderPreset(this: any, presetValue: string): void {
     const selectEl = this.ui.selectControls[0]
 
     if (!selectEl) {
@@ -302,40 +315,44 @@ export const BaseSliderControlView = {
   },
 
   /** Validates an inline input and toggles invalid state */
-  _validateSliderInlineInput(input) {
+  _validateSliderInlineInput(this: any, input: HTMLInputElement): boolean {
     return ValidationService.validateInputElement(input)
   },
 
   /** Gets the inline container for slider */
-  _getSliderInlineContainer(setting) {
+  _getSliderInlineContainer(this: any, setting: string): HTMLElement | null {
     return this.$el[0].querySelector(`.e-fluid-inline-container[data-setting="${setting}"]`)
   },
 
   /** Toggles visibility of inline inputs for slider */
-  _toggleSliderInlineInputs(setting, show) {
+  _toggleSliderInlineInputs(this: any, setting: string, show: boolean): void {
     const container = this._getSliderInlineContainer(setting)
     InlineInputManager.toggleVisibility(container, show)
   },
 
   /** Parses a value with unit like "20px" or "1.5rem" */
-  _parseSliderValueWithUnit(value) {
+  _parseSliderValueWithUnit(this: any, value: string): { size: string; unit: string } | null {
     return ValidationService.parseValueWithUnit(value)
   },
 
   /** Gets inline input values for slider */
-  _getSliderInlineInputValues(setting) {
+  _getSliderInlineInputValues(this: any, setting: string): IInlineInputValues | null {
     const container = this._getSliderInlineContainer(setting)
     return InlineInputManager.getInputValues(container)
   },
 
   /** Sets inline input values for slider */
-  _setSliderInlineInputValues(setting, values) {
+  _setSliderInlineInputValues(
+    this: any,
+    setting: string,
+    values: { minSize: string; minUnit: string; maxSize: string; maxUnit: string }
+  ): void {
     const container = this._getSliderInlineContainer(setting)
     InlineInputManager.setInputValues(container, values)
   },
 
   /** Initialize inline inputs state for slider on render */
-  initializeInlineInputsState() {
+  initializeInlineInputsState(this: any): void {
     // Override base method for slider-specific behavior
     if (!this.ui.selectControls || this.ui.selectControls.length === 0) {
       return
@@ -378,7 +395,7 @@ export const BaseSliderControlView = {
   },
 
   /** Handles inline input value changes for slider */
-  _onSliderInlineInputChange(setting) {
+  _onSliderInlineInputChange(this: any, setting: string): void {
     const values = this._getSliderInlineInputValues(setting)
     if (!values) {
       return
@@ -399,7 +416,7 @@ export const BaseSliderControlView = {
     }
   },
 
-  _setupSliderInheritanceAttributes(fluidSelector) {
+  _setupSliderInheritanceAttributes(this: any, fluidSelector: HTMLSelectElement): void {
     InheritanceAttributeManager.setupAttributes(
       fluidSelector,
       'size',
@@ -408,7 +425,7 @@ export const BaseSliderControlView = {
     )
   },
 
-  isEmptyValue(value) {
+  isEmptyValue(this: any, value: { size?: string | null } | null | undefined): boolean {
     if (!value) {
       return true
     }
@@ -416,7 +433,7 @@ export const BaseSliderControlView = {
     return value.size === '' || value.size === null || value.size === undefined
   },
 
-  onSelectChange(selectEl) {
+  onSelectChange(this: any, selectEl: HTMLSelectElement): void {
     const value = selectEl.value
     const isInheritValue = value === ''
     const isCustomValue = value === CUSTOM_FLUID_VALUE
@@ -454,7 +471,7 @@ export const BaseSliderControlView = {
     this.ui.input.trigger('change')
   },
 
-  updateUnitChoices() {
+  updateUnitChoices(this: any): void {
     const unit = this.getControlValue('unit')
     const wasFluid = this.$el.hasClass('e-units-fluid')
     const isNowFluid = unit === 'fluid'
@@ -493,11 +510,8 @@ export const BaseSliderControlView = {
     }
   },
 
-  /**
-   * Check if this slider control is inside a fluid preset repeater.
-   * Uses view hierarchy: Slider → RepeaterRow → GlobalStyleRepeater
-   */
-  _isInFluidPresetRepeater() {
+  /** Check if this slider control is inside a fluid preset repeater */
+  _isInFluidPresetRepeater(this: any): boolean {
     try {
       // Traverse up: slider → repeater row → repeater
       const repeaterView = this._parent?._parent
@@ -510,13 +524,8 @@ export const BaseSliderControlView = {
   /**
    * Override handleUnitChange to preserve size value when switching units,
    * but ONLY for sliders inside fluid preset repeaters.
-   *
-   * This fixes an Elementor core bug where the UI shows a value after unit change
-   * but the model actually has empty string, causing data loss on save.
-   *
-   * For all other sliders, standard Elementor behavior is preserved.
    */
-  handleUnitChange() {
+  handleUnitChange(this: any): void {
     // Only apply the fix for fluid preset repeater sliders
     if (!this._isInFluidPresetRepeater()) {
       callSuper(this, 'handleUnitChange', arguments)
