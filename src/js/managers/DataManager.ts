@@ -1,25 +1,19 @@
 import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants/API'
 import { showControlSpinner, hideControlSpinner, elementorAjaxRequest } from '../utils'
+import type { IPresetGroup } from '../interfaces'
 
 export class DataManager {
-  /** @type {import('../interfaces').IPresetGroup[] | null} */
-  presets = null
-  /** @type {Promise<import('../interfaces').IPresetGroup[]> | null} */
-  request = null
-  /** @type {boolean} */
-  isPending = false
+  presets: IPresetGroup[] | null = null
+  request: Promise<IPresetGroup[]> | null = null
+  isPending: boolean = false
 
-  invalidate() {
+  invalidate(): void {
     this.presets = null
     this.request = null
     this.isPending = false
   }
 
-  /**
-   * @param {HTMLElement} [el]
-   * @returns {Promise<import('../interfaces').IPresetGroup[] | null>}
-   */
-  async getPresetsData(el) {
+  async getPresetsData(el?: HTMLElement): Promise<IPresetGroup[] | null> {
     if (this.presets) {
       hideControlSpinner(el)
       return this.presets
@@ -39,7 +33,7 @@ export class DataManager {
 
     this.isPending = true
 
-    this.request = elementorAjaxRequest(AJAX_ACTIONS.FETCH_PRESETS, AJAX_DEFAULTS.FETCH_PRESETS).then(
+    this.request = elementorAjaxRequest<IPresetGroup[]>(AJAX_ACTIONS.FETCH_PRESETS, AJAX_DEFAULTS.FETCH_PRESETS).then(
       (response) => {
         this.presets = response
         return response

@@ -8,18 +8,13 @@ import {
 } from '../utils/cssRules'
 
 export class CSSManager {
-  constructor() {
-    this.styleElement = null
-    this.styleElementId = STYLES.STYLE_ID
-  }
+  private styleElement: HTMLElement | null = null
+  private styleElementId: string = STYLES.STYLE_ID
 
-  /**
-   * Create or get the style element in the Elementor preview frame
-   * @returns {HTMLElement|null} Style element or null if unavailable
-   */
-  createOrGetStyleElement() {
+  /** Create or get the style element in the Elementor preview frame */
+  createOrGetStyleElement(): HTMLElement | null {
     try {
-      const iframe = /** @type {HTMLIFrameElement|undefined} */ (window.elementor?.$preview?.[0])
+      const iframe = window.elementor?.$preview?.[0] as HTMLIFrameElement | undefined
       if (!iframe?.contentDocument) {
         return null
       }
@@ -46,36 +41,26 @@ export class CSSManager {
     }
   }
 
-  /**
-   * Get current CSS rules from the style element
-   * @returns {string[]} Array of CSS rules
-   */
-  getCurrentRules() {
+  /** Get current CSS rules from the style element */
+  getCurrentRules(): string[] {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) return []
+    if (!styleEl) { return [] }
 
     return parseRulesFromText(styleEl.textContent ?? '')
   }
 
-  /**
-   * Set CSS rules in the style element
-   * @param {string[]} rules - Array of CSS rules to set
-   */
-  setRules(rules) {
+  /** Set CSS rules in the style element */
+  setRules(rules: string[]): void {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) return
+    if (!styleEl) { return }
 
     styleEl.textContent = formatRulesForStylesheet(rules)
   }
 
-  /**
-   * Unset a CSS variable by adding a rule to the style element
-   * @param {string} id - The ID to build the CSS variable name
-   * @returns {boolean} Success status
-   */
-  unsetCssVariable(id) {
+  /** Unset a CSS variable by adding a rule to the style element */
+  unsetCssVariable(id: string): boolean {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) return false
+    if (!styleEl) { return false }
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
     const currentRules = this.getCurrentRules()
@@ -85,14 +70,10 @@ export class CSSManager {
     return true
   }
 
-  /**
-   * Restore a CSS variable by removing unset rules
-   * @param {string} id - The ID to restore CSS variable for
-   * @returns {boolean} Success status
-   */
-  restoreCssVariable(id) {
+  /** Restore a CSS variable by removing unset rules */
+  restoreCssVariable(id: string): boolean {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) return false
+    if (!styleEl) { return false }
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
     const filteredRules = filterRulesByVariable(this.getCurrentRules(), cssVarName)
@@ -101,15 +82,10 @@ export class CSSManager {
     return true
   }
 
-  /**
-   * Set a CSS variable with clamp formula in preview
-   * @param {string} id - The preset ID
-   * @param {string} clampFormula - The clamp CSS formula
-   * @returns {boolean} Success status
-   */
-  setCssVariable(id, clampFormula) {
+  /** Set a CSS variable with clamp formula in preview */
+  setCssVariable(id: string, clampFormula: string): boolean {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) return false
+    if (!styleEl) { return false }
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
 

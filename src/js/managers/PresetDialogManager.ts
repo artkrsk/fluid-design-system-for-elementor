@@ -1,23 +1,40 @@
-import { ValidationService } from '../utils/validation.js'
-import { DialogBuilder } from '../utils/dialogBuilder.js'
-import { generateClampFormula } from '../utils/clamp.js'
-import { UI_DEFAULTS } from '../constants/VALUES.js'
-import { ValueFormatter } from '../utils/formatters.js'
-import cssManager from './CSSManager.js'
+import { ValidationService } from '../utils/validation'
+import { DialogBuilder } from '../utils/dialogBuilder'
+import { generateClampFormula } from '../utils/clamp'
+import { UI_DEFAULTS } from '../constants/VALUES'
+import { ValueFormatter } from '../utils/formatters'
+import cssManager from './CSSManager'
+import type { IPresetDialogData, IPresetDialogCallbacks } from '../interfaces'
 
-/**
- * Manages preset dialog creation and lifecycle
- * Centralizes dialog logic to eliminate duplication between view classes
- */
+interface IDialogConfig {
+  headerMessage?: string
+  messageText?: string
+  confirmButton?: string
+  defaultName: string
+  defaultMin: string
+  defaultMax: string
+  onConfirm: (name: string, group: string, minVal: string, maxVal: string) => void
+}
+
+interface IPresetData {
+  presetId: string
+  presetTitle: string
+  minSize: string
+  minUnit: string
+  maxSize: string
+  maxUnit: string
+  groupId: string
+  setting: string
+}
+
+/** Manages preset dialog creation and lifecycle */
 export class PresetDialogManager {
-  /**
-   * Opens unified preset dialog for create or edit mode
-   * @param {'create' | 'edit'} mode
-   * @param {import('../interfaces').IPresetDialogData} data
-   * @param {import('../interfaces').IPresetDialogCallbacks} callbacks
-   * @returns {Promise<any>}
-   */
-  static async open(mode, data, callbacks) {
+  /** Opens unified preset dialog for create or edit mode */
+  static async open(
+    mode: 'create' | 'edit',
+    data: IPresetDialogData,
+    callbacks: IPresetDialogCallbacks
+  ): Promise<unknown> {
     // Validate mode
     if (mode !== 'create' && mode !== 'edit') {
       throw new Error(`Invalid mode: ${mode}. Expected 'create' or 'edit'.`)
@@ -101,15 +118,13 @@ export class PresetDialogManager {
     return dialog
   }
 
-  /**
-   * Gets mode-specific dialog configuration
-   * @private
-   * @param {'create' | 'edit'} mode
-   * @param {import('../interfaces').IPresetDialogData} data
-   * @param {import('../interfaces').IPresetDialogCallbacks} callbacks
-   */
-  static _getDialogConfig(mode, data, callbacks) {
-    const configs = {
+  /** Gets mode-specific dialog configuration */
+  private static _getDialogConfig(
+    mode: 'create' | 'edit',
+    data: IPresetDialogData,
+    callbacks: IPresetDialogCallbacks
+  ): IDialogConfig {
+    const configs: Record<'create' | 'edit', IDialogConfig> = {
       create: {
         headerMessage: window.ArtsFluidDSStrings?.saveAsPreset,
         messageText: window.ArtsFluidDSStrings?.createNewPreset,
@@ -117,8 +132,7 @@ export class PresetDialogManager {
         defaultName: `Custom ${data.minSize}${data.minUnit} ~ ${data.maxSize}${data.maxUnit}`,
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
-        /** @param {string} name @param {string} group @param {string} minVal @param {string} maxVal */
-        onConfirm: (name, group, minVal, maxVal) => {
+        onConfirm: (name: string, group: string, minVal: string, maxVal: string) => {
           callbacks.onCreate?.(name, group, minVal, maxVal, data.setting ?? '')
         }
       },
@@ -129,8 +143,7 @@ export class PresetDialogManager {
         defaultName: data.presetTitle || '',
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
-        /** @param {string} name @param {string} group @param {string} minVal @param {string} maxVal */
-        onConfirm: (name, group, minVal, maxVal) => {
+        onConfirm: (name: string, group: string, minVal: string, maxVal: string) => {
           callbacks.onUpdate?.(data.presetId ?? '', name, group || (data.groupId ?? ''), minVal, maxVal)
         }
       }
@@ -139,13 +152,8 @@ export class PresetDialogManager {
     return configs[mode]
   }
 
-  /**
-   * Creates dialog message DOM with inputs
-   * @private
-   * @param {{ headerMessage?: string, messageText?: string, confirmButton?: string, defaultName: string, defaultMin: string, defaultMax: string, onConfirm: Function }} config
-   * @param {'create' | 'edit'} mode
-   */
-  static _createDialogMessage(config, mode) {
+  /** Creates dialog message DOM with inputs */
+  private static _createDialogMessage(config: IDialogConfig, mode: 'create' | 'edit') {
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
     const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
       config.messageText ?? ''
@@ -197,18 +205,16 @@ export class PresetDialogManager {
     return { $message, $input, $minInput, $maxInput, $groupSelect, $separator }
   }
 
-  /**
-   * Initializes dialog UI
-   * @private
-   * @param {JQuery} $input
-   * @param {JQuery} $minInput
-   * @param {JQuery} $maxInput
-   * @param {JQuery} $groupSelect
-   * @param {JQuery} $separator
-   * @param {JQuery} $confirmButton
-   * @param {import('../interfaces').IPresetDialogData} data
-   */
-  static async _initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $separator, $confirmButton, data) {
+  /** Initializes dialog UI */
+  private static async _initializeDialogUI(
+    $input: JQuery,
+    $minInput: JQuery,
+    $maxInput: JQuery,
+    $groupSelect: JQuery,
+    $separator: JQuery,
+    $confirmButton: JQuery,
+    data: IPresetDialogData
+  ): Promise<void> {
     // Populate and initialize group selector (only exists in create mode)
     if ($groupSelect && $groupSelect.length) {
       await DialogBuilder.populateGroupSelector($groupSelect, data.groupId)
@@ -258,14 +264,8 @@ export class PresetDialogManager {
     validateAll()
   }
 
-  /**
-   * Attaches live preview listeners for edit mode
-   * @private
-   * @param {JQuery} $minInput
-   * @param {JQuery} $maxInput
-   * @param {string} presetId
-   */
-  static _attachLivePreviewListeners($minInput, $maxInput, presetId) {
+  /** Attaches live preview listeners for edit mode */
+  private static _attachLivePreviewListeners($minInput: JQuery, $maxInput: JQuery, presetId: string): void {
     if (!presetId) {
       return
     }
@@ -293,15 +293,13 @@ export class PresetDialogManager {
     $maxInput.on('input', updatePreview)
   }
 
-  /**
-   * Attaches live preview for create mode (mirrors to inline inputs)
-   * @private
-   * @param {JQuery} $minInput
-   * @param {JQuery} $maxInput
-   * @param {string} setting
-   * @param {(setting: string) => HTMLElement | null} getInlineContainerFn
-   */
-  static _attachCreateModeLivePreview($minInput, $maxInput, setting, getInlineContainerFn) {
+  /** Attaches live preview for create mode (mirrors to inline inputs) */
+  private static _attachCreateModeLivePreview(
+    $minInput: JQuery,
+    $maxInput: JQuery,
+    setting: string,
+    getInlineContainerFn: (setting: string) => HTMLElement | null
+  ): void {
     const updateInlineInputs = () => {
       // Find inline input container via callback
       const container = getInlineContainerFn(setting)
@@ -310,12 +308,8 @@ export class PresetDialogManager {
       }
 
       // Get inline input elements
-      const inlineMinInput = /** @type {HTMLInputElement | null} */ (
-        container.querySelector('[data-fluid-role="min"]')
-      )
-      const inlineMaxInput = /** @type {HTMLInputElement | null} */ (
-        container.querySelector('[data-fluid-role="max"]')
-      )
+      const inlineMinInput = container.querySelector('[data-fluid-role="min"]') as HTMLInputElement | null
+      const inlineMaxInput = container.querySelector('[data-fluid-role="max"]') as HTMLInputElement | null
 
       if (!inlineMinInput || !inlineMaxInput) {
         return
@@ -334,14 +328,8 @@ export class PresetDialogManager {
     $maxInput.on('input', updateInlineInputs)
   }
 
-  /**
-   * Extracts preset data from option element
-   * @param {HTMLElement} option - Option element with data attributes
-   * @param {string} presetId - Preset ID
-   * @param {string} setting - Setting name
-   * @returns {Object} Preset data object
-   */
-  static extractPresetData(option, presetId, setting) {
+  /** Extracts preset data from option element */
+  static extractPresetData(option: HTMLElement, presetId: string, setting: string): IPresetData {
     return {
       presetId,
       presetTitle: option.dataset.title || '',

@@ -1,64 +1,49 @@
+import type { Container } from '@arts/elementor-types'
+
+interface SaveChangesDialog {
+  onConfirm: () => void
+  onCancel: () => void
+  setSettings(key: string, value: any): void
+}
+
 export class StateManager {
-  /**
-   * Checks if a timestamp has exceeded the reorder detection window
-   * @param {number} timestamp - Removal timestamp
-   * @param {number} currentTime - Current time
-   * @param {number} windowMs - Detection window in milliseconds
-   * @returns {boolean}
-   */
-  static isRemovalExpired(timestamp, currentTime, windowMs) {
+  /** Checks if a timestamp has exceeded the reorder detection window */
+  static isRemovalExpired(timestamp: number, currentTime: number, windowMs: number): boolean {
     return currentTime - timestamp > windowMs
   }
 
-  constructor() {
-    // Track removed items for undo operations
-    this.removedItems = new Map()
+  private removedItems = new Map<string, boolean>()
+  private recentRemovals = new Map<string, number>()
+  private changedDocuments = new Map<string | number, boolean>()
+  private REORDER_DETECTION_WINDOW = 200
+  private saveChangesDialog: SaveChangesDialog | null = null
 
-    // Track recent removals to detect reordering operations
-    this.recentRemovals = new Map()
-
-    // Track document changes and states
-    this.changedDocuments = new Map()
-
-    // Time window for considering an add after remove as a reorder (milliseconds)
-    this.REORDER_DETECTION_WINDOW = 200
-
-    // Save changes dialog
-    this.saveChangesDialog = null
-  }
-
-  /** @param {import('@arts/elementor-types').Container} container */
-  markDocumentAsChanged(container) {
-    if (!container?.document?.id) return
+  markDocumentAsChanged(container: Container): void {
+    if (!container?.document?.id) { return }
     this.changedDocuments.set(container.document.id, true)
   }
 
-  /** @param {string | number} documentId */
-  clearDocumentChanges(documentId) {
+  clearDocumentChanges(documentId: string | number): void {
     this.changedDocuments.delete(documentId)
   }
 
-  /** @param {string | number} documentId */
-  hasDocumentChanges(documentId) {
+  hasDocumentChanges(documentId: string | number): boolean {
     return this.changedDocuments.has(documentId)
   }
 
-  /** @param {string} id */
-  setRecentRemoval(id) {
+  setRecentRemoval(id: string): void {
     this.recentRemovals.set(id, Date.now())
   }
 
-  /** @param {string} id */
-  hasRecentRemoval(id) {
+  hasRecentRemoval(id: string): boolean {
     return this.recentRemovals.has(id)
   }
 
-  /** @param {string} id */
-  deleteRecentRemoval(id) {
+  deleteRecentRemoval(id: string): void {
     this.recentRemovals.delete(id)
   }
 
-  cleanupRecentRemovals() {
+  cleanupRecentRemovals(): void {
     const now = Date.now()
     this.recentRemovals.forEach((timestamp, id) => {
       if (StateManager.isRemovalExpired(timestamp, now, this.REORDER_DETECTION_WINDOW)) {
@@ -67,28 +52,21 @@ export class StateManager {
     })
   }
 
-  /** @param {string} id */
-  hasRemovedItems(id) {
+  hasRemovedItems(id: string): boolean {
     return this.removedItems.has(id)
   }
 
-  /** @param {string} id */
-  markItemAsRemoved(id) {
+  markItemAsRemoved(id: string): void {
     this.removedItems.set(id, true)
   }
 
-  /** @param {string} id */
-  markItemAsRestored(id) {
+  markItemAsRestored(id: string): void {
     this.removedItems.delete(id)
   }
 
-  /**
-   * @param {() => void} onConfirm
-   * @param {() => void} onCancel
-   */
-  getSaveChangesDialog(onConfirm, onCancel) {
+  getSaveChangesDialog(onConfirm: () => void, onCancel: () => void): SaveChangesDialog | null {
     if (!this.saveChangesDialog) {
-      this.saveChangesDialog = window.elementorCommon?.dialogsManager.createWidget('confirm', {
+      this.saveChangesDialog = (window.elementorCommon?.dialogsManager.createWidget('confirm', {
         id: 'elementor-fluid-spacing-save-changes-dialog',
         headerMessage: window.ArtsFluidDSStrings?.saveChanges,
         message: window.ArtsFluidDSStrings?.saveChangesMessage,
@@ -100,7 +78,7 @@ export class StateManager {
           confirm: window.ArtsFluidDSStrings?.save,
           cancel: window.ArtsFluidDSStrings?.discard
         }
-      })
+      }) as SaveChangesDialog | undefined) ?? null
     }
 
     if (!this.saveChangesDialog) {
