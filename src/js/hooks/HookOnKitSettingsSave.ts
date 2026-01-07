@@ -1,23 +1,23 @@
 import { COMMANDS, HOOK_IDS } from '../constants'
 import dataManager from '../managers/DataManager'
+import type { HookArgs } from '@arts/elementor-types'
 
-const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+const commandSystem = window.$e!
 
 export class HookOnKitSettingsSave extends commandSystem.modules.hookUI.After {
-  getCommand() {
+  getCommand(): string {
     return COMMANDS.DOCUMENT.SAVE
   }
 
-  getId() {
+  getId(): string {
     return HOOK_IDS.KIT.SAVE
   }
 
-  /** @param {import('@arts/elementor-types').HookArgs} args */
-  getConditions(args) {
-    return args.document && args.document.config && args.document.config.type === 'kit'
+  getConditions(args: HookArgs): boolean {
+    return args.document?.config?.type === 'kit'
   }
 
-  apply() {
+  apply(): void {
     dataManager.invalidate()
   }
 }

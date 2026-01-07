@@ -2,33 +2,32 @@ import { stateManager, cssManager } from '../managers'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
 import { getItemId } from '../utils'
 import { isFluidPresetRepeater } from '../utils/controls'
+import type { HookArgs } from '@arts/elementor-types'
 
-const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+const commandSystem = window.$e!
 
 export class HookOnRepeaterAdd extends commandSystem.modules.hookUI.After {
-  getCommand() {
+  getCommand(): string {
     return COMMANDS.REPEATER.INSERT
   }
 
-  getId() {
+  getId(): string {
     return HOOK_IDS.REPEATER.ADD
   }
 
-  getContainerType() {
+  getContainerType(): string {
     return CONTAINER_TYPES.DOCUMENT
   }
 
-  /** @param {import('@arts/elementor-types').HookArgs} args */
-  getConditions(args) {
+  getConditions(args: HookArgs): boolean {
     return isFluidPresetRepeater(args.name, args.container)
   }
 
-  /** @param {import('@arts/elementor-types').HookArgs} args */
-  apply(args) {
+  apply(args: HookArgs): void {
     const { isRestored } = args
     const addedItemId = getItemId(args.model)
 
-    if (!addedItemId) return
+    if (!addedItemId) { return }
 
     // Mark document as having changes
     stateManager.markDocumentAsChanged(args.container)

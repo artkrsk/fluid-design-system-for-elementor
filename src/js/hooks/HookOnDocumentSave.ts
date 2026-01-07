@@ -1,28 +1,28 @@
 import stateManager from '../managers/StateManager'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
+import type { HookArgs } from '@arts/elementor-types'
 
-const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+const commandSystem = window.$e!
 
 export class HookOnDocumentSave extends commandSystem.modules.hookUI.After {
-  getCommand() {
+  getCommand(): string {
     return COMMANDS.DOCUMENT.UPDATE
   }
 
-  getId() {
+  getId(): string {
     return HOOK_IDS.DOCUMENT.SAVE
   }
 
-  getContainerType() {
+  getContainerType(): string {
     return CONTAINER_TYPES.DOCUMENT
   }
 
-  getConditions() {
+  getConditions(): boolean {
     return true // Apply to any document
   }
 
-  /** @param {import('@arts/elementor-types').HookArgs} args */
-  apply(args) {
-    if (args.document && args.document.id) {
+  apply(args: HookArgs): void {
+    if (args.document?.id) {
       stateManager.clearDocumentChanges(args.document.id)
     }
   }
