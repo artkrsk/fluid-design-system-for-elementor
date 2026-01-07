@@ -123,6 +123,7 @@ class PresetUtils {
    */
   static handleComplexPresetInheritance(optionEl, preset) {
     const {
+      value,
       min_size,
       min_unit,
       max_size,
@@ -135,6 +136,7 @@ class PresetUtils {
     } = preset
 
     optionEl.setAttribute('data-inherited-preset', 'true')
+    optionEl.setAttribute('data-value-display', value)
     PresetUtils.#setElementAttributes(optionEl, {
       'data-min-size': min_size,
       'data-min-unit': min_unit,
@@ -171,7 +173,7 @@ class PresetUtils {
         optionEl.setAttribute('data-value-display', inheritedSize ?? '')
         optionEl.textContent = inheritedPreset.name
       }
-    } else if (inheritedSize) {
+    } else if (inheritedSize && inheritedSize !== CUSTOM_FLUID_VALUE) {
       // Check if it's an inline clamp formula
       const parsed = parseClampFormula(inheritedSize)
       if (parsed) {
@@ -204,6 +206,8 @@ class PresetUtils {
         optionEl.textContent = displayValue
       }
     }
+    // Note: CUSTOM_FLUID_VALUE without actual clamp formula is skipped
+    // to show simple inherit option instead of raw "__custom__" value
   }
 
   /**
