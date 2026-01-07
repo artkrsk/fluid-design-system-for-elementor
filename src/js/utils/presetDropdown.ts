@@ -1,15 +1,9 @@
-import { buildSelectOptions } from './preset.js'
+import { buildSelectOptions } from './preset'
 
-/**
- * Manages preset dropdown UI operations
- */
+/** Manages preset dropdown UI operations */
 export class PresetDropdownManager {
-  /**
-   * Refreshes a single dropdown with fresh preset data
-   * @param {HTMLSelectElement} selectEl - Select element to refresh
-   * @param {HTMLElement} controlEl - Control element for context
-   */
-  static async refreshDropdown(selectEl, controlEl) {
+  /** Refreshes a single dropdown with fresh preset data */
+  static async refreshDropdown(selectEl: HTMLSelectElement, controlEl: HTMLElement): Promise<void> {
     // Clear existing options
     selectEl.innerHTML = ''
 
@@ -20,12 +14,8 @@ export class PresetDropdownManager {
     jQuery(selectEl).trigger('change.select2')
   }
 
-  /**
-   * Refreshes multiple dropdowns with fresh preset data
-   * @param {HTMLSelectElement[]} selectElements - Array of select elements
-   * @param {HTMLElement} controlEl - Control element for context
-   */
-  static async refreshDropdowns(selectElements, controlEl) {
+  /** Refreshes multiple dropdowns with fresh preset data */
+  static async refreshDropdowns(selectElements: HTMLSelectElement[] | null, controlEl: HTMLElement): Promise<void> {
     if (!selectElements || !Array.isArray(selectElements)) {
       return
     }
@@ -35,12 +25,8 @@ export class PresetDropdownManager {
     }
   }
 
-  /**
-   * Updates select element value and triggers Select2 update
-   * @param {HTMLSelectElement} selectEl - Select element
-   * @param {string} value - Value to set
-   */
-  static updateSelectValue(selectEl, value) {
+  /** Updates select element value and triggers Select2 update */
+  static updateSelectValue(selectEl: HTMLSelectElement, value: string): void {
     selectEl.value = value
     selectEl.setAttribute('data-value', value)
     jQuery(selectEl).trigger('change.select2')

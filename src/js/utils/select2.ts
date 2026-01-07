@@ -1,17 +1,16 @@
-import { TemplateRenderer } from './templates.js'
+import { TemplateRenderer } from './templates'
+import type {
+  TSelect2State,
+  TSelect2MatcherData,
+  TSelect2SearchOptions,
+  TSelect2OptionData
+} from '../types'
 
-/**
- * @typedef {Select2.OptionData | Select2.LoadingData | Select2.OptGroupData} Select2State
- * @typedef {Select2.OptionData | Select2.OptGroupData} Select2MatcherData
- */
+// Re-export for JSDoc compatibility in templates.js
+export type { TSelect2State as Select2State } from '../types'
 
 class Select2Utils {
-  /**
-   * @param {Select2State} state
-   * @param {boolean} isTemplateResult
-   * @returns {JQuery<HTMLElement>|string}
-   */
-  static getTemplateSelect2(state, isTemplateResult) {
+  static getTemplateSelect2(state: TSelect2State, isTemplateResult: boolean): JQuery<HTMLElement> | string {
     return TemplateRenderer.getTemplateSelect2(state, isTemplateResult)
   }
 
@@ -21,17 +20,16 @@ class Select2Utils {
       dropdownAutoWidth: true,
       theme: 'default select2-container--width-auto',
       containerCssClass: 'select2-selection--height-large',
-      templateResult: /** @param {Select2State} state */ (state) => Select2Utils.getTemplateSelect2(state, true),
-      templateSelection: /** @param {Select2State} state */ (state) => Select2Utils.getTemplateSelect2(state, false),
-      /** @type {(params: Select2.SearchOptions, data: Select2MatcherData) => Select2MatcherData | null} */
-      matcher: (params, data) => {
+      templateResult: (state: TSelect2State) => Select2Utils.getTemplateSelect2(state, true),
+      templateSelection: (state: TSelect2State) => Select2Utils.getTemplateSelect2(state, false),
+      matcher: (params: TSelect2SearchOptions, data: TSelect2MatcherData): TSelect2MatcherData | null => {
         // No search term - show everything
         if (jQuery.trim(params.term) === '') {
           return data
         }
 
         // Regular option (no children) - default text matching
-        if (typeof data.children === 'undefined') {
+        if (!('children' in data) || typeof data.children === 'undefined') {
           if (data.text.toUpperCase().indexOf(params.term.toUpperCase()) > -1) {
             return data
           }
@@ -48,17 +46,18 @@ class Select2Utils {
         }
 
         // Group doesn't match - filter children individually
-        /** @type {Select2.OptionData[]} */
-        const filteredChildren = []
-        jQuery.each(data.children, (idx, /** @type {Select2.OptionData} */ child) => {
+        const filteredChildren: TSelect2OptionData[] = []
+        jQuery.each(data.children, (_idx: number, child: TSelect2OptionData) => {
           if (child.text.toUpperCase().indexOf(term) > -1) {
             filteredChildren.push(child)
           }
         })
 
         if (filteredChildren.length) {
-          const modifiedData = jQuery.extend({}, data, true)
-          modifiedData.children = filteredChildren
+          const modifiedData = jQuery.extend({}, data, true) as TSelect2MatcherData
+          if ('children' in modifiedData) {
+            modifiedData.children = filteredChildren
+          }
           return modifiedData
         }
 

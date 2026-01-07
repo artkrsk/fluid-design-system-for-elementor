@@ -1,41 +1,49 @@
-import { createElement } from './dom.js'
-import { ValidationService } from './validation.js'
-import { ValueFormatter } from './formatters.js'
+import { createElement } from './dom'
+import { ValidationService } from './validation'
+import { ValueFormatter } from './formatters'
 import { UI_DEFAULTS } from '../constants/VALUES'
 
-/**
- * Manages inline min/max input fields for custom fluid values
- */
+interface IInlineContainerResult {
+  container: HTMLElement
+  abortController: AbortController
+}
+
+interface IInlineInputValues {
+  minSize: string
+  minUnit: string
+  maxSize: string
+  maxUnit: string
+}
+
+/** Manages inline min/max input fields for custom fluid values */
 export class InlineInputManager {
-  /**
-   * Creates the inline min/max input container with event listeners
-   * @param {string} setting - Setting name (e.g., 'top', 'size')
-   * @param {Function} onInputChange - Callback when input values change
-   * @param {Function} onSaveClick - Callback when save button is clicked
-   * @returns {{container: HTMLElement, abortController: AbortController}} Container and abort controller
-   */
-  static createContainer(setting, onInputChange, onSaveClick) {
+  /** Creates the inline min/max input container with event listeners */
+  static createContainer(
+    setting: string,
+    onInputChange: ((setting: string) => void) | null,
+    onSaveClick: ((setting: string) => void) | null
+  ): IInlineContainerResult {
     const container = createElement('div', 'e-fluid-inline-container e-hidden', {
       'data-setting': setting
     })
 
     // Min value input (text input accepting "20px", "1.5rem", etc.)
-    const minInput = /** @type {HTMLInputElement} */ (createElement('input', 'e-fluid-inline-input', {
+    const minInput = createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'min',
       placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER
-    }))
+    }) as HTMLInputElement
 
     // Separator
     const separator = createElement('span', 'e-fluid-inline-separator')
     separator.textContent = '~'
 
     // Max value input
-    const maxInput = /** @type {HTMLInputElement} */ (createElement('input', 'e-fluid-inline-input', {
+    const maxInput = createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'max',
       placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER
-    }))
+    }) as HTMLInputElement
 
     container.appendChild(minInput)
     container.appendChild(separator)
@@ -45,7 +53,7 @@ export class InlineInputManager {
     const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
       type: 'button',
       title: window.ArtsFluidDSStrings?.saveAsPreset ?? ''
-    })
+    }) as HTMLButtonElement
     const icon = createElement('i', 'eicon-plus')
     saveButton.appendChild(icon)
     container.appendChild(saveButton)
@@ -74,7 +82,7 @@ export class InlineInputManager {
     // Attach button click listener with AbortController
     saveButton.addEventListener(
       'click',
-      /** @param {Event} e */ (e) => {
+      (e: Event) => {
         e.preventDefault()
         if (onSaveClick) {
           onSaveClick(setting)
@@ -89,30 +97,19 @@ export class InlineInputManager {
     return { container, abortController }
   }
 
-  /**
-   * Updates separator text based on value equality
-   * @param {HTMLInputElement} minInput - Min input element
-   * @param {HTMLInputElement} maxInput - Max input element
-   * @param {HTMLElement} separator - Separator element
-   */
-  static updateSeparator(minInput, maxInput, separator) {
+  /** Updates separator text based on value equality */
+  static updateSeparator(minInput: HTMLInputElement, maxInput: HTMLInputElement, separator: HTMLElement): void {
     const minParsed = ValidationService.parseValueWithUnit(minInput.value)
     const maxParsed = ValidationService.parseValueWithUnit(maxInput.value)
 
     separator.textContent = ValueFormatter.calculateSeparator(minParsed, maxParsed)
   }
 
-  /**
-   * Updates save button disabled state based on input validity
-   * @param {HTMLElement} container - Inline input container
-   */
-  static updateSaveButtonState(container) {
-    /** @type {HTMLInputElement|null} */
-    const minInput = container.querySelector('[data-fluid-role="min"]')
-    /** @type {HTMLInputElement|null} */
-    const maxInput = container.querySelector('[data-fluid-role="max"]')
-    /** @type {HTMLButtonElement|null} */
-    const saveButton = container.querySelector('.e-fluid-save-preset')
+  /** Updates save button disabled state based on input validity */
+  static updateSaveButtonState(container: HTMLElement): void {
+    const minInput = container.querySelector('[data-fluid-role="min"]') as HTMLInputElement | null
+    const maxInput = container.querySelector('[data-fluid-role="max"]') as HTMLInputElement | null
+    const saveButton = container.querySelector('.e-fluid-save-preset') as HTMLButtonElement | null
 
     if (!minInput || !maxInput || !saveButton) {
       return
@@ -122,20 +119,14 @@ export class InlineInputManager {
     saveButton.disabled = !validation.valid
   }
 
-  /**
-   * Gets inline input values for a setting
-   * @param {HTMLElement} container - Inline input container
-   * @returns {{minSize: string, minUnit: string, maxSize: string, maxUnit: string}|null} Input values or null
-   */
-  static getInputValues(container) {
+  /** Gets inline input values for a setting */
+  static getInputValues(container: HTMLElement | null): IInlineInputValues | null {
     if (!container) {
       return null
     }
 
-    /** @type {HTMLInputElement|null} */
-    const minInput = container.querySelector('[data-fluid-role="min"]')
-    /** @type {HTMLInputElement|null} */
-    const maxInput = container.querySelector('[data-fluid-role="max"]')
+    const minInput = container.querySelector('[data-fluid-role="min"]') as HTMLInputElement | null
+    const maxInput = container.querySelector('[data-fluid-role="max"]') as HTMLInputElement | null
 
     const minValue = minInput?.value ?? ''
     const maxValue = maxInput?.value ?? ''
@@ -155,20 +146,14 @@ export class InlineInputManager {
     }
   }
 
-  /**
-   * Sets inline input values (used when loading existing inline value)
-   * @param {HTMLElement} container - Inline input container
-   * @param {{minSize: string, minUnit: string, maxSize: string, maxUnit: string}} values - Values to set
-   */
-  static setInputValues(container, values) {
+  /** Sets inline input values (used when loading existing inline value) */
+  static setInputValues(container: HTMLElement | null, values: IInlineInputValues | null): void {
     if (!container || !values) {
       return
     }
 
-    /** @type {HTMLInputElement|null} */
-    const minInput = container.querySelector('[data-fluid-role="min"]')
-    /** @type {HTMLInputElement|null} */
-    const maxInput = container.querySelector('[data-fluid-role="max"]')
+    const minInput = container.querySelector('[data-fluid-role="min"]') as HTMLInputElement | null
+    const maxInput = container.querySelector('[data-fluid-role="max"]') as HTMLInputElement | null
 
     if (minInput && values.minSize) {
       minInput.value = `${values.minSize}${values.minUnit || 'px'}`
@@ -180,8 +165,7 @@ export class InlineInputManager {
     }
 
     // Update separator after setting values
-    /** @type {HTMLElement|null} */
-    const separator = container.querySelector('.e-fluid-inline-separator')
+    const separator = container.querySelector('.e-fluid-inline-separator') as HTMLElement | null
     if (minInput && maxInput && separator) {
       InlineInputManager.updateSeparator(minInput, maxInput, separator)
     }
@@ -190,23 +174,15 @@ export class InlineInputManager {
     InlineInputManager.updateSaveButtonState(container)
   }
 
-  /**
-   * Toggles visibility of inline inputs
-   * @param {HTMLElement} container - Inline input container
-   * @param {boolean} show - Whether to show or hide
-   */
-  static toggleVisibility(container, show) {
+  /** Toggles visibility of inline inputs */
+  static toggleVisibility(container: HTMLElement | null, show: boolean): void {
     if (container) {
       container.classList.toggle('e-hidden', !show)
     }
   }
 
-  /**
-   * Syncs values across multiple linked containers (for linked dimensions)
-   * @param {HTMLElement[]} containers - Array of containers to sync
-   * @param {{minSize: string, minUnit: string, maxSize: string, maxUnit: string}} values - Values to sync
-   */
-  static syncLinkedContainers(containers, values) {
+  /** Syncs values across multiple linked containers (for linked dimensions) */
+  static syncLinkedContainers(containers: HTMLElement[] | null, values: IInlineInputValues | null): void {
     if (!containers || !values) {
       return
     }
@@ -216,10 +192,8 @@ export class InlineInputManager {
         return
       }
 
-      /** @type {HTMLInputElement|null} */
-      const minInput = container.querySelector('[data-fluid-role="min"]')
-      /** @type {HTMLInputElement|null} */
-      const maxInput = container.querySelector('[data-fluid-role="max"]')
+      const minInput = container.querySelector('[data-fluid-role="min"]') as HTMLInputElement | null
+      const maxInput = container.querySelector('[data-fluid-role="max"]') as HTMLInputElement | null
 
       if (minInput) {
         minInput.value = `${values.minSize}${values.minUnit}`
@@ -231,8 +205,7 @@ export class InlineInputManager {
       }
 
       // Update separator after setting values
-      /** @type {HTMLElement|null} */
-      const separator = container.querySelector('.e-fluid-inline-separator')
+      const separator = container.querySelector('.e-fluid-inline-separator') as HTMLElement | null
       if (minInput && maxInput && separator) {
         InlineInputManager.updateSeparator(minInput, maxInput, separator)
       }

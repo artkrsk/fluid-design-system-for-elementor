@@ -1,17 +1,11 @@
-import { ValueFormatter } from './formatters.js'
-import { getInheritedPresetSync } from './preset.js'
+import { ValueFormatter } from './formatters'
+import { getInheritedPresetSync } from './preset'
+import type { TSelect2State } from '../types'
 
-/**
- * HTML template generation utilities for Select2 preset options
- */
+/** HTML template generation utilities for Select2 preset options */
 export class TemplateRenderer {
-  /**
-   * Creates a base template container
-   * @param {string} className - Additional CSS classes
-   * @param {string} content - Inner HTML content
-   * @returns {JQuery<HTMLElement>} jQuery element
-   */
-  static createBaseTemplate(className = '', content = '') {
+  /** Creates a base template container */
+  static createBaseTemplate(className: string = '', content: string = ''): JQuery<HTMLElement> {
     return jQuery(`
       <span class="select2-result-fluid-spacing-formatted ${className}">
         ${content}
@@ -19,12 +13,8 @@ export class TemplateRenderer {
     `)
   }
 
-  /**
-   * Creates a header section
-   * @param {string} content - Header content
-   * @returns {string} Header HTML
-   */
-  static createHeader(content) {
+  /** Creates a header section */
+  static createHeader(content: string): string {
     return `
       <span class="select2-result-fluid-spacing-formatted__header">
         ${content}
@@ -32,12 +22,8 @@ export class TemplateRenderer {
     `
   }
 
-  /**
-   * Creates a footer section
-   * @param {string} content - Footer content
-   * @returns {string} Footer HTML
-   */
-  static createFooter(content) {
+  /** Creates a footer section */
+  static createFooter(content: string): string {
     return `
       <span class="select2-result-fluid-spacing-formatted__footer">
         ${content}
@@ -45,12 +31,8 @@ export class TemplateRenderer {
     `
   }
 
-  /**
-   * Creates template for inherited value
-   * @param {string} valueDisplay - Value to display
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static createInheritTemplate(valueDisplay) {
+  /** Creates template for inherited value */
+  static createInheritTemplate(valueDisplay: string): JQuery<HTMLElement> {
     return TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',
       `
@@ -64,13 +46,8 @@ export class TemplateRenderer {
     )
   }
 
-  /**
-   * Creates simple inherit template
-   * @param {HTMLElement} element - Option element
-   * @param {string} text - Option text
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static createSimpleInheritTemplate(element, text) {
+  /** Creates simple inherit template */
+  static createSimpleInheritTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
     const inheritedTitle =
       element.getAttribute('data-inherited-title') ||
       text ||
@@ -84,16 +61,14 @@ export class TemplateRenderer {
     )
   }
 
-  /**
-   * Creates template for complex preset (with min/max values)
-   * @param {string} minSize - Minimum size
-   * @param {string} minUnit - Minimum unit
-   * @param {string} maxSize - Maximum size
-   * @param {string} maxUnit - Maximum unit
-   * @param {string} name - Preset name
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static createComplexPresetTemplate(minSize, minUnit, maxSize, maxUnit, name) {
+  /** Creates template for complex preset (with min/max values) */
+  static createComplexPresetTemplate(
+    minSize: string,
+    minUnit: string,
+    maxSize: string,
+    maxUnit: string,
+    name: string
+  ): JQuery<HTMLElement> {
     return TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',
       `
@@ -107,12 +82,8 @@ export class TemplateRenderer {
     )
   }
 
-  /**
-   * Handles fluid preset template rendering
-   * @param {string} valueDisplay - Display value
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static handleFluidPresetTemplate(valueDisplay) {
+  /** Handles fluid preset template rendering */
+  static handleFluidPresetTemplate(valueDisplay: string): JQuery<HTMLElement> {
     const inheritedPreset = getInheritedPresetSync(valueDisplay)
 
     if (inheritedPreset && inheritedPreset.isComplex) {
@@ -129,13 +100,8 @@ export class TemplateRenderer {
     return TemplateRenderer.createInheritTemplate(valueDisplay)
   }
 
-  /**
-   * Handles empty value template
-   * @param {HTMLElement} element - Option element
-   * @param {string} text - Option text
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static handleEmptyValueTemplate(element, text) {
+  /** Handles empty value template */
+  static handleEmptyValueTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
     const valueDisplay = element.getAttribute('data-value-display')
 
     if (valueDisplay) {
@@ -151,14 +117,12 @@ export class TemplateRenderer {
     return TemplateRenderer.createSimpleInheritTemplate(element, text)
   }
 
-  /**
-   * Creates template for inherited value
-   * @param {HTMLElement} element - Option element
-   * @param {string} valueDisplay - Display value
-   * @param {string} title - Title
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static createInheritedValueTemplate(element, valueDisplay, title) {
+  /** Creates template for inherited value */
+  static createInheritedValueTemplate(
+    element: HTMLElement,
+    valueDisplay: string,
+    title: string
+  ): JQuery<HTMLElement> {
     const isCustomValue = element.getAttribute('data-custom-value') === 'true'
     const minSize = element.getAttribute('data-min-size')
     const minUnit = element.getAttribute('data-min-unit')
@@ -216,17 +180,15 @@ export class TemplateRenderer {
     return markup
   }
 
-  /**
-   * Creates template for inherited preset
-   * @param {string} minSize - Minimum size
-   * @param {string} minUnit - Minimum unit
-   * @param {string} maxSize - Maximum size
-   * @param {string} maxUnit - Maximum unit
-   * @param {string} title - Preset title
-   * @param {HTMLElement} element - Option element
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static createInheritedPresetTemplate(minSize, minUnit, maxSize, maxUnit, title, element) {
+  /** Creates template for inherited preset */
+  static createInheritedPresetTemplate(
+    minSize: string,
+    minUnit: string,
+    maxSize: string,
+    maxUnit: string,
+    title: string,
+    element: HTMLElement
+  ): JQuery<HTMLElement> {
     const headerContent = ValueFormatter.formatSizeRange(minSize, minUnit, maxSize, maxUnit, {
       includeSpan: true
     })
@@ -250,13 +212,8 @@ export class TemplateRenderer {
     return markup
   }
 
-  /**
-   * Creates template for custom preset
-   * @param {string} displayValue - Display value
-   * @param {string} title - Preset title
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static createCustomPresetTemplate(displayValue, title) {
+  /** Creates template for custom preset */
+  static createCustomPresetTemplate(displayValue: string, title: string): JQuery<HTMLElement> {
     const markup = TemplateRenderer.createBaseTemplate(
       '',
       TemplateRenderer.createHeader(`
@@ -276,28 +233,17 @@ export class TemplateRenderer {
     return markup
   }
 
-  /**
-   * Creates template for normal value
-   * @param {string} minSize - Minimum size
-   * @param {string} minUnit - Minimum unit
-   * @param {string} maxSize - Maximum size
-   * @param {string} maxUnit - Maximum unit
-   * @param {string} title - Title
-   * @param {string} text - Text content
-   * @param {boolean} isTemplateResult - Whether this is for template result
-   * @param {HTMLElement} element - Option element
-   * @returns {JQuery<HTMLElement>} Template element
-   */
+  /** Creates template for normal value */
   static createNormalValueTemplate(
-    minSize,
-    minUnit,
-    maxSize,
-    maxUnit,
-    title,
-    text,
-    isTemplateResult,
-    element
-  ) {
+    minSize: string,
+    minUnit: string,
+    maxSize: string,
+    maxUnit: string,
+    title: string,
+    text: string,
+    isTemplateResult: boolean,
+    element: HTMLElement
+  ): JQuery<HTMLElement> {
     // If we have a title but no min/max sizes, render simple title-only template
     if (title && (!minSize || !maxSize)) {
       return TemplateRenderer.createBaseTemplate(
@@ -361,14 +307,12 @@ export class TemplateRenderer {
     )
   }
 
-  /**
-   * Handles non-empty value template
-   * @param {HTMLElement} element - Option element
-   * @param {string} text - Option text
-   * @param {boolean} isTemplateResult - Whether this is for template result
-   * @returns {JQuery<HTMLElement>} Template element
-   */
-  static handleNonEmptyValueTemplate(element, text, isTemplateResult) {
+  /** Handles non-empty value template */
+  static handleNonEmptyValueTemplate(
+    element: HTMLElement,
+    text: string,
+    isTemplateResult: boolean
+  ): JQuery<HTMLElement> {
     const isInheritedPreset = element.getAttribute('data-inherited-preset')
     const isInheritedValue = element.getAttribute('data-inherited-value')
     const title = element.getAttribute('data-title') || ''
@@ -409,18 +353,13 @@ export class TemplateRenderer {
     )
   }
 
-  /**
-   * Main template selection function for Select2
-   * @param {import('./select2.js').Select2State} state
-   * @param {boolean} isTemplateResult
-   * @returns {JQuery<HTMLElement>|string}
-   */
-  static getTemplateSelect2(state, isTemplateResult) {
+  /** Main template selection function for Select2 */
+  static getTemplateSelect2(state: TSelect2State, isTemplateResult: boolean): JQuery<HTMLElement> | string {
     if (!state.element) {
       return state.text
     }
 
-    const element = /** @type {HTMLOptionElement} */ (state.element)
+    const element = state.element as HTMLOptionElement
 
     if (element.value === '') {
       return TemplateRenderer.handleEmptyValueTemplate(element, state.text)

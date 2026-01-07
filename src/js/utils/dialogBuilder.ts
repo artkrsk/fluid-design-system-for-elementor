@@ -1,21 +1,10 @@
-import { PresetAPIService } from '../services/presetAPI.js'
+import { PresetAPIService } from '../services/presetAPI'
 import { SELECT2_CONFIG } from '../constants/VALUES'
 
-/**
- * Dialog building utilities for preset dialogs
- * Pure helper functions with no complex logic or timing dependencies
- * Extracted from duplicated dialog creation code for safety and reusability
- */
+/** Dialog building utilities for preset dialogs */
 export class DialogBuilder {
-  /**
-   * Creates read-only preview display of min/max values
-   * @param {string} minSize - Minimum size
-   * @param {string} minUnit - Minimum unit
-   * @param {string} maxSize - Maximum size
-   * @param {string} maxUnit - Maximum unit
-   * @returns {JQuery<HTMLElement>} Preview element
-   */
-  static createPreviewDisplay(minSize, minUnit, maxSize, maxUnit) {
+  /** Creates read-only preview display of min/max values */
+  static createPreviewDisplay(minSize: string, minUnit: string, maxSize: string, maxUnit: string): JQuery {
     const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
     return jQuery('<div>', {
       class: 'e-fluid-preset-preview',
@@ -23,13 +12,8 @@ export class DialogBuilder {
     })
   }
 
-  /**
-   * Creates preset name input field
-   * @param {string} defaultValue - Default input value
-   * @param {string | null} placeholder - Input placeholder text (defaults to translation)
-   * @returns {JQuery<HTMLElement>} Input element
-   */
-  static createNameInput(defaultValue = '', placeholder = null) {
+  /** Creates preset name input field */
+  static createNameInput(defaultValue: string = '', placeholder: string | null = null): JQuery {
     return jQuery('<input>', {
       type: 'text',
       name: 'preset-name',
@@ -38,24 +22,16 @@ export class DialogBuilder {
     })
   }
 
-  /**
-   * Creates group selector dropdown
-   * @returns {JQuery<HTMLElement>} Select element
-   */
-  static createGroupSelector() {
+  /** Creates group selector dropdown */
+  static createGroupSelector(): JQuery {
     return jQuery('<select>', {
       name: 'preset-group',
       class: 'e-fluid-group-select'
     })
   }
 
-  /**
-   * Populates group selector with available groups
-   * Uses PresetAPIService to fetch groups, falls back to defaults on error
-   * @param {JQuery<HTMLElement>} $select - Select element to populate
-   * @param {string | null} defaultGroup - Optional group ID to pre-select
-   */
-  static async populateGroupSelector($select, defaultGroup = null) {
+  /** Populates group selector with available groups */
+  static async populateGroupSelector($select: JQuery, defaultGroup: string | null = null): Promise<void> {
     try {
       const groups = await PresetAPIService.fetchGroups()
 
@@ -91,12 +67,8 @@ export class DialogBuilder {
     }
   }
 
-  /**
-   * Initializes Select2 on group selector
-   * @param {JQuery<HTMLElement>} $select - Select element
-   * @param {Object} options - Optional Select2 options to merge
-   */
-  static initializeSelect2($select, options = {}) {
+  /** Initializes Select2 on group selector */
+  static initializeSelect2($select: JQuery, options: Record<string, unknown> = {}): void {
     const defaultOptions = {
       minimumResultsForSearch: SELECT2_CONFIG.HIDE_SEARCH_BOX,
       width: '100%'
@@ -104,13 +76,8 @@ export class DialogBuilder {
     $select.select2({ ...defaultOptions, ...options })
   }
 
-  /**
-   * Attaches name validation to input field
-   * Updates button state based on input validity
-   * @param {JQuery<HTMLElement>} $input - Name input element
-   * @param {JQuery<HTMLElement>} $button - Confirm button element
-   */
-  static attachNameValidation($input, $button) {
+  /** Attaches name validation to input field */
+  static attachNameValidation($input: JQuery, $button: JQuery): void {
     $input.on('input', () => {
       const inputValue = String($input.val() || '')
       const isNameValid = inputValue.trim().length > 0
@@ -118,12 +85,8 @@ export class DialogBuilder {
     })
   }
 
-  /**
-   * Attaches Enter key handler for form submission
-   * @param {JQuery<HTMLElement>} $input - Input element to listen on
-   * @param {JQuery<HTMLElement>} $button - Button to click on Enter
-   */
-  static attachEnterKeyHandler($input, $button) {
+  /** Attaches Enter key handler for form submission */
+  static attachEnterKeyHandler($input: JQuery, $button: JQuery): void {
     $input.on('keydown', (e) => {
       if (e.key === 'Enter' && !$button.prop('disabled')) {
         e.preventDefault()
@@ -132,23 +95,15 @@ export class DialogBuilder {
     })
   }
 
-  /**
-   * Auto-focuses input and selects text
-   * @param {JQuery<HTMLElement>} $input - Input element to focus
-   * @param {number} delay - Delay in milliseconds (default 50)
-   */
-  static autoFocusInput($input, delay = 50) {
+  /** Auto-focuses input and selects text */
+  static autoFocusInput($input: JQuery, delay: number = 50): void {
     setTimeout(() => {
       $input.focus().select()
     }, delay)
   }
 
-  /**
-   * Sets initial button state based on input value
-   * @param {JQuery<HTMLElement>} $input - Input element to check
-   * @param {JQuery<HTMLElement>} $button - Button to enable/disable
-   */
-  static setInitialButtonState($input, $button) {
+  /** Sets initial button state based on input value */
+  static setInitialButtonState($input: JQuery, $button: JQuery): void {
     const initialValue = String($input.val() || '')
     const hasInitialName = initialValue.trim().length > 0
     $button.prop('disabled', !hasInitialName)

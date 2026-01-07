@@ -1,17 +1,16 @@
-/**
- * Manages inheritance attribute setup for fluid control selectors
- * Sets data-* attributes that are used by preset.js when building inherit options
- */
+import type { BackboneModel } from '@arts/elementor-types'
+import type { IInheritedControlValue } from '../interfaces'
+
+/** Manages inheritance attribute setup for fluid control selectors */
 export class InheritanceAttributeManager {
-  /**
-   * Sets up inheritance attributes if control is responsive
-   * @param {HTMLElement} fluidSelector
-   * @param {string} propertyName - Property name to read ('size' for slider, 'top'/'left'/etc for dimensions)
-   * @param {import('@arts/elementor-types').BackboneModel} controlModel
-   * @param {() => import('../interfaces').IInheritedControlValue | null} getParentValueFn
-   */
-  static setupAttributes(fluidSelector, propertyName, controlModel, getParentValueFn) {
-    const controlName = controlModel.get('name')
+  /** Sets up inheritance attributes if control is responsive */
+  static setupAttributes(
+    fluidSelector: HTMLElement,
+    propertyName: string,
+    controlModel: BackboneModel,
+    getParentValueFn: () => IInheritedControlValue | null
+  ): void {
+    const controlName = controlModel.get('name') as string | undefined
     const isResponsiveControl = controlName && /_(?!.*_)(.+)$/.test(controlName)
 
     if (isResponsiveControl) {
@@ -22,13 +21,12 @@ export class InheritanceAttributeManager {
     }
   }
 
-  /**
-   * Sets inheritance data attributes on selector element
-   * @param {HTMLElement} fluidSelector
-   * @param {import('../interfaces').IInheritedControlValue} inheritedControl
-   * @param {string} propertyName
-   */
-  static setAttributes(fluidSelector, inheritedControl, propertyName) {
+  /** Sets inheritance data attributes on selector element */
+  static setAttributes(
+    fluidSelector: HTMLElement,
+    inheritedControl: IInheritedControlValue,
+    propertyName: string
+  ): void {
     const inheritedSize = inheritedControl[propertyName]
     const inheritedUnit = inheritedControl.unit
     const sourceUnit = inheritedControl.__sourceUnit || inheritedUnit

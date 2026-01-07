@@ -1,15 +1,21 @@
 import { createElement } from './dom'
 import { dataManager } from '../managers'
-import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
+import { CUSTOM_FLUID_VALUE } from '../constants'
 import { parseClampFormula } from './clamp'
-import { ValueFormatter } from './formatters.js'
+import { ValueFormatter } from './formatters'
+import type { IFluidPreset, ICustomPreset, IInheritanceData } from '../interfaces'
+import type { TInheritedPresetResult } from '../types'
+
+/** Type guard to check if preset is IFluidPreset */
+function isFluidPreset(preset: IFluidPreset | ICustomPreset): preset is IFluidPreset {
+  return 'min_size' in preset && 'max_size' in preset
+}
 
 class PresetUtils {
-  /**
-   * @param {HTMLElement} element
-   * @param {Record<string, string | boolean | undefined | null>} attributes
-   */
-  static #setElementAttributes(element, attributes) {
+  static #setElementAttributes(
+    element: HTMLElement,
+    attributes: Record<string, string | boolean | undefined | null>
+  ): void {
     Object.entries(attributes).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         element.setAttribute(key, String(value))
@@ -17,14 +23,12 @@ class PresetUtils {
     })
   }
 
-  /**
-   * @param {string} value
-   * @param {string} currentValue
-   * @param {Record<string, string | boolean | undefined>} [attributes]
-   * @returns {HTMLOptionElement}
-   */
-  static #createBaseOption(value, currentValue, attributes = {}) {
-    const optionEl = /** @type {HTMLOptionElement} */ (createElement('option'))
+  static #createBaseOption(
+    value: string,
+    currentValue: string,
+    attributes: Record<string, string | boolean | undefined> = {}
+  ): HTMLOptionElement {
+    const optionEl = createElement('option') as HTMLOptionElement
     optionEl.value = value
     if (currentValue === value) {
       optionEl.setAttribute('selected', 'selected')
@@ -33,11 +37,7 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * @param {import('../interfaces').IFluidPreset} preset
-   * @param {string} currentValue
-   */
-  static createPresetOption(preset, currentValue) {
+  static createPresetOption(preset: IFluidPreset, currentValue: string): HTMLOptionElement {
     const {
       id,
       value,
@@ -71,11 +71,7 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * @param {import('../interfaces').ICustomPreset} preset
-   * @param {string} currentValue
-   */
-  static createCustomPresetOption(preset, currentValue) {
+  static createCustomPresetOption(preset: ICustomPreset, currentValue: string): HTMLOptionElement {
     const { id, value, title, display_value } = preset
 
     const optionEl = PresetUtils.#createBaseOption(value, currentValue, {
@@ -100,24 +96,23 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * @param {HTMLOptionElement} optionEl
-   * @param {import('../interfaces').IInheritanceData & {name?: string}} inheritanceData
-   */
-  static handleMixedUnitsInheritance(optionEl, inheritanceData) {
+  static handleMixedUnitsInheritance(
+    optionEl: HTMLOptionElement,
+    inheritanceData: IInheritanceData & { name?: string }
+  ): void {
     const { inheritedSize, sourceUnit, inheritedFrom, inheritedVia, inheritedDevice, name } =
       inheritanceData
 
     optionEl.setAttribute('data-mixed-units', 'true')
     optionEl.setAttribute('data-inherited-title', name ?? '')
 
-    if (inheritedFrom) optionEl.setAttribute('data-inherited-from', inheritedFrom)
-    if (inheritedVia) optionEl.setAttribute('data-inherited-via', inheritedVia)
-    if (inheritedDevice) optionEl.setAttribute('data-inherited-device', inheritedDevice)
+    if (inheritedFrom) { optionEl.setAttribute('data-inherited-from', inheritedFrom) }
+    if (inheritedVia) { optionEl.setAttribute('data-inherited-via', inheritedVia) }
+    if (inheritedDevice) { optionEl.setAttribute('data-inherited-device', inheritedDevice) }
 
     const displayValue =
       sourceUnit === 'custom' ? inheritedSize : inheritedSize ? `${inheritedSize}${sourceUnit}` : ''
-    if (sourceUnit === 'custom') optionEl.setAttribute('data-custom-value', 'true')
+    if (sourceUnit === 'custom') { optionEl.setAttribute('data-custom-value', 'true') }
 
     optionEl.setAttribute('data-title', displayValue ?? '')
     if (displayValue) {
@@ -127,11 +122,7 @@ class PresetUtils {
     optionEl.textContent = displayValue ?? ''
   }
 
-  /**
-   * @param {HTMLOptionElement} optionEl
-   * @param {import('../interfaces').IFluidPreset} preset
-   */
-  static handleComplexPresetInheritance(optionEl, preset) {
+  static handleComplexPresetInheritance(optionEl: HTMLOptionElement, preset: IFluidPreset): HTMLOptionElement {
     const {
       value,
       min_size,
@@ -162,18 +153,17 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * @param {HTMLOptionElement} optionEl
-   * @param {import('../interfaces').IInheritanceData & {name?: string}} inheritanceData
-   */
-  static handleFluidInheritance(optionEl, inheritanceData) {
+  static handleFluidInheritance(
+    optionEl: HTMLOptionElement,
+    inheritanceData: IInheritanceData & { name?: string }
+  ): void {
     const { inheritedSize, inheritedFrom, inheritedVia, inheritedDevice, name } = inheritanceData
     const inheritedPreset = PresetUtils.getInheritedPresetSync(inheritedSize)
 
     optionEl.setAttribute('data-inherited-title', name ?? '')
-    if (inheritedFrom) optionEl.setAttribute('data-inherited-from', inheritedFrom)
-    if (inheritedVia) optionEl.setAttribute('data-inherited-via', inheritedVia)
-    if (inheritedDevice) optionEl.setAttribute('data-inherited-device', inheritedDevice)
+    if (inheritedFrom) { optionEl.setAttribute('data-inherited-from', inheritedFrom) }
+    if (inheritedVia) { optionEl.setAttribute('data-inherited-via', inheritedVia) }
+    if (inheritedDevice) { optionEl.setAttribute('data-inherited-device', inheritedDevice) }
 
     if (inheritedPreset) {
       if (inheritedPreset.isComplex) {
@@ -220,11 +210,11 @@ class PresetUtils {
     // to show simple inherit option instead of raw "__custom__" value
   }
 
-  /**
-   * @param {HTMLOptionElement} optionEl
-   * @param {{inheritedSize: string|null, sourceUnit: string|null, name: string}} data
-   */
-  static handleStandardInheritance(optionEl, { inheritedSize, sourceUnit, name }) {
+  static handleStandardInheritance(
+    optionEl: HTMLOptionElement,
+    data: { inheritedSize: string | null; sourceUnit: string | null; name: string }
+  ): HTMLOptionElement {
+    const { inheritedSize, sourceUnit, name } = data
     const valueText =
       inheritedSize !== null && sourceUnit !== null ? `${inheritedSize}${sourceUnit}` : name
 
@@ -237,13 +227,12 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * @param {HTMLOptionElement} optionEl
-   * @param {string} currentValue
-   * @param {import('../interfaces').IInheritanceData} inheritanceData
-   * @param {string} name
-   */
-  static handleInheritOption(optionEl, currentValue, inheritanceData, name) {
+  static handleInheritOption(
+    optionEl: HTMLOptionElement,
+    currentValue: string,
+    inheritanceData: IInheritanceData,
+    name: string
+  ): HTMLOptionElement {
     const { inheritedSize, inheritedUnit, sourceUnit } = inheritanceData
 
     if (currentValue === '') {
@@ -269,13 +258,12 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * @param {string} value
-   * @param {string} name
-   * @param {string} currentValue
-   * @param {import('../interfaces').IInheritanceData} inheritanceData
-   */
-  static createSimpleOption(value, name, currentValue, inheritanceData) {
+  static createSimpleOption(
+    value: string,
+    name: string,
+    currentValue: string,
+    inheritanceData: IInheritanceData
+  ): HTMLOptionElement {
     const optionEl = PresetUtils.#createBaseOption(value, currentValue)
 
     if (value === '') {
@@ -287,19 +275,15 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * Creates the "Custom value..." option for inline fluid values
-   * @param {string} currentValue
-   * @returns {HTMLOptionElement}
-   */
-  static createCustomValueOption(currentValue) {
+  /** Creates the "Custom value..." option for inline fluid values */
+  static createCustomValueOption(currentValue: string): HTMLOptionElement {
     const isCustomSelected =
       currentValue === CUSTOM_FLUID_VALUE || (currentValue && currentValue.startsWith('clamp('))
 
-    const optionEl = /** @type {HTMLOptionElement} */ (createElement('option', null, {
+    const optionEl = createElement('option', null, {
       value: CUSTOM_FLUID_VALUE,
       'data-is-custom-fluid': 'true'
-    }))
+    }) as HTMLOptionElement
 
     if (isCustomSelected) {
       optionEl.setAttribute('selected', 'selected')
@@ -309,12 +293,7 @@ class PresetUtils {
     return optionEl
   }
 
-  /**
-   * @param {HTMLSelectElement} selectEl
-   * @param {HTMLElement} [el]
-   * @returns {Promise<HTMLSelectElement>}
-   */
-  static async buildSelectOptions(selectEl, el) {
+  static async buildSelectOptions(selectEl: HTMLSelectElement, el?: HTMLElement): Promise<HTMLSelectElement> {
     const presetsData = await dataManager.getPresetsData(el)
 
     if (!presetsData) {
@@ -328,7 +307,7 @@ class PresetUtils {
     }
 
     const currentValue = selectEl.getAttribute('data-value') ?? ''
-    const inheritanceData = {
+    const inheritanceData: IInheritanceData = {
       inheritedSize: selectEl.getAttribute('data-inherited-size'),
       inheritedUnit: selectEl.getAttribute('data-inherited-unit'),
       sourceUnit: selectEl.getAttribute('data-source-unit'),
@@ -357,9 +336,9 @@ class PresetUtils {
         const optionsGroupEl = createElement('optgroup', null, { label: name })
 
         for (const preset of value) {
-          let optionEl
+          let optionEl: HTMLOptionElement
           // Check if this is a fluid preset (has min/max values) or custom preset
-          if (preset.min_size !== undefined && preset.max_size !== undefined) {
+          if (isFluidPreset(preset)) {
             optionEl = PresetUtils.createPresetOption(preset, currentValue)
           } else {
             optionEl = PresetUtils.createCustomPresetOption(preset, currentValue)
@@ -384,11 +363,7 @@ class PresetUtils {
     return selectEl
   }
 
-  /**
-   * @param {string|null} inheritedSize
-   * @returns {Promise<(import('../interfaces').IFluidPreset & {isComplex: true}) | {isComplex: false, id: string, name: string} | null>}
-   */
-  static async getInheritedPreset(inheritedSize) {
+  static async getInheritedPreset(inheritedSize: string | null): Promise<TInheritedPresetResult> {
     const presetsData = await dataManager.getPresetsData()
 
     if (!presetsData) {
@@ -396,25 +371,21 @@ class PresetUtils {
     }
 
     for (const { name, value } of presetsData) {
-      if (typeof value === 'object') {
-        for (const preset of Object.values(value)) {
-          if (inheritedSize === preset.value) {
-            return { ...preset, isComplex: true }
+      if (typeof value === 'object' && Array.isArray(value)) {
+        for (const preset of value) {
+          if (inheritedSize === preset.value && isFluidPreset(preset)) {
+            return { ...preset, isComplex: true as const }
           }
         }
       } else if (typeof value === 'string' && inheritedSize === value) {
-        return { isComplex: false, id: value, name }
+        return { isComplex: false as const, id: value, name }
       }
     }
 
     return null
   }
 
-  /**
-   * @param {string|null} inheritedSize
-   * @returns {(import('../interfaces').IFluidPreset & {isComplex: true}) | {isComplex: false, id: string, name: string} | null}
-   */
-  static getInheritedPresetSync(inheritedSize) {
+  static getInheritedPresetSync(inheritedSize: string | null): TInheritedPresetResult {
     const presetsData = dataManager.presets
 
     if (!presetsData) {
@@ -422,14 +393,14 @@ class PresetUtils {
     }
 
     for (const { name, value } of presetsData) {
-      if (typeof value === 'object') {
-        for (const preset of Object.values(value)) {
-          if (inheritedSize === preset.value) {
-            return { ...preset, isComplex: true }
+      if (typeof value === 'object' && Array.isArray(value)) {
+        for (const preset of value) {
+          if (inheritedSize === preset.value && isFluidPreset(preset)) {
+            return { ...preset, isComplex: true as const }
           }
         }
       } else if (typeof value === 'string' && inheritedSize === value) {
-        return { isComplex: false, id: value, name }
+        return { isComplex: false as const, id: value, name }
       }
     }
 
