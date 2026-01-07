@@ -11,10 +11,10 @@ export const AJAX_ACTIONS = {
 
   /** Fetch preset group metadata */
   GET_GROUPS: 'arts_fluid_design_system_get_groups'
-}
+} as const
 
 /** Default AJAX request parameters */
 export const AJAX_DEFAULTS = {
   /** Default search data for preset fetching */
   FETCH_PRESETS: { search: '' }
-}
+} as const

@@ -7,4 +7,4 @@ export const STYLES = {
 
   /** Prefix for preset CSS custom properties (e.g., --arts-fluid-preset--{id}) */
   VAR_PREFIX: '--arts-fluid-preset--'
-}
+} as const

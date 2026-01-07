@@ -1,5 +1,5 @@
 /** Base prefix for all plugin identifiers */
-export const PREFIX = 'fluid-design-system-for-elementor'
+export const PREFIX = 'fluid-design-system-for-elementor' as const
 
 /** Elementor command paths for $e.run() */
 export const COMMANDS = {
@@ -12,7 +12,7 @@ export const COMMANDS = {
     UPDATE: 'document/save/update',
     SAVE: 'document/save/save'
   }
-}
+} as const
 
 /** Hook registration IDs for $e.hooks system */
 export const HOOK_IDS = {
@@ -27,14 +27,14 @@ export const HOOK_IDS = {
   KIT: {
     SAVE: `${PREFIX}-hook-on-kit-save`
   }
-}
+} as const
 
 /** Component namespaces for $e.components.register() */
 export const NAMESPACES = {
   HOOKS: `${PREFIX}-hooks`
-}
+} as const
 
 /** Elementor container type identifiers */
 export const CONTAINER_TYPES = {
   DOCUMENT: 'document'
-}
+} as const
