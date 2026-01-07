@@ -1,10 +1,5 @@
 import type { Container } from '@arts/elementor-types'
-
-interface SaveChangesDialog {
-  onConfirm: () => void
-  onCancel: () => void
-  setSettings(key: string, value: any): void
-}
+import type { ISaveChangesDialog } from '../interfaces'
 
 export class StateManager {
   /** Checks if a timestamp has exceeded the reorder detection window */
@@ -16,7 +11,7 @@ export class StateManager {
   private recentRemovals = new Map<string, number>()
   private changedDocuments = new Map<string | number, boolean>()
   private REORDER_DETECTION_WINDOW = 200
-  private saveChangesDialog: SaveChangesDialog | null = null
+  private saveChangesDialog: ISaveChangesDialog | null = null
 
   markDocumentAsChanged(container: Container): void {
     if (!container?.document?.id) { return }
@@ -64,7 +59,7 @@ export class StateManager {
     this.removedItems.delete(id)
   }
 
-  getSaveChangesDialog(onConfirm: () => void, onCancel: () => void): SaveChangesDialog | null {
+  getSaveChangesDialog(onConfirm: () => void, onCancel: () => void): ISaveChangesDialog | null {
     if (!this.saveChangesDialog) {
       this.saveChangesDialog = (window.elementorCommon?.dialogsManager.createWidget('confirm', {
         id: 'elementor-fluid-spacing-save-changes-dialog',
@@ -78,7 +73,7 @@ export class StateManager {
           confirm: window.ArtsFluidDSStrings?.save,
           cancel: window.ArtsFluidDSStrings?.discard
         }
-      }) as SaveChangesDialog | undefined) ?? null
+      }) as ISaveChangesDialog | undefined) ?? null
     }
 
     if (!this.saveChangesDialog) {

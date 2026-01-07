@@ -1,8 +1,5 @@
 import type { TParsedValue } from '../types'
-
-interface FormatSizeRangeOptions {
-  includeSpan?: boolean
-}
+import type { IFormatSizeRangeOptions } from '../interfaces'
 
 /** Value formatting utilities for fluid design system */
 export class ValueFormatter {
@@ -12,7 +9,7 @@ export class ValueFormatter {
     minUnit: string,
     maxSize: string,
     maxUnit: string,
-    options: FormatSizeRangeOptions = {}
+    options: IFormatSizeRangeOptions = {}
   ): string {
     const { includeSpan = false } = options
 

@@ -4,28 +4,7 @@ import { generateClampFormula } from '../utils/clamp'
 import { UI_DEFAULTS } from '../constants/VALUES'
 import { ValueFormatter } from '../utils/formatters'
 import cssManager from './CSSManager'
-import type { IPresetDialogData, IPresetDialogCallbacks } from '../interfaces'
-
-interface IDialogConfig {
-  headerMessage?: string
-  messageText?: string
-  confirmButton?: string
-  defaultName: string
-  defaultMin: string
-  defaultMax: string
-  onConfirm: (name: string, group: string, minVal: string, maxVal: string) => void
-}
-
-interface IPresetData {
-  presetId: string
-  presetTitle: string
-  minSize: string
-  minUnit: string
-  maxSize: string
-  maxUnit: string
-  groupId: string
-  setting: string
-}
+import type { IDialogConfig, IPresetData, IPresetDialogData, IPresetDialogCallbacks } from '../interfaces'
 
 /** Manages preset dialog creation and lifecycle */
 export class PresetDialogManager {
