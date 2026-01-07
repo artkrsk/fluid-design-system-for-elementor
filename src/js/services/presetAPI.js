@@ -1,20 +1,5 @@
 import { AJAX_ACTIONS } from '../constants/API'
-
-/**
- * Wraps Elementor AJAX request in a Promise
- * @param {string} action - AJAX action name
- * @param {Object} data - Data to send with request
- * @returns {Promise<any>} Promise that resolves with response or rejects with error
- */
-function elementorAjaxRequest(action, data = {}) {
-  return new Promise((resolve, reject) => {
-    window.elementor?.ajax.addRequest(action, {
-      data,
-      success: resolve,
-      error: reject
-    })
-  })
-}
+import { elementorAjaxRequest } from '../utils/elementorAjax.js'
 
 /**
  * Service for preset-related API calls

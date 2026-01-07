@@ -1,5 +1,5 @@
 import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants/API'
-import { showControlSpinner, hideControlSpinner } from '../utils'
+import { showControlSpinner, hideControlSpinner, elementorAjaxRequest } from '../utils'
 
 export class DataManager {
   /** @type {import('../interfaces').IPresetGroup[] | null} */
@@ -39,18 +39,12 @@ export class DataManager {
 
     this.isPending = true
 
-    this.request = new Promise((resolve, reject) => {
-      window.elementor?.ajax.addRequest(AJAX_ACTIONS.FETCH_PRESETS, {
-        data: AJAX_DEFAULTS.FETCH_PRESETS,
-        success: (response) => {
-          this.presets = response
-          resolve(response)
-        },
-        error: (error) => {
-          reject(error)
-        }
-      })
-    })
+    this.request = elementorAjaxRequest(AJAX_ACTIONS.FETCH_PRESETS, AJAX_DEFAULTS.FETCH_PRESETS).then(
+      (response) => {
+        this.presets = response
+        return response
+      }
+    )
 
     try {
       const result = await this.request
