@@ -1,7 +1,9 @@
 import stateManager from '../managers/StateManager'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
 
-export class HookOnDocumentSave extends window.$e.modules.hookUI.After {
+const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+
+export class HookOnDocumentSave extends commandSystem.modules.hookUI.After {
   getCommand() {
     return COMMANDS.DOCUMENT.UPDATE
   }

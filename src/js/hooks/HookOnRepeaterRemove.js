@@ -3,7 +3,9 @@ import { getItemId } from '../utils'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
 import { isFluidPresetRepeater } from '../utils/controls'
 
-export class HookOnRepeaterRemove extends window.$e.modules.hookUI.Before {
+const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+
+export class HookOnRepeaterRemove extends commandSystem.modules.hookUI.Before {
   getCommand() {
     return COMMANDS.REPEATER.REMOVE
   }

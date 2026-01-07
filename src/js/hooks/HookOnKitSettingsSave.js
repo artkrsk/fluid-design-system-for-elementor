@@ -1,7 +1,9 @@
 import { COMMANDS, HOOK_IDS } from '../constants'
 import dataManager from '../managers/DataManager'
 
-export class HookOnKitSettingsSave extends window.$e.modules.hookUI.After {
+const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+
+export class HookOnKitSettingsSave extends commandSystem.modules.hookUI.After {
   getCommand() {
     return COMMANDS.DOCUMENT.SAVE
   }

@@ -7,7 +7,9 @@ import {
 } from '../hooks'
 import { NAMESPACES, COMMANDS } from '../constants'
 
-class Component extends window.$e.modules.ComponentBase {
+const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+
+class Component extends commandSystem.modules.ComponentBase {
   getNamespace() {
     return NAMESPACES.HOOKS
   }
@@ -24,5 +26,5 @@ class Component extends window.$e.modules.ComponentBase {
 }
 
 export const registerComponent = () => {
-  window.$e.components.register(new Component())
+  window.$e?.components.register(new Component())
 }
