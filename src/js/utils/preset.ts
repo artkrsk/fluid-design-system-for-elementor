@@ -4,10 +4,9 @@ import {
   createPresetOption,
   createCustomPresetOption,
   createSimpleOption,
-  createCustomValueOption,
-  isFluidPreset
+  createCustomValueOption
 } from './presetOptions'
-import { getInheritedPreset, getInheritedPresetSync } from './presetLookup'
+import { getInheritedPreset, getInheritedPresetSync, isFluidPreset } from './presetLookup'
 import type { IInheritanceData } from '../interfaces'
 
 /** Builds select options from preset data */

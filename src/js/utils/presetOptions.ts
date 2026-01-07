@@ -283,6 +283,3 @@ export function createCustomValueOption(currentValue: string): HTMLOptionElement
   optionEl.textContent = window.ArtsFluidDSStrings?.customValue ?? ''
   return optionEl
 }
-
-// Re-export for convenience
-export { isFluidPreset }
