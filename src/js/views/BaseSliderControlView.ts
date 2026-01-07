@@ -4,7 +4,6 @@ import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../
 import { ValidationService } from '../utils/validation'
 import { InlineInputManager } from '../utils/inlineInputs'
 import { PresetDropdownManager } from '../utils/presetDropdown'
-import { PresetAPIService } from '../services/presetAPI'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
 import { PresetDialogManager } from '../managers/PresetDialogManager'
 import { handleUpdatePreset, handleCreatePreset } from '../utils/presetActions'
@@ -129,38 +128,6 @@ export const BaseSliderControlView: Record<string, unknown> = {
         this.onConfirmUpdatePreset(presetId, name, group, minVal, maxVal),
       getInlineContainer: (setting: string) => this._getSliderInlineContainer(setting)
     })
-  },
-
-  /** Populates group select options by fetching group metadata for slider (deprecated, use DialogBuilder) */
-  async _populateSliderGroupOptions(this: any, $select: JQuery): Promise<void> {
-    try {
-      const groups = await PresetAPIService.fetchGroups()
-
-      if (!groups || !Array.isArray(groups) || groups.length === 0) {
-        // Fallback to default groups
-        $select.append(
-          jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-          jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-        )
-        return
-      }
-
-      // Add all groups with proper IDs
-      for (const group of groups) {
-        $select.append(
-          jQuery('<option>', {
-            value: group.id,
-            text: group.name
-          })
-        )
-      }
-    } catch {
-      // Fallback on error
-      $select.append(
-        jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-        jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-      )
-    }
   },
 
   /** Handles preset create confirmation for slider */

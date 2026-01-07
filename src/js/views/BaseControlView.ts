@@ -6,7 +6,6 @@ import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../
 import { ValidationService, isEmptyControlValue, isCustomFluidValue } from '../utils/validation'
 import { InlineInputManager } from '../utils/inlineInputs'
 import { PresetDropdownManager } from '../utils/presetDropdown'
-import { PresetAPIService } from '../services/presetAPI'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
 import { PresetDialogManager } from '../managers/PresetDialogManager'
 import { EditIconHandler } from '../utils/editIconHandler'
@@ -16,6 +15,7 @@ import { isFluidUnit, requiresTextInput, hasFluidInUnits } from '../utils/contro
 import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants'
 import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
 
+/** Mixin for fluid unit support in Elementor dimension/gap controls */
 export const BaseControlView: Record<string, unknown> = {
   isDestroyed: false,
   abortControllers: new Map<string, AbortController>(),
@@ -45,7 +45,6 @@ export const BaseControlView: Record<string, unknown> = {
   onDestroy(this: any): void {
     this.isDestroyed = true
 
-    // Clean up inline input event listeners using AbortController
     if (this.abortControllers && this.abortControllers.size > 0) {
       for (const [_setting, controller] of this.abortControllers) {
         controller.abort()
@@ -90,26 +89,21 @@ export const BaseControlView: Record<string, unknown> = {
     this.initializeInlineInputsState()
   },
 
-  /** Initialize inline inputs visibility based on current value */
   initializeInlineInputsState(this: any): void {
     if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
       return
     }
 
-    // Check if dimensions are linked
     const isLinked = this.isLinkedDimensions()
     let linkedClampValues: ReturnType<typeof parseClampFormula> = null
 
     for (const selectEl of this.ui.selectControls) {
       const setting = selectEl.getAttribute('data-setting')
       const currentValue = this.getControlValue(setting)
-
-      // Show inputs if custom value is selected OR if value is inline clamp
       const isCustomSelected = selectEl.value === CUSTOM_FLUID_VALUE
       const hasInlineClamp = isInlineClampValue(currentValue)
 
       if (isCustomSelected || hasInlineClamp) {
-        // Verify container exists before trying to manipulate it
         const container = this.getInlineContainer(setting)
         if (!container) {
           continue
@@ -117,20 +111,16 @@ export const BaseControlView: Record<string, unknown> = {
 
         this.toggleInlineInputs(setting, true)
 
-        // Populate inputs if there's a clamp formula
         if (hasInlineClamp) {
           const parsed = parseClampFormula(currentValue)
           if (parsed) {
             this.setInlineInputValues(setting, parsed)
-
-            // Store for linked sync
             if (isLinked && !linkedClampValues) {
               linkedClampValues = parsed
             }
           }
         }
 
-        // Ensure Custom value is selected
         if (hasInlineClamp) {
           selectEl.value = CUSTOM_FLUID_VALUE
           selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
@@ -139,18 +129,14 @@ export const BaseControlView: Record<string, unknown> = {
       }
     }
 
-    // If linked and we found clamp values, sync to all dimensions
     if (isLinked && linkedClampValues) {
       for (const selectEl of this.ui.selectControls) {
         const setting = selectEl.getAttribute('data-setting')
         if (setting) {
           const container = this.getInlineContainer(setting)
           if (container) {
-            // Show inputs and set values
             this.toggleInlineInputs(setting, true)
             this.setInlineInputValues(setting, linkedClampValues)
-
-            // Ensure Custom value is selected
             selectEl.value = CUSTOM_FLUID_VALUE
             selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
             jQuery(selectEl).trigger('change.select2')
@@ -200,7 +186,6 @@ export const BaseControlView: Record<string, unknown> = {
           this.onSelectChange(selectEl)
         })
 
-      // Attach edit icon handler for inline preset editing
       const editIconHandler = new EditIconHandler(selectEl, (presetId: string) =>
         this.onEditPresetClick(selectEl, presetId)
       )
@@ -512,38 +497,6 @@ export const BaseControlView: Record<string, unknown> = {
         this.onConfirmUpdatePreset(presetId, name, group, minVal, maxVal),
       getInlineContainer: (setting: string) => this.getInlineContainer(setting)
     })
-  },
-
-  /** Populates group select options by fetching group metadata (deprecated, use DialogBuilder) */
-  async populateGroupOptions(this: any, $select: JQuery): Promise<void> {
-    try {
-      const groups = await PresetAPIService.fetchGroups()
-
-      if (!groups || !Array.isArray(groups) || groups.length === 0) {
-        // Fallback to default groups
-        $select.append(
-          jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-          jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-        )
-        return
-      }
-
-      // Add all groups with proper IDs
-      for (const group of groups) {
-        $select.append(
-          jQuery('<option>', {
-            value: group.id,
-            text: group.name
-          })
-        )
-      }
-    } catch {
-      // Fallback on error
-      $select.append(
-        jQuery('<option>', { value: 'fluid_spacing_presets', text: 'Spacing Presets' }),
-        jQuery('<option>', { value: 'fluid_typography_presets', text: 'Typography Presets' })
-      )
-    }
   },
 
   /** Handles preset create confirmation */
