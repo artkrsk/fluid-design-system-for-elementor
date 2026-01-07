@@ -1,17 +1,18 @@
+import type { ElementorEditor } from '@arts/elementor-types'
 import { BaseControlView } from './BaseControlView'
 import { BaseControlViewStatic } from './BaseControlViewStatic'
 import { BaseGapsControlView } from './BaseGapsControlView'
 
 const createGapsControlView = () => {
-  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  const editor = window.elementor as ElementorEditor
   return editor.modules.controls.Gaps.extend(
     { ...BaseControlView, ...BaseGapsControlView },
     { ...BaseControlViewStatic }
   )
 }
 
-export function registerGapsControlView() {
+export function registerGapsControlView(): void {
   const GapsControlView = createGapsControlView()
-  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  const editor = window.elementor as ElementorEditor
   editor.addControlView('gaps', GapsControlView)
 }

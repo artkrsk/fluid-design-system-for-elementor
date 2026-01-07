@@ -1,30 +1,21 @@
+import type { ElementorEditor } from '@arts/elementor-types'
 import { callSuper } from '../utils/backbone'
 
-/**
- * Custom repeater row view for fluid presets
- */
 const createFluidPresetRepeaterRow = () => {
-  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  const editor = window.elementor as ElementorEditor
   return editor.modules.controls.RepeaterRow.extend({
-    /**
-     * Determine if this is a fluid preset repeater
-     * @returns {boolean}
-     */
-    isFluidPresetRepeater() {
+    isFluidPresetRepeater(this: any): boolean {
       return this._parent?.model?.get('is_fluid_preset_repeater') === true
     },
 
-    /**
-     * @returns {Object} UI selectors
-     */
-    ui() {
+    ui(this: any) {
       const ui = callSuper(this, 'ui', arguments)
       ui.resetButton = '.elementor-repeater-tool-reset'
       ui.sortButton = '.elementor-repeater-tool-sort'
       return ui
     },
 
-    onChildviewRender() {
+    onChildviewRender(this: any) {
       callSuper(this, 'onChildviewRender', arguments)
 
       if (!this.isFluidPresetRepeater()) {
@@ -43,10 +34,7 @@ const createFluidPresetRepeaterRow = () => {
       }
     },
 
-    /**
-     * Override remove button click to customize modal dialog
-     */
-    onRemoveButtonClick() {
+    onRemoveButtonClick(this: any) {
       if (!this.isFluidPresetRepeater()) {
         return callSuper(this, 'onRemoveButtonClick', arguments)
       }
@@ -69,17 +57,14 @@ const createFluidPresetRepeaterRow = () => {
         }
       })
 
-      this.confirmDeleteModal.show()
+      this.confirmDeleteModal?.show()
     }
   })
 }
 
-// Export a function that will be called after elementor/init
-export function registerRepeaterRowView() {
+export function registerRepeaterRowView(): void {
   const FluidPresetRepeaterRow = createFluidPresetRepeaterRow()
-
-  // Register the custom row view
-  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  const editor = window.elementor as ElementorEditor
   Object.assign(editor.modules.controls, {
     FluidPresetRepeaterRow
   })

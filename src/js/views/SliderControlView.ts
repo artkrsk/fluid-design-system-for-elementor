@@ -1,17 +1,18 @@
+import type { ElementorEditor } from '@arts/elementor-types'
 import { BaseControlView } from './BaseControlView'
 import { BaseControlViewStatic } from './BaseControlViewStatic'
 import { BaseSliderControlView } from './BaseSliderControlView'
 
 const createSliderControlView = () => {
-  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  const editor = window.elementor as ElementorEditor
   return editor.modules.controls.Slider.extend(
     { ...BaseControlView, ...BaseSliderControlView },
     { ...BaseControlViewStatic }
   )
 }
 
-export function registerSliderControlView() {
+export function registerSliderControlView(): void {
   const SliderControlView = createSliderControlView()
-  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  const editor = window.elementor as ElementorEditor
   editor.addControlView('slider', SliderControlView)
 }
