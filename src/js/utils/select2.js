@@ -1,6 +1,11 @@
 import { TemplateRenderer } from './templates.js'
 
 class Select2Utils {
+  /**
+   * @param {Object} state - Select2 state object
+   * @param {boolean} isTemplateResult - Whether this is for template result
+   * @returns {JQuery<HTMLElement>|string} Template element or text
+   */
   static getTemplateSelect2(state, isTemplateResult) {
     return TemplateRenderer.getTemplateSelect2(state, isTemplateResult)
   }

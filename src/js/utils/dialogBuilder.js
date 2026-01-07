@@ -13,7 +13,7 @@ export class DialogBuilder {
    * @param {string} minUnit - Minimum unit
    * @param {string} maxSize - Maximum size
    * @param {string} maxUnit - Maximum unit
-   * @returns {jQuery} Preview element
+   * @returns {JQuery<HTMLElement>} Preview element
    */
   static createPreviewDisplay(minSize, minUnit, maxSize, maxUnit) {
     const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
@@ -26,8 +26,8 @@ export class DialogBuilder {
   /**
    * Creates preset name input field
    * @param {string} defaultValue - Default input value
-   * @param {string} placeholder - Input placeholder text (defaults to translation)
-   * @returns {jQuery} Input element
+   * @param {string | null} placeholder - Input placeholder text (defaults to translation)
+   * @returns {JQuery<HTMLElement>} Input element
    */
   static createNameInput(defaultValue = '', placeholder = null) {
     return jQuery('<input>', {
@@ -40,7 +40,7 @@ export class DialogBuilder {
 
   /**
    * Creates group selector dropdown
-   * @returns {jQuery} Select element
+   * @returns {JQuery<HTMLElement>} Select element
    */
   static createGroupSelector() {
     return jQuery('<select>', {
@@ -52,8 +52,8 @@ export class DialogBuilder {
   /**
    * Populates group selector with available groups
    * Uses PresetAPIService to fetch groups, falls back to defaults on error
-   * @param {jQuery} $select - Select element to populate
-   * @param {string} defaultGroup - Optional group ID to pre-select
+   * @param {JQuery<HTMLElement>} $select - Select element to populate
+   * @param {string | null} defaultGroup - Optional group ID to pre-select
    */
   static async populateGroupSelector($select, defaultGroup = null) {
     try {
@@ -93,7 +93,7 @@ export class DialogBuilder {
 
   /**
    * Initializes Select2 on group selector
-   * @param {jQuery} $select - Select element
+   * @param {JQuery<HTMLElement>} $select - Select element
    * @param {Object} options - Optional Select2 options to merge
    */
   static initializeSelect2($select, options = {}) {
@@ -107,8 +107,8 @@ export class DialogBuilder {
   /**
    * Attaches name validation to input field
    * Updates button state based on input validity
-   * @param {jQuery} $input - Name input element
-   * @param {jQuery} $button - Confirm button element
+   * @param {JQuery<HTMLElement>} $input - Name input element
+   * @param {JQuery<HTMLElement>} $button - Confirm button element
    */
   static attachNameValidation($input, $button) {
     $input.on('input', () => {
@@ -120,8 +120,8 @@ export class DialogBuilder {
 
   /**
    * Attaches Enter key handler for form submission
-   * @param {jQuery} $input - Input element to listen on
-   * @param {jQuery} $button - Button to click on Enter
+   * @param {JQuery<HTMLElement>} $input - Input element to listen on
+   * @param {JQuery<HTMLElement>} $button - Button to click on Enter
    */
   static attachEnterKeyHandler($input, $button) {
     $input.on('keydown', (e) => {
@@ -134,7 +134,7 @@ export class DialogBuilder {
 
   /**
    * Auto-focuses input and selects text
-   * @param {jQuery} $input - Input element to focus
+   * @param {JQuery<HTMLElement>} $input - Input element to focus
    * @param {number} delay - Delay in milliseconds (default 50)
    */
   static autoFocusInput($input, delay = 50) {
@@ -145,8 +145,8 @@ export class DialogBuilder {
 
   /**
    * Sets initial button state based on input value
-   * @param {jQuery} $input - Input element to check
-   * @param {jQuery} $button - Button to enable/disable
+   * @param {JQuery<HTMLElement>} $input - Input element to check
+   * @param {JQuery<HTMLElement>} $button - Button to enable/disable
    */
   static setInitialButtonState($input, $button) {
     const initialValue = String($input.val() || '')
