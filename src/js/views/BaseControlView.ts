@@ -3,31 +3,32 @@ import { createElement } from '../utils/dom'
 import { buildSelectOptions } from '../utils/preset'
 import { getSelect2DefaultOptions } from '../utils/select2'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
-import { ValidationService, isEmptyControlValue, isCustomFluidValue } from '../utils/validation.js'
-import { InlineInputManager } from '../utils/inlineInputs.js'
-import { PresetDropdownManager } from '../utils/presetDropdown.js'
-import { PresetAPIService } from '../services/presetAPI.js'
-import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
-import { PresetDialogManager } from '../managers/PresetDialogManager.js'
-import { EditIconHandler } from '../utils/editIconHandler.js'
-import { resolveInheritedValue } from '../utils/deviceInheritance.js'
-import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData.js'
-import { isFluidUnit, isCustomUnit, hasFluidInUnits } from '../utils/controls.js'
+import { ValidationService, isEmptyControlValue, isCustomFluidValue } from '../utils/validation'
+import { InlineInputManager } from '../utils/inlineInputs'
+import { PresetDropdownManager } from '../utils/presetDropdown'
+import { PresetAPIService } from '../services/presetAPI'
+import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
+import { PresetDialogManager } from '../managers/PresetDialogManager'
+import { EditIconHandler } from '../utils/editIconHandler'
+import { resolveInheritedValue } from '../utils/deviceInheritance'
+import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData'
+import { isFluidUnit, isCustomUnit, hasFluidInUnits } from '../utils/controls'
 import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/STYLES'
+import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
 
-export const BaseControlView = {
+export const BaseControlView: Record<string, unknown> = {
   isDestroyed: false,
-  abortControllers: new Map(),
+  abortControllers: new Map<string, AbortController>(),
 
-  initialize() {
+  initialize(this: any): void {
     callSuper(this, 'initialize', arguments)
     this.isDestroyed = false
-    this.abortControllers = new Map()
+    this.abortControllers = new Map<string, AbortController>()
   },
 
-  ui() {
+  ui(this: any): Record<string, string> {
     const ui = callSuper(this, 'ui', arguments)
     ui.selectControls = '.elementor-control-fluid-selector'
     ui.dimensions = '.elementor-control-input-wrapper ul > li'
@@ -35,7 +36,7 @@ export const BaseControlView = {
     return ui
   },
 
-  async onRender() {
+  async onRender(this: any): Promise<void> {
     callSuper(this, 'onRender')
 
     if (this.hasFluidUnit()) {
@@ -43,7 +44,7 @@ export const BaseControlView = {
     }
   },
 
-  onDestroy() {
+  onDestroy(this: any): void {
     this.isDestroyed = true
 
     // Clean up inline input event listeners using AbortController
@@ -57,11 +58,11 @@ export const BaseControlView = {
     callSuper(this, 'onDestroy')
   },
 
-  hasRenderedFluidSelector() {
+  hasRenderedFluidSelector(this: any): boolean {
     return this.ui.selectControls && this.ui.selectControls.length > 0
   },
 
-  updatePlaceholderClassState() {
+  updatePlaceholderClassState(this: any): void {
     if (!this.ui.selectControls?.length) {
       return
     }
@@ -78,7 +79,7 @@ export const BaseControlView = {
     }
   },
 
-  async renderFluidSelector() {
+  async renderFluidSelector(this: any): Promise<void> {
     if (this.isDestroyed) {
       return
     }
@@ -92,14 +93,14 @@ export const BaseControlView = {
   },
 
   /** Initialize inline inputs visibility based on current value */
-  initializeInlineInputsState() {
+  initializeInlineInputsState(this: any): void {
     if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
       return
     }
 
     // Check if dimensions are linked
     const isLinked = this.isLinkedDimensions()
-    let linkedClampValues = null
+    let linkedClampValues: ReturnType<typeof parseClampFormula> = null
 
     for (const selectEl of this.ui.selectControls) {
       const setting = selectEl.getAttribute('data-setting')
@@ -142,7 +143,7 @@ export const BaseControlView = {
 
     // If linked and we found clamp values, sync to all dimensions
     if (isLinked && linkedClampValues) {
-        for (const selectEl of this.ui.selectControls) {
+      for (const selectEl of this.ui.selectControls) {
         const setting = selectEl.getAttribute('data-setting')
         if (setting) {
           const container = this.getInlineContainer(setting)
@@ -161,7 +162,7 @@ export const BaseControlView = {
     }
   },
 
-  addLoadingOptions() {
+  addLoadingOptions(this: any): void {
     if (this.isDestroyed) {
       return
     }
@@ -184,7 +185,7 @@ export const BaseControlView = {
     }
   },
 
-  createSelect2() {
+  createSelect2(this: any): void {
     if (this.isDestroyed) {
       return
     }
@@ -196,21 +197,20 @@ export const BaseControlView = {
         return
       }
 
-      jQuery(selectEl)
-        .select2(select2Options)
+      ;(jQuery(selectEl).select2(select2Options as any) as unknown as JQuery)
         .on('change', () => {
           this.onSelectChange(selectEl)
         })
 
       // Attach edit icon handler for inline preset editing
-      const editIconHandler = new EditIconHandler(selectEl, (presetId) =>
+      const editIconHandler = new EditIconHandler(selectEl, (presetId: string) =>
         this.onEditPresetClick(selectEl, presetId)
       )
       editIconHandler.attach()
     }
   },
 
-  async populateSelectElements() {
+  async populateSelectElements(this: any): Promise<void> {
     if (this.isDestroyed) {
       return
     }
@@ -225,7 +225,7 @@ export const BaseControlView = {
     }
   },
 
-  onSelectChange(selectEl) {
+  onSelectChange(this: any, selectEl: HTMLSelectElement): void {
     const value = selectEl.value
     const isInheritValue = value === ''
     const isCustomValue = value === CUSTOM_FLUID_VALUE
@@ -241,7 +241,7 @@ export const BaseControlView = {
 
       // If linked, show custom on all dimensions
       if (this.isLinkedDimensions()) {
-            for (const otherSelectEl of this.ui.selectControls || []) {
+        for (const otherSelectEl of this.ui.selectControls || []) {
           if (otherSelectEl !== selectEl) {
             const otherSetting = otherSelectEl.getAttribute('data-setting')
             if (otherSetting) {
@@ -267,9 +267,9 @@ export const BaseControlView = {
       return
     }
 
-    const newValue = {
+    const newValue: Record<string, string> = {
       unit: 'fluid',
-      [dimensionName]: value
+      [dimensionName as string]: value
     }
 
     selectEl.classList.toggle('e-select-placeholder', isInheritValue)
@@ -280,7 +280,7 @@ export const BaseControlView = {
       this.handleLinkedDimensionsChange(selectEl, value, isInheritValue)
 
       // Hide inline inputs for all linked dimensions when switching away from custom
-        for (const otherSelectEl of this.ui.selectControls || []) {
+      for (const otherSelectEl of this.ui.selectControls || []) {
         const otherSetting = otherSelectEl.getAttribute('data-setting')
         if (otherSetting) {
           this.toggleInlineInputs(otherSetting, false)
@@ -293,7 +293,12 @@ export const BaseControlView = {
     this.updateDimensions()
   },
 
-  handleLinkedDimensionsChange(selectEl, value, isInheritValue) {
+  handleLinkedDimensionsChange(
+    this: any,
+    selectEl: HTMLSelectElement,
+    value: string,
+    isInheritValue: boolean
+  ): void {
     this.ui.controls.val(value)
 
     for (const el of this.ui.selectControls) {
@@ -306,13 +311,13 @@ export const BaseControlView = {
     }
   },
 
-  handleUnlinkedDimensionsChange(dimensionName, value) {
+  handleUnlinkedDimensionsChange(this: any, dimensionName: string, value: string): void {
     const relatedInputEl = this.ui.controls.filter(`[data-setting="${dimensionName}"]`)
     relatedInputEl.val(value)
     relatedInputEl.trigger('change')
   },
 
-  updateUnitChoices() {
+  updateUnitChoices(this: any): void {
     const unit = this.getControlValue('unit')
     const wasFluid = this.$el.hasClass('e-units-fluid')
     const isNowFluid = unit === 'fluid'
@@ -328,7 +333,7 @@ export const BaseControlView = {
       this.updatePlaceholderClassState()
 
       // Show inline inputs if Custom value is selected
-        for (const selectEl of this.ui.selectControls || []) {
+      for (const selectEl of this.ui.selectControls || []) {
         if (selectEl.value === CUSTOM_FLUID_VALUE) {
           const setting = selectEl.getAttribute('data-setting')
           if (setting) {
@@ -340,7 +345,7 @@ export const BaseControlView = {
 
     // Hide inline inputs when switching away from fluid unit
     if (wasFluid && !isNowFluid) {
-        for (const selectEl of this.ui.selectControls || []) {
+      for (const selectEl of this.ui.selectControls || []) {
         const setting = selectEl.getAttribute('data-setting')
         if (setting) {
           this.toggleInlineInputs(setting, false)
@@ -349,7 +354,7 @@ export const BaseControlView = {
     }
   },
 
-  onLinkDimensionsClicked(evt) {
+  onLinkDimensionsClicked(this: any, evt: Event): void {
     evt.preventDefault()
     evt.stopPropagation()
 
@@ -358,9 +363,9 @@ export const BaseControlView = {
     this.setValue('isLinked', !this.ui.link.hasClass('unlinked'))
 
     if (this.isLinkedDimensions()) {
-        const value = this.ui.controls.eq(0).val()
-        this.ui.controls.val(value)
-        for (const selectEl of this.ui.selectControls) {
+      const value = this.ui.controls.eq(0).val()
+      this.ui.controls.val(value)
+      for (const selectEl of this.ui.selectControls) {
         selectEl.value = value
         jQuery(selectEl).trigger('change.select2')
       }
@@ -369,20 +374,22 @@ export const BaseControlView = {
     this.updateDimensions()
   },
 
-  renderFluidSelectElements() {
+  renderFluidSelectElements(this: any): void {
     if (this.isDestroyed) {
       return
     }
 
     if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
-        this.ui.selectControls = []
+      this.ui.selectControls = []
     }
 
     for (const dimension of this.ui.dimensions) {
       const inputEl = dimension.querySelector('input[type="text"], input[type="number"]')
       const labelEl = dimension.querySelector('label')
 
-      if (!inputEl || !labelEl) continue
+      if (!inputEl || !labelEl) {
+        continue
+      }
 
       const fluidSelector = dimension.querySelector('.elementor-control-fluid-selector')
       const fluidSelectorContainer = dimension.querySelector(
@@ -395,8 +402,13 @@ export const BaseControlView = {
     }
   },
 
-  createFluidSelector(dimension, inputEl, labelEl) {
-    const setting = inputEl.dataset.setting
+  createFluidSelector(
+    this: any,
+    dimension: Element,
+    inputEl: HTMLInputElement,
+    labelEl: HTMLLabelElement
+  ): void {
+    const setting = inputEl.dataset.setting ?? ''
 
     // Check if containers already exist (prevent duplicates during re-render)
     const existingSelector = dimension.querySelector('.elementor-control-fluid-selector-container')
@@ -429,7 +441,7 @@ export const BaseControlView = {
   },
 
   /** Creates the inline min/max input container */
-  createInlineInputsContainer(setting) {
+  createInlineInputsContainer(this: any, setting: string): HTMLElement {
     const { container, abortController } = InlineInputManager.createContainer(
       setting,
       () => this.onInlineInputChange(setting),
@@ -443,12 +455,12 @@ export const BaseControlView = {
   },
 
   /** Updates Save button disabled state based on input validity */
-  updateSaveButtonState(container) {
+  updateSaveButtonState(this: any, container: HTMLElement): void {
     InlineInputManager.updateSaveButtonState(container)
   },
 
   /** Handles Save as Preset button click */
-  async onSaveAsPresetClick(setting) {
+  async onSaveAsPresetClick(this: any, setting: string): Promise<void> {
     const values = this.getInlineInputValues(setting)
     if (!values) {
       return
@@ -463,7 +475,7 @@ export const BaseControlView = {
 
     // Get inline container and save button
     const container = this.getInlineContainer(setting)
-    const saveButton = container?.querySelector('.e-fluid-save-preset')
+    const saveButton = container?.querySelector('.e-fluid-save-preset') as HTMLButtonElement | null
     const icon = saveButton?.querySelector('i')
 
     if (!container || !saveButton || !icon) {
@@ -494,18 +506,18 @@ export const BaseControlView = {
   },
 
   /** Opens unified preset dialog (delegates to PresetDialogManager) */
-  async openPresetDialog(mode, data) {
+  async openPresetDialog(this: any, mode: 'create' | 'edit', data: IPresetDialogData): Promise<unknown> {
     return PresetDialogManager.open(mode, data, {
-      onCreate: (name, group, minVal, maxVal, setting) =>
+      onCreate: (name: string, group: string, minVal: string, maxVal: string, setting: string) =>
         this.onConfirmCreatePreset(name, group, minVal, maxVal, setting),
-      onUpdate: (presetId, name, group, minVal, maxVal) =>
+      onUpdate: (presetId: string, name: string, group: string, minVal: string, maxVal: string) =>
         this.onConfirmUpdatePreset(presetId, name, group, minVal, maxVal),
-      getInlineContainer: (setting) => this.getInlineContainer(setting)
+      getInlineContainer: (setting: string) => this.getInlineContainer(setting)
     })
   },
 
   /** Populates group select options by fetching group metadata (deprecated, use DialogBuilder) */
-  async populateGroupOptions($select) {
+  async populateGroupOptions(this: any, $select: JQuery): Promise<void> {
     try {
       const groups = await PresetAPIService.fetchGroups()
 
@@ -537,7 +549,14 @@ export const BaseControlView = {
   },
 
   /** Handles preset create confirmation */
-  async onConfirmCreatePreset(title, group, minValue, maxValue, setting) {
+  async onConfirmCreatePreset(
+    this: any,
+    title: string,
+    group: string,
+    minValue: string,
+    maxValue: string,
+    setting: string
+  ): Promise<void> {
     // Parse combined input values
     const minParsed = ValidationService.parseValueWithUnit(minValue)
     const maxParsed = ValidationService.parseValueWithUnit(maxValue)
@@ -573,7 +592,7 @@ export const BaseControlView = {
 
         // If linked, apply preset to all dimensions
         if (this.isLinkedDimensions()) {
-                for (const selectEl of this.ui.selectControls || []) {
+          for (const selectEl of this.ui.selectControls || []) {
             const otherSetting = selectEl.getAttribute('data-setting')
             if (otherSetting && otherSetting !== setting) {
               this.selectPreset(otherSetting, presetValue)
@@ -586,17 +605,15 @@ export const BaseControlView = {
       window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
-          message: error || window.ArtsFluidDSStrings?.failedToSave
+          message: (error as string) || window.ArtsFluidDSStrings?.failedToSave
         })
         .show()
     }
   },
 
-  /**
-   * Handles edit icon click on a preset
-   */
-  async onEditPresetClick(selectEl, presetId) {
-    const setting = selectEl.getAttribute('data-setting')
+  /** Handles edit icon click on a preset */
+  async onEditPresetClick(this: any, selectEl: HTMLSelectElement, presetId: string): Promise<void> {
+    const setting = selectEl.getAttribute('data-setting') ?? ''
 
     // Find the option element with preset data
     const option = selectEl.querySelector(`option[data-id="${presetId}"]`)
@@ -605,7 +622,7 @@ export const BaseControlView = {
     }
 
     // Extract preset data using manager
-    const presetData = PresetDialogManager.extractPresetData(option, presetId, setting)
+    const presetData = PresetDialogManager.extractPresetData(option as HTMLOptionElement, presetId, setting)
 
     // Open dialog in edit mode
     const dialog = await this.openPresetDialog('edit', presetData)
@@ -613,7 +630,14 @@ export const BaseControlView = {
   },
 
   /** Handles preset update confirmation (edit mode) */
-  async onConfirmUpdatePreset(presetId, title, groupId, minValue, maxValue) {
+  async onConfirmUpdatePreset(
+    this: any,
+    presetId: string,
+    title: string,
+    groupId: string,
+    minValue: string,
+    maxValue: string
+  ): Promise<void> {
     // Parse combined input values
     const minParsed = ValidationService.parseValueWithUnit(minValue)
     const maxParsed = ValidationService.parseValueWithUnit(maxValue)
@@ -648,22 +672,22 @@ export const BaseControlView = {
       window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
-          message: error || 'Failed to update preset'
+          message: (error as string) || 'Failed to update preset'
         })
         .show()
     }
   },
 
   /** Refreshes all preset dropdowns in the control */
-  async refreshPresetDropdowns() {
+  async refreshPresetDropdowns(this: any): Promise<void> {
     await PresetDropdownManager.refreshDropdowns(this.ui.selectControls, this.el)
   },
 
   /** Selects a preset value in the dropdown and updates control */
-  selectPreset(setting, presetValue) {
+  selectPreset(this: any, setting: string, presetValue: string): void {
     // Find the select element for this setting
     const selectEl = this.ui.selectControls.find(
-      (el) => el.getAttribute('data-setting') === setting
+      (el: HTMLSelectElement) => el.getAttribute('data-setting') === setting
     )
 
     if (!selectEl) {
@@ -685,40 +709,44 @@ export const BaseControlView = {
   },
 
   /** Validates an inline input and toggles invalid state */
-  validateInlineInput(input) {
+  validateInlineInput(this: any, input: HTMLInputElement): boolean {
     return ValidationService.validateInputElement(input)
   },
 
   /** Gets the inline container for a specific setting */
-  getInlineContainer(setting) {
+  getInlineContainer(this: any, setting: string): HTMLElement | null {
     return this.$el[0].querySelector(`.e-fluid-inline-container[data-setting="${setting}"]`)
   },
 
   /** Toggles visibility of inline inputs */
-  toggleInlineInputs(setting, show) {
+  toggleInlineInputs(this: any, setting: string, show: boolean): void {
     const container = this.getInlineContainer(setting)
     InlineInputManager.toggleVisibility(container, show)
   },
 
   /** Parses a value with unit like "20px" or "1.5rem" */
-  parseValueWithUnit(value) {
+  parseValueWithUnit(this: any, value: string): { size: string; unit: string } | null {
     return ValidationService.parseValueWithUnit(value)
   },
 
   /** Gets inline input values for a setting */
-  getInlineInputValues(setting) {
+  getInlineInputValues(this: any, setting: string): IInlineInputValues | null {
     const container = this.getInlineContainer(setting)
     return InlineInputManager.getInputValues(container)
   },
 
   /** Sets inline input values (used when loading existing inline value) */
-  setInlineInputValues(setting, values) {
+  setInlineInputValues(
+    this: any,
+    setting: string,
+    values: { minSize: string; minUnit: string; maxSize: string; maxUnit: string }
+  ): void {
     const container = this.getInlineContainer(setting)
     InlineInputManager.setInputValues(container, values)
   },
 
   /** Handles inline input value changes */
-  onInlineInputChange(setting) {
+  onInlineInputChange(this: any, setting: string): void {
     const values = this.getInlineInputValues(setting)
     if (!values) {
       return
@@ -730,16 +758,16 @@ export const BaseControlView = {
     if (minSize && maxSize) {
       const clampValue = generateClampFormula(minSize, minUnit, maxSize, maxUnit)
 
-      const newValue = {
+      const newValue: Record<string, string> = {
         unit: 'fluid',
         [setting]: clampValue
       }
 
       // Handle linked dimensions/gaps - sync all values and inputs
       if (this.isLinkedDimensions()) {
-        const linkedContainers = []
+        const linkedContainers: HTMLElement[] = []
 
-            for (const selectEl of this.ui.selectControls || []) {
+        for (const selectEl of this.ui.selectControls || []) {
           const otherSetting = selectEl.getAttribute('data-setting')
           if (otherSetting && otherSetting !== setting) {
             // Add linked dimension value to the model update
@@ -750,7 +778,7 @@ export const BaseControlView = {
               linkedContainers.push(otherContainer)
 
               // Update related input for Elementor's internal tracking
-                        const linkedInputEl = this.ui.controls.filter(`[data-setting="${otherSetting}"]`)
+              const linkedInputEl = this.ui.controls.filter(`[data-setting="${otherSetting}"]`)
               linkedInputEl.val(clampValue)
             }
           }
@@ -765,7 +793,7 @@ export const BaseControlView = {
       this.setValue(newValue)
 
       // Update related input for Elementor's internal tracking
-        const relatedInputEl = this.ui.controls.filter(`[data-setting="${setting}"]`)
+      const relatedInputEl = this.ui.controls.filter(`[data-setting="${setting}"]`)
       relatedInputEl.val(clampValue)
 
       this.updateDimensions()
@@ -773,11 +801,11 @@ export const BaseControlView = {
   },
 
   /** Checks if a value is a custom inline value */
-  isCustomFluidValue(value) {
+  isCustomFluidValue(this: any, value: string): boolean {
     return isCustomFluidValue(value)
   },
 
-  setupInheritanceAttributes(fluidSelector, setting) {
+  setupInheritanceAttributes(this: any, fluidSelector: HTMLSelectElement, setting: string): void {
     InheritanceAttributeManager.setupAttributes(
       fluidSelector,
       setting,
@@ -786,7 +814,7 @@ export const BaseControlView = {
     )
   },
 
-  getParentControlValue() {
+  getParentControlValue(this: any): unknown {
     if (!this.model.get('responsive')) {
       return null
     }
@@ -808,39 +836,45 @@ export const BaseControlView = {
       return resolveInheritedValue(
         controlName,
         deviceOrder,
-        (name) => this._getControlValue(name),
-        (value) => this.isEmptyValue(value)
+        (name: string) => this._getControlValue(name),
+        (value: unknown) => this.isEmptyValue(value)
       )
     } catch {
       return null
     }
   },
 
-  isEmptyValue(value) {
-    return isEmptyControlValue(value)
+  isEmptyValue(this: any, value: unknown): boolean {
+    return isEmptyControlValue(value as Record<string, any> | null | undefined)
   },
 
-  _getControlValue(controlName) {
+  _getControlValue(this: any, controlName: string): unknown {
     if (this.options?.elementSettingsModel) {
       const controlValue = this.options.elementSettingsModel.get(controlName)
-      if (controlValue) return controlValue
+      if (controlValue) {
+        return controlValue
+      }
     }
 
     if (this.container?.settings) {
       const controlValue = this.container.settings.get(controlName)
-      if (controlValue) return controlValue
+      if (controlValue) {
+        return controlValue
+      }
     }
 
     const settings = this.model.get('settings')
     if (settings?.get) {
       const controlValue = settings.get(controlName)
-      if (controlValue) return controlValue
+      if (controlValue) {
+        return controlValue
+      }
     }
 
     return null
   },
 
-  attachSelectElementsListeners() {
+  attachSelectElementsListeners(this: any): void {
     if (this.isDestroyed) {
       return
     }
@@ -854,19 +888,19 @@ export const BaseControlView = {
     }
   },
 
-  getCurrentUnit() {
+  getCurrentUnit(this: any): string {
     return this.getControlValue('unit')
   },
 
-  isFluidUnit() {
+  isFluidUnit(this: any): boolean {
     return isFluidUnit(this.getCurrentUnit())
   },
 
-  hasFluidUnit() {
+  hasFluidUnit(this: any): boolean {
     return hasFluidInUnits(this.model.get('size_units'))
   },
 
-  isCustomUnit() {
+  isCustomUnit(this: any): boolean {
     return isCustomUnit(this.getCurrentUnit())
   }
 }
