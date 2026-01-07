@@ -75,7 +75,7 @@ export class StateManager {
 
   getSaveChangesDialog(onConfirm, onCancel) {
     if (!this.saveChangesDialog) {
-      this.saveChangesDialog = window.elementorCommon.dialogsManager.createWidget('confirm', {
+      this.saveChangesDialog = window.elementorCommon?.dialogsManager.createWidget('confirm', {
         id: 'elementor-fluid-spacing-save-changes-dialog',
         headerMessage: window.ArtsFluidDSStrings?.saveChanges,
         message: window.ArtsFluidDSStrings?.saveChangesMessage,
@@ -88,6 +88,10 @@ export class StateManager {
           cancel: window.ArtsFluidDSStrings?.discard
         }
       })
+    }
+
+    if (!this.saveChangesDialog) {
+      return null
     }
 
     // Update the event handlers

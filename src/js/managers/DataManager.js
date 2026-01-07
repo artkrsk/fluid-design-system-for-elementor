@@ -2,7 +2,9 @@ import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants/API'
 import { showControlSpinner, hideControlSpinner } from '../utils'
 
 export class DataManager {
+  /** @type {Array<{name: string, value: any}>|null} */
   presets = null
+  /** @type {Promise<any>|null} */
   request = null
   isPending = false
 
@@ -22,7 +24,7 @@ export class DataManager {
       showControlSpinner(el)
     }
 
-    if (this.isPending) {
+    if (this.isPending && this.request) {
       this.request.finally(() => {
         hideControlSpinner(el)
       })
@@ -33,7 +35,7 @@ export class DataManager {
     this.isPending = true
 
     this.request = new Promise((resolve, reject) => {
-      window.elementor.ajax.addRequest(AJAX_ACTIONS.FETCH_PRESETS, {
+      window.elementor?.ajax.addRequest(AJAX_ACTIONS.FETCH_PRESETS, {
         data: AJAX_DEFAULTS.FETCH_PRESETS,
         success: (response) => {
           this.presets = response

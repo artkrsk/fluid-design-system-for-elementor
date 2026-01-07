@@ -33,7 +33,8 @@ export class CSSManager {
    */
   createOrGetStyleElement() {
     try {
-      if (!window.elementor?.$preview?.[0]?.contentDocument) {
+      const iframe = /** @type {HTMLIFrameElement|undefined} */ (window.elementor?.$preview?.[0])
+      if (!iframe?.contentDocument) {
         return null
       }
 
@@ -41,7 +42,7 @@ export class CSSManager {
         return this.styleElement
       }
 
-      const previewDocument = window.elementor.$preview[0].contentDocument
+      const previewDocument = iframe.contentDocument
       let styleEl = previewDocument.getElementById(this.styleElementId)
 
       if (styleEl instanceof HTMLElement) {

@@ -45,7 +45,7 @@ export class PresetDialogManager {
 
     // Create dialog with mode-specific class
     const modeClass = mode === 'create' ? 'e-fluid-create-preset-dialog' : 'e-fluid-edit-preset-dialog'
-    const dialog = elementorCommon.dialogsManager.createWidget('confirm', {
+    const dialog = window.elementorCommon?.dialogsManager.createWidget('confirm', {
       className: `e-fluid-save-preset-dialog ${modeClass}`,
       headerMessage: config.headerMessage,
       message: $message,
@@ -61,6 +61,9 @@ export class PresetDialogManager {
         config.onConfirm($input.val(), $groupSelect.val(), $minInput.val(), $maxInput.val())
       },
       onShow: async () => {
+        if (!dialog) {
+          return
+        }
         try {
           const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
           await this._initializeDialogUI(

@@ -8,7 +8,7 @@ import { AJAX_ACTIONS } from '../constants/API'
  */
 function elementorAjaxRequest(action, data = {}) {
   return new Promise((resolve, reject) => {
-    window.elementor.ajax.addRequest(action, {
+    window.elementor?.ajax.addRequest(action, {
       data,
       success: resolve,
       error: reject
