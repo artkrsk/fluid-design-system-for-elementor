@@ -10,12 +10,13 @@
     "strictNullChecks": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "types": ["jquery", "select2"],
+    "types": ["jquery", "select2", "vitest/globals"],
     "baseUrl": ".",
     "paths": {
-      "@arts/elementor-types": ["../elementor-types/src"]
+      "@arts/elementor-types": ["../elementor-types/src"],
+      "@/*": ["src/ts/*"]
     }
   },
-  "include": ["src/js/**/*.js", "src/js/**/*.ts", "src/js/**/*.d.ts", "src/js/global.d.ts"],
+  "include": ["src/ts/**/*.js", "src/ts/**/*.ts", "src/ts/**/*.d.ts", "src/ts/global.d.ts", "tests/ts/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
