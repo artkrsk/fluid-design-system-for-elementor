@@ -18,10 +18,12 @@ export class HookOnRepeaterRemove extends commandSystem.modules.hookUI.Before {
     return CONTAINER_TYPES.DOCUMENT
   }
 
+  /** @param {import('@arts/elementor-types').HookArgs} args */
   getConditions(args) {
     return isFluidPresetRepeater(args.name, args.container)
   }
 
+  /** @param {import('@arts/elementor-types').HookArgs} args */
   apply(args) {
     const { container, name: presetName, index } = args
 

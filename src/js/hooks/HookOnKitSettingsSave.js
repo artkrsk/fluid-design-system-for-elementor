@@ -12,6 +12,7 @@ export class HookOnKitSettingsSave extends commandSystem.modules.hookUI.After {
     return HOOK_IDS.KIT.SAVE
   }
 
+  /** @param {import('@arts/elementor-types').HookArgs} args */
   getConditions(args) {
     return args.document && args.document.config && args.document.config.type === 'kit'
   }

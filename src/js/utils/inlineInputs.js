@@ -74,7 +74,7 @@ export class InlineInputManager {
     // Attach button click listener with AbortController
     saveButton.addEventListener(
       'click',
-      (e) => {
+      /** @param {Event} e */ (e) => {
         e.preventDefault()
         if (onSaveClick) {
           onSaveClick(setting)

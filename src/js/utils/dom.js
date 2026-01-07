@@ -1,3 +1,8 @@
+/**
+ * @param {string} tag
+ * @param {string | null} [className]
+ * @param {Record<string, string>} [attributes]
+ */
 export const createElement = (tag, className, attributes = {}) => {
   const element = document.createElement(tag)
 

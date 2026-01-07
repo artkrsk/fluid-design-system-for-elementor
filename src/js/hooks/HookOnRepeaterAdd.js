@@ -18,10 +18,12 @@ export class HookOnRepeaterAdd extends commandSystem.modules.hookUI.After {
     return CONTAINER_TYPES.DOCUMENT
   }
 
+  /** @param {import('@arts/elementor-types').HookArgs} args */
   getConditions(args) {
     return isFluidPresetRepeater(args.name, args.container)
   }
 
+  /** @param {import('@arts/elementor-types').HookArgs} args */
   apply(args) {
     const { isRestored } = args
     const addedItemId = getItemId(args.model)

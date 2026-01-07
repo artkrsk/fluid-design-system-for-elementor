@@ -81,6 +81,7 @@ export function parseClampFormula(clampFormula) {
   const secondValue = match[2].trim()
 
   // Parse value and unit from strings like "20px" or "1.5rem"
+  /** @param {string} str */
   const parseValueUnit = (str) => {
     const valueMatch = str.match(/^(-?[\d.]+)(.+)$/)
     if (valueMatch) {

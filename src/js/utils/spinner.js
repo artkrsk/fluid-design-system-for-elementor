@@ -3,6 +3,7 @@ class SpinnerUtils {
     return `<span class="elementor-control-spinner" style="display: none;">&nbsp;<i class="eicon-spinner eicon-animation-spin"></i>&nbsp;</span>`
   }
 
+  /** @param {HTMLElement | undefined} el */
   static addControlSpinner(el) {
     if (!el) {
       return null
@@ -21,15 +22,17 @@ class SpinnerUtils {
     }
   }
 
+  /** @param {HTMLElement | undefined} el */
   static showControlSpinner(el) {
     if (!el) {
       return null
     }
 
-    let spinnerEl = el.querySelector('.elementor-control-spinner')
+    /** @type {HTMLElement | null} */
+    let spinnerEl = /** @type {HTMLElement | null} */ (el.querySelector('.elementor-control-spinner'))
 
     if (!spinnerEl) {
-      spinnerEl = SpinnerUtils.addControlSpinner(el)
+      spinnerEl = /** @type {HTMLElement | null} */ (SpinnerUtils.addControlSpinner(el))
     }
 
     if (spinnerEl) {
@@ -39,12 +42,13 @@ class SpinnerUtils {
     return spinnerEl
   }
 
+  /** @param {HTMLElement | undefined} el */
   static hideControlSpinner(el) {
     if (!el) {
       return null
     }
 
-    const spinnerEl = el.querySelector('.elementor-control-spinner')
+    const spinnerEl = /** @type {HTMLElement | null} */ (el.querySelector('.elementor-control-spinner'))
 
     if (spinnerEl) {
       spinnerEl.style.display = 'none'

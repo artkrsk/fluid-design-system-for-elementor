@@ -12,13 +12,10 @@ import cssManager from './CSSManager.js'
 export class PresetDialogManager {
   /**
    * Opens unified preset dialog for create or edit mode
-   * @param {'create' | 'edit'} mode - Dialog mode
-   * @param {Object} data - Dialog data (minSize, maxSize, presetId, etc.)
-   * @param {Object} callbacks - View-specific callbacks
-   * @param {Function} callbacks.onCreate - Called when creating preset
-   * @param {Function} callbacks.onUpdate - Called when updating preset
-   * @param {Function} callbacks.getInlineContainer - Gets inline input container (create mode)
-   * @returns {Promise<any>} Elementor dialog instance
+   * @param {'create' | 'edit'} mode
+   * @param {import('../interfaces').IPresetDialogData} data
+   * @param {import('../interfaces').IPresetDialogCallbacks} callbacks
+   * @returns {Promise<any>}
    */
   static async open(mode, data, callbacks) {
     // Validate mode
@@ -58,7 +55,12 @@ export class PresetDialogManager {
       },
       onConfirm: () => {
         confirmed = true
-        config.onConfirm($input.val(), $groupSelect.val(), $minInput.val(), $maxInput.val())
+        config.onConfirm(
+          String($input.val() ?? ''),
+          String($groupSelect.val() ?? ''),
+          String($minInput.val() ?? ''),
+          String($maxInput.val() ?? '')
+        )
       },
       onShow: async () => {
         if (!dialog) {
@@ -102,6 +104,9 @@ export class PresetDialogManager {
   /**
    * Gets mode-specific dialog configuration
    * @private
+   * @param {'create' | 'edit'} mode
+   * @param {import('../interfaces').IPresetDialogData} data
+   * @param {import('../interfaces').IPresetDialogCallbacks} callbacks
    */
   static _getDialogConfig(mode, data, callbacks) {
     const configs = {
@@ -112,8 +117,9 @@ export class PresetDialogManager {
         defaultName: `Custom ${data.minSize}${data.minUnit} ~ ${data.maxSize}${data.maxUnit}`,
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
+        /** @param {string} name @param {string} group @param {string} minVal @param {string} maxVal */
         onConfirm: (name, group, minVal, maxVal) => {
-          callbacks.onCreate(name, group, minVal, maxVal, data.setting)
+          callbacks.onCreate?.(name, group, minVal, maxVal, data.setting ?? '')
         }
       },
       edit: {
@@ -123,8 +129,9 @@ export class PresetDialogManager {
         defaultName: data.presetTitle || '',
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
+        /** @param {string} name @param {string} group @param {string} minVal @param {string} maxVal */
         onConfirm: (name, group, minVal, maxVal) => {
-          callbacks.onUpdate(data.presetId, name, group || data.groupId, minVal, maxVal)
+          callbacks.onUpdate?.(data.presetId ?? '', name, group || (data.groupId ?? ''), minVal, maxVal)
         }
       }
     }
@@ -135,11 +142,13 @@ export class PresetDialogManager {
   /**
    * Creates dialog message DOM with inputs
    * @private
+   * @param {{ headerMessage?: string, messageText?: string, confirmButton?: string, defaultName: string, defaultMin: string, defaultMax: string, onConfirm: Function }} config
+   * @param {'create' | 'edit'} mode
    */
   static _createDialogMessage(config, mode) {
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
     const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
-      config.messageText
+      config.messageText ?? ''
     )
 
     const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
@@ -191,6 +200,13 @@ export class PresetDialogManager {
   /**
    * Initializes dialog UI
    * @private
+   * @param {JQuery} $input
+   * @param {JQuery} $minInput
+   * @param {JQuery} $maxInput
+   * @param {JQuery} $groupSelect
+   * @param {JQuery} $separator
+   * @param {JQuery} $confirmButton
+   * @param {import('../interfaces').IPresetDialogData} data
    */
   static async _initializeDialogUI($input, $minInput, $maxInput, $groupSelect, $separator, $confirmButton, data) {
     // Populate and initialize group selector (only exists in create mode)
@@ -205,8 +221,8 @@ export class PresetDialogManager {
 
     // Update separator based on value equality
     const updateSeparator = () => {
-      const minParsed = ValidationService.parseValueWithUnit($minInput.val())
-      const maxParsed = ValidationService.parseValueWithUnit($maxInput.val())
+      const minParsed = ValidationService.parseValueWithUnit(String($minInput.val() ?? ''))
+      const maxParsed = ValidationService.parseValueWithUnit(String($maxInput.val() ?? ''))
 
       $separator.text(ValueFormatter.calculateSeparator(minParsed, maxParsed))
     }
@@ -218,8 +234,8 @@ export class PresetDialogManager {
       const isNameValid = name.length > 0
 
       // Min/Max validation
-      const minParsed = ValidationService.parseValueWithUnit($minInput.val())
-      const maxParsed = ValidationService.parseValueWithUnit($maxInput.val())
+      const minParsed = ValidationService.parseValueWithUnit(String($minInput.val() ?? ''))
+      const maxParsed = ValidationService.parseValueWithUnit(String($maxInput.val() ?? ''))
 
       $minInput.toggleClass('e-fluid-inline-invalid', !minParsed)
       $maxInput.toggleClass('e-fluid-inline-invalid', !maxParsed)
@@ -245,6 +261,9 @@ export class PresetDialogManager {
   /**
    * Attaches live preview listeners for edit mode
    * @private
+   * @param {JQuery} $minInput
+   * @param {JQuery} $maxInput
+   * @param {string} presetId
    */
   static _attachLivePreviewListeners($minInput, $maxInput, presetId) {
     if (!presetId) {
@@ -277,6 +296,10 @@ export class PresetDialogManager {
   /**
    * Attaches live preview for create mode (mirrors to inline inputs)
    * @private
+   * @param {JQuery} $minInput
+   * @param {JQuery} $maxInput
+   * @param {string} setting
+   * @param {(setting: string) => HTMLElement | null} getInlineContainerFn
    */
   static _attachCreateModeLivePreview($minInput, $maxInput, setting, getInlineContainerFn) {
     const updateInlineInputs = () => {
@@ -287,8 +310,12 @@ export class PresetDialogManager {
       }
 
       // Get inline input elements
-      const inlineMinInput = container.querySelector('[data-fluid-role="min"]')
-      const inlineMaxInput = container.querySelector('[data-fluid-role="max"]')
+      const inlineMinInput = /** @type {HTMLInputElement | null} */ (
+        container.querySelector('[data-fluid-role="min"]')
+      )
+      const inlineMaxInput = /** @type {HTMLInputElement | null} */ (
+        container.querySelector('[data-fluid-role="max"]')
+      )
 
       if (!inlineMinInput || !inlineMaxInput) {
         return

@@ -38,6 +38,7 @@ export class EditIconHandler {
    * Handles select2:selecting event (fires for non-selected items)
    * @private
    */
+  /** @param {Event} e */
   _handleSelecting(e) {
     const clickEvent = e.params?.args?.originalEvent
     if (!clickEvent || !clickEvent.target) {
@@ -83,7 +84,7 @@ export class EditIconHandler {
       const $dropdown = jQuery('.select2-dropdown')
 
       // Create mousedown handler
-      this.mousedownHandler = (e) => {
+      this.mousedownHandler = /** @param {Event} e */ (e) => {
         e.stopPropagation()
         e.stopImmediatePropagation()
         e.preventDefault()

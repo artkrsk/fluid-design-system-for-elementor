@@ -20,6 +20,7 @@ export class HookOnDocumentSave extends commandSystem.modules.hookUI.After {
     return true // Apply to any document
   }
 
+  /** @param {import('@arts/elementor-types').HookArgs} args */
   apply(args) {
     if (args.document && args.document.id) {
       stateManager.clearDocumentChanges(args.document.id)
