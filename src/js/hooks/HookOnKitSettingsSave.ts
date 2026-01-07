@@ -4,6 +4,7 @@ import type { HookArgs } from '@arts/elementor-types'
 
 const commandSystem = window.$e!
 
+/** Invalidates preset cache when Kit saves */
 export class HookOnKitSettingsSave extends commandSystem.modules.hookUI.After {
   getCommand(): string {
     return COMMANDS.DOCUMENT.SAVE

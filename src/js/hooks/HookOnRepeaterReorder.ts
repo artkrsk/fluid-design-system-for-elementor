@@ -6,6 +6,7 @@ import type { HookArgs, BackboneCollection } from '@arts/elementor-types'
 
 const commandSystem = window.$e!
 
+/** Restores CSS variables after reorder operations */
 export class HookOnRepeaterReorder extends commandSystem.modules.hookUI.After {
   getCommand(): string {
     return COMMANDS.REPEATER.MOVE

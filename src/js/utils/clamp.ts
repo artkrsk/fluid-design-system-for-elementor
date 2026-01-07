@@ -4,7 +4,7 @@ import type { TParsedClamp } from '../types'
 const CSS_VAR_MIN_SCREEN = '--arts-fluid-min-screen'
 const CSS_VAR_SCREEN_DIFF = '--arts-fluid-screen-diff'
 
-/** Generates a CSS clamp() formula for inline fluid values */
+/** Generates clamp() formula for fluid values */
 export function generateClampFormula(
   minSize: number | string,
   minUnit: string,
@@ -37,12 +37,12 @@ export function generateClampFormula(
   return `clamp(${lowerBound}, ${preferredValue}, ${upperBound})`
 }
 
-/** Checks if a value is a custom inline clamp formula (not a preset reference) */
+/** Checks if value is inline clamp (not preset reference) */
 export function isInlineClampValue(value: string): boolean {
   return typeof value === 'string' && value.startsWith('clamp(')
 }
 
-/** Parses an inline clamp formula to extract min/max values */
+/** Parses clamp formula to extract min/max values */
 export function parseClampFormula(clampFormula: string): TParsedClamp | null {
   if (!isInlineClampValue(clampFormula)) {
     return null

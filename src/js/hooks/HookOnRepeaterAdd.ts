@@ -6,6 +6,7 @@ import type { HookArgs } from '@arts/elementor-types'
 
 const commandSystem = window.$e!
 
+/** Tracks added items for undo/redo CSS restoration */
 export class HookOnRepeaterAdd extends commandSystem.modules.hookUI.After {
   getCommand(): string {
     return COMMANDS.REPEATER.INSERT

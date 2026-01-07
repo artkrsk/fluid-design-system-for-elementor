@@ -3,7 +3,7 @@ import type { TSelect2SelectingEvent } from '../types'
 
 type EditCallback = (presetId: string) => void
 
-/** Handles edit icon click events in Select2 dropdowns */
+/** Handles edit icon clicks in Select2 preset dropdowns */
 export class EditIconHandler {
   private selectEl: HTMLSelectElement
   private onEdit: EditCallback

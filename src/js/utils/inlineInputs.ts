@@ -16,18 +16,15 @@ export class InlineInputManager {
       'data-setting': setting
     })
 
-    // Min value input (text input accepting "20px", "1.5rem", etc.)
     const minInput = createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'min',
       placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER
     }) as HTMLInputElement
 
-    // Separator
     const separator = createElement('span', 'e-fluid-inline-separator')
     separator.textContent = '~'
 
-    // Max value input
     const maxInput = createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'max',
@@ -38,7 +35,6 @@ export class InlineInputManager {
     container.appendChild(separator)
     container.appendChild(maxInput)
 
-    // Add "Save as Preset" button (Elementor pattern)
     const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
       type: 'button',
       title: window.ArtsFluidDSStrings?.saveAsPreset ?? ''
@@ -47,11 +43,9 @@ export class InlineInputManager {
     saveButton.appendChild(icon)
     container.appendChild(saveButton)
 
-    // Create AbortController for event listeners
     const abortController = new AbortController()
     const { signal } = abortController
 
-    // Attach input event listeners with validation and AbortController
     const handleInputChange = () => {
       ValidationService.validateInputElement(minInput)
       ValidationService.validateInputElement(maxInput)
@@ -65,10 +59,8 @@ export class InlineInputManager {
     minInput.addEventListener('input', handleInputChange, { signal })
     maxInput.addEventListener('input', handleInputChange, { signal })
 
-    // Set initial separator state
     InlineInputManager.updateSeparator(minInput, maxInput, separator)
 
-    // Attach button click listener with AbortController
     saveButton.addEventListener(
       'click',
       (e: Event) => {
@@ -80,7 +72,6 @@ export class InlineInputManager {
       { signal }
     )
 
-    // Set initial button state
     InlineInputManager.updateSaveButtonState(container)
 
     return { container, abortController }
@@ -153,13 +144,11 @@ export class InlineInputManager {
       ValidationService.validateInputElement(maxInput)
     }
 
-    // Update separator after setting values
     const separator = container.querySelector('.e-fluid-inline-separator') as HTMLElement | null
     if (minInput && maxInput && separator) {
       InlineInputManager.updateSeparator(minInput, maxInput, separator)
     }
 
-    // Update button state after setting values
     InlineInputManager.updateSaveButtonState(container)
   }
 
@@ -193,7 +182,6 @@ export class InlineInputManager {
         ValidationService.validateInputElement(maxInput)
       }
 
-      // Update separator after setting values
       const separator = container.querySelector('.e-fluid-inline-separator') as HTMLElement | null
       if (minInput && maxInput && separator) {
         InlineInputManager.updateSeparator(minInput, maxInput, separator)

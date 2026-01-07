@@ -6,6 +6,7 @@ import type { HookArgs, BackboneCollection } from '@arts/elementor-types'
 
 const commandSystem = window.$e!
 
+/** Tracks removed items and unsets CSS variables */
 export class HookOnRepeaterRemove extends commandSystem.modules.hookUI.Before {
   getCommand(): string {
     return COMMANDS.REPEATER.REMOVE

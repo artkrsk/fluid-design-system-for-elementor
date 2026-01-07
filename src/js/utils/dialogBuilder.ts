@@ -1,7 +1,7 @@
 import { PresetAPIService } from '../services/presetAPI'
 import { SELECT2_CONFIG } from '../constants'
 
-/** Dialog building utilities for preset dialogs */
+/** Preset dialog UI builders */
 export class DialogBuilder {
   /** Creates read-only preview display of min/max values */
   static createPreviewDisplay(minSize: string, minUnit: string, maxSize: string, maxUnit: string): JQuery {

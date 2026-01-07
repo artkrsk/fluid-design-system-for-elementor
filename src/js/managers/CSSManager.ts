@@ -11,7 +11,7 @@ export class CSSManager {
   private styleElement: HTMLElement | null = null
   private styleElementId: string = STYLES.STYLE_ID
 
-  /** Create or get the style element in the Elementor preview frame */
+  /** Gets/creates preview frame style element */
   createOrGetStyleElement(): HTMLElement | null {
     try {
       const iframe = window.elementor?.$preview?.[0] as HTMLIFrameElement | undefined
@@ -41,7 +41,7 @@ export class CSSManager {
     }
   }
 
-  /** Get current CSS rules from the style element */
+  /** Gets current CSS rules */
   getCurrentRules(): string[] {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) { return [] }
@@ -49,7 +49,7 @@ export class CSSManager {
     return parseRulesFromText(styleEl.textContent ?? '')
   }
 
-  /** Set CSS rules in the style element */
+  /** Sets CSS rules */
   setRules(rules: string[]): void {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) { return }
@@ -57,7 +57,7 @@ export class CSSManager {
     styleEl.textContent = formatRulesForStylesheet(rules)
   }
 
-  /** Unset a CSS variable by adding a rule to the style element */
+  /** Unsets CSS variable by adding unset rule */
   unsetCssVariable(id: string): boolean {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) { return false }
@@ -70,7 +70,7 @@ export class CSSManager {
     return true
   }
 
-  /** Restore a CSS variable by removing unset rules */
+  /** Restores CSS variable by removing unset rules */
   restoreCssVariable(id: string): boolean {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) { return false }
@@ -82,14 +82,12 @@ export class CSSManager {
     return true
   }
 
-  /** Set a CSS variable with clamp formula in preview */
+  /** Sets CSS variable with clamp formula */
   setCssVariable(id: string, clampFormula: string): boolean {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) { return false }
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
-
-    // Remove any existing rules for this variable and add the new one
     const filteredRules = filterRulesByVariable(this.getCurrentRules(), cssVarName)
     filteredRules.push(createVariableRule(cssVarName, clampFormula))
     this.setRules(filteredRules)

@@ -4,6 +4,7 @@ import type { HookArgs } from '@arts/elementor-types'
 
 const commandSystem = window.$e!
 
+/** Clears document change state after save */
 export class HookOnDocumentSave extends commandSystem.modules.hookUI.After {
   getCommand(): string {
     return COMMANDS.DOCUMENT.UPDATE
