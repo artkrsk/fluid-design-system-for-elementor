@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": ["jquery", "select2"],
+    "baseUrl": ".",
+    "paths": {
+      "@arts/elementor-types": ["../elementor-types/src"]
+    }
+  },
+  "include": ["src/js/**/*.js", "src/js/**/*.ts", "src/js/**/*.d.ts", "src/js/global.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
