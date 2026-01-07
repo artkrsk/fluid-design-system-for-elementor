@@ -1,36 +1,5 @@
-import type { DataManager } from './managers/DataManager'
 import type { ElementorEditor, ElementorCommon, $e } from '@arts/elementor-types'
-
-/** Localized strings for the Fluid Design System */
-interface IArtsFluidDSStrings {
-  inherit?: string
-  customValue?: string
-  saveAsPreset?: string
-  createNewPreset?: string
-  editPreset?: string
-  editPresetMessage?: string
-  presetName?: string
-  spacingPresets?: string
-  typographyPresets?: string
-  addPreset?: string
-  newPreset?: string
-  deleteFluidPreset?: string
-  deletePresetMessage?: string
-  saveChanges?: string
-  saveChangesMessage?: string
-  error?: string
-  failedToSave?: string
-  create?: string
-  save?: string
-  cancel?: string
-  discard?: string
-  delete?: string
-}
-
-/** Global Fluid Design System namespace */
-interface IArtsFluidDesignSystem {
-  dataManager: DataManager
-}
+import type { IArtsFluidDSStrings, IArtsFluidDesignSystem } from './interfaces'
 
 declare global {
   interface Window {
@@ -44,7 +13,7 @@ declare global {
     _?: typeof import('underscore')
     /** Localized strings (initialized by wp_localize_script) */
     ArtsFluidDSStrings?: IArtsFluidDSStrings
-    /** Plugin namespace (initialized in index.js) */
+    /** Plugin namespace (initialized in index.ts) */
     artsFluidDesignSystem: IArtsFluidDesignSystem
   }
 }

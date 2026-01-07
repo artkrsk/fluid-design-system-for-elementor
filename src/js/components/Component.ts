@@ -7,14 +7,14 @@ import {
 } from '../hooks'
 import { NAMESPACES, COMMANDS } from '../constants'
 
-const commandSystem = /** @type {import('@arts/elementor-types').$e} */ (window.$e)
+const commandSystem = window.$e!
 
 class Component extends commandSystem.modules.ComponentBase {
-  getNamespace() {
+  getNamespace(): string {
     return NAMESPACES.HOOKS
   }
 
-  defaultHooks() {
+  defaultHooks(): Record<string, unknown> {
     return this.importHooks({
       [COMMANDS.REPEATER.INSERT]: HookOnRepeaterAdd,
       [COMMANDS.REPEATER.REMOVE]: HookOnRepeaterRemove,
@@ -25,6 +25,6 @@ class Component extends commandSystem.modules.ComponentBase {
   }
 }
 
-export const registerComponent = () => {
+export const registerComponent = (): void => {
   window.$e?.components.register(new Component())
 }
