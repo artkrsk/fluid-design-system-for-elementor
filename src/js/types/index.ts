@@ -1,4 +1,6 @@
+export * from './TInheritedPresetResult'
 export * from './TParsedClamp'
 export * from './TParsedControlName'
 export * from './TParsedValue'
+export * from './TSelect2State'
 export * from './TValidationResult'
