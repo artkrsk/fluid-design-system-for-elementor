@@ -1,18 +1,19 @@
-/**
- * Value formatting utilities for fluid design system
- */
+import type { TParsedValue } from '../types'
+
+interface FormatSizeRangeOptions {
+  includeSpan?: boolean
+}
+
+/** Value formatting utilities for fluid design system */
 export class ValueFormatter {
-  /**
-   * Formats size display with proper handling of equal values
-   * @param {string} minSize - Minimum size value
-   * @param {string} minUnit - Minimum size unit
-   * @param {string} maxSize - Maximum size value
-   * @param {string} maxUnit - Maximum size unit
-   * @param {Object} [options] - Formatting options
-   * @param {boolean} [options.includeSpan=false] - Whether to include span wrapper for divider
-   * @returns {string} Formatted size string
-   */
-  static formatSizeRange(minSize, minUnit, maxSize, maxUnit, options = {}) {
+  /** Formats size display with proper handling of equal values */
+  static formatSizeRange(
+    minSize: string,
+    minUnit: string,
+    maxSize: string,
+    maxUnit: string,
+    options: FormatSizeRangeOptions = {}
+  ): string {
     const { includeSpan = false } = options
 
     // If min and max are equal with same unit, show single value
@@ -27,23 +28,16 @@ export class ValueFormatter {
     return `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
   }
 
-  /**
-   * Formats inherited value for display
-   * @param {string} inheritedSize - The inherited size value
-   * @param {string} sourceUnit - The source unit
-   * @returns {string} Formatted inherited value
-   */
-  static formatInheritedValue(inheritedSize, sourceUnit) {
+  /** Formats inherited value for display */
+  static formatInheritedValue(inheritedSize: string, sourceUnit: string): string {
     return sourceUnit === 'custom' ? inheritedSize : `${inheritedSize}${sourceUnit}`
   }
 
-  /**
-   * Calculates separator text based on value equality
-   * @param {{size: string, unit: string}|null} minParsed - Parsed minimum value
-   * @param {{size: string, unit: string}|null} maxParsed - Parsed maximum value
-   * @returns {'~' | '='} Separator character
-   */
-  static calculateSeparator(minParsed, maxParsed) {
+  /** Calculates separator text based on value equality */
+  static calculateSeparator(
+    minParsed: TParsedValue | null,
+    maxParsed: TParsedValue | null
+  ): '~' | '=' {
     if (!minParsed || !maxParsed) {
       return '~'
     }

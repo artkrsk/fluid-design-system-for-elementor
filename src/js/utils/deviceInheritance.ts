@@ -4,16 +4,14 @@
  * Extracted for testability and easier TypeScript migration.
  */
 
-/** @typedef {import('../types').TParsedControlName} TParsedControlName */
-/** @typedef {import('../interfaces').IInheritedControlValue} IInheritedControlValue */
+import type { TParsedControlName } from '../types'
+import type { IInheritedControlValue } from '../interfaces'
 
-/**
- * Parse control name to extract base name and device suffix
- * @param {string} controlName - Full control name (e.g., 'padding_tablet')
- * @param {string[]} deviceOrder - Device order from largest to smallest
- * @returns {TParsedControlName}
- */
-export function parseControlNameDevice(controlName, deviceOrder) {
+/** Parse control name to extract base name and device suffix */
+export function parseControlNameDevice(
+  controlName: string,
+  deviceOrder: string[]
+): TParsedControlName {
   for (const device of deviceOrder) {
     if (device === 'desktop') {
       continue
@@ -28,25 +26,18 @@ export function parseControlNameDevice(controlName, deviceOrder) {
   return { baseName: controlName, deviceSuffix: null }
 }
 
-/**
- * Get control name for a specific device
- * @param {string} baseName - Base control name
- * @param {string} device - Device name
- * @returns {string}
- */
-export function getDeviceControlName(baseName, device) {
+/** Get control name for a specific device */
+export function getDeviceControlName(baseName: string, device: string): string {
   return device === 'desktop' ? baseName : `${baseName}_${device}`
 }
 
-/**
- * Build inheritance metadata result object
- * @param {Record<string, any>} value - Source value object
- * @param {string} inheritedFrom - Device the value was inherited from
- * @param {string} directParent - Direct parent device
- * @param {string[]} inheritPath - Path of devices traversed
- * @returns {IInheritedControlValue}
- */
-export function buildInheritanceResult(value, inheritedFrom, directParent, inheritPath) {
+/** Build inheritance metadata result object */
+export function buildInheritanceResult(
+  value: Record<string, any>,
+  inheritedFrom: string,
+  directParent: string,
+  inheritPath: string[]
+): IInheritedControlValue {
   return {
     ...value,
     __inheritedFrom: inheritedFrom,
@@ -56,31 +47,24 @@ export function buildInheritanceResult(value, inheritedFrom, directParent, inher
   }
 }
 
-/**
- * Get ancestor devices for a given device in the hierarchy
- * @param {string} deviceSuffix - Current device suffix
- * @param {string[]} deviceOrder - Device order from largest to smallest
- * @returns {string[]} Ancestor devices (devices larger than current)
- */
-export function getAncestorDevices(deviceSuffix, deviceOrder) {
+/** Get ancestor devices for a given device in the hierarchy */
+export function getAncestorDevices(deviceSuffix: string, deviceOrder: string[]): string[] {
   const currentIndex = deviceOrder.indexOf(deviceSuffix)
   return deviceOrder.slice(0, currentIndex)
 }
 
-/**
- * Find inherited value by traversing device hierarchy upward
- * @param {string} baseName - Base control name
- * @param {string[]} ancestorDevices - Ancestor devices from largest to smallest
- * @param {(controlName: string) => Record<string, any> | null} getValueFn - Function to get control value
- * @param {(value: any) => boolean} isEmptyFn - Function to check if value is empty
- * @returns {IInheritedControlValue | null}
- */
-export function findInheritedValue(baseName, ancestorDevices, getValueFn, isEmptyFn) {
+/** Find inherited value by traversing device hierarchy upward */
+export function findInheritedValue(
+  baseName: string,
+  ancestorDevices: string[],
+  getValueFn: (controlName: string) => Record<string, any> | null,
+  isEmptyFn: (value: any) => boolean
+): IInheritedControlValue | null {
   if (ancestorDevices.length === 0) {
     return null
   }
 
-  const inheritPath = []
+  const inheritPath: string[] = []
   const directParent = ancestorDevices[ancestorDevices.length - 1]
 
   // First check direct parent
@@ -113,13 +97,11 @@ export function findInheritedValue(baseName, ancestorDevices, getValueFn, isEmpt
   return null
 }
 
-/**
- * Handle widescreen inheritance (inherits from desktop)
- * @param {string} baseName - Base control name
- * @param {(controlName: string) => Record<string, any> | null} getValueFn - Function to get control value
- * @returns {IInheritedControlValue | null}
- */
-export function getWidescreenInheritedValue(baseName, getValueFn) {
+/** Handle widescreen inheritance (inherits from desktop) */
+export function getWidescreenInheritedValue(
+  baseName: string,
+  getValueFn: (controlName: string) => Record<string, any> | null
+): IInheritedControlValue | null {
   const desktopValue = getValueFn(baseName)
   if (desktopValue) {
     return buildInheritanceResult(desktopValue, 'desktop', 'desktop', ['desktop'])
@@ -127,15 +109,13 @@ export function getWidescreenInheritedValue(baseName, getValueFn) {
   return null
 }
 
-/**
- * Get parent control value with full inheritance resolution
- * @param {string} controlName - Current control name
- * @param {string[]} deviceOrder - Device order from largest to smallest
- * @param {(controlName: string) => Record<string, any> | null} getValueFn - Function to get control value
- * @param {(value: any) => boolean} isEmptyFn - Function to check if value is empty
- * @returns {IInheritedControlValue | null}
- */
-export function resolveInheritedValue(controlName, deviceOrder, getValueFn, isEmptyFn) {
+/** Get parent control value with full inheritance resolution */
+export function resolveInheritedValue(
+  controlName: string,
+  deviceOrder: string[],
+  getValueFn: (controlName: string) => Record<string, any> | null,
+  isEmptyFn: (value: any) => boolean
+): IInheritedControlValue | null {
   const { baseName, deviceSuffix } = parseControlNameDevice(controlName, deviceOrder)
 
   // Desktop controls don't inherit

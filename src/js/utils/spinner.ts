@@ -1,10 +1,9 @@
 class SpinnerUtils {
-  static #getSpinnerHTML() {
+  static #getSpinnerHTML(): string {
     return `<span class="elementor-control-spinner" style="display: none;">&nbsp;<i class="eicon-spinner eicon-animation-spin"></i>&nbsp;</span>`
   }
 
-  /** @param {HTMLElement | undefined} el */
-  static addControlSpinner(el) {
+  static addControlSpinner(el: HTMLElement | undefined): Element | null | undefined {
     if (!el) {
       return null
     }
@@ -22,17 +21,15 @@ class SpinnerUtils {
     }
   }
 
-  /** @param {HTMLElement | undefined} el */
-  static showControlSpinner(el) {
+  static showControlSpinner(el: HTMLElement | undefined): HTMLElement | null {
     if (!el) {
       return null
     }
 
-    /** @type {HTMLElement | null} */
-    let spinnerEl = /** @type {HTMLElement | null} */ (el.querySelector('.elementor-control-spinner'))
+    let spinnerEl = el.querySelector('.elementor-control-spinner') as HTMLElement | null
 
     if (!spinnerEl) {
-      spinnerEl = /** @type {HTMLElement | null} */ (SpinnerUtils.addControlSpinner(el))
+      spinnerEl = SpinnerUtils.addControlSpinner(el) as HTMLElement | null
     }
 
     if (spinnerEl) {
@@ -42,13 +39,12 @@ class SpinnerUtils {
     return spinnerEl
   }
 
-  /** @param {HTMLElement | undefined} el */
-  static hideControlSpinner(el) {
+  static hideControlSpinner(el: HTMLElement | undefined): HTMLElement | null {
     if (!el) {
       return null
     }
 
-    const spinnerEl = /** @type {HTMLElement | null} */ (el.querySelector('.elementor-control-spinner'))
+    const spinnerEl = el.querySelector('.elementor-control-spinner') as HTMLElement | null
 
     if (spinnerEl) {
       spinnerEl.style.display = 'none'

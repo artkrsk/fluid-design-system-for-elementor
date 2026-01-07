@@ -1,24 +1,16 @@
-/**
- * Client-side clamp formula generation for inline fluid values.
- *
- * Uses CSS variables for screen widths to maintain consistency
- * with preset-based fluid values.
- */
+import type { TParsedClamp } from '../types'
 
 /** CSS variable names (must match PHP CSSVariables.php) */
 const CSS_VAR_MIN_SCREEN = '--arts-fluid-min-screen'
 const CSS_VAR_SCREEN_DIFF = '--arts-fluid-screen-diff'
 
-/**
- * Generates a CSS clamp() formula for inline fluid values.
- *
- * @param {number|string} minSize - Minimum size value
- * @param {string} minUnit - Minimum size unit (px, rem, em, %, vw, vh)
- * @param {number|string} maxSize - Maximum size value
- * @param {string} maxUnit - Maximum size unit (px, rem, em, %, vw, vh)
- * @returns {string} Complete clamp() formula
- */
-export function generateClampFormula(minSize, minUnit, maxSize, maxUnit) {
+/** Generates a CSS clamp() formula for inline fluid values */
+export function generateClampFormula(
+  minSize: number | string,
+  minUnit: string,
+  maxSize: number | string,
+  maxUnit: string
+): string {
   const minValue = `${minSize}${minUnit}`
   const maxValue = `${maxSize}${maxUnit}`
 
@@ -45,24 +37,13 @@ export function generateClampFormula(minSize, minUnit, maxSize, maxUnit) {
   return `clamp(${lowerBound}, ${preferredValue}, ${upperBound})`
 }
 
-/**
- * Checks if a value is a custom inline clamp formula (not a preset reference).
- *
- * @param {string} value - The value to check
- * @returns {boolean} True if it's an inline clamp formula
- */
-export function isInlineClampValue(value) {
+/** Checks if a value is a custom inline clamp formula (not a preset reference) */
+export function isInlineClampValue(value: string): boolean {
   return typeof value === 'string' && value.startsWith('clamp(')
 }
 
-/**
- * Parses an inline clamp formula to extract min/max values.
- * This is useful for populating inputs when editing an existing inline value.
- *
- * @param {string} clampFormula - The clamp() formula string
- * @returns {import('../types').TParsedClamp | null}
- */
-export function parseClampFormula(clampFormula) {
+/** Parses an inline clamp formula to extract min/max values */
+export function parseClampFormula(clampFormula: string): TParsedClamp | null {
   if (!isInlineClampValue(clampFormula)) {
     return null
   }
@@ -81,8 +62,7 @@ export function parseClampFormula(clampFormula) {
   const secondValue = match[2].trim()
 
   // Parse value and unit from strings like "20px" or "1.5rem"
-  /** @param {string} str */
-  const parseValueUnit = (str) => {
+  const parseValueUnit = (str: string): { size: string; unit: string } | null => {
     const valueMatch = str.match(/^(-?[\d.]+)(.+)$/)
     if (valueMatch) {
       return { size: valueMatch[1], unit: valueMatch[2] }

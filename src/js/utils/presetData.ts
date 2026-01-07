@@ -4,15 +4,16 @@
  * Extracted for testability with Vitest.
  */
 
-/**
- * Builds data object for creating a new preset
- * @param {string} title - Preset title
- * @param {import('../types').TParsedValue} minParsed - Parsed min value
- * @param {import('../types').TParsedValue} maxParsed - Parsed max value
- * @param {string} [group] - Group ID
- * @returns {import('../interfaces').ISavePresetData}
- */
-export function buildCreatePresetData(title, minParsed, maxParsed, group) {
+import type { TParsedValue } from '../types'
+import type { ISavePresetData, IUpdatePresetData } from '../interfaces'
+
+/** Builds data object for creating a new preset */
+export function buildCreatePresetData(
+  title: string,
+  minParsed: TParsedValue,
+  maxParsed: TParsedValue,
+  group?: string
+): ISavePresetData {
   const defaultTitle = `Custom ${minParsed.size}${minParsed.unit} ~ ${maxParsed.size}${maxParsed.unit}`
 
   return {
@@ -25,16 +26,14 @@ export function buildCreatePresetData(title, minParsed, maxParsed, group) {
   }
 }
 
-/**
- * Builds data object for updating an existing preset
- * @param {string} presetId - Preset ID
- * @param {string} title - Preset title
- * @param {import('../types').TParsedValue} minParsed - Parsed min value
- * @param {import('../types').TParsedValue} maxParsed - Parsed max value
- * @param {string} groupId - Group ID
- * @returns {import('../interfaces').IUpdatePresetData}
- */
-export function buildUpdatePresetData(presetId, title, minParsed, maxParsed, groupId) {
+/** Builds data object for updating an existing preset */
+export function buildUpdatePresetData(
+  presetId: string,
+  title: string,
+  minParsed: TParsedValue,
+  maxParsed: TParsedValue,
+  groupId: string
+): IUpdatePresetData {
   return {
     preset_id: presetId,
     title: title?.trim() || '',
