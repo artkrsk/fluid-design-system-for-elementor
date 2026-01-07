@@ -60,7 +60,7 @@ export function isInlineClampValue(value) {
  * This is useful for populating inputs when editing an existing inline value.
  *
  * @param {string} clampFormula - The clamp() formula string
- * @returns {{ minSize: string, minUnit: string, maxSize: string, maxUnit: string } | null}
+ * @returns {import('../types').TParsedClamp | null}
  */
 export function parseClampFormula(clampFormula) {
   if (!isInlineClampValue(clampFormula)) {

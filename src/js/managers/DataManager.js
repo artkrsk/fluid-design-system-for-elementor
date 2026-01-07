@@ -2,10 +2,11 @@ import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants/API'
 import { showControlSpinner, hideControlSpinner } from '../utils'
 
 export class DataManager {
-  /** @type {Array<{name: string, value: any}>|null} */
+  /** @type {import('../interfaces').IPresetGroup[] | null} */
   presets = null
-  /** @type {Promise<any>|null} */
+  /** @type {Promise<import('../interfaces').IPresetGroup[]> | null} */
   request = null
+  /** @type {boolean} */
   isPending = false
 
   invalidate() {
@@ -14,6 +15,10 @@ export class DataManager {
     this.isPending = false
   }
 
+  /**
+   * @param {HTMLElement} [el]
+   * @returns {Promise<import('../interfaces').IPresetGroup[] | null>}
+   */
   async getPresetsData(el) {
     if (this.presets) {
       hideControlSpinner(el)

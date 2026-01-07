@@ -6,8 +6,8 @@ import { VALUE_WITH_UNIT_PATTERN } from '../constants/VALUES'
 export class ValidationService {
   /**
    * Checks if both parsed values are zero
-   * @param {{size: string, unit: string}} minParsed - Parsed minimum value
-   * @param {{size: string, unit: string}} maxParsed - Parsed maximum value
+   * @param {import('../types').TParsedValue} minParsed
+   * @param {import('../types').TParsedValue} maxParsed
    * @returns {boolean}
    */
   static isBothValuesZero(minParsed, maxParsed) {
@@ -16,8 +16,8 @@ export class ValidationService {
 
   /**
    * Parses a value with unit like "20px" or "1.5rem"
-   * @param {string} value - Value to parse
-   * @returns {{size: string, unit: string}|null} Parsed value or null if invalid
+   * @param {string} value
+   * @returns {import('../types').TParsedValue | null}
    */
   static parseValueWithUnit(value) {
     // Empty value defaults to 0px
@@ -39,9 +39,9 @@ export class ValidationService {
 
   /**
    * Validates if both min and max inputs have valid values
-   * @param {string} minValue - Minimum value to validate
-   * @param {string} maxValue - Maximum value to validate
-   * @returns {{valid: boolean, error?: string, values?: Object}} Validation result
+   * @param {string} minValue
+   * @param {string} maxValue
+   * @returns {import('../types').TValidationResult}
    */
   static validateMinMax(minValue, maxValue) {
     const minParsed = ValidationService.parseValueWithUnit(minValue)

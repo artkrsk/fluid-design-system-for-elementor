@@ -33,9 +33,8 @@ export class PresetAPIService {
 
   /**
    * Saves a new fluid preset
-   * @param {{title: string, min_size: string, min_unit: string, max_size: string, max_unit: string, group: string}} presetData - Preset data to save
-   * @returns {Promise<{id: string}>} Saved preset with generated ID
-   * @throws {Error} If AJAX request fails
+   * @param {import('../interfaces').ISavePresetData} presetData
+   * @returns {Promise<import('../interfaces').IPresetResponse>}
    */
   static async savePreset(presetData) {
     return await elementorAjaxRequest(AJAX_ACTIONS.SAVE_PRESET, presetData)
@@ -43,9 +42,8 @@ export class PresetAPIService {
 
   /**
    * Updates an existing fluid preset
-   * @param {{preset_id: string, title: string, min_size: string, min_unit: string, max_size: string, max_unit: string, group: string}} presetData - Preset data to update
-   * @returns {Promise<{id: string, title: string, control_id: string}>} Updated preset info
-   * @throws {Error} If AJAX request fails
+   * @param {import('../interfaces').IUpdatePresetData} presetData
+   * @returns {Promise<import('../interfaces').IPresetResponse>}
    */
   static async updatePreset(presetData) {
     return await elementorAjaxRequest(AJAX_ACTIONS.UPDATE_PRESET, presetData)

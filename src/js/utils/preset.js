@@ -23,6 +23,10 @@ class PresetUtils {
     return optionEl
   }
 
+  /**
+   * @param {import('../interfaces').IFluidPreset} preset
+   * @param {string} currentValue
+   */
   static createPresetOption(preset, currentValue) {
     const {
       id,
@@ -57,6 +61,10 @@ class PresetUtils {
     return optionEl
   }
 
+  /**
+   * @param {import('../interfaces').ICustomPreset} preset
+   * @param {string} currentValue
+   */
   static createCustomPresetOption(preset, currentValue) {
     const { id, value, title, display_value } = preset
 
@@ -82,12 +90,16 @@ class PresetUtils {
     return optionEl
   }
 
+  /**
+   * @param {HTMLOptionElement} optionEl
+   * @param {import('../interfaces').IInheritanceData & {name?: string}} inheritanceData
+   */
   static handleMixedUnitsInheritance(optionEl, inheritanceData) {
-    const { inheritedSize, sourceUnit, inheritedFrom, inheritedVia, inheritedDevice } =
+    const { inheritedSize, sourceUnit, inheritedFrom, inheritedVia, inheritedDevice, name } =
       inheritanceData
 
     optionEl.setAttribute('data-mixed-units', 'true')
-    optionEl.setAttribute('data-inherited-title', name)
+    optionEl.setAttribute('data-inherited-title', name ?? '')
 
     if (inheritedFrom) optionEl.setAttribute('data-inherited-from', inheritedFrom)
     if (inheritedVia) optionEl.setAttribute('data-inherited-via', inheritedVia)
@@ -97,14 +109,18 @@ class PresetUtils {
       sourceUnit === 'custom' ? inheritedSize : inheritedSize ? `${inheritedSize}${sourceUnit}` : ''
     if (sourceUnit === 'custom') optionEl.setAttribute('data-custom-value', 'true')
 
-    optionEl.setAttribute('data-title', displayValue)
+    optionEl.setAttribute('data-title', displayValue ?? '')
     if (displayValue) {
       optionEl.setAttribute('data-value-display', displayValue)
     }
     optionEl.setAttribute('data-inherited-value', 'true')
-    optionEl.textContent = displayValue
+    optionEl.textContent = displayValue ?? ''
   }
 
+  /**
+   * @param {HTMLOptionElement} optionEl
+   * @param {import('../interfaces').IFluidPreset} preset
+   */
   static handleComplexPresetInheritance(optionEl, preset) {
     const {
       min_size,
@@ -134,11 +150,15 @@ class PresetUtils {
     return optionEl
   }
 
+  /**
+   * @param {HTMLOptionElement} optionEl
+   * @param {import('../interfaces').IInheritanceData & {name?: string}} inheritanceData
+   */
   static handleFluidInheritance(optionEl, inheritanceData) {
-    const { inheritedSize, inheritedFrom, inheritedVia, inheritedDevice } = inheritanceData
+    const { inheritedSize, inheritedFrom, inheritedVia, inheritedDevice, name } = inheritanceData
     const inheritedPreset = PresetUtils.getInheritedPresetSync(inheritedSize)
 
-    optionEl.setAttribute('data-inherited-title', name)
+    optionEl.setAttribute('data-inherited-title', name ?? '')
     if (inheritedFrom) optionEl.setAttribute('data-inherited-from', inheritedFrom)
     if (inheritedVia) optionEl.setAttribute('data-inherited-via', inheritedVia)
     if (inheritedDevice) optionEl.setAttribute('data-inherited-device', inheritedDevice)
@@ -148,10 +168,10 @@ class PresetUtils {
         PresetUtils.handleComplexPresetInheritance(optionEl, inheritedPreset)
       } else {
         optionEl.setAttribute('data-inherited-value', 'true')
-        optionEl.setAttribute('data-value-display', inheritedSize)
-        optionEl.textContent = inheritedPreset.title
+        optionEl.setAttribute('data-value-display', inheritedSize ?? '')
+        optionEl.textContent = inheritedPreset.name
       }
-    } else {
+    } else if (inheritedSize) {
       // Check if it's an inline clamp formula
       const parsed = parseClampFormula(inheritedSize)
       if (parsed) {
@@ -178,7 +198,7 @@ class PresetUtils {
       } else {
         // Fallback to raw display for unknown formats
         optionEl.setAttribute('data-inherited-value', 'true')
-        const displayValue = inheritedSize || name
+        const displayValue = inheritedSize || name || ''
         optionEl.setAttribute('data-title', displayValue)
         optionEl.setAttribute('data-value-display', displayValue)
         optionEl.textContent = displayValue
@@ -186,6 +206,10 @@ class PresetUtils {
     }
   }
 
+  /**
+   * @param {HTMLOptionElement} optionEl
+   * @param {{inheritedSize: string|null, sourceUnit: string|null, name: string}} data
+   */
   static handleStandardInheritance(optionEl, { inheritedSize, sourceUnit, name }) {
     const valueText =
       inheritedSize !== null && sourceUnit !== null ? `${inheritedSize}${sourceUnit}` : name
@@ -199,6 +223,12 @@ class PresetUtils {
     return optionEl
   }
 
+  /**
+   * @param {HTMLOptionElement} optionEl
+   * @param {string} currentValue
+   * @param {import('../interfaces').IInheritanceData} inheritanceData
+   * @param {string} name
+   */
   static handleInheritOption(optionEl, currentValue, inheritanceData, name) {
     const { inheritedSize, inheritedUnit, sourceUnit } = inheritanceData
 
@@ -225,6 +255,12 @@ class PresetUtils {
     return optionEl
   }
 
+  /**
+   * @param {string} value
+   * @param {string} name
+   * @param {string} currentValue
+   * @param {import('../interfaces').IInheritanceData} inheritanceData
+   */
   static createSimpleOption(value, name, currentValue, inheritanceData) {
     const optionEl = PresetUtils.#createBaseOption(value, currentValue)
 
@@ -255,6 +291,11 @@ class PresetUtils {
     return optionEl
   }
 
+  /**
+   * @param {HTMLSelectElement} selectEl
+   * @param {HTMLElement} [el]
+   * @returns {Promise<HTMLSelectElement>}
+   */
   static async buildSelectOptions(selectEl, el) {
     const presetsData = await dataManager.getPresetsData(el)
 
@@ -268,7 +309,7 @@ class PresetUtils {
       loadingOption.remove()
     }
 
-    const currentValue = selectEl.getAttribute('data-value')
+    const currentValue = selectEl.getAttribute('data-value') ?? ''
     const inheritanceData = {
       inheritedSize: selectEl.getAttribute('data-inherited-size'),
       inheritedUnit: selectEl.getAttribute('data-inherited-unit'),
@@ -325,6 +366,10 @@ class PresetUtils {
     return selectEl
   }
 
+  /**
+   * @param {string|null} inheritedSize
+   * @returns {Promise<(import('../interfaces').IFluidPreset & {isComplex: true}) | {isComplex: false, id: string, name: string} | null>}
+   */
   static async getInheritedPreset(inheritedSize) {
     const presetsData = await dataManager.getPresetsData()
 
@@ -347,6 +392,10 @@ class PresetUtils {
     return null
   }
 
+  /**
+   * @param {string|null} inheritedSize
+   * @returns {(import('../interfaces').IFluidPreset & {isComplex: true}) | {isComplex: false, id: string, name: string} | null}
+   */
   static getInheritedPresetSync(inheritedSize) {
     const presetsData = dataManager.presets
 
