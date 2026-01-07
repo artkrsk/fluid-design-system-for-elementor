@@ -5,8 +5,8 @@ export function isFluidUnit(unit: string | undefined): boolean {
   return unit === 'fluid'
 }
 
-/** Checks if a unit value is custom (fluid or custom) */
-export function isCustomUnit(unit: string | undefined): boolean {
+/** Checks if unit type requires text input instead of number spinner */
+export function requiresTextInput(unit: string | undefined): boolean {
   return unit === 'fluid' || unit === 'custom'
 }
 

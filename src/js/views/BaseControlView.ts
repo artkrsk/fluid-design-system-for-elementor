@@ -11,11 +11,9 @@ import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
 import { PresetDialogManager } from '../managers/PresetDialogManager'
 import { EditIconHandler } from '../utils/editIconHandler'
 import { resolveInheritedValue } from '../utils/deviceInheritance'
-import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData'
-import { isFluidUnit, isCustomUnit, hasFluidInUnits } from '../utils/controls'
-import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants/VALUES'
-import { dataManager, cssManager } from '../managers'
-import { STYLES } from '../constants/STYLES'
+import { handleUpdatePreset, handleCreatePreset } from '../utils/presetActions'
+import { isFluidUnit, requiresTextInput, hasFluidInUnits } from '../utils/controls'
+import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants'
 import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
 
 export const BaseControlView: Record<string, unknown> = {
@@ -557,58 +555,18 @@ export const BaseControlView: Record<string, unknown> = {
     maxValue: string,
     setting: string
   ): Promise<void> {
-    // Parse combined input values
-    const minParsed = ValidationService.parseValueWithUnit(minValue)
-    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
-
-    if (!minParsed || !maxParsed) {
-      return
-    }
-
-    const ajaxData = buildCreatePresetData(title, minParsed, maxParsed, group)
-
-    try {
-      const response = await PresetAPIService.savePreset(ajaxData)
-
-      // Generate and inject CSS variable into preview immediately
-      const clampFormula = generateClampFormula(
-        minParsed.size,
-        minParsed.unit,
-        maxParsed.size,
-        maxParsed.unit
-      )
-      cssManager.setCssVariable(response.id, clampFormula)
-
-      // Invalidate cache to force fresh data fetch
-      dataManager.invalidate()
-
-      // Refresh all preset dropdowns
-      await this.refreshPresetDropdowns()
-
-      // Auto-select the new preset (with delay for Select2 to process refresh)
-      setTimeout(() => {
-        const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
-        this.selectPreset(setting, presetValue)
-
-        // If linked, apply preset to all dimensions
-        if (this.isLinkedDimensions()) {
-          for (const selectEl of this.ui.selectControls || []) {
-            const otherSetting = selectEl.getAttribute('data-setting')
-            if (otherSetting && otherSetting !== setting) {
-              this.selectPreset(otherSetting, presetValue)
-            }
-          }
+    await handleCreatePreset(title, group, minValue, maxValue, setting, {
+      refreshDropdowns: () => this.refreshPresetDropdowns(),
+      selectPreset: (s: string, v: string) => this.selectPreset(s, v),
+      getLinkedSelects: () => {
+        if (!this.isLinkedDimensions()) {
+          return []
         }
-      }, UI_TIMING.PRESET_AUTO_SELECT_DELAY)
-    } catch (error) {
-      // Show error message
-      window.elementorCommon?.dialogsManager
-        .createWidget('alert', {
-          headerMessage: window.ArtsFluidDSStrings?.error,
-          message: (error as string) || window.ArtsFluidDSStrings?.failedToSave
-        })
-        .show()
-    }
+        return (this.ui.selectControls || []).map((el: HTMLSelectElement) => ({
+          setting: el.getAttribute('data-setting') ?? ''
+        }))
+      }
+    })
   },
 
   /** Handles edit icon click on a preset */
@@ -638,44 +596,9 @@ export const BaseControlView: Record<string, unknown> = {
     minValue: string,
     maxValue: string
   ): Promise<void> {
-    // Parse combined input values
-    const minParsed = ValidationService.parseValueWithUnit(minValue)
-    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
-
-    if (!minParsed || !maxParsed) {
-      return
-    }
-
-    // Generate and inject CSS immediately (before AJAX) to prevent flash of old values
-    const clampFormula = generateClampFormula(
-      minParsed.size,
-      minParsed.unit,
-      maxParsed.size,
-      maxParsed.unit
+    await handleUpdatePreset(presetId, title, groupId, minValue, maxValue, () =>
+      this.refreshPresetDropdowns()
     )
-    cssManager.setCssVariable(presetId, clampFormula)
-
-    const presetData = buildUpdatePresetData(presetId, title, minParsed, maxParsed, groupId)
-
-    try {
-      await PresetAPIService.updatePreset(presetData)
-
-      // Invalidate cache
-      dataManager.invalidate()
-
-      // Refresh dropdowns to show updated values
-      await this.refreshPresetDropdowns()
-    } catch (error) {
-      // Restore original CSS on error
-      cssManager.restoreCssVariable(presetId)
-
-      window.elementorCommon?.dialogsManager
-        .createWidget('alert', {
-          headerMessage: window.ArtsFluidDSStrings?.error,
-          message: (error as string) || 'Failed to update preset'
-        })
-        .show()
-    }
   },
 
   /** Refreshes all preset dropdowns in the control */
@@ -901,6 +824,6 @@ export const BaseControlView: Record<string, unknown> = {
   },
 
   isCustomUnit(this: any): boolean {
-    return isCustomUnit(this.getCurrentUnit())
+    return requiresTextInput(this.getCurrentUnit())
   }
 }

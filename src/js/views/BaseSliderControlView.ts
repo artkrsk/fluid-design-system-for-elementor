@@ -7,11 +7,8 @@ import { PresetDropdownManager } from '../utils/presetDropdown'
 import { PresetAPIService } from '../services/presetAPI'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
 import { PresetDialogManager } from '../managers/PresetDialogManager'
-import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData'
-import { isCustomUnit } from '../utils/controls'
-import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
-import { dataManager, cssManager } from '../managers'
-import { STYLES } from '../constants/STYLES'
+import { handleUpdatePreset, handleCreatePreset } from '../utils/presetActions'
+import { CUSTOM_FLUID_VALUE } from '../constants'
 import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
 
 export const BaseSliderControlView: Record<string, unknown> = {
@@ -175,46 +172,10 @@ export const BaseSliderControlView: Record<string, unknown> = {
     maxValue: string,
     _setting: string
   ): Promise<void> {
-    // Parse combined input values
-    const minParsed = ValidationService.parseValueWithUnit(minValue)
-    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
-
-    if (!minParsed || !maxParsed) {
-      return
-    }
-
-    const ajaxData = buildCreatePresetData(title, minParsed, maxParsed, group)
-
-    try {
-      const response = await PresetAPIService.savePreset(ajaxData)
-
-      // Generate and inject CSS variable into preview immediately
-      const clampFormula = generateClampFormula(
-        minParsed.size,
-        minParsed.unit,
-        maxParsed.size,
-        maxParsed.unit
-      )
-      cssManager.setCssVariable(response.id, clampFormula)
-
-      // Invalidate cache to force fresh data fetch
-      dataManager.invalidate()
-
-      // Refresh preset dropdown
-      await this._refreshSliderPresetDropdown()
-
-      // Auto-select the new preset
-      const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
-      this._selectSliderPreset(presetValue)
-    } catch (error) {
-      // Show error message
-      window.elementorCommon?.dialogsManager
-        .createWidget('alert', {
-          headerMessage: window.ArtsFluidDSStrings?.error,
-          message: (error as string) || window.ArtsFluidDSStrings?.failedToSave
-        })
-        .show()
-    }
+    await handleCreatePreset(title, group, minValue, maxValue, 'size', {
+      refreshDropdowns: () => this._refreshSliderPresetDropdown(),
+      selectPreset: (_s: string, v: string) => this._selectSliderPreset(v)
+    })
   },
 
   /** Handles edit icon click on a preset (slider) */
@@ -244,44 +205,9 @@ export const BaseSliderControlView: Record<string, unknown> = {
     minValue: string,
     maxValue: string
   ): Promise<void> {
-    // Parse combined input values
-    const minParsed = ValidationService.parseValueWithUnit(minValue)
-    const maxParsed = ValidationService.parseValueWithUnit(maxValue)
-
-    if (!minParsed || !maxParsed) {
-      return
-    }
-
-    // Generate and inject CSS immediately (before AJAX) to prevent flash of old values
-    const clampFormula = generateClampFormula(
-      minParsed.size,
-      minParsed.unit,
-      maxParsed.size,
-      maxParsed.unit
+    await handleUpdatePreset(presetId, title, groupId, minValue, maxValue, () =>
+      this._refreshSliderPresetDropdown()
     )
-    cssManager.setCssVariable(presetId, clampFormula)
-
-    const presetData = buildUpdatePresetData(presetId, title, minParsed, maxParsed, groupId)
-
-    try {
-      await PresetAPIService.updatePreset(presetData)
-
-      // Invalidate cache
-      dataManager.invalidate()
-
-      // Refresh dropdowns to show updated values
-      await this._refreshSliderPresetDropdown()
-    } catch (error) {
-      // Restore original CSS on error
-      cssManager.restoreCssVariable(presetId)
-
-      window.elementorCommon?.dialogsManager
-        .createWidget('alert', {
-          headerMessage: window.ArtsFluidDSStrings?.error,
-          message: (error as string) || 'Failed to update preset'
-        })
-        .show()
-    }
   },
 
   /** Refreshes the slider preset dropdown */
