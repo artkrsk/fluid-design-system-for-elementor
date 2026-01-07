@@ -634,7 +634,6 @@ export const BaseControlView = {
     // Find the option element with preset data
     const option = selectEl.querySelector(`option[data-id="${presetId}"]`)
     if (!option) {
-      console.error('Preset option not found:', presetId)
       return
     }
 

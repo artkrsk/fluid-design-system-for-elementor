@@ -84,8 +84,8 @@ export class PresetDialogManager {
             // Create mode: Mirror to inline inputs
             this._attachCreateModeLivePreview($minInput, $maxInput, data.setting, callbacks.getInlineContainer)
           }
-        } catch (error) {
-          console.error('[FluidDS] Error in dialog onShow:', error)
+        } catch {
+          // Silently handle setup errors - dialog will still function
         }
       },
       onHide: () => {
