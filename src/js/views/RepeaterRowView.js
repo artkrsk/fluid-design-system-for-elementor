@@ -1,8 +1,11 @@
+import { callSuper } from '../utils/backbone'
+
 /**
  * Custom repeater row view for fluid presets
  */
 const createFluidPresetRepeaterRow = () => {
-  return window.elementor.modules.controls.RepeaterRow.extend({
+  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  return editor.modules.controls.RepeaterRow.extend({
     /**
      * Determine if this is a fluid preset repeater
      * @returns {boolean}
@@ -15,14 +18,14 @@ const createFluidPresetRepeaterRow = () => {
      * @returns {Object} UI selectors
      */
     ui() {
-      const ui = this.constructor.__super__.ui.apply(this, arguments)
+      const ui = callSuper(this, 'ui', arguments)
       ui.resetButton = '.elementor-repeater-tool-reset'
       ui.sortButton = '.elementor-repeater-tool-sort'
       return ui
     },
 
     onChildviewRender() {
-      this.constructor.__super__.onChildviewRender.apply(this, arguments)
+      callSuper(this, 'onChildviewRender', arguments)
 
       if (!this.isFluidPresetRepeater()) {
         return
@@ -45,13 +48,12 @@ const createFluidPresetRepeaterRow = () => {
      */
     onRemoveButtonClick() {
       if (!this.isFluidPresetRepeater()) {
-        // Call parent method for non-fluid presets
-        return this.constructor.__super__.onRemoveButtonClick.apply(this, arguments)
+        return callSuper(this, 'onRemoveButtonClick', arguments)
       }
 
       const translatedMessage = window.ArtsFluidDSStrings?.deletePresetMessage
 
-      this.confirmDeleteModal = elementorCommon.dialogsManager.createWidget('confirm', {
+      this.confirmDeleteModal = window.elementorCommon?.dialogsManager.createWidget('confirm', {
         className: 'e-global__confirm-delete',
         headerMessage: window.ArtsFluidDSStrings?.deleteFluidPreset,
         message: '<i class="eicon-info-circle"></i> ' + translatedMessage,
@@ -77,7 +79,8 @@ export function registerRepeaterRowView() {
   const FluidPresetRepeaterRow = createFluidPresetRepeaterRow()
 
   // Register the custom row view
-  Object.assign(window.elementor.modules.controls, {
+  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  Object.assign(editor.modules.controls, {
     FluidPresetRepeaterRow
   })
 }

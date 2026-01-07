@@ -3,7 +3,8 @@ import { BaseControlViewStatic } from './BaseControlViewStatic'
 import { BaseDimensionsControlView } from './BaseDimensionsControlView'
 
 const createDimensionsControlView = () => {
-  return window.elementor.modules.controls.Dimensions.extend(
+  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  return editor.modules.controls.Dimensions.extend(
     { ...BaseControlView, ...BaseDimensionsControlView },
     { ...BaseControlViewStatic }
   )
@@ -11,6 +12,6 @@ const createDimensionsControlView = () => {
 
 export function registerDimensionsControlView() {
   const DimensionsControlView = createDimensionsControlView()
-
-  window.elementor.addControlView('dimensions', DimensionsControlView)
+  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  editor.addControlView('dimensions', DimensionsControlView)
 }

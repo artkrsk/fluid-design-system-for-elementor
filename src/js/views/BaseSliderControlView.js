@@ -1,3 +1,4 @@
+import { callSuper } from '../utils/backbone'
 import { createElement } from '../utils/dom'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
 import { ValidationService } from '../utils/validation.js'
@@ -205,7 +206,7 @@ export const BaseSliderControlView = {
       this._selectSliderPreset(presetValue)
     } catch (error) {
       // Show error message
-      elementorCommon.dialogsManager
+      window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
           message: error || window.ArtsFluidDSStrings?.failedToSave
@@ -276,7 +277,7 @@ export const BaseSliderControlView = {
       // Restore original CSS on error
       cssManager.restoreCssVariable(presetId)
 
-      elementorCommon.dialogsManager
+      window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
           message: error || 'Failed to update preset'
@@ -533,9 +534,7 @@ export const BaseSliderControlView = {
   handleUnitChange() {
     // Only apply the fix for fluid preset repeater sliders
     if (!this._isInFluidPresetRepeater()) {
-      // Standard Elementor behavior for all other sliders
-      // @ts-expect-error - Type assertion for super access in mixin pattern
-      this.constructor.__super__.handleUnitChange.apply(this, arguments)
+      callSuper(this, 'handleUnitChange', arguments)
       return
     }
 
@@ -543,8 +542,7 @@ export const BaseSliderControlView = {
     const currentSize = this.getControlValue('size')
 
     // Call parent's handleUnitChange which will reset the size
-    // @ts-expect-error - Type assertion for super access in mixin pattern
-    this.constructor.__super__.handleUnitChange.apply(this, arguments)
+    callSuper(this, 'handleUnitChange', arguments)
 
     // If we had a valid size, restore it (only for fluid preset repeaters)
     if (currentSize !== '' && currentSize !== null && currentSize !== undefined) {

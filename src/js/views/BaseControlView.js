@@ -1,3 +1,4 @@
+import { callSuper } from '../utils/backbone'
 import { createElement } from '../utils/dom'
 import { buildSelectOptions } from '../utils/preset'
 import { getSelect2DefaultOptions } from '../utils/select2'
@@ -18,15 +19,13 @@ export const BaseControlView = {
   abortControllers: new Map(),
 
   initialize() {
-    // @ts-expect-error - Type assertion for super access
-    this.constructor.__super__.initialize.apply(this, arguments)
+    callSuper(this, 'initialize', arguments)
     this.isDestroyed = false
     this.abortControllers = new Map()
   },
 
   ui() {
-    // @ts-expect-error - Type assertion for super access
-    const ui = this.constructor.__super__.ui.apply(this, arguments)
+    const ui = callSuper(this, 'ui', arguments)
     ui.selectControls = '.elementor-control-fluid-selector'
     ui.dimensions = '.elementor-control-input-wrapper ul > li'
 
@@ -34,8 +33,7 @@ export const BaseControlView = {
   },
 
   async onRender() {
-    // @ts-expect-error - Type assertion for super access
-    this.constructor.__super__.onRender.call(this)
+    callSuper(this, 'onRender')
 
     if (this.hasFluidUnit()) {
       await this.renderFluidSelector()
@@ -53,8 +51,7 @@ export const BaseControlView = {
       this.abortControllers.clear()
     }
 
-    // @ts-expect-error - Type assertion for super access
-    this.constructor.__super__.onDestroy.call(this)
+    callSuper(this, 'onDestroy')
   },
 
   hasRenderedFluidSelector() {
@@ -619,7 +616,7 @@ export const BaseControlView = {
       }, UI_TIMING.PRESET_AUTO_SELECT_DELAY)
     } catch (error) {
       // Show error message
-      elementorCommon.dialogsManager
+      window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
           message: error || window.ArtsFluidDSStrings?.failedToSave
@@ -690,7 +687,7 @@ export const BaseControlView = {
       // Restore original CSS on error
       cssManager.restoreCssVariable(presetId)
 
-      elementorCommon.dialogsManager
+      window.elementorCommon?.dialogsManager
         .createWidget('alert', {
           headerMessage: window.ArtsFluidDSStrings?.error,
           message: error || 'Failed to update preset'
@@ -846,10 +843,14 @@ export const BaseControlView = {
       let baseControlName = controlName
       let currentDeviceSuffix = ''
 
-      const deviceOrder = window.elementor.breakpoints.getActiveBreakpointsList({
+      const deviceOrder = window.elementor?.breakpoints.getActiveBreakpointsList({
         largeToSmall: true,
         withDesktop: true
       })
+
+      if (!deviceOrder) {
+        return null
+      }
 
       for (const device of deviceOrder) {
         if (device === 'desktop') {

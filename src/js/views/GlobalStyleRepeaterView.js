@@ -1,11 +1,13 @@
+import { callSuper } from '../utils/backbone'
+
 /**
  * Global style repeater view
  */
 const createGlobalStyleRepeater = () => {
-  return window.elementor.modules.controls['Global-style-repeater'].extend({
+  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  return editor.modules.controls['Global-style-repeater'].extend({
     initialize() {
-      // Call parent initialize first
-      this.constructor.__super__.initialize.apply(this, arguments)
+      callSuper(this, 'initialize', arguments)
 
       // Check if this is a fluid spacing/typography repeater
       if (this.isFluidSpacingTypographyRepeater()) {
@@ -59,7 +61,7 @@ const createGlobalStyleRepeater = () => {
           // Show our custom confirmation modal
           const translatedMessage = window.ArtsFluidDSStrings?.deletePresetMessage
 
-          const confirmDeleteModal = elementorCommon.dialogsManager.createWidget('confirm', {
+          const confirmDeleteModal = window.elementorCommon?.dialogsManager.createWidget('confirm', {
             className: 'e-global__confirm-delete',
             headerMessage: window.ArtsFluidDSStrings?.deleteFluidPreset,
             message: '<i class="eicon-info-circle"></i> ' + translatedMessage,
@@ -76,13 +78,15 @@ const createGlobalStyleRepeater = () => {
             }
           })
 
-          confirmDeleteModal.show()
+          if (confirmDeleteModal) {
+            confirmDeleteModal.show()
+          }
         })
       }
     },
 
     templateHelpers() {
-      const templateHelpers = this.constructor.__super__.templateHelpers.call(this)
+      const templateHelpers = callSuper(this, 'templateHelpers')
 
       if (this.isFluidSpacingTypographyRepeater()) {
         templateHelpers.addButtonText = window.ArtsFluidDSStrings?.addPreset
@@ -91,7 +95,7 @@ const createGlobalStyleRepeater = () => {
     },
 
     getDefaults() {
-      const defaults = this.constructor.__super__.getDefaults.call(this)
+      const defaults = callSuper(this, 'getDefaults')
 
       if (this.isFluidSpacingTypographyRepeater()) {
         defaults.title = `${window.ArtsFluidDSStrings?.newPreset} #${this.children.length + 1}`
@@ -104,7 +108,6 @@ const createGlobalStyleRepeater = () => {
 
 export function registerRepeaterGlobalStyleView() {
   const GlobalStyleRepeater = createGlobalStyleRepeater()
-
-  // Register the global style repeater view
-  window.elementor.addControlView('global-style-repeater', GlobalStyleRepeater)
+  const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
+  editor.addControlView('global-style-repeater', GlobalStyleRepeater)
 }
