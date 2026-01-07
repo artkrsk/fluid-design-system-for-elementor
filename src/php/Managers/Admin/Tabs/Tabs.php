@@ -1,23 +1,22 @@
 <?php
+/**
+ * Admin tab navigation and content routing.
+ *
+ * @package Arts\FluidDesignSystem
+ */
 
 namespace Arts\FluidDesignSystem\Managers\Admin\Tabs;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
+/**
+ * Tab-based admin interface router.
+ */
 class Tabs extends BaseManager {
-	/**
-	 * Render navigation tabs.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param string $current_tab Current active tab.
-	 * @return void
-	 */
 	public function render_tabs( string $current_tab ): void {
 		$tabs = $this->get_tabs();
 
@@ -35,15 +34,6 @@ class Tabs extends BaseManager {
 		}
 	}
 
-	/**
-	 * Render tab content.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param string $current_tab Current active tab.
-	 * @return void
-	 */
 	public function render_tab_content( string $current_tab ): void {
 		if ( $this->managers === null ) {
 			return;
@@ -71,14 +61,7 @@ class Tabs extends BaseManager {
 		<?php
 	}
 
-	/**
-	 * Get available tabs.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return array<string, array<string, string>> Array of tabs data.
-	 */
+	/** @return array<string, array<string, string>> */
 	public function get_tabs(): array {
 		return array(
 			'groups' => array(

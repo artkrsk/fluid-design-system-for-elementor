@@ -1,6 +1,8 @@
 <?php
 /**
- * CSS Variables manager for Fluid Design System.
+ * CSS variable naming and clamp() formula generation.
+ *
+ * Constants must match JavaScript: constants/STYLES.ts
  *
  * @package Arts\FluidDesignSystem
  * @since 1.0.0
@@ -9,93 +11,27 @@
 namespace Arts\FluidDesignSystem\Managers;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 /**
- * CSSVariables Class
- *
- * Manages CSS variable generation and clamp formula creation
- * for the Fluid Design System.
+ * CSS variable constants and clamp() formula builder.
  *
  * @since 1.0.0
  */
 class CSSVariables extends BaseManager {
 
-	/**
-	 * CSS variable prefix for fluid design system.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_PREFIX = 'arts-fluid';
-
-	/**
-	 * CSS variable prefix for fluid presets.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_PRESET_PREFIX = '--' . self::CSS_VAR_PREFIX . '-preset--';
-
-	/**
-	 * CSS variable for minimum screen width.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_MIN_SCREEN = '--' . self::CSS_VAR_PREFIX . '-min-screen';
-
-	/**
-	 * CSS variable for minimum screen width value.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
+	const CSS_VAR_PREFIX           = 'arts-fluid';
+	const CSS_VAR_PRESET_PREFIX    = '--' . self::CSS_VAR_PREFIX . '-preset--';
+	const CSS_VAR_MIN_SCREEN       = '--' . self::CSS_VAR_PREFIX . '-min-screen';
 	const CSS_VAR_MIN_SCREEN_VALUE = '--' . self::CSS_VAR_PREFIX . '-min-screen-value';
-
-	/**
-	 * CSS variable for maximum screen width.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_MAX_SCREEN = '--' . self::CSS_VAR_PREFIX . '-max-screen';
-
-	/**
-	 * CSS variable for maximum screen width value.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
+	const CSS_VAR_MAX_SCREEN       = '--' . self::CSS_VAR_PREFIX . '-max-screen';
 	const CSS_VAR_MAX_SCREEN_VALUE = '--' . self::CSS_VAR_PREFIX . '-max-screen-value';
+	const CSS_VAR_SCREEN_DIFF      = '--' . self::CSS_VAR_PREFIX . '-screen-diff';
 
-	/**
-	 * CSS variable for screen difference calculation.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const CSS_VAR_SCREEN_DIFF = '--' . self::CSS_VAR_PREFIX . '-screen-diff';
-
-	/**
-	 * Get CSS variable name for a preset with the specified ID.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param string $id The preset ID.
-	 * @return string The CSS variable name.
-	 */
+	/** @param string $id Preset ID (Elementor _id). */
 	public static function get_css_var_preset( string $id ): string {
 		/** @var string */
 		$result = apply_filters(
@@ -106,14 +42,6 @@ class CSSVariables extends BaseManager {
 		return $result;
 	}
 
-	/**
-	 * Get CSS variable name for minimum screen width.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The CSS variable name.
-	 */
 	public static function get_css_var_min_screen(): string {
 		/** @var string */
 		$result = apply_filters(
@@ -123,14 +51,6 @@ class CSSVariables extends BaseManager {
 		return $result;
 	}
 
-	/**
-	 * Get CSS variable name for minimum screen width value.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The CSS variable name.
-	 */
 	public static function get_css_var_min_screen_value(): string {
 		/** @var string */
 		$result = apply_filters(
@@ -140,14 +60,6 @@ class CSSVariables extends BaseManager {
 		return $result;
 	}
 
-	/**
-	 * Get CSS variable name for maximum screen width.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The CSS variable name.
-	 */
 	public static function get_css_var_max_screen(): string {
 		/** @var string */
 		$result = apply_filters(
@@ -157,14 +69,6 @@ class CSSVariables extends BaseManager {
 		return $result;
 	}
 
-	/**
-	 * Get CSS variable name for maximum screen width value.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The CSS variable name.
-	 */
 	public static function get_css_var_max_screen_value(): string {
 		/** @var string */
 		$result = apply_filters(
@@ -174,14 +78,6 @@ class CSSVariables extends BaseManager {
 		return $result;
 	}
 
-	/**
-	 * Get CSS variable name for screen difference.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The CSS variable name.
-	 */
 	public static function get_css_var_screen_diff(): string {
 		/** @var string */
 		$result = apply_filters(
@@ -192,27 +88,22 @@ class CSSVariables extends BaseManager {
 	}
 
 	/**
-	 * Generates a CSS clamp formula for the fluid unit.
+	 * Generates clamp(min, preferred, max) with dynamic bounds.
 	 *
-	 * @since 1.0.0
-	 * @access public
+	 * Uses CSS min()/max() to handle both normal (min < max) and inverted (min > max) cases.
+	 * Explicit parentheses ensure proper order of operations with mixed units.
 	 *
-	 * @param string      $min_value The control name for minimum value
-	 * @param string      $max_value The control name for maximum value
-	 * @param string|null $min_screen The minimum screen width value or CSS variable
-	 * @param string|null $max_screen The maximum screen width value or CSS variable
-	 *
-	 * @return string The complete clamp formula
+	 * @param string      $min_value  Elementor control name for min value.
+	 * @param string      $max_value  Elementor control name for max value.
+	 * @param string|null $min_screen Custom min breakpoint or null for global.
+	 * @param string|null $max_screen Custom max breakpoint or null for global.
 	 */
 	public static function get_clamp_formula( string $min_value, string $max_value, ?string $min_screen = null, ?string $max_screen = null ): string {
-		// Break down the formula into logical parts
 		$min_size = '{{' . $min_value . '.size}}{{' . $min_value . '.unit}}';
 		$max_size = '{{' . $max_value . '.size}}{{' . $max_value . '.unit}}';
 
-		// Calculate the difference between max and min values with explicit parentheses
 		$value_diff = '({{' . $max_value . '.size}} - {{' . $min_value . '.size}})';
 
-		// Use provided values or fall back to CSS variables
 		if ( $min_screen === null ) {
 			$min_screen = 'var(' . self::get_css_var_min_screen() . ')';
 		}
@@ -220,25 +111,16 @@ class CSSVariables extends BaseManager {
 			$max_screen = 'var(' . self::get_css_var_screen_diff() . ')';
 		}
 
-		// Explicit parentheses around viewport calculation
-		$viewport_calc = "(100vw - {$min_screen})";
-
-		// Explicit parentheses around division operation
-		$scaling_factor = "({$value_diff} * ({$viewport_calc} / {$max_screen}))";
-
-		// Build the formula with proper grouping to handle mixed signs
-		// Use parentheses around the entire addition to ensure proper calculation
+		$viewport_calc   = "(100vw - {$min_screen})";
+		$scaling_factor  = "({$value_diff} * ({$viewport_calc} / {$max_screen}))";
 		$preferred_value = "calc(({$min_size}) + ({$scaling_factor}))";
 
-		// Use CSS min() and max() to automatically determine correct bounds
-		// This handles both normal cases (min < max) and inverted cases (min > max)
+		// Dynamic bounds handle inverted min/max values
 		$lower_bound = "min({$min_size}, {$max_size})";
 		$upper_bound = "max({$min_size}, {$max_size})";
 
-		// Build the clamp with dynamic bounds
 		$formula = "clamp({$lower_bound}, {$preferred_value}, {$upper_bound})";
 
-		// Allow filtering of the complete formula
 		/** @var string */
 		$result = apply_filters(
 			'arts/fluid_design_system/css/clamp_formula',

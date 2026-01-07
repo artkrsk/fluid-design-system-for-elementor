@@ -1,31 +1,29 @@
 <?php
+/**
+ * Admin page assets (CSS/JS) enqueuing.
+ *
+ * @package Arts\FluidDesignSystem
+ */
 
 namespace Arts\FluidDesignSystem\Managers\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
+/**
+ * Enqueues modular CSS/JS for admin groups management page.
+ */
 class Frontend extends BaseManager {
 
-	/**
-	 * Enqueue admin assets.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param string $hook_suffix The current admin page hook suffix.
-	 * @return void
-	 */
+	/** Hooked to admin_enqueue_scripts. */
 	public function enqueue_assets( string $hook_suffix ): void {
-		// Only enqueue on our admin pages
 		if ( strpos( $hook_suffix, 'fluid-design-system' ) === false ) {
 			return;
 		}
 
-		// Enqueue jQuery UI Sortable for drag & drop functionality
 		wp_enqueue_script( 'jquery-ui-sortable' );
 
 		// Enqueue Elementor icons for the hero button
@@ -232,14 +230,7 @@ class Frontend extends BaseManager {
 		);
 	}
 
-	/**
-	 * Get control registry data for JavaScript.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return array<string, array<string, string>> Control registry mapping data.
-	 */
+	/** @return array<string, array<string, string>> */
 	private function get_control_registry_data(): array {
 		$registry_data = array();
 

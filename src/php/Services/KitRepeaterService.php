@@ -1,46 +1,31 @@
 <?php
 /**
- * Kit Repeater Service
+ * Kit repeater item CRUD with autosave synchronization.
  *
  * @package Arts\FluidDesignSystem
- * @since 2.1.0
  */
 
 namespace Arts\FluidDesignSystem\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 /**
- * Service for Kit repeater item operations
- *
- * Handles CRUD operations on Elementor Kit repeater controls
- * with autosave support and proper error handling.
- *
- * @since 2.1.0
+ * Direct Kit meta manipulation for preset updates.
  */
 class KitRepeaterService {
 
 	/**
-	 * Updates a repeater item in Kit by ID.
+	 * Updates a repeater item by _id, preserving existing fields via array_merge.
 	 *
-	 * Preserves existing fields not included in $updated_fields via array_merge.
-	 * Handles autosaves recursively to maintain consistency.
-	 *
-	 * @since 2.1.0
-	 * @access public
-	 * @static
-	 *
-	 * @param \Elementor\Core\Kits\Documents\Kit $kit           Kit document instance.
-	 * @param string                              $control_id    Repeater control ID.
+	 * @param \Elementor\Core\Kits\Documents\Kit $kit
+	 * @param string                              $control_id
 	 * @param string                              $item_id       Item _id to update.
-	 * @param array<string, mixed>                $updated_fields Fields to update.
-	 * @return bool Success status.
-	 * @throws \Exception If preset not found or update fails.
+	 * @param array<string, mixed>                $updated_fields Fields to merge.
+	 * @throws \Exception If preset not found.
 	 */
 	public static function update_item( $kit, $control_id, $item_id, $updated_fields ): bool {
-		// Get current kit settings
 		$meta_key          = \Elementor\Core\Settings\Page\Manager::META_KEY;
 		$document_settings = $kit->get_meta( $meta_key );
 
@@ -57,7 +42,6 @@ class KitRepeaterService {
 		/** @var array<int, array<string, mixed>> $presets */
 		$presets = $document_settings[ $control_id ];
 
-		// Find and update the item (preserving other fields)
 		$found = false;
 		foreach ( $presets as $index => $existing_item ) {
 			if ( ! is_array( $existing_item ) ) {
@@ -65,8 +49,7 @@ class KitRepeaterService {
 			}
 
 			if ( isset( $existing_item['_id'] ) && $existing_item['_id'] === $item_id ) {
-				// Use array_merge to preserve fields not in $updated_fields
-				// This maintains custom_screen_width and other metadata
+				// array_merge preserves custom_screen_width and other metadata
 				$document_settings[ $control_id ][ $index ] = array_merge( $existing_item, $updated_fields );
 				$found                                      = true;
 				break;
@@ -77,7 +60,6 @@ class KitRepeaterService {
 			throw new \Exception( esc_html__( 'Preset not found.', 'fluid-design-system-for-elementor' ) );
 		}
 
-		// Save settings using Page Settings Manager
 		$page_settings_manager = \Elementor\Core\Settings\Manager::get_settings_managers( 'page' );
 
 		if ( $page_settings_manager instanceof \Elementor\Core\Settings\Base\Manager ) {
@@ -88,27 +70,19 @@ class KitRepeaterService {
 			}
 		}
 
-		// Handle autosave recursively
 		self::process_autosave( $kit, 'update_item', $control_id, $item_id, $updated_fields );
 
 		return true;
 	}
 
 	/**
-	 * Handles autosave recursively for Kit operations.
+	 * Recursively applies operation to autosave document.
 	 *
-	 * Ensures autosave stays in sync with main Kit document.
-	 *
-	 * @since 2.1.0
-	 * @access private
-	 * @static
-	 *
-	 * @param \Elementor\Core\Kits\Documents\Kit $kit    Kit document instance.
-	 * @param string                              $method Method name to call recursively.
-	 * @param mixed                               ...$args Arguments to pass to method.
-	 * @return void
+	 * @param \Elementor\Core\Kits\Documents\Kit $kit
+	 * @param string                              $method
+	 * @param mixed                               ...$args
 	 */
-	private static function process_autosave( $kit, $method, ...$args ) {
+	private static function process_autosave( $kit, $method, ...$args ): void {
 		$autosave = $kit->get_autosave();
 		if ( $autosave instanceof \Elementor\Core\Kits\Documents\Kit ) {
 			self::$method( $autosave, ...$args );

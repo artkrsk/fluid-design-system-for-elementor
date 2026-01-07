@@ -1,25 +1,26 @@
 <?php
+/**
+ * Admin groups table rendering.
+ *
+ * @package Arts\FluidDesignSystem
+ */
 
 namespace Arts\FluidDesignSystem\Managers\Admin\Tabs\Groups;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use Arts\FluidDesignSystem\Managers\GroupsData;
 use Arts\Utilities\Utilities;
 
+/**
+ * Renders sortable groups table with inline editing and accordion presets.
+ */
 class View extends BaseManager {
-	/**
-	 * Render the Groups tab content.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array<string, mixed> $tab_data Tab data.
-	 * @return void
-	 */
-	public function render( $tab_data ) {
+	/** @param array<string, mixed> $tab_data */
+	public function render( $tab_data ): void {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null ) {
 			return;
@@ -168,42 +169,22 @@ class View extends BaseManager {
 		<?php
 	}
 
-	/**
-	 * Get rendered HTML for main groups table body.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return string HTML for table body.
-	 */
-	public function get_main_groups_table_body_html() {
+	public function get_main_groups_table_body_html(): string {
 		ob_start();
 		$this->render_main_groups_table_body();
 		$output = ob_get_clean();
 		return is_string( $output ) ? $output : '';
 	}
 
-	/**
-	 * Get rendered HTML for developer groups table body.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return string HTML for table body.
-	 */
-	public function get_developer_groups_table_body_html() {
+	public function get_developer_groups_table_body_html(): string {
 		ob_start();
 		$this->render_developer_groups_table_body();
 		$output = ob_get_clean();
 		return is_string( $output ) ? $output : '';
 	}
 
-	/**
-	 * Get complete main groups table HTML for AJAX responses.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return string Complete HTML table.
-	 */
-	public function get_main_groups_table_html() {
+	/** Returns full table HTML for AJAX table refresh. */
+	public function get_main_groups_table_html(): string {
 		ob_start();
 		?>
 		<table class="wp-list-table widefat fixed" id="fluid-groups-sortable">
@@ -217,14 +198,8 @@ class View extends BaseManager {
 		return is_string( $output ) ? $output : '';
 	}
 
-	/**
-	 * Get complete developer groups table HTML for AJAX responses.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return string Complete HTML table.
-	 */
-	public function get_developer_groups_table_html() {
+	/** Returns full table HTML for AJAX table refresh. */
+	public function get_developer_groups_table_html(): string {
 		ob_start();
 		?>
 		<table class="wp-list-table widefat fixed" id="fluid-developer-groups-table-list">
@@ -238,15 +213,7 @@ class View extends BaseManager {
 		return is_string( $output ) ? $output : '';
 	}
 
-	/**
-	 * Render the main groups table (built-in + custom, sortable).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function render_main_groups_table() {
+	private function render_main_groups_table(): void {
 		?>
 		<form method="post" id="fluid-groups-form">
 			<?php wp_nonce_field( 'fluid_groups_action', 'fluid_groups_nonce' ); ?>
@@ -275,15 +242,7 @@ class View extends BaseManager {
 		<?php
 	}
 
-	/**
-	 * Render the developer groups table (filter-based, read-only).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function render_developer_groups_table() {
+	private function render_developer_groups_table(): void {
 		?>
 		<table class="wp-list-table widefat fixed" id="fluid-developer-groups-table-list">
 			<?php $this->render_table_header(); ?>
@@ -294,15 +253,7 @@ class View extends BaseManager {
 		<?php
 	}
 
-	/**
-	 * Render table header (shared between main and developer tables).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function render_table_header() {
+	private function render_table_header(): void {
 		?>
 		<thead>
 			<tr>
@@ -329,15 +280,7 @@ class View extends BaseManager {
 		<?php
 	}
 
-	/**
-	 * Render main groups table body content.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function render_main_groups_table_body() {
+	private function render_main_groups_table_body(): void {
 		$groups = GroupsData::get_main_groups();
 
 		if ( ! empty( $groups ) ) {
@@ -358,15 +301,7 @@ class View extends BaseManager {
 		$this->render_inline_add_row();
 	}
 
-	/**
-	 * Render developer groups table body content.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function render_developer_groups_table_body() {
+	private function render_developer_groups_table_body(): void {
 		$groups = GroupsData::get_filter_groups();
 
 		if ( ! empty( $groups ) ) {
@@ -385,16 +320,10 @@ class View extends BaseManager {
 	}
 
 	/**
-	 * Render a single group row for developer table (filter-based, read-only).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param array<string, mixed> $group Group data.
-	 * @param int                  $display_order Display order number.
-	 * @return void
+	 * @param array<string, mixed> $group
+	 * @param int                  $display_order
 	 */
-	private function render_developer_group_row( $group, $display_order = 1 ) {
+	private function render_developer_group_row( $group, $display_order = 1 ): void {
 		$group_name_raw    = isset( $group['name'] ) ? $group['name'] : ( isset( $group['title'] ) ? $group['title'] : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' ) );
 		$group_name        = is_string( $group_name_raw ) ? esc_html( $group_name_raw ) : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' );
 		$group_description = isset( $group['description'] ) && is_string( $group['description'] ) ? esc_html( $group['description'] ) : '';
@@ -444,17 +373,8 @@ class View extends BaseManager {
 	}
 
 
-	/**
-	 * Render preset list for accordion content.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param array<string, mixed> $group Group data.
-	 * @param bool                 $is_developer_group Whether this is for a developer group (read-only).
-	 * @return void
-	 */
-	private function render_group_presets( $group, $is_developer_group = false ) {
+	/** @param array<string, mixed> $group */
+	private function render_group_presets( $group, bool $is_developer_group = false ): void {
 		$presets = isset( $group['value'] ) && is_array( $group['value'] ) ? $group['value'] : array();
 
 		// Add wrapper div for smooth animations
@@ -491,16 +411,10 @@ class View extends BaseManager {
 	}
 
 	/**
-	 * Render individual preset item - ENSURE PRESET IDs ARE ALWAYS SET.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param array<string, mixed> $preset Preset data.
-	 * @param array<string, mixed> $group Group data.
-	 * @return void
+	 * @param array<string, mixed> $preset
+	 * @param array<string, mixed> $group
 	 */
-	private function render_preset_item( $preset, $group ) {
+	private function render_preset_item( $preset, $group ): void {
 		// Generate a fallback ID if missing to prevent empty data-preset-id
 		$preset_id = isset( $preset['_id'] ) && is_string( $preset['_id'] ) && ! empty( $preset['_id'] )
 		? esc_attr( $preset['_id'] )
@@ -517,16 +431,10 @@ class View extends BaseManager {
 	}
 
 	/**
-	 * Render a single group row for main table (built-in + custom, all sortable).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param array<string, mixed> $group Group data.
-	 * @param int                  $display_order Display order number.
-	 * @return void
+	 * @param array<string, mixed> $group
+	 * @param int                  $display_order
 	 */
-	private function render_main_group_row( $group, $display_order = 1 ) {
+	private function render_main_group_row( $group, $display_order = 1 ): void {
 		$group_type        = isset( $group['type'] ) && is_string( $group['type'] ) ? $group['type'] : 'unknown';
 		$group_name_raw    = isset( $group['name'] ) ? $group['name'] : ( isset( $group['title'] ) ? $group['title'] : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' ) );
 		$group_name        = is_string( $group_name_raw ) ? esc_html( $group_name_raw ) : esc_html__( 'Untitled Group', 'fluid-design-system-for-elementor' );
@@ -612,16 +520,8 @@ class View extends BaseManager {
 		<?php
 	}
 
-	/**
-	 * Render actions for custom groups (delete button).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param array<string, mixed> $group Group data.
-	 * @return string HTML for group actions.
-	 */
-	private function render_custom_group_actions( $group ) {
+	/** @param array<string, mixed> $group */
+	private function render_custom_group_actions( $group ): string {
 		if ( ! isset( $group['id'] ) || ! is_string( $group['id'] ) ) {
 			return '';
 		}
@@ -635,15 +535,7 @@ class View extends BaseManager {
 		);
 	}
 
-	/**
-	 * Render inline add group row.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function render_inline_add_row() {
+	private function render_inline_add_row(): void {
 		?>
 		<tr class="inline-add-row" id="inline-add-row">
 			<td class="column-order">
