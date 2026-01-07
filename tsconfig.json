@@ -6,7 +6,7 @@
     "checkJs": true,
     "allowJs": true,
     "noEmit": true,
-    "strict": false,
+    "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

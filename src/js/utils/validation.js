@@ -1,4 +1,26 @@
-import { VALUE_WITH_UNIT_PATTERN } from '../constants/VALUES'
+import { VALUE_WITH_UNIT_PATTERN, CUSTOM_FLUID_VALUE } from '../constants/VALUES'
+import { isInlineClampValue } from './clamp'
+
+/**
+ * Check if control value object is empty
+ * @param {Record<string, any> | null | undefined} value
+ * @returns {boolean}
+ */
+export function isEmptyControlValue(value) {
+  return !value || Object.keys(value).length === 0
+}
+
+/**
+ * Check if value represents a custom fluid value (either placeholder or inline clamp)
+ * @param {string | null | undefined} value
+ * @returns {boolean}
+ */
+export function isCustomFluidValue(value) {
+  if (!value) {
+    return false
+  }
+  return value === CUSTOM_FLUID_VALUE || isInlineClampValue(value)
+}
 
 /**
  * Input validation utilities for fluid design system

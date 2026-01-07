@@ -3,13 +3,14 @@ import { createElement } from '../utils/dom'
 import { buildSelectOptions } from '../utils/preset'
 import { getSelect2DefaultOptions } from '../utils/select2'
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
-import { ValidationService } from '../utils/validation.js'
+import { ValidationService, isEmptyControlValue, isCustomFluidValue } from '../utils/validation.js'
 import { InlineInputManager } from '../utils/inlineInputs.js'
 import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { PresetDialogManager } from '../managers/PresetDialogManager.js'
 import { EditIconHandler } from '../utils/editIconHandler.js'
+import { resolveInheritedValue } from '../utils/deviceInheritance.js'
 import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/STYLES'
@@ -55,17 +56,14 @@ export const BaseControlView = {
   },
 
   hasRenderedFluidSelector() {
-    // @ts-expect-error - Type assertion for ui access
-    return this.ui.selectControls.length > 0
+    return this.ui.selectControls && this.ui.selectControls.length > 0
   },
 
   updatePlaceholderClassState() {
-    // @ts-expect-error - Type assertion for ui access
     if (!this.ui.selectControls?.length) {
       return
     }
 
-    // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       const value = selectEl.value
       const isEmptyValue = value === ''
@@ -93,7 +91,6 @@ export const BaseControlView = {
 
   /** Initialize inline inputs visibility based on current value */
   initializeInlineInputsState() {
-    // @ts-expect-error - Type assertion for ui access
     if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
       return
     }
@@ -102,7 +99,6 @@ export const BaseControlView = {
     const isLinked = this.isLinkedDimensions()
     let linkedClampValues = null
 
-    // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       const setting = selectEl.getAttribute('data-setting')
       const currentValue = this.getControlValue(setting)
@@ -144,8 +140,7 @@ export const BaseControlView = {
 
     // If linked and we found clamp values, sync to all dimensions
     if (isLinked && linkedClampValues) {
-      // @ts-expect-error - Type assertion for ui access
-      for (const selectEl of this.ui.selectControls) {
+        for (const selectEl of this.ui.selectControls) {
         const setting = selectEl.getAttribute('data-setting')
         if (setting) {
           const container = this.getInlineContainer(setting)
@@ -169,7 +164,6 @@ export const BaseControlView = {
       return
     }
 
-    // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       if (this.isDestroyed) {
         return
@@ -195,7 +189,6 @@ export const BaseControlView = {
 
     const select2Options = getSelect2DefaultOptions()
 
-    // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       if (this.isDestroyed) {
         return
@@ -220,7 +213,6 @@ export const BaseControlView = {
       return
     }
 
-    // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       if (this.isDestroyed) {
         return
@@ -247,8 +239,7 @@ export const BaseControlView = {
 
       // If linked, show custom on all dimensions
       if (this.isLinkedDimensions()) {
-        // @ts-expect-error - Type assertion for ui access
-        for (const otherSelectEl of this.ui.selectControls || []) {
+            for (const otherSelectEl of this.ui.selectControls || []) {
           if (otherSelectEl !== selectEl) {
             const otherSetting = otherSelectEl.getAttribute('data-setting')
             if (otherSetting) {
@@ -287,8 +278,7 @@ export const BaseControlView = {
       this.handleLinkedDimensionsChange(selectEl, value, isInheritValue)
 
       // Hide inline inputs for all linked dimensions when switching away from custom
-      // @ts-expect-error - Type assertion for ui access
-      for (const otherSelectEl of this.ui.selectControls || []) {
+        for (const otherSelectEl of this.ui.selectControls || []) {
         const otherSetting = otherSelectEl.getAttribute('data-setting')
         if (otherSetting) {
           this.toggleInlineInputs(otherSetting, false)
@@ -302,10 +292,8 @@ export const BaseControlView = {
   },
 
   handleLinkedDimensionsChange(selectEl, value, isInheritValue) {
-    // @ts-expect-error - Type assertion for ui access
     this.ui.controls.val(value)
 
-    // @ts-expect-error - Type assertion for ui access
     for (const el of this.ui.selectControls) {
       if (el !== selectEl) {
         el.value = value
@@ -317,7 +305,6 @@ export const BaseControlView = {
   },
 
   handleUnlinkedDimensionsChange(dimensionName, value) {
-    // @ts-expect-error - Type assertion for ui access
     const relatedInputEl = this.ui.controls.filter(`[data-setting="${dimensionName}"]`)
     relatedInputEl.val(value)
     relatedInputEl.trigger('change')
@@ -328,21 +315,18 @@ export const BaseControlView = {
     const wasFluid = this.$el.hasClass('e-units-fluid')
     const isNowFluid = unit === 'fluid'
 
-    // @ts-expect-error - Type assertion for ui access
     this.ui.unitSwitcher.attr('data-selected', unit).find('span').html(unit)
     this.$el.toggleClass('e-units-custom', this.isCustomUnit())
     this.$el.toggleClass('e-units-fluid', isNowFluid)
 
     const inputType = this.isCustomUnit() ? 'text' : 'number'
-    // @ts-expect-error - Type assertion for ui access
     this.ui.controls.attr('type', inputType)
 
     if (isNowFluid) {
       this.updatePlaceholderClassState()
 
       // Show inline inputs if Custom value is selected
-      // @ts-expect-error - Type assertion for ui access
-      for (const selectEl of this.ui.selectControls || []) {
+        for (const selectEl of this.ui.selectControls || []) {
         if (selectEl.value === CUSTOM_FLUID_VALUE) {
           const setting = selectEl.getAttribute('data-setting')
           if (setting) {
@@ -354,8 +338,7 @@ export const BaseControlView = {
 
     // Hide inline inputs when switching away from fluid unit
     if (wasFluid && !isNowFluid) {
-      // @ts-expect-error - Type assertion for ui access
-      for (const selectEl of this.ui.selectControls || []) {
+        for (const selectEl of this.ui.selectControls || []) {
         const setting = selectEl.getAttribute('data-setting')
         if (setting) {
           this.toggleInlineInputs(setting, false)
@@ -368,19 +351,14 @@ export const BaseControlView = {
     evt.preventDefault()
     evt.stopPropagation()
 
-    // @ts-expect-error - Type assertion for ui access
     this.ui.link.toggleClass('unlinked')
 
-    // @ts-expect-error - Type assertion for ui access
     this.setValue('isLinked', !this.ui.link.hasClass('unlinked'))
 
     if (this.isLinkedDimensions()) {
-      // @ts-expect-error - Type assertion for ui access
-      const value = this.ui.controls.eq(0).val()
-      // @ts-expect-error - Type assertion for ui access
-      this.ui.controls.val(value)
-      // @ts-expect-error - Type assertion for ui access
-      for (const selectEl of this.ui.selectControls) {
+        const value = this.ui.controls.eq(0).val()
+        this.ui.controls.val(value)
+        for (const selectEl of this.ui.selectControls) {
         selectEl.value = value
         jQuery(selectEl).trigger('change.select2')
       }
@@ -394,13 +372,10 @@ export const BaseControlView = {
       return
     }
 
-    // @ts-expect-error - Type assertion for ui access
     if (!this.ui.selectControls || !Array.isArray(this.ui.selectControls)) {
-      // @ts-expect-error - Type assertion for ui access
-      this.ui.selectControls = []
+        this.ui.selectControls = []
     }
 
-    // @ts-expect-error - Type assertion for ui access
     for (const dimension of this.ui.dimensions) {
       const inputEl = dimension.querySelector('input[type="text"], input[type="number"]')
       const labelEl = dimension.querySelector('label')
@@ -440,7 +415,6 @@ export const BaseControlView = {
     this.setupInheritanceAttributes(fluidSelector, setting)
     fluidSelectorContainer.appendChild(fluidSelector)
 
-    // @ts-expect-error - Type assertion for ui access
     this.ui.selectControls.push(fluidSelector)
 
     dimension.appendChild(fluidSelectorContainer)
@@ -605,8 +579,7 @@ export const BaseControlView = {
 
         // If linked, apply preset to all dimensions
         if (this.isLinkedDimensions()) {
-          // @ts-expect-error - Type assertion for ui access
-          for (const selectEl of this.ui.selectControls || []) {
+                for (const selectEl of this.ui.selectControls || []) {
             const otherSetting = selectEl.getAttribute('data-setting')
             if (otherSetting && otherSetting !== setting) {
               this.selectPreset(otherSetting, presetValue)
@@ -697,14 +670,12 @@ export const BaseControlView = {
 
   /** Refreshes all preset dropdowns in the control */
   async refreshPresetDropdowns() {
-    // @ts-expect-error - Type assertion for ui access
     await PresetDropdownManager.refreshDropdowns(this.ui.selectControls, this.el)
   },
 
   /** Selects a preset value in the dropdown and updates control */
   selectPreset(setting, presetValue) {
     // Find the select element for this setting
-    // @ts-expect-error - Type assertion for ui access
     const selectEl = this.ui.selectControls.find(
       (el) => el.getAttribute('data-setting') === setting
     )
@@ -782,8 +753,7 @@ export const BaseControlView = {
       if (this.isLinkedDimensions()) {
         const linkedContainers = []
 
-        // @ts-expect-error - Type assertion for ui access
-        for (const selectEl of this.ui.selectControls || []) {
+            for (const selectEl of this.ui.selectControls || []) {
           const otherSetting = selectEl.getAttribute('data-setting')
           if (otherSetting && otherSetting !== setting) {
             // Add linked dimension value to the model update
@@ -794,8 +764,7 @@ export const BaseControlView = {
               linkedContainers.push(otherContainer)
 
               // Update related input for Elementor's internal tracking
-              // @ts-expect-error - Type assertion for ui access
-              const linkedInputEl = this.ui.controls.filter(`[data-setting="${otherSetting}"]`)
+                        const linkedInputEl = this.ui.controls.filter(`[data-setting="${otherSetting}"]`)
               linkedInputEl.val(clampValue)
             }
           }
@@ -810,8 +779,7 @@ export const BaseControlView = {
       this.setValue(newValue)
 
       // Update related input for Elementor's internal tracking
-      // @ts-expect-error - Type assertion for ui access
-      const relatedInputEl = this.ui.controls.filter(`[data-setting="${setting}"]`)
+        const relatedInputEl = this.ui.controls.filter(`[data-setting="${setting}"]`)
       relatedInputEl.val(clampValue)
 
       this.updateDimensions()
@@ -820,7 +788,7 @@ export const BaseControlView = {
 
   /** Checks if a value is a custom inline value */
   isCustomFluidValue(value) {
-    return value === CUSTOM_FLUID_VALUE || isInlineClampValue(value)
+    return isCustomFluidValue(value)
   },
 
   setupInheritanceAttributes(fluidSelector, setting) {
@@ -839,9 +807,6 @@ export const BaseControlView = {
 
     try {
       const controlName = this.model.get('name')
-      let baseControlName = controlName
-      let currentDeviceSuffix = ''
-
       const deviceOrder = window.elementor?.breakpoints.getActiveBreakpointsList({
         largeToSmall: true,
         withDesktop: true
@@ -851,117 +816,22 @@ export const BaseControlView = {
         return null
       }
 
-      for (const device of deviceOrder) {
-        if (device === 'desktop') {
-          continue
-        }
-
-        if (controlName.endsWith('_' + device)) {
-          baseControlName = controlName.replace('_' + device, '')
-          currentDeviceSuffix = device
-
-          break
-        }
-      }
-
-      if (!currentDeviceSuffix) {
-        return null
-      }
-
-      if (currentDeviceSuffix === 'widescreen') {
-        return this.handleWidescreenInheritance(baseControlName)
-      }
-
-      return this.handleStandardInheritance(baseControlName, currentDeviceSuffix, deviceOrder)
+      // Use pure utility function with dependency injection
+      // Pass control-specific isEmptyValue for correct empty checks
+      // (dimensions check all props, slider checks size, etc.)
+      return resolveInheritedValue(
+        controlName,
+        deviceOrder,
+        (name) => this._getControlValue(name),
+        (value) => this.isEmptyValue(value)
+      )
     } catch {
       return null
     }
   },
 
-  handleWidescreenInheritance(baseControlName) {
-    const desktopValue = this._getControlValue(baseControlName)
-
-    if (desktopValue) {
-      return {
-        ...desktopValue,
-        __inheritedFrom: 'desktop',
-        __directParentDevice: 'desktop',
-        __inheritPath: ['desktop'],
-        __sourceUnit: desktopValue.unit
-      }
-    }
-    return null
-  },
-
-  handleStandardInheritance(baseControlName, currentDeviceSuffix, deviceOrder) {
-    const currentDeviceIndex = deviceOrder.indexOf(currentDeviceSuffix)
-    const ancestorDevices = deviceOrder.slice(0, currentDeviceIndex)
-    const inheritPath = []
-    let directParent = ''
-
-    const parentDevice = ancestorDevices[ancestorDevices.length - 1]
-    const parentControlName =
-      parentDevice === 'desktop' ? baseControlName : baseControlName + '_' + parentDevice
-
-    directParent = parentDevice
-    const parentValue = this._getControlValue(parentControlName)
-    inheritPath.push(parentDevice)
-
-    if (!parentValue || this.isEmptyValue(parentValue)) {
-      return this.findNonEmptyAncestorValue(
-        baseControlName,
-        ancestorDevices,
-        inheritPath,
-        directParent
-      )
-    }
-
-    return {
-      ...parentValue,
-      __inheritedFrom: parentDevice,
-      __directParentDevice: directParent,
-      __inheritPath: inheritPath,
-      __sourceUnit: parentValue.unit
-    }
-  },
-
-  findNonEmptyAncestorValue(baseControlName, ancestorDevices, inheritPath, directParent) {
-    for (let i = ancestorDevices.length - 2; i >= 0; i--) {
-      const device = ancestorDevices[i]
-      const deviceControlName =
-        device === 'desktop' ? baseControlName : baseControlName + '_' + device
-      const deviceValue = this._getControlValue(deviceControlName)
-      inheritPath.unshift(device)
-
-      if (deviceValue && !this.isEmptyValue(deviceValue)) {
-        return {
-          ...deviceValue,
-          __inheritedFrom: device,
-          __directParentDevice: directParent,
-          __inheritPath: inheritPath,
-          __sourceUnit: deviceValue.unit
-        }
-      }
-    }
-
-    const parentDevice = ancestorDevices[ancestorDevices.length - 1]
-    const parentControlName =
-      parentDevice === 'desktop' ? baseControlName : baseControlName + '_' + parentDevice
-    const parentValue = this._getControlValue(parentControlName)
-
-    return parentValue
-      ? {
-          ...parentValue,
-          __inheritedFrom: parentDevice,
-          __directParentDevice: directParent,
-          __inheritPath: inheritPath,
-          __sourceUnit: parentValue.unit
-        }
-      : null
-  },
-
   isEmptyValue(value) {
-    return !value || Object.keys(value).length === 0
+    return isEmptyControlValue(value)
   },
 
   _getControlValue(controlName) {
@@ -989,7 +859,6 @@ export const BaseControlView = {
       return
     }
 
-    // @ts-expect-error - Type assertion for ui access
     for (const selectEl of this.ui.selectControls) {
       if (this.isDestroyed) {
         return

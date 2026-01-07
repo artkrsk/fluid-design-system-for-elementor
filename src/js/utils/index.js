@@ -1,6 +1,7 @@
 export * from './backbone'
 export * from './clamp'
 export * from './controls'
+export * from './deviceInheritance'
 export * from './dialogBuilder'
 export * from './dom'
 export * from './editIconHandler'
