@@ -23,7 +23,7 @@ export default [
       '__e2e__/',
       '__tests__/',
       'vendor/',
-      'src/js/www',
+      'src/ts/www',
       'src/php'
     ]
   },
@@ -31,6 +31,7 @@ export default [
   {
     files: [
       '*.config.js',
+      '*.config.ts',
       'config/**/*.js',
       'vite.config.js',
       '__builder__/**/*.js',
@@ -50,7 +51,7 @@ export default [
   },
   // Configuration for source files
   {
-    files: ['src/js/**/*.js'],
+    files: ['src/ts/**/*.ts', 'src/ts/**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',

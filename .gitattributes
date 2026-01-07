@@ -38,7 +38,6 @@ drafts export-ignore
 
 # Source files not needed in the Composer package
 src/ts export-ignore
-src/js export-ignore
 src/styles export-ignore
 src/wordpress-plugin export-ignore
 

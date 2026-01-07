@@ -5,7 +5,7 @@
 export default {
   // Basic project information
   name: 'Fluid Design System for Elementor',
-  entry: './src/js/index.js',
+  entry: './src/ts/index.ts',
   author: 'Artem Semkin',
   license: 'GPL-3.0',
   description: 'Fluid spacing and typography units for Elementor',
@@ -20,7 +20,7 @@ export default {
     dist: './dist',
     php: './src/php',
     styles: './src/styles',
-    js: './src/js',
+    ts: './src/ts',
     wordpress: {
       plugin: './src/wordpress-plugin',
       languages: './src/wordpress-plugin/languages'
@@ -31,17 +31,17 @@ export default {
       assets: 'src/php/libraries/arts-fluid-design-system'
     },
     aliases: {
-      '@': './src/js',
-      '@core': './src/js/core',
-      '@controls': './src/js/controls',
-      '@hooks': './src/js/hooks',
-      '@services': './src/js/services'
+      '@': './src/ts',
+      '@core': './src/ts/core',
+      '@controls': './src/ts/controls',
+      '@hooks': './src/ts/hooks',
+      '@services': './src/ts/services'
     }
   },
 
   // Development configuration
   dev: {
-    root: './src/js/www',
+    root: './src/ts/www',
     server: {
       port: 8080,
       host: 'localhost'
