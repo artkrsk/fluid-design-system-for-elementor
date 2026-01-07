@@ -129,6 +129,38 @@ describe('clamp utilities', () => {
       expect(parseClampFormula('clamp(invalid)')).toBeNull()
     })
 
+    it('returns null when min() contains invalid values', () => {
+      // min() with values that cannot be parsed (no numeric prefix)
+      expect(parseClampFormula('clamp(min(invalid, also-invalid), calc(...), max(...))')).toBeNull()
+    })
+
+    it('returns null when one value in min() is invalid', () => {
+      // First value valid, second invalid
+      expect(parseClampFormula('clamp(min(16px, invalid), calc((16px)), max(16px, 24px))')).toBeNull()
+    })
+
+    it('parses when calc base matches second value (inverted order)', () => {
+      // Create formula where calc base is the second value in min()
+      // This triggers line 90 - the else branch
+      const formula = 'clamp(min(24px, 16px), calc((16px) + ...), max(24px, 16px))'
+      const parsed = parseClampFormula(formula)
+
+      expect(parsed).not.toBeNull()
+      expect(parsed?.minSize).toBe('16')
+      expect(parsed?.maxSize).toBe('24')
+    })
+
+    it('uses fallback when no calc pattern matches', () => {
+      // clamp with min() but no calc() pattern - triggers line 95
+      const formula = 'clamp(min(16px, 24px), 20px, max(16px, 24px))'
+      const parsed = parseClampFormula(formula)
+
+      expect(parsed).not.toBeNull()
+      // Fallback assumes first is min, second is max
+      expect(parsed?.minSize).toBe('16')
+      expect(parsed?.maxSize).toBe('24')
+    })
+
     it('roundtrips formula generation and parsing', () => {
       const testCases = [
         { min: 16, minUnit: 'px', max: 24, maxUnit: 'px' },

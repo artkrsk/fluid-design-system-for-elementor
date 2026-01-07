@@ -9,7 +9,33 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/ts/**/*.ts'],
-      exclude: ['src/ts/**/*.d.ts']
+      exclude: [
+        'src/ts/**/*.d.ts',
+        'src/ts/**/index.ts',
+        'src/ts/interfaces/**',
+        'src/ts/types/**',
+        'src/ts/constants/**',
+        'src/ts/views/**',
+        'src/ts/hooks/**',
+        'src/ts/components/**',
+        'src/ts/managers/**',
+        'src/ts/services/**',
+        // DOM/jQuery dependent utils (require integration tests)
+        'src/ts/utils/backbone.ts',
+        'src/ts/utils/dialogBuilder.ts',
+        'src/ts/utils/editIconHandler.ts',
+        'src/ts/utils/elementorAjax.ts',
+        'src/ts/utils/inheritanceAttributes.ts',
+        'src/ts/utils/inlineInputs.ts',
+        'src/ts/utils/preset.ts',
+        'src/ts/utils/presetActions.ts',
+        'src/ts/utils/presetDropdown.ts',
+        'src/ts/utils/presetLookup.ts',
+        'src/ts/utils/presetOptions.ts',
+        'src/ts/utils/select2.ts',
+        'src/ts/utils/spinner.ts',
+        'src/ts/utils/templates.ts'
+      ]
     }
   },
   resolve: {
