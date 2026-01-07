@@ -21,7 +21,7 @@ export class EditIconHandler {
    */
   attach() {
     jQuery(this.selectEl)
-      .on('select2:selecting', (e) => this._handleSelecting(e))
+      .on('select2:selecting', (e) => this._handleSelecting(/** @type {any} */ (e)))
       .on('select2:open', () => this._handleOpen())
       .on('select2:close', () => this._handleClose())
   }
@@ -37,8 +37,8 @@ export class EditIconHandler {
   /**
    * Handles select2:selecting event (fires for non-selected items)
    * @private
+   * @param {JQuery.TriggeredEvent & {params?: {args?: {originalEvent?: MouseEvent}}}} e
    */
-  /** @param {Event} e */
   _handleSelecting(e) {
     const clickEvent = e.params?.args?.originalEvent
     if (!clickEvent || !clickEvent.target) {
@@ -84,12 +84,12 @@ export class EditIconHandler {
       const $dropdown = jQuery('.select2-dropdown')
 
       // Create mousedown handler
-      this.mousedownHandler = /** @param {Event} e */ (e) => {
+      this.mousedownHandler = /** @param {JQuery.TriggeredEvent} e */ (e) => {
         e.stopPropagation()
         e.stopImmediatePropagation()
         e.preventDefault()
 
-        const presetId = jQuery(e.currentTarget).data('preset-id')
+        const presetId = e.currentTarget ? jQuery(e.currentTarget).data('preset-id') : null
 
         // Close dropdown first, then open dialog
         jQuery(this.selectEl).one('select2:close', () => {

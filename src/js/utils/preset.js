@@ -5,16 +5,26 @@ import { parseClampFormula } from './clamp'
 import { ValueFormatter } from './formatters.js'
 
 class PresetUtils {
+  /**
+   * @param {HTMLElement} element
+   * @param {Record<string, string | boolean | undefined | null>} attributes
+   */
   static #setElementAttributes(element, attributes) {
     Object.entries(attributes).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        element.setAttribute(key, value)
+        element.setAttribute(key, String(value))
       }
     })
   }
 
+  /**
+   * @param {string} value
+   * @param {string} currentValue
+   * @param {Record<string, string | boolean | undefined>} [attributes]
+   * @returns {HTMLOptionElement}
+   */
   static #createBaseOption(value, currentValue, attributes = {}) {
-    const optionEl = createElement('option')
+    const optionEl = /** @type {HTMLOptionElement} */ (createElement('option'))
     optionEl.value = value
     if (currentValue === value) {
       optionEl.setAttribute('selected', 'selected')
@@ -277,21 +287,25 @@ class PresetUtils {
     return optionEl
   }
 
-  /** Creates the "Custom value..." option for inline fluid values */
+  /**
+   * Creates the "Custom value..." option for inline fluid values
+   * @param {string} currentValue
+   * @returns {HTMLOptionElement}
+   */
   static createCustomValueOption(currentValue) {
     const isCustomSelected =
       currentValue === CUSTOM_FLUID_VALUE || (currentValue && currentValue.startsWith('clamp('))
 
-    const optionEl = createElement('option', null, {
+    const optionEl = /** @type {HTMLOptionElement} */ (createElement('option', null, {
       value: CUSTOM_FLUID_VALUE,
       'data-is-custom-fluid': 'true'
-    })
+    }))
 
     if (isCustomSelected) {
       optionEl.setAttribute('selected', 'selected')
     }
 
-    optionEl.textContent = window.ArtsFluidDSStrings?.customValue
+    optionEl.textContent = window.ArtsFluidDSStrings?.customValue ?? ''
     return optionEl
   }
 

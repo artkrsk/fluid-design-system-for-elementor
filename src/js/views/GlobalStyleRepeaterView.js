@@ -5,7 +5,8 @@ import { callSuper } from '../utils/backbone'
  */
 const createGlobalStyleRepeater = () => {
   const editor = /** @type {import('@arts/elementor-types').ElementorEditor} */ (window.elementor)
-  return editor.modules.controls['Global-style-repeater'].extend({
+  const GlobalStyleRepeaterBase = /** @type {any} */ (editor.modules.controls)['Global-style-repeater']
+  return GlobalStyleRepeaterBase.extend({
     initialize() {
       callSuper(this, 'initialize', arguments)
 
@@ -20,7 +21,7 @@ const createGlobalStyleRepeater = () => {
       return this.model.get('is_fluid_preset_repeater') === true
     },
 
-    // This method will be called after each child view is rendered
+    /** @param {import('@arts/elementor-types').BackboneView & {$el: JQuery}} childView */
     onAfterChildViewRender(childView) {
       if (!this.isFluidSpacingTypographyRepeater()) {
         return
@@ -41,20 +42,24 @@ const createGlobalStyleRepeater = () => {
         removeButton.data('e-global-type', 'fluid-preset')
 
         // If tipsy is already initialized, destroy it first
+        const tipsyButton = /** @type {any} */ (removeButton)
         if (removeButton.data('tipsy')) {
-          removeButton.tipsy('hide')
+          tipsyButton.tipsy('hide')
           // Remove the tipsy data to ensure we create a fresh instance
-          jQuery.removeData(removeButton.get(0), 'tipsy')
+          const el = removeButton.get(0)
+          if (el) {
+            jQuery.removeData(el, 'tipsy')
+          }
         }
 
         // Initialize tipsy with proper options
-        removeButton.tipsy({
+        tipsyButton.tipsy({
           title: () => window.ArtsFluidDSStrings?.deleteFluidPreset,
           gravity: () => 's'
         })
 
         // Override the click handler for the remove button
-        removeButton.off('click').on('click', (e) => {
+        removeButton.off('click').on('click', /** @param {JQuery.ClickEvent} e */ (e) => {
           e.preventDefault()
           e.stopPropagation()
 

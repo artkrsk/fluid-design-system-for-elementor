@@ -1,10 +1,15 @@
 import { TemplateRenderer } from './templates.js'
 
+/**
+ * @typedef {Select2.OptionData | Select2.LoadingData | Select2.OptGroupData} Select2State
+ * @typedef {Select2.OptionData | Select2.OptGroupData} Select2MatcherData
+ */
+
 class Select2Utils {
   /**
-   * @param {Object} state - Select2 state object
-   * @param {boolean} isTemplateResult - Whether this is for template result
-   * @returns {JQuery<HTMLElement>|string} Template element or text
+   * @param {Select2State} state
+   * @param {boolean} isTemplateResult
+   * @returns {JQuery<HTMLElement>|string}
    */
   static getTemplateSelect2(state, isTemplateResult) {
     return TemplateRenderer.getTemplateSelect2(state, isTemplateResult)
@@ -16,8 +21,9 @@ class Select2Utils {
       dropdownAutoWidth: true,
       theme: 'default select2-container--width-auto',
       containerCssClass: 'select2-selection--height-large',
-      templateResult: (state) => Select2Utils.getTemplateSelect2(state, true),
-      templateSelection: (state) => Select2Utils.getTemplateSelect2(state, false),
+      templateResult: /** @param {Select2State} state */ (state) => Select2Utils.getTemplateSelect2(state, true),
+      templateSelection: /** @param {Select2State} state */ (state) => Select2Utils.getTemplateSelect2(state, false),
+      /** @type {(params: Select2.SearchOptions, data: Select2MatcherData) => Select2MatcherData | null} */
       matcher: (params, data) => {
         // No search term - show everything
         if (jQuery.trim(params.term) === '') {
@@ -42,8 +48,9 @@ class Select2Utils {
         }
 
         // Group doesn't match - filter children individually
+        /** @type {Select2.OptionData[]} */
         const filteredChildren = []
-        jQuery.each(data.children, (idx, child) => {
+        jQuery.each(data.children, (idx, /** @type {Select2.OptionData} */ child) => {
           if (child.text.toUpperCase().indexOf(term) > -1) {
             filteredChildren.push(child)
           }

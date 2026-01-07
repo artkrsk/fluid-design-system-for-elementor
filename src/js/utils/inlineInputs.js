@@ -20,22 +20,22 @@ export class InlineInputManager {
     })
 
     // Min value input (text input accepting "20px", "1.5rem", etc.)
-    const minInput = createElement('input', 'e-fluid-inline-input', {
+    const minInput = /** @type {HTMLInputElement} */ (createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'min',
       placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER
-    })
+    }))
 
     // Separator
     const separator = createElement('span', 'e-fluid-inline-separator')
     separator.textContent = '~'
 
     // Max value input
-    const maxInput = createElement('input', 'e-fluid-inline-input', {
+    const maxInput = /** @type {HTMLInputElement} */ (createElement('input', 'e-fluid-inline-input', {
       type: 'text',
       'data-fluid-role': 'max',
       placeholder: UI_DEFAULTS.INLINE_INPUT_PLACEHOLDER
-    })
+    }))
 
     container.appendChild(minInput)
     container.appendChild(separator)
@@ -44,7 +44,7 @@ export class InlineInputManager {
     // Add "Save as Preset" button (Elementor pattern)
     const saveButton = createElement('button', 'e-control-tool e-fluid-save-preset', {
       type: 'button',
-      title: window.ArtsFluidDSStrings?.saveAsPreset
+      title: window.ArtsFluidDSStrings?.saveAsPreset ?? ''
     })
     const icon = createElement('i', 'eicon-plus')
     saveButton.appendChild(icon)

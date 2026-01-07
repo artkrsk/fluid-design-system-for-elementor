@@ -411,16 +411,16 @@ export class TemplateRenderer {
 
   /**
    * Main template selection function for Select2
-   * @param {Object} state - Select2 state object
-   * @param {boolean} isTemplateResult - Whether this is for template result
-   * @returns {JQuery<HTMLElement>|string} Template element or text
+   * @param {import('./select2.js').Select2State} state
+   * @param {boolean} isTemplateResult
+   * @returns {JQuery<HTMLElement>|string}
    */
   static getTemplateSelect2(state, isTemplateResult) {
     if (!state.element) {
       return state.text
     }
 
-    const { element } = state
+    const element = /** @type {HTMLOptionElement} */ (state.element)
 
     if (element.value === '') {
       return TemplateRenderer.handleEmptyValueTemplate(element, state.text)

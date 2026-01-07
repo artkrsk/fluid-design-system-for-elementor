@@ -1,4 +1,5 @@
 export const BaseDimensionsControlView = {
+  /** @param {import('../interfaces').IDimensionsValue | null | undefined} value */
   isEmptyValue(value) {
     if (!value) {
       return true

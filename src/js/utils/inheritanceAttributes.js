@@ -5,10 +5,10 @@
 export class InheritanceAttributeManager {
   /**
    * Sets up inheritance attributes if control is responsive
-   * @param {HTMLElement} fluidSelector - Select element to set attributes on
-   * @param {string} propertyName - Property name to read from inherited control ('size' for slider, 'top'/'left'/etc for dimensions)
-   * @param {Object} controlModel - Backbone control model
-   * @param {Function} getParentValueFn - Function that returns parent control value with inheritance metadata
+   * @param {HTMLElement} fluidSelector
+   * @param {string} propertyName - Property name to read ('size' for slider, 'top'/'left'/etc for dimensions)
+   * @param {import('@arts/elementor-types').BackboneModel} controlModel
+   * @param {() => import('../interfaces').IInheritedControlValue | null} getParentValueFn
    */
   static setupAttributes(fluidSelector, propertyName, controlModel, getParentValueFn) {
     const controlName = controlModel.get('name')
@@ -24,10 +24,9 @@ export class InheritanceAttributeManager {
 
   /**
    * Sets inheritance data attributes on selector element
-   * These attributes are read by preset.js when building the inherit option
-   * @param {HTMLElement} fluidSelector - Select element
-   * @param {Object} inheritedControl - Inherited control data with metadata (__inheritedFrom, __sourceUnit, etc.)
-   * @param {string} propertyName - Property name to read from inheritedControl
+   * @param {HTMLElement} fluidSelector
+   * @param {import('../interfaces').IInheritedControlValue} inheritedControl
+   * @param {string} propertyName
    */
   static setAttributes(fluidSelector, inheritedControl, propertyName) {
     const inheritedSize = inheritedControl[propertyName]
@@ -37,7 +36,7 @@ export class InheritanceAttributeManager {
     const directParentDevice = inheritedControl.__directParentDevice
 
     if (inheritedSize !== undefined) {
-      fluidSelector.setAttribute('data-inherited-size', inheritedSize)
+      fluidSelector.setAttribute('data-inherited-size', String(inheritedSize))
     }
     if (inheritedUnit) {
       fluidSelector.setAttribute('data-inherited-unit', inheritedUnit)
