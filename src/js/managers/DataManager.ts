@@ -1,4 +1,4 @@
-import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants/API'
+import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants'
 import { showControlSpinner, hideControlSpinner, elementorAjaxRequest } from '../utils'
 import type { IPresetGroup } from '../interfaces'
 

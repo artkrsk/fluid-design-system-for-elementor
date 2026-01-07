@@ -1,7 +1,7 @@
 import { ValidationService } from '../utils/validation'
 import { DialogBuilder } from '../utils/dialogBuilder'
 import { generateClampFormula } from '../utils/clamp'
-import { UI_DEFAULTS } from '../constants/VALUES'
+import { UI_DEFAULTS } from '../constants'
 import { ValueFormatter } from '../utils/formatters'
 import cssManager from './CSSManager'
 import type { IDialogConfig, IPresetData, IPresetDialogData, IPresetDialogCallbacks } from '../interfaces'

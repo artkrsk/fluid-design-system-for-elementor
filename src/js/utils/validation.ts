@@ -1,4 +1,4 @@
-import { VALUE_WITH_UNIT_PATTERN, CUSTOM_FLUID_VALUE } from '../constants/VALUES'
+import { VALUE_WITH_UNIT_PATTERN, CUSTOM_FLUID_VALUE } from '../constants'
 import { isInlineClampValue } from './clamp'
 import type { TParsedValue, TValidationResult } from '../types'
 

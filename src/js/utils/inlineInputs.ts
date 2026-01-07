@@ -1,7 +1,7 @@
 import { createElement } from './dom'
 import { ValidationService } from './validation'
 import { ValueFormatter } from './formatters'
-import { UI_DEFAULTS } from '../constants/VALUES'
+import { UI_DEFAULTS } from '../constants'
 import type { IInlineContainerResult, IInlineInputValues } from '../interfaces'
 
 /** Manages inline min/max input fields for custom fluid values */

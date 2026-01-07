@@ -1,4 +1,4 @@
-import { AJAX_ACTIONS } from '../constants/API'
+import { AJAX_ACTIONS } from '../constants'
 import { elementorAjaxRequest } from '../utils/elementorAjax'
 import type { ISavePresetData, IUpdatePresetData, IPresetResponse, IPresetGroupOption } from '../interfaces'
 

@@ -1,5 +1,5 @@
 import { PresetAPIService } from '../services/presetAPI'
-import { SELECT2_CONFIG } from '../constants/VALUES'
+import { SELECT2_CONFIG } from '../constants'
 
 /** Dialog building utilities for preset dialogs */
 export class DialogBuilder {

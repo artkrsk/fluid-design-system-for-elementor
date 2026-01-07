@@ -1,4 +1,4 @@
-import { UI_TIMING } from '../constants/VALUES'
+import { UI_TIMING } from '../constants'
 import type { TSelect2SelectingEvent } from '../types'
 
 type EditCallback = (presetId: string) => void
