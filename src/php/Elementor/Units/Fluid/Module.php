@@ -1,6 +1,6 @@
 <?php
 /**
- * Fluid Unit Module for handling AJAX requests.
+ * AJAX handlers for fluid preset operations in Elementor editor.
  *
  * @package Arts\FluidDesignSystem
  * @since 1.0.0
@@ -9,7 +9,7 @@
 namespace Arts\FluidDesignSystem\Elementor\Units\Fluid;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit;
 }
 
 use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
@@ -20,105 +20,36 @@ use Arts\FluidDesignSystem\Managers\ControlRegistry;
 use Arts\FluidDesignSystem\Services\KitRepeaterService;
 
 /**
- * Module Class
- *
- * Handles AJAX operations for retrieving fluid design system presets
- * for use in the Elementor editor.
+ * AJAX handlers for fluid preset CRUD operations.
  *
  * @since 1.0.0
  */
 class Module extends Module_Base {
-	/**
-	 * Module instance.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 * @static
-	 * @var Module|null The singleton instance.
-	 */
+	/** @var Module|null */
 	protected static $instance;
 
-	/**
-	 * AJAX action identifier for retrieving presets.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
-	const ACTION_GET_PRESETS = 'arts_fluid_design_system_presets';
-
-	/**
-	 * AJAX action identifier for saving new presets.
-	 *
-	 * @since 1.2.2
-	 * @access public
-	 * @var string
-	 */
-	const ACTION_SAVE_PRESET = 'arts_fluid_design_system_save_preset';
-
-	/**
-	 * AJAX action identifier for retrieving group list.
-	 *
-	 * @since 1.2.2
-	 * @access public
-	 * @var string
-	 */
-	const ACTION_GET_GROUPS = 'arts_fluid_design_system_get_groups';
-
-	/**
-	 * AJAX action identifier for updating existing presets.
-	 *
-	 * @since 2.1.0
-	 * @access public
-	 * @var string
-	 */
+	const ACTION_GET_PRESETS   = 'arts_fluid_design_system_presets';
+	const ACTION_SAVE_PRESET   = 'arts_fluid_design_system_save_preset';
+	const ACTION_GET_GROUPS    = 'arts_fluid_design_system_get_groups';
 	const ACTION_UPDATE_PRESET = 'arts_fluid_design_system_update_preset';
 
-	/**
-	 * Get module instance.
-	 *
-	 * Ensures only one instance of the module is loaded or can be loaded.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @return Module An instance of the module class.
-	 */
+	/** @return Module */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 		}
-
 		return self::$instance;
 	}
 
-	/**
-	 * Get module name.
-	 *
-	 * Retrieve the module name.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string Module name.
-	 */
+	/** @inheritDoc */
 	public function get_name() {
 		return 'arts-fluid-design-system-units-fluid-ajax-handlers';
 	}
 
 	/**
-	 * Register AJAX actions.
-	 *
-	 * Register AJAX action handlers for the module.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param Ajax $ajax_manager An instance of the AJAX manager.
-	 * @return void
+	 * @param Ajax $ajax_manager Elementor AJAX manager.
 	 */
-	public function register_ajax_actions( Ajax $ajax_manager ) {
+	public function register_ajax_actions( Ajax $ajax_manager ): void {
 		$ajax_manager->register_ajax_action( self::ACTION_GET_PRESETS, array( self::class, 'ajax_fluid_design_system_presets' ) );
 		$ajax_manager->register_ajax_action( self::ACTION_SAVE_PRESET, array( self::class, 'ajax_save_fluid_preset' ) );
 		$ajax_manager->register_ajax_action( self::ACTION_GET_GROUPS, array( self::class, 'ajax_get_groups' ) );
@@ -126,20 +57,11 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * AJAX handler for retrieving fluid design system presets.
-	 *
-	 * Retrieves fluid spacing and typography presets configured in Elementor.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @param array<string, mixed> $data Data received from the AJAX request.
-	 * @return array<int, array<string, mixed>> Formatted presets data for the fluid unit control.
-	 * @throws \Exception If the user does not have permission to edit posts.
+	 * @param array<string, mixed> $data AJAX request data.
+	 * @return array<int, array<string, mixed>> Formatted presets for fluid unit control.
+	 * @throws \Exception On permission denied.
 	 */
 	public static function ajax_fluid_design_system_presets( $data ): array {
-		// Verify user permissions
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
 		}
@@ -148,33 +70,17 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Get all preset groups including built-in, filter-based, and custom groups.
+	 * Aggregates presets from Kit settings, custom groups, and filter-based sources.
 	 *
-	 * This method consolidates all preset groups from various sources:
-	 * - Built-in groups (Typography, Spacing) from Elementor kit settings
-	 * - Filter-based groups added by developers via the custom_presets filter
-	 * - Future: Custom groups stored in database (Milestone 2)
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @param array<string, mixed> $data Optional data context for filter processing.
-	 * @return array<int, array<string, mixed>> Formatted presets data for the fluid unit control and admin display.
+	 * @param array<string, mixed> $data Optional context for filter processing.
+	 * @return array<int, array<string, mixed>> Formatted presets for dropdown.
 	 */
 	public static function get_all_preset_groups( $data = array() ): array {
-		// Initialize the result with default options
-		$result = self::get_default_preset_options();
-
-		// Get global breakpoint settings
+		$result              = self::get_default_preset_options();
 		$breakpoint_settings = self::get_breakpoint_settings();
+		$preset_collections  = self::get_preset_collections();
 
-		// Get preset settings from Elementor kit
-		$preset_collections = self::get_preset_collections();
-
-		// Process each preset collection
 		foreach ( $preset_collections as $control_id => $collection_data ) {
-			// Validate collection structure
 			if ( ! is_array( $collection_data ) || ! isset( $collection_data['title'] ) || ! isset( $collection_data['presets'] ) || ! isset( $collection_data['control_id'] ) ) {
 				continue;
 			}
@@ -194,41 +100,25 @@ class Module extends Module_Base {
 		}
 
 		/**
-		 * Filter to add custom fluid design system presets.
+		 * Adds custom preset groups. Filter-added presets are marked non-editable.
 		 *
-		 * Allows developers to add custom preset collections to the fluid unit control.
-		 * Each custom preset group should have the following structure:
-		 *
-		 * array(
-		 *     'name'        => 'Group Name',           // Required: Display name for the group
-		 *     'description' => 'Group description',   // Optional: Description shown in admin
-		 *     'value'       => array(                  // Required: Array of presets
-		 *         array(
-		 *             'id'              => 'preset-id',         // Required: Unique preset identifier
-		 *             'value'           => 'var(--css-var)',    // Required: CSS value (CSS var or any valid CSS value)
-		 *             'title'           => 'Preset Title',      // Required: Display name for the preset
-		 *             'display_value'   => true|'Custom Text',  // Optional: Controls value display in UI
-		 *                                                       //   true = show actual value
-		 *                                                       //   string = show custom text
-		 *                                                       //   omitted = show title only
-		 *         ),
-		 *     ),
-		 * )
+		 * Expected structure per group:
+		 * - name: string (required)
+		 * - value: array of presets with id, value, title keys (required)
+		 * - description: string (optional)
 		 *
 		 * @since 1.0.0
-		 *
-		 * @param array $result             The existing preset collections.
-		 * @param array $breakpoint_settings Global breakpoint settings.
-		 * @param array $data               The AJAX request data.
+		 * @param array<int, array<string, mixed>> $result             Existing presets.
+		 * @param array<string, int>               $breakpoint_settings Min/max screen widths.
+		 * @param array<string, mixed>             $data                AJAX request data.
 		 */
 		$filtered_result = apply_filters( 'arts/fluid_design_system/custom_presets', $result, $breakpoint_settings, $data );
 
-		// Ensure filter returns an array
 		if ( ! is_array( $filtered_result ) ) {
 			return $result;
 		}
 
-		// Mark filter-added presets as not editable
+		// Mark filter-added groups as non-editable (Kit presets remain editable)
 		$num_kit_groups = count( $result );
 		for ( $i = $num_kit_groups; $i < count( $filtered_result ); $i++ ) {
 			if ( ! isset( $filtered_result[ $i ] ) || ! is_array( $filtered_result[ $i ] ) ) {
@@ -252,13 +142,7 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Get default preset options that should always be available.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @return array<int, array<string, string>> Array of default preset options.
+	 * @return array<int, array<string, string>> Default + 0px options always shown first.
 	 */
 	public static function get_default_preset_options(): array {
 		return array(
@@ -274,13 +158,7 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Get global breakpoint settings from Elementor kit.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @static
-	 *
-	 * @return array<string, int> Array with min and max screen width values.
+	 * @return array<string, int> Global min/max breakpoints from Kit settings.
 	 */
 	private static function get_breakpoint_settings(): array {
 		$min_width = Utilities::get_kit_settings( 'min_screen_width', 360 );
@@ -293,16 +171,11 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Get preset collections from Elementor kit.
+	 * Built-in + custom group presets from Kit settings.
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @static
-	 *
-	 * @return array<string, array{title: string, control_id: string, presets: array<int, array<string, mixed>>}> Array of preset collections with control_id as keys.
+	 * @return array<string, array{title: string, control_id: string, presets: array<int, array<string, mixed>>}>
 	 */
 	public static function get_preset_collections(): array {
-		// Get correct names from ControlRegistry
 		$metadata = ControlRegistry::get_builtin_group_metadata();
 
 		$spacing_name    = isset( $metadata['spacing']['name'] ) && is_string( $metadata['spacing']['name'] ) ? $metadata['spacing']['name'] : 'Spacing';
@@ -330,7 +203,6 @@ class Module extends Module_Base {
 			),
 		);
 
-		// Add custom groups collections
 		$custom_groups = get_option( 'arts_fluid_design_system_custom_groups', array() );
 
 		if ( is_array( $custom_groups ) ) {
@@ -359,18 +231,12 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Process a collection of presets into a formatted group.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @static
-	 *
-	 * @param string                               $collection_title  The title of the collection.
-	 * @param array<int, array<string, mixed>>     $presets           Array of preset data.
-	 * @param int                                  $global_min_width  Global minimum screen width.
-	 * @param int                                  $global_max_width  Global maximum screen width.
-	 * @param string|null                          $control_id        Control ID for the group (e.g., 'fluid_spacing_presets').
-	 * @return array<string, mixed>                Formatted preset group.
+	 * @param string                           $collection_title Group display name.
+	 * @param array<int, array<string, mixed>> $presets          Raw preset data from Kit.
+	 * @param int                              $global_min_width Global min breakpoint.
+	 * @param int                              $global_max_width Global max breakpoint.
+	 * @param string|null                      $control_id       Control ID for saving.
+	 * @return array<string, mixed> Formatted group with value array.
 	 */
 	private static function process_preset_collection( $collection_title, $presets, $global_min_width, $global_max_width, $control_id = null ): array {
 		$preset_group = array(
@@ -380,14 +246,9 @@ class Module extends Module_Base {
 		);
 
 		foreach ( $presets as $preset ) {
-			$formatted_preset = self::format_preset(
-				$preset,
-				$global_min_width,
-				$global_max_width
-			);
+			$formatted_preset = self::format_preset( $preset, $global_min_width, $global_max_width );
 
 			if ( $formatted_preset ) {
-				// Mark Kit presets as editable
 				$formatted_preset['editable'] = true;
 				$preset_group['value'][]      = $formatted_preset;
 			}
@@ -397,56 +258,39 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Format a single preset for use in the UI.
+	 * Transforms Kit preset data to dropdown format. Returns null for invalid presets.
 	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @static
+	 * Validates: title, _id, min/max arrays with size+unit, numeric size values.
+	 * Empty size strings cause CSS generation failures - filtered out here.
 	 *
-	 * @param array<string, mixed> $preset            The preset data.
-	 * @param int                  $global_min_width  Global minimum screen width.
-	 * @param int                  $global_max_width  Global maximum screen width.
-	 * @return array<string, mixed>|null              Formatted preset or null if invalid.
+	 * @param array<string, mixed> $preset           Raw preset from Kit.
+	 * @param int                  $global_min_width Fallback min breakpoint.
+	 * @param int                  $global_max_width Fallback max breakpoint.
+	 * @return array<string, mixed>|null Formatted preset or null if invalid.
 	 */
 	private static function format_preset( $preset, $global_min_width, $global_max_width ): ?array {
-		// Only process presets with a title and ID
 		if ( empty( $preset['title'] ) || ! is_string( $preset['title'] ) || empty( $preset['_id'] ) || ! is_string( $preset['_id'] ) ) {
 			return null;
 		}
 
-		// Validate required nested array structures
 		if ( ! isset( $preset['min'] ) || ! is_array( $preset['min'] ) || ! isset( $preset['max'] ) || ! is_array( $preset['max'] ) ) {
 			return null;
 		}
 
-		// Validate required min/max fields exist
 		if ( ! isset( $preset['min']['size'] ) || ! isset( $preset['min']['unit'] ) || ! isset( $preset['max']['size'] ) || ! isset( $preset['max']['unit'] ) ) {
 			return null;
 		}
 
-		// Validate that size values are numeric (not empty strings)
-		// This prevents CSS generation failures when sizes are accidentally saved as empty
 		if ( ! is_numeric( $preset['min']['size'] ) || ! is_numeric( $preset['max']['size'] ) ) {
 			return null;
 		}
 
-		// Get preset-specific or global breakpoint values
-		$preset_breakpoints = self::get_preset_breakpoints(
-			$preset,
-			$global_min_width,
-			$global_max_width
-		);
+		$preset_breakpoints = self::get_preset_breakpoints( $preset, $global_min_width, $global_max_width );
 
-		// Extract necessary values from the preset
-		$id    = $preset['_id'];
-		$title = $preset['title'];
-		$value = 'var(' . CSSVariables::get_css_var_preset( $id ) . ')';
-
-		// Create the formatted preset
 		return array(
-			'id'                    => $id,
-			'value'                 => $value,
-			'title'                 => $title,
+			'id'                    => $preset['_id'],
+			'value'                 => 'var(' . CSSVariables::get_css_var_preset( $preset['_id'] ) . ')',
+			'title'                 => $preset['title'],
 			'min_size'              => $preset['min']['size'],
 			'min_unit'              => $preset['min']['unit'],
 			'max_size'              => $preset['max']['size'],
@@ -459,22 +303,17 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Get the breakpoint values for a specific preset.
+	 * Uses preset-specific breakpoints when override_screen_width_enabled is set.
 	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @static
-	 *
-	 * @param array<string, mixed> $preset            The preset data.
-	 * @param int                  $global_min_width  Global minimum screen width.
-	 * @param int                  $global_max_width  Global maximum screen width.
-	 * @return array<string, int>                     Array with min_width and max_width values.
+	 * @param array<string, mixed> $preset           Preset with optional override fields.
+	 * @param int                  $global_min_width Fallback min.
+	 * @param int                  $global_max_width Fallback max.
+	 * @return array<string, int> min_width and max_width.
 	 */
 	private static function get_preset_breakpoints( $preset, $global_min_width, $global_max_width ): array {
 		$min_width = $global_min_width;
 		$max_width = $global_max_width;
 
-		// Use custom breakpoints if enabled in the preset
 		if ( ! empty( $preset['override_screen_width_enabled'] ) ) {
 			if ( isset( $preset['overriden_min_screen_width'] ) && is_numeric( $preset['overriden_min_screen_width'] ) ) {
 				$min_width = (int) $preset['overriden_min_screen_width'];
@@ -491,23 +330,17 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * AJAX handler for saving a new fluid preset.
+	 * Creates preset in Kit via add_repeater_row. Uses isset() for validation since '0' is valid.
 	 *
-	 * @since 1.2.2
-	 * @access public
-	 * @static
-	 *
-	 * @param array<string, mixed> $data Data received from the AJAX request.
-	 * @return array<string, mixed> Response data.
-	 * @throws \Exception If validation fails or save fails.
+	 * @param array<string, mixed> $data title, min_size, min_unit, max_size, max_unit, group.
+	 * @return array<string, mixed> success, id, title, control_id.
+	 * @throws \Exception On validation/permission failure.
 	 */
 	public static function ajax_save_fluid_preset( $data ): array {
-		// Verify user permissions
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
 		}
 
-		// Validate required fields (use isset to allow '0' values)
 		$required_fields = array( 'title', 'min_size', 'min_unit', 'max_size', 'max_unit' );
 		foreach ( $required_fields as $field ) {
 			if ( ! isset( $data[ $field ] ) || $data[ $field ] === '' ) {
@@ -516,21 +349,13 @@ class Module extends Module_Base {
 			}
 		}
 
-		// Get active Kit
 		$kit = \Elementor\Plugin::$instance->kits_manager->get_active_kit();
-		if ( ! $kit ) {
-			throw new \Exception( esc_html__( 'Could not get active Kit.', 'fluid-design-system-for-elementor' ) );
-		}
-
-		// Ensure $kit is Kit object (PHPStan)
 		if ( ! $kit instanceof \Elementor\Core\Kits\Documents\Kit ) {
 			throw new \Exception( esc_html__( 'Invalid Kit instance.', 'fluid-design-system-for-elementor' ) );
 		}
 
-		// Generate unique ID
 		$preset_id = ! empty( $data['id'] ) && is_string( $data['id'] ) ? sanitize_key( $data['id'] ) : 'fluid-' . wp_generate_uuid4();
 
-		// Build preset object (with type validation)
 		$preset_item = array(
 			'_id'   => $preset_id,
 			'title' => is_string( $data['title'] ) ? sanitize_text_field( $data['title'] ) : '',
@@ -544,13 +369,10 @@ class Module extends Module_Base {
 			),
 		);
 
-		// Use group as control_id directly (frontend sends full control_id)
 		$control_id = ! empty( $data['group'] ) && is_string( $data['group'] ) ? sanitize_key( $data['group'] ) : 'fluid_spacing_presets';
 
-		// Add preset to Kit
 		$kit->add_repeater_row( $control_id, $preset_item );
 
-		// Return success response
 		return array(
 			'success'    => true,
 			'id'         => $preset_id,
@@ -560,40 +382,31 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * AJAX handler for retrieving group list with metadata.
+	 * Returns simplified group list with control_id for saving.
 	 *
-	 * @since 1.2.2
-	 * @access public
-	 * @static
-	 *
-	 * @param array<string, mixed> $data Data received from the AJAX request.
-	 * @return array<int, array<string, mixed>> Array of groups with id, name, type.
-	 * @throws \Exception If the user does not have permission to edit posts.
+	 * @param array<string, mixed> $data Unused.
+	 * @return array<int, array<string, mixed>> id (control_id), name, type per group.
+	 * @throws \Exception On permission denied.
 	 */
 	public static function ajax_get_groups( $data ): array {
-		// Verify user permissions
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
 		}
 
-		// Get main groups (built-in + custom) with proper IDs
-		$groups = \Arts\FluidDesignSystem\Managers\GroupsData::get_main_groups();
-
-		// Simplify response - return control_id for use in save
+		$groups     = \Arts\FluidDesignSystem\Managers\GroupsData::get_main_groups();
 		$simplified = array();
+
 		foreach ( $groups as $group ) {
 			$group_id   = isset( $group['id'] ) && is_string( $group['id'] ) ? $group['id'] : '';
 			$group_type = isset( $group['type'] ) && is_string( $group['type'] ) ? $group['type'] : 'builtin';
 
-			// Determine control_id
-			if ( $group_type === 'custom' && $group_id !== '' ) {
-				$control_id = ControlRegistry::get_custom_group_control_id( $group_id );
-			} else {
-				$control_id = $group_id; // Built-in groups already have full control_id as ID
-			}
+			// Custom groups need control_id transformation; built-in already use control_id as ID
+			$control_id = ( $group_type === 'custom' && $group_id !== '' )
+				? ControlRegistry::get_custom_group_control_id( $group_id )
+				: $group_id;
 
 			$simplified[] = array(
-				'id'   => $control_id, // Full control_id for saving
+				'id'   => $control_id,
 				'name' => isset( $group['name'] ) && is_string( $group['name'] ) ? $group['name'] : '',
 				'type' => $group_type,
 			);
@@ -603,23 +416,17 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * AJAX handler for updating an existing fluid preset.
+	 * Updates existing preset via KitRepeaterService (handles autosave sync).
 	 *
-	 * @since 2.1.0
-	 * @access public
-	 * @static
-	 *
-	 * @param array<string, mixed> $data Data received from the AJAX request.
-	 * @return array<string, mixed> Response data.
-	 * @throws \Exception If validation fails or update fails.
+	 * @param array<string, mixed> $data preset_id, title, min_size, min_unit, max_size, max_unit, group.
+	 * @return array<string, mixed> success, id, title, control_id.
+	 * @throws \Exception On validation/permission failure.
 	 */
 	public static function ajax_update_fluid_preset( $data ): array {
-		// Verify permissions
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			throw new \Exception( esc_html__( 'Access denied.', 'fluid-design-system-for-elementor' ) );
 		}
 
-		// Validate required fields
 		$required = array( 'preset_id', 'title', 'min_size', 'min_unit', 'max_size', 'max_unit', 'group' );
 		foreach ( $required as $field ) {
 			if ( ! isset( $data[ $field ] ) || $data[ $field ] === '' ) {
@@ -628,7 +435,6 @@ class Module extends Module_Base {
 			}
 		}
 
-		// Get active Kit
 		$kit = \Elementor\Plugin::$instance->kits_manager->get_active_kit();
 		if ( ! $kit instanceof \Elementor\Core\Kits\Documents\Kit ) {
 			throw new \Exception( esc_html__( 'Invalid Kit instance.', 'fluid-design-system-for-elementor' ) );
@@ -637,7 +443,6 @@ class Module extends Module_Base {
 		$preset_id  = isset( $data['preset_id'] ) && is_string( $data['preset_id'] ) ? sanitize_key( $data['preset_id'] ) : '';
 		$control_id = isset( $data['group'] ) && is_string( $data['group'] ) ? sanitize_key( $data['group'] ) : '';
 
-		// Build updated preset object (only fields we're updating)
 		$updated_fields = array(
 			'_id'   => $preset_id,
 			'title' => isset( $data['title'] ) && is_string( $data['title'] ) ? sanitize_text_field( $data['title'] ) : '',
@@ -651,10 +456,8 @@ class Module extends Module_Base {
 			),
 		);
 
-		// Update in Kit using service (handles autosaves internally)
 		KitRepeaterService::update_item( $kit, $control_id, $preset_id, $updated_fields );
 
-		// Return success
 		return array(
 			'success'    => true,
 			'id'         => $preset_id,

@@ -1,25 +1,25 @@
 <?php
+/**
+ * Admin menu registration and page container rendering.
+ *
+ * @package Arts\FluidDesignSystem
+ */
 
 namespace Arts\FluidDesignSystem\Managers\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use Arts\Utilities\Utilities;
 
+/**
+ * Registers submenu under Elementor and renders tab-based admin page.
+ */
 class Page extends BaseManager {
-	/**
-	 * Add admin menu page.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return void
-	 */
+	/** Hooked to admin_menu. */
 	public function add_admin_menu(): void {
-		// Only add menu if Elementor is active
 		if ( ! Utilities::is_elementor_plugin_active() ) {
 			return;
 		}
@@ -35,14 +35,7 @@ class Page extends BaseManager {
 		);
 	}
 
-	/**
-	 * Render the admin page.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return void
-	 */
+	/** Page container with tab navigation and content. */
 	public function render_admin_page(): void {
 		// Check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {

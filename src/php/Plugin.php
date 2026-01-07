@@ -1,74 +1,40 @@
 <?php
 /**
- * Main plugin class for Fluid Design System.
+ * Plugin initialization and hook registration.
  *
  * @package Arts\FluidDesignSystem
- * @since 1.0.0
  */
 
 namespace Arts\FluidDesignSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Plugin as BasePlugin;
 
 /**
- * Plugin Class
- *
- * Main class that initializes the Fluid Design System plugin,
- * manages dependencies, and sets up hooks.
- *
- * @since 1.0.0
+ * Main plugin class - managers, actions, and filters.
  */
 class Plugin extends BasePlugin {
-	/**
-	 * Get default configuration for the plugin.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return array<string, mixed> Empty array as default configuration.
-	 */
+	/** @return array<string, mixed> */
 	protected function get_default_config(): array {
 		return array();
 	}
 
-	/**
-	 * Get default strings for the plugin.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return array<string, string> Empty array as default strings.
-	 */
+	/** @return array<string, string> */
 	protected function get_default_strings(): array {
 		return array();
 	}
 
-	/**
-	 * Get default WordPress action to run the plugin.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return string WordPress action name.
-	 */
 	protected function get_default_run_action(): string {
 		return 'init';
 	}
 
 	/**
-	 * Get manager classes for the plugin.
+	 * Keys become $this->managers->key accessors.
 	 *
-	 * Defines which manager classes should be instantiated
-	 * and made available through the $this->managers object.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return array<string, class-string> Associative array of manager keys and their corresponding class names.
+	 * @return array<string, class-string>
 	 */
 	protected function get_managers_classes(): array {
 		return array(
@@ -90,74 +56,28 @@ class Plugin extends BasePlugin {
 		);
 	}
 
-	/**
-	 * Actions to perform after initializing managers.
-	 *
-	 * Registers filters for Elementor extensions, configuration, and strings.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return void
-	 */
+	/** Registers filters for ArtsElementorExtension integration. */
 	protected function do_after_init_managers(): void {
-		// Register tabs for Elementor site settings
 		add_filter( 'arts/elementor_extension/tabs/tabs', array( $this->managers->options, 'get_elementor_site_settings_tabs' ) );
-
-		// Set up extension configuration
 		add_filter( 'arts/elementor_extension/plugin/config', array( $this->managers->extension, 'filter_plugin_config' ) );
-
-		// Set up extension strings
 		add_filter( 'arts/elementor_extension/plugin/strings', array( $this->managers->extension, 'get_strings' ) );
 	}
 
-	/**
-	 * Register WordPress actions for the plugin.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return void
-	 */
 	protected function add_actions(): void {
-		// Add fluid unit to Elementor controls
 		add_action( 'elementor/element/after_section_end', array( $this->managers->units, 'modify_control_settings' ), 10, 3 );
-
-		// Register fluid unit AJAX handlers for UI interactions
 		add_action( 'elementor/ajax/register_actions', array( $this->managers->units, 'register_ajax_handlers' ) );
-
-		// Add necessary scripts to Elementor editor
 		add_action( 'elementor/editor/before_enqueue_scripts', array( $this->managers->compatibility, 'elementor_enqueue_editor_scripts' ) );
-
-		// Add custom styles to Elementor editor
 		add_action( 'elementor/editor/after_enqueue_styles', array( $this->managers->compatibility, 'elementor_enqueue_editor_styles' ) );
-
-		// Optimize generated CSS to simplify fluid clamp formulas
 		add_action( 'elementor/css-file/post/parse', array( $this->managers->units, 'optimize_fluid_css_post_parse' ) );
-
-		// Add admin menu for preset groups management
 		add_action( 'admin_menu', array( $this->managers->admin_page, 'add_admin_menu' ), 80 );
-
-		// Enqueue admin assets
 		add_action( 'admin_enqueue_scripts', array( $this->managers->admin_frontend, 'enqueue_assets' ) );
-
-		// Add AJAX handler for admin operations
 		add_action( 'wp_ajax_fluid_design_system_admin_action', array( $this->managers->admin_tabs_groups_ajax, 'handle_ajax_requests' ) );
 	}
 
-
-	/**
-	 * Register WordPress filters for the plugin.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return void
-	 */
 	protected function add_filters(): void {
 		add_filter( 'elementor/files/css/selectors', array( $this->managers->units, 'modify_selectors' ), 10, 3 );
 
-		// Only add plugin action links if the plugin is being used as a WordPress plugin
+		// Plugin action links only when used as standalone WP plugin
 		if ( defined( 'ARTS_FLUID_DS_PLUGIN_FILE' ) ) {
 			/** @var string $plugin_file */
 			$plugin_file = constant( 'ARTS_FLUID_DS_PLUGIN_FILE' );

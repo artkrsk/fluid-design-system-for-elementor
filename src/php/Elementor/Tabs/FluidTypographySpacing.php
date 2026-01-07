@@ -1,6 +1,6 @@
 <?php
 /**
- * Fluid Typography and Spacing tab for Elementor.
+ * Fluid Typography and Spacing tab for Elementor Site Settings.
  *
  * @package Arts\FluidDesignSystem
  * @since 1.0.0
@@ -9,7 +9,7 @@
 namespace Arts\FluidDesignSystem\Elementor\Tabs;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit;
 }
 
 use Elementor\Core\Kits\Controls\Repeater as Global_Style_Repeater;
@@ -22,80 +22,46 @@ use Arts\FluidDesignSystem\Managers\GroupsData;
 use Arts\Utilities\Utilities;
 
 /**
- * FluidTypographySpacing Class
- *
- * Implements a tab in Elementor for controlling fluid typography
- * and spacing presets with responsive scaling.
+ * Elementor Site Settings tab for fluid typography and spacing presets.
  *
  * @since 1.0.0
  */
 class FluidTypographySpacing extends BaseTab {
-	/**
-	 * Tab identifier.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @var string
-	 */
+	/** @var string */
 	const TAB_ID = 'arts-fluid-design-system-tab-fluid-typography-spacing';
 
-	/**
-	 * Get the title of the tab.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The tab title.
-	 */
+	/** @inheritDoc */
 	public function get_title(): string {
 		return esc_html__( 'Fluid Typography & Spacing', 'fluid-design-system-for-elementor' );
 	}
 
-	/**
-	 * Get the group this tab belongs to.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The tab group.
-	 */
+	/** @inheritDoc */
 	public function get_group(): string {
 		return 'global';
 	}
 
-	/**
-	 * Get the icon for this tab.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string The tab icon.
-	 */
+	/** @inheritDoc */
 	public function get_icon(): string {
 		return 'eicon-spacer';
 	}
 
 	/**
-	 * Factory method to create a fluid preset repeater control.
+	 * Creates a fluid preset repeater control with consistent configuration.
 	 *
-	 * Creates a standardized fluid preset repeater control with consistent
-	 * configuration across all fluid preset types (built-in and custom).
+	 * The 'is_fluid_preset_repeater' flag enables JS-side detection for custom UI behavior.
 	 *
 	 * @since 1.0.0
-	 * @access public
 	 *
-	 * @param string   $control_id The control ID.
-	 * @param array<string, mixed>    $args       Optional additional control arguments.
-	 * @param Repeater|null $repeater   Optional custom repeater instance.
-	 * @return array<string, mixed>                  The control configuration array.
+	 * @param string                $control_id Control ID.
+	 * @param array<string, mixed>  $args       Optional control arguments to merge.
+	 * @param Repeater|null         $repeater   Optional custom repeater instance.
+	 * @return array<string, mixed> The control configuration.
 	 */
 	public function create_fluid_preset_control( $control_id, $args = array(), $repeater = null ): array {
-		// Get the repeater control (use provided or create new)
 		if ( null === $repeater ) {
 			$repeater = $this->get_repeater_control();
 		}
 
-		// Base configuration for all fluid preset controls
 		$base_config = array(
 			'type'                     => Global_Style_Repeater::CONTROL_TYPE,
 			'fields'                   => $repeater->get_controls(),
@@ -108,36 +74,24 @@ class FluidTypographySpacing extends BaseTab {
 			'render_type'              => 'template',
 		);
 
-		// Merge with custom arguments (allows overriding defaults)
 		$config = array_merge( $base_config, $args );
-
-		// Add the control to this instance
 		$this->add_control( $control_id, $config );
 
 		return $config;
 	}
 
 	/**
-	 * Factory method to create a fluid preset section with optional description.
-	 *
-	 * Creates a complete fluid preset section including:
-	 * - Section start with proper labeling
-	 * - Optional description/info control
-	 * - Fluid preset repeater control
-	 * - Section end
+	 * Creates a complete fluid preset section with optional info alert.
 	 *
 	 * @since 1.0.0
-	 * @access public
 	 *
-	 * @param string $section_id   The section ID.
-	 * @param string $control_id   The control ID for the repeater.
-	 * @param string $label        The section label.
-	 * @param string $description  Optional description text.
-	 * @param array<string, mixed>  $args         Optional additional control arguments.
-	 * @return void
+	 * @param string               $section_id  Section ID.
+	 * @param string               $control_id  Repeater control ID.
+	 * @param string               $label       Section label.
+	 * @param string               $description Optional info text shown as alert.
+	 * @param array<string, mixed> $args        Optional control arguments.
 	 */
 	public function create_fluid_preset_section( $section_id, $control_id, $label, $description = '', $args = array() ): void {
-		// Start the section
 		$this->start_controls_section(
 			$section_id,
 			array(
@@ -146,11 +100,9 @@ class FluidTypographySpacing extends BaseTab {
 			)
 		);
 
-		// Add description if provided
 		if ( ! empty( $description ) ) {
-			$info_control_id = $control_id . '_info';
 			$this->add_control(
-				$info_control_id,
+				$control_id . '_info',
 				array(
 					'type'            => Controls_Manager::RAW_HTML,
 					'raw'             => esc_html( $description ),
@@ -159,27 +111,19 @@ class FluidTypographySpacing extends BaseTab {
 			);
 		}
 
-		// Create the fluid preset control
 		$this->create_fluid_preset_control( $control_id, $args );
-
-		// End the section
 		$this->end_controls_section();
 	}
 
 	/**
-	 * Convenience method to create a custom group section using the factory.
-	 *
-	 * This is a specialized version of create_fluid_preset_section() that
-	 * automatically generates IDs and uses consistent naming patterns for custom groups.
+	 * Creates a custom group section with auto-generated IDs from ControlRegistry.
 	 *
 	 * @since 1.0.0
-	 * @access public
 	 *
-	 * @param string $group_id     The custom group ID.
-	 * @param string $name         The group display name.
-	 * @param string $description  Optional description text.
-	 * @param array<string, mixed>  $args         Optional additional control arguments.
-	 * @return void
+	 * @param string               $group_id    Custom group ID.
+	 * @param string               $name        Display name.
+	 * @param string               $description Optional info text.
+	 * @param array<string, mixed> $args        Optional control arguments.
 	 */
 	public function create_custom_group_section( $group_id, $name, $description = '', $args = array() ): void {
 		$section_id = ControlRegistry::get_custom_group_section_id( $group_id );
@@ -188,32 +132,14 @@ class FluidTypographySpacing extends BaseTab {
 		$this->create_fluid_preset_section( $section_id, $control_id, $name, $description, $args );
 	}
 
-	/**
-	 * Register tab controls.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 *
-	 * @return void
-	 */
+	/** @inheritDoc */
 	protected function register_tab_controls(): void {
-		// Always register breakpoints first
 		$this->register_section_fluid_breakpoints();
-
-		// Register main groups (built-in + custom) in correct order
 		$this->register_main_group_sections();
 	}
 
-	/**
-	 * Register sections for main groups (built-in + custom) in correct order.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
+	/** Registers built-in and custom group sections in user-defined order. */
 	private function register_main_group_sections(): void {
-		// Get the main groups in the correct order
 		$main_groups = $this->get_main_groups_from_manager();
 
 		foreach ( $main_groups as $group ) {
@@ -230,25 +156,16 @@ class FluidTypographySpacing extends BaseTab {
 	}
 
 	/**
-	 * Get main groups from the groups data manager.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return array<int, array<string, mixed>> Array of main groups.
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function get_main_groups_from_manager(): array {
 		return GroupsData::get_main_groups();
 	}
 
 	/**
-	 * Register a section for a built-in group.
+	 * Routes built-in group IDs to their registration methods.
 	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param array<string, mixed> $group Group data.
-	 * @return void
+	 * @param array<string, mixed> $group Group data with 'id' key.
 	 */
 	private function register_builtin_group_section( array $group ): void {
 		if ( ! isset( $group['id'] ) ) {
@@ -269,36 +186,21 @@ class FluidTypographySpacing extends BaseTab {
 	}
 
 	/**
-	 * Register a section for a custom group.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param array<string, mixed> $group_data Group data from groups data manager.
-	 * @return void
+	 * @param array<string, mixed> $group_data Group data from GroupsData.
 	 */
 	private function register_custom_group_section( array $group_data ): void {
-		// Extract group information from the groups data manager format
 		$group_id    = Utilities::get_string_value( $group_data['id'] ?? '' );
 		$name        = Utilities::get_string_value( $group_data['name'] ?? '' );
 		$description = Utilities::get_string_value( $group_data['description'] ?? '' );
 
 		if ( empty( $group_id ) || empty( $name ) ) {
-			return; // Skip invalid groups
+			return;
 		}
 
-		// Use convenience method for custom groups
 		$this->create_custom_group_section( $group_id, $name, $description );
 	}
 
-	/**
-	 * Register fluid breakpoints section.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
+	/** Global breakpoints used for clamp() calculations when presets don't override. */
 	private function register_section_fluid_breakpoints(): void {
 		$this->start_controls_section(
 			'section_fluid_breakpoints',
@@ -308,7 +210,6 @@ class FluidTypographySpacing extends BaseTab {
 			)
 		);
 
-		// Screen width settings
 		$this->add_control(
 			'min_screen_width',
 			array(
@@ -345,12 +246,10 @@ class FluidTypographySpacing extends BaseTab {
 	}
 
 	/**
-	 * Get repeater control for fluid presets.
+	 * Builds the repeater control structure for fluid presets.
 	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return Repeater The repeater control.
+	 * The 'title' selector generates the clamp() CSS variable using min/max values.
+	 * Override controls allow per-preset breakpoint customization.
 	 */
 	private function get_repeater_control(): Repeater {
 		$repeater = new Repeater();
@@ -464,9 +363,8 @@ class FluidTypographySpacing extends BaseTab {
 			)
 		);
 
-		// Note: Using the same CSS variable name with different conditions
-		// Elementor's CSS processing will use the last defined value
-		// This allows us to override the default clamp formula with custom screen widths
+		// Selector intentionally redefines the same CSS variable - Elementor uses last value,
+		// allowing custom breakpoints to override the default clamp formula when enabled
 		$repeater->add_control(
 			'override_screen_width_enabled',
 			array(
@@ -527,67 +425,45 @@ class FluidTypographySpacing extends BaseTab {
 		$repeater->end_popover();
 
 		/**
-		 * Filter the repeater control.
+		 * Allows adding custom fields to the preset repeater.
 		 *
 		 * @since 1.0.0
-		 *
-		 * @param Repeater $repeater The repeater control.
-		 * @param self $tab The current tab instance.
+		 * @param Repeater $repeater The repeater instance.
+		 * @param self     $tab      The current tab instance.
+		 * @return Repeater
 		 */
-		return apply_filters( 'arts/fluid_design_system/controls/fluid_preset_repeater', $repeater, $this );
+		$filtered = apply_filters( 'arts/fluid_design_system/controls/fluid_preset_repeater', $repeater, $this );
+
+		return $filtered instanceof Repeater ? $filtered : $repeater;
 	}
 
-	/**
-	 * Register fluid spacing section.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
 	private function register_section_fluid_spacing(): void {
-		// Get metadata for consistent labeling
 		$metadata = ControlRegistry::get_builtin_group_metadata();
 
 		if ( ! isset( $metadata['spacing'] ) || ! is_array( $metadata['spacing'] ) ) {
 			return;
 		}
 
-		$spacing_metadata = $metadata['spacing'];
-
-		// Use factory method to create the complete section
 		$this->create_fluid_preset_section(
 			'section_fluid_spacing_presets',
 			'fluid_spacing_presets',
-			Utilities::get_string_value( $spacing_metadata['name'] ?? '' ),
-			Utilities::get_string_value( $spacing_metadata['description'] ?? '' )
+			Utilities::get_string_value( $metadata['spacing']['name'] ?? '' ),
+			Utilities::get_string_value( $metadata['spacing']['description'] ?? '' )
 		);
 	}
 
-	/**
-	 * Register fluid typography section.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
 	private function register_section_fluid_typography(): void {
-		// Get metadata for consistent labeling
 		$metadata = ControlRegistry::get_builtin_group_metadata();
 
 		if ( ! isset( $metadata['typography'] ) || ! is_array( $metadata['typography'] ) ) {
 			return;
 		}
 
-		$typography_metadata = $metadata['typography'];
-
-		// Use factory method to create the complete section
 		$this->create_fluid_preset_section(
 			'section_fluid_typography_presets',
 			'fluid_typography_presets',
-			Utilities::get_string_value( $typography_metadata['name'] ?? '' ),
-			Utilities::get_string_value( $typography_metadata['description'] ?? '' )
+			Utilities::get_string_value( $metadata['typography']['name'] ?? '' ),
+			Utilities::get_string_value( $metadata['typography']['description'] ?? '' )
 		);
 	}
 }

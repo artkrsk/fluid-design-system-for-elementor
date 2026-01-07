@@ -1,9 +1,14 @@
 <?php
+/**
+ * Form POST handlers for admin group CRUD operations.
+ *
+ * @package Arts\FluidDesignSystem
+ */
 
 namespace Arts\FluidDesignSystem\Managers\Admin\Tabs\Groups;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
@@ -11,15 +16,17 @@ use Arts\FluidDesignSystem\Managers\Data;
 use Arts\FluidDesignSystem\Managers\GroupsData;
 use Arts\Utilities\Utilities;
 
+/**
+ * Handles synchronous form submissions: batch saves, create/delete actions.
+ */
 class Handlers extends BaseManager {
 	/**
-	 * Handle save all changes action (unified save for order, titles, descriptions, etc.)
+	 * Unified save processing new group creation, ordering, title/description updates, deletions.
 	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
+	 * Temporary IDs (temp_*) are mapped to real IDs after group creation to preserve
+	 * the user's intended order when new groups are added before saving.
 	 */
-	public function handle_save_all_changes() {
+	public function handle_save_all_changes(): void {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
@@ -363,14 +370,8 @@ class Handlers extends BaseManager {
 		}
 	}
 
-	/**
-	 * Handle group actions (create, delete).
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	 */
-	public function handle_group_actions() {
+	/** Called from Page::render_admin_page() to process POST actions before rendering. */
+	public function handle_group_actions(): void {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
@@ -413,15 +414,7 @@ class Handlers extends BaseManager {
 		}
 	}
 
-	/**
-	 * Handle create group action.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function handle_create_group() {
+	private function handle_create_group(): void {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
@@ -451,15 +444,7 @@ class Handlers extends BaseManager {
 		}
 	}
 
-	/**
-	 * Handle delete group action.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return void
-	 */
-	private function handle_delete_group() {
+	private function handle_delete_group(): void {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
@@ -480,17 +465,8 @@ class Handlers extends BaseManager {
 		}
 	}
 
-	/**
-	 * Check if a group name is already taken (custom, built-in, or filter-based).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param string $name Group name to check.
-	 * @param string $exclude_id Optional. Group ID to exclude from check.
-	 * @return bool True if name is taken, false otherwise.
-	 */
-	private function is_group_name_taken( $name, $exclude_id = null ) {
+	/** Checks all group types (custom, built-in, filter-based) for duplicate names. */
+	private function is_group_name_taken( string $name, ?string $exclude_id = null ): bool {
 		$sanitized_name = sanitize_text_field( $name );
 
 		// Check custom groups

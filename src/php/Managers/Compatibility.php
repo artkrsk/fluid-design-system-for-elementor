@@ -1,6 +1,6 @@
 <?php
 /**
- * Compatibility manager for Arts Fluid Design System.
+ * Editor script/style enqueuing and localization.
  *
  * @package Arts\FluidDesignSystem
  * @since 1.0.0
@@ -9,38 +9,21 @@
 namespace Arts\FluidDesignSystem\Managers;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 
 /**
- * Compatibility Class
- *
- * Manages compatibility with Elementor editor by handling script
- * and style enqueuing, as well as providing localized strings.
+ * Elementor editor assets and localization.
  *
  * @since 1.0.0
  */
 class Compatibility extends BaseManager {
-	/**
-	 * Script and style handle.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @var string
-	 */
+	/** @var string */
 	private $handle = 'arts-fluid-design-system-editor';
 
-	/**
-	 * Enqueue the editor scripts.
-	 *
-	 * Registers and enqueues the necessary JavaScript files for the editor.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @return void
-	 */
+	/** Hooked to elementor/editor/after_enqueue_scripts. */
 	public function elementor_enqueue_editor_scripts(): void {
 		/** @var string|false $version */
 		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) && is_string( constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) )
@@ -55,7 +38,6 @@ class Compatibility extends BaseManager {
 			true
 		);
 
-		// Localize script with translation strings
 		wp_localize_script(
 			$this->handle,
 			'ArtsFluidDSStrings',
@@ -63,15 +45,7 @@ class Compatibility extends BaseManager {
 		);
 	}
 
-	/**
-	 * Enqueue the editor styles.
-	 *
-	 * Registers and enqueues the necessary CSS files for the editor.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @return void
-	 */
+	/** Hooked to elementor/editor/after_enqueue_styles. */
 	public function elementor_enqueue_editor_styles(): void {
 		/** @var string|false $version */
 		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) && is_string( constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) )
@@ -87,14 +61,9 @@ class Compatibility extends BaseManager {
 	}
 
 	/**
-	 * Get all translatable strings for localization.
+	 * Keys must match constants in JS: interfaces/IArtsFluidDSStrings.ts
 	 *
-	 * Provides an array of strings that need to be available for translation
-	 * in the JavaScript code.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 * @return array<string, string> Array of translatable strings.
+	 * @return array<string, string>
 	 */
 	private function get_localized_strings(): array {
 		return array(

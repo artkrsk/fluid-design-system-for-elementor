@@ -1,15 +1,14 @@
 <?php
 /**
- * Options manager for Fluid Design System.
+ * Elementor Site Settings tab and plugin action links.
  *
  * @package Arts\FluidDesignSystem
- * @since 1.0.0
  */
 
 namespace Arts\FluidDesignSystem\Managers;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\Utilities\Utilities;
@@ -17,25 +16,14 @@ use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
 
 /**
- * Options Class
- *
- * Manages Elementor site settings tabs and options
- * for the Fluid Design System.
- *
- * @since 1.0.0
+ * Site Settings tab registration and plugin links.
  */
 class Options extends BaseManager {
 	/**
-	 * Register the `Fluid Typography & Spacing` tab in Elementor site settings.
+	 * Hooked to elementor/kit/additional_settings_tabs.
 	 *
-	 * Adds a custom tab to Elementor site settings for managing
-	 * typography and spacing options.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param array<int|string, mixed> $tabs Array of Elementor site settings tabs.
-	 * @return array<int|string, mixed> Array of Elementor site settings tabs with our custom tab added.
+	 * @param array<int|string, mixed> $tabs
+	 * @return array<int|string, mixed>
 	 */
 	public function get_elementor_site_settings_tabs( array $tabs ): array {
 		$tabs[] = array(
@@ -46,25 +34,18 @@ class Options extends BaseManager {
 	}
 
 	/**
-	 * Add plugin action links.
+	 * Hooked to plugin_action_links_{plugin_basename}.
 	 *
-	 * Adds "Customize Presets" and "Manage Groups" links to the plugin's action links in the WordPress admin plugins page.
-	 *
-	 * @since 1.0.1
-	 * @access public
-	 *
-	 * @param array<int, string> $links Array of plugin action links.
-	 * @return array<int, string> Modified array of plugin action links.
+	 * @param array<int, string> $links
+	 * @return array<int, string>
 	 */
 	public function add_plugin_action_links( array $links ): array {
-		// Check if Elementor is active
 		if ( ! Utilities::is_elementor_plugin_active() ) {
 			return $links;
 		}
 
 		$new_links = array();
 
-		// Add "Customize Presets" link (opens in new tab)
 		$settings_url = Utilities::get_elementor_editor_site_settings_url( FluidTypographySpacing::TAB_ID );
 		if ( $settings_url ) {
 			$new_links[] = sprintf(
@@ -74,7 +55,6 @@ class Options extends BaseManager {
 			);
 		}
 
-		// Add "Manage Groups" link
 		$admin_url   = admin_url( 'admin.php?page=fluid-design-system' );
 		$new_links[] = sprintf(
 			'<a href="%s">%s</a>',
@@ -82,7 +62,6 @@ class Options extends BaseManager {
 			esc_html__( 'Manage', 'fluid-design-system-for-elementor' )
 		);
 
-		// Prepend our links to the existing ones
 		return array_merge( $new_links, $links );
 	}
 }

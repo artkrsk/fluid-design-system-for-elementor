@@ -1,9 +1,14 @@
 <?php
+/**
+ * AJAX handlers for admin group operations.
+ *
+ * @package Arts\FluidDesignSystem
+ */
 
 namespace Arts\FluidDesignSystem\Managers\Admin\Tabs\Groups;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
@@ -11,16 +16,12 @@ use Arts\FluidDesignSystem\Managers\Data;
 use Arts\FluidDesignSystem\Managers\GroupsData;
 use Arts\Utilities\Utilities;
 
+/**
+ * Handles async operations for groups admin: title/description updates, reordering, bulk saves.
+ */
 class AJAX extends BaseManager {
-	/**
-	 * Handle AJAX requests for admin operations.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return void
-	 */
-	public function handle_ajax_requests() {
+	/** Hooked to wp_ajax_fluid_design_system_admin_action. */
+	public function handle_ajax_requests(): void {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null ) {
 			wp_send_json_error(
@@ -86,14 +87,7 @@ class AJAX extends BaseManager {
 		}
 	}
 
-	/**
-	 * Handle AJAX title update.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return array<string, mixed> Operation result
-	 */
+	/** @return array<string, mixed> */
 	private function handle_ajax_update_title() {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
@@ -159,14 +153,7 @@ class AJAX extends BaseManager {
 		}
 	}
 
-	/**
-	 * Handle AJAX description update.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return array<string, mixed> Operation result
-	 */
+	/** @return array<string, mixed> */
 	private function handle_ajax_update_description() {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
@@ -223,14 +210,7 @@ class AJAX extends BaseManager {
 		}
 	}
 
-	/**
-	 * Handle AJAX groups reordering.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return array<string, mixed> Operation result
-	 */
+	/** @return array<string, mixed> */
 	private function handle_ajax_reorder_groups() {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null ) {
@@ -270,14 +250,7 @@ class AJAX extends BaseManager {
 		}
 	}
 
-	/**
-	 * Handle AJAX save all changes request.
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @return array<string, mixed> Array with success status and optional message.
-	 */
+	/** @return array<string, mixed> */
 	private function handle_ajax_save_all_changes() {
 		// Check managers availability
 		if ( $this->managers === null || $this->managers->admin_tabs_groups_handlers === null || $this->managers->admin_tabs_groups_view === null ) {
@@ -331,12 +304,11 @@ class AJAX extends BaseManager {
 	}
 
 	/**
-	 * Handle AJAX preset snapshot save - PROPER ELEMENTOR API APPROACH.
+	 * Saves preset organization via Kit post meta directly.
 	 *
-	 * @since 1.0.0
-	 * @access private
+	 * Uses Page Settings Manager API to preserve metadata during cross-group moves.
 	 *
-	 * @return array<string, mixed> Operation result
+	 * @return array<string, mixed>
 	 */
 	private function handle_ajax_save_presets_snapshot() {
 		// Nonce verification is handled in handle_ajax_requests()
@@ -457,17 +429,8 @@ class AJAX extends BaseManager {
 		);
 	}
 
-	/**
-	 * Check if a group name is already taken (custom, built-in, or filter-based).
-	 *
-	 * @since 1.0.0
-	 * @access private
-	 *
-	 * @param string $name Group name to check.
-	 * @param string $exclude_id Optional. Group ID to exclude from check.
-	 * @return bool True if name is taken, false otherwise.
-	 */
-	private function is_group_name_taken( $name, $exclude_id = null ) {
+	/** Checks all group types (custom, built-in, filter-based) for duplicate names. */
+	private function is_group_name_taken( string $name, ?string $exclude_id = null ): bool {
 		$sanitized_name = sanitize_text_field( $name );
 
 		// Check custom groups

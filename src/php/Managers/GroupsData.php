@@ -1,15 +1,19 @@
 <?php
 /**
- * Groups data manager for Fluid Design System.
+ * Aggregates built-in, custom, and filter-based preset groups.
+ *
+ * Group types:
+ * - builtin: Spacing/Typography (from ControlRegistry)
+ * - custom: User-created via admin UI (from Data manager)
+ * - filter: Developer-added via arts/fluid_design_system/preset_groups filter
  *
  * @package Arts\FluidDesignSystem
- * @since 1.0.0
  */
 
 namespace Arts\FluidDesignSystem\Managers;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
@@ -19,47 +23,25 @@ use Arts\FluidDesignSystem\Managers\Data;
 use Arts\Utilities\Utilities;
 
 /**
- * GroupsData Class
- *
- * Manages group data retrieval and validation logic
- * for the Fluid Design System admin interface.
- *
- * @since 1.0.0
+ * Aggregates all preset group types for admin display.
  */
 class GroupsData extends BaseManager {
 
-	/**
-	 * Get all groups (built-in, custom, and filter-based).
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return array<int, array<string, mixed>> Array of groups.
-	 */
+	/** @return array<int, array<string, mixed>> */
 	public static function get_all_groups(): array {
 		$groups = array();
-
-		// Add main groups (built-in + custom) in correct order
 		$groups = array_merge( $groups, self::get_main_groups() );
-
-		// Add filter-based groups (developer-added groups last)
 		$groups = array_merge( $groups, self::get_filter_groups() );
-
 		return $groups;
 	}
 
 	/**
-	 * Get main groups (built-in + custom) in the correct order.
+	 * Main groups respect custom ordering when set, falls back to builtin+custom sequence.
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return array<int, array<string, mixed>> Array of main groups in order.
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function get_main_groups(): array {
-		// Check if custom ordering is active
 		if ( ! Data::is_main_group_ordering_active() ) {
-			// Backward compatibility: return in original order
 			$builtin_groups = self::get_builtin_groups();
 			$custom_groups  = self::get_custom_groups();
 			/** @var array<int, array<string, mixed>> $merged */
@@ -67,16 +49,13 @@ class GroupsData extends BaseManager {
 			return $merged;
 		}
 
-		// Get custom order
 		$ordered_ids = Data::get_main_group_order();
 		/** @var array<string, array<string, mixed>> $all_available_groups */
 		$all_available_groups = array();
 
-		// Get all available groups indexed by ID
 		$builtin_groups = self::get_builtin_groups();
 		$custom_groups  = self::get_custom_groups();
 
-		// Index built-in groups by their control ID (which is used as their "ID")
 		foreach ( $builtin_groups as $group ) {
 			$group_array = Utilities::get_array_value( $group );
 			if ( isset( $group_array['id'] ) ) {
@@ -85,7 +64,6 @@ class GroupsData extends BaseManager {
 			}
 		}
 
-		// Index custom groups by their ID
 		foreach ( $custom_groups as $group ) {
 			$group_array = Utilities::get_array_value( $group );
 			if ( isset( $group_array['id'] ) ) {
@@ -94,7 +72,6 @@ class GroupsData extends BaseManager {
 			}
 		}
 
-		// Build ordered array
 		/** @var array<int, array<string, mixed>> $ordered_groups */
 		$ordered_groups = array();
 		foreach ( $ordered_ids as $group_id ) {
@@ -106,7 +83,7 @@ class GroupsData extends BaseManager {
 			}
 		}
 
-		// Add any remaining groups that weren't in the order (fallback for data integrity)
+		// Append any groups not in saved order (data integrity fallback)
 		foreach ( $all_available_groups as $group ) {
 			/** @var array<string, mixed> $group_item */
 			$group_item       = $group;
@@ -116,23 +93,13 @@ class GroupsData extends BaseManager {
 		return $ordered_groups;
 	}
 
-	/**
-	 * Get built-in groups.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return array<int, array<string, mixed>> Array of built-in groups.
-	 */
+	/** @return array<int, array<string, mixed>> */
 	public static function get_builtin_groups(): array {
-		$groups = array();
-
-		// Get built-in control mappings from tab registrar
+		$groups           = array();
 		$builtin_controls = ControlRegistry::get_builtin_control_mappings();
 
 		$order = 10;
 		foreach ( $builtin_controls as $control_id => $group_data ) {
-			// Get actual presets from Site Settings
 			$presets = Utilities::get_kit_settings( $control_id, array(), false );
 
 			$groups[] = array(
@@ -150,24 +117,15 @@ class GroupsData extends BaseManager {
 		return $groups;
 	}
 
-
-
 	/**
-	 * Get filter-based groups (from developers).
+	 * Filter groups are developer-added via hook, excluding builtin and custom.
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return array<int, array<string, mixed>> Array of filter-based groups.
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function get_filter_groups(): array {
-		// Get all preset groups from the Module (includes filter-based groups)
-		$all_groups = FluidUnitModule::get_all_preset_groups();
-
-		// Get dynamic list of built-in names from metadata (clean names, not collection titles)
+		$all_groups    = FluidUnitModule::get_all_preset_groups();
 		$builtin_names = self::get_builtin_names();
 
-		// Get custom group names to exclude them from filter groups
 		$custom_groups = Data::get_custom_groups();
 		$custom_names  = array();
 		foreach ( $custom_groups as $custom_group ) {
@@ -176,21 +134,17 @@ class GroupsData extends BaseManager {
 			}
 		}
 
-		// Filter out only the groups that were added via filter (not built-in default groups or custom groups)
 		$filter_groups = array();
 
 		foreach ( $all_groups as $group ) {
-			// Skip default options and built-in groups
 			if ( in_array( $group['name'], $builtin_names, true ) ) {
 				continue;
 			}
 
-			// Skip custom groups (they should only appear in the custom section)
 			if ( in_array( $group['name'], $custom_names, true ) ) {
 				continue;
 			}
 
-			// Mark as filter type and add to results
 			$group['type']   = 'filter';
 			$filter_groups[] = $group;
 		}
@@ -199,17 +153,13 @@ class GroupsData extends BaseManager {
 	}
 
 	/**
-	 * Get built-in names dynamically from tab registrar.
+	 * Collects all reserved names (default options + builtin group names).
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return array<int, string> Array of built-in group names.
+	 * @return array<int, string>
 	 */
 	public static function get_builtin_names(): array {
 		$builtin_names = array();
 
-		// Get default preset option names
 		$default_options = FluidUnitModule::get_default_preset_options();
 		foreach ( $default_options as $option ) {
 			$option_array = Utilities::get_array_value( $option );
@@ -218,7 +168,6 @@ class GroupsData extends BaseManager {
 			}
 		}
 
-		// Get built-in group names from tab registrar
 		$builtin_controls = ControlRegistry::get_builtin_control_mappings();
 		foreach ( $builtin_controls as $group_data ) {
 			$group_array = Utilities::get_array_value( $group_data );
@@ -231,12 +180,9 @@ class GroupsData extends BaseManager {
 	}
 
 	/**
-	 * Get custom groups from data manager.
+	 * Custom groups with their Kit preset values for admin display.
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return array<int, array<string, mixed>> Array of custom groups.
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function get_custom_groups(): array {
 		$custom_groups_data = Data::get_custom_groups();
@@ -246,7 +192,6 @@ class GroupsData extends BaseManager {
 			$group_array = Utilities::get_array_value( $group_data );
 			$group_id    = Utilities::get_string_value( $id );
 
-			// Get actual presets from Site Settings
 			$control_id = ControlRegistry::get_custom_group_control_id( $group_id );
 			$presets    = Utilities::get_kit_settings( $control_id, array(), false );
 
@@ -260,7 +205,6 @@ class GroupsData extends BaseManager {
 			);
 		}
 
-		// Sort by order field
 		usort(
 			$groups,
 			function ( $a, $b ) {
@@ -272,16 +216,12 @@ class GroupsData extends BaseManager {
 	}
 
 	/**
-	 * Check if a group name is already taken (custom, built-in, or filter-based).
+	 * Checks all group types (custom, builtin, filter) for name collision.
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @param string $name Group name to check.
-	 * @param string $exclude_id Optional. Group ID to exclude from check.
-	 * @return bool True if name is taken, false otherwise.
+	 * @param string      $name       Group name to check.
+	 * @param string|null $exclude_id Group ID to skip (for updates).
 	 */
-	public static function is_group_name_taken( $name, $exclude_id = null ) {
+	public static function is_group_name_taken( $name, $exclude_id = null ): bool {
 		$sanitized_name = sanitize_text_field( $name );
 
 		// Check custom groups
