@@ -1,30 +1,16 @@
 import { STYLES } from '../constants'
+import {
+  parseRulesFromText,
+  formatRulesForStylesheet,
+  filterRulesByVariable,
+  createVariableRule,
+  createUnsetRule
+} from '../utils/cssRules'
 
 export class CSSManager {
   constructor() {
     this.styleElement = null
     this.styleElementId = STYLES.STYLE_ID
-  }
-
-  /**
-   * Parses CSS text into an array of rule strings
-   * @param {string} cssText - Raw CSS text from style element
-   * @returns {string[]} Array of trimmed CSS rules
-   */
-  static parseRulesFromText(cssText) {
-    return cssText
-      .split('}')
-      .map((rule) => rule.trim())
-      .filter((rule) => rule.length > 0)
-  }
-
-  /**
-   * Formats CSS rules for stylesheet insertion
-   * @param {string[]} rules - Array of CSS rules
-   * @returns {string} Formatted CSS text
-   */
-  static formatRulesForStylesheet(rules) {
-    return rules.map((rule) => (rule.endsWith('}') ? rule : `${rule}}`)).join('')
   }
 
   /**
@@ -68,7 +54,7 @@ export class CSSManager {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) return []
 
-    return CSSManager.parseRulesFromText(styleEl.textContent)
+    return parseRulesFromText(styleEl.textContent ?? '')
   }
 
   /**
@@ -79,7 +65,7 @@ export class CSSManager {
     const styleEl = this.createOrGetStyleElement()
     if (!styleEl) return
 
-    styleEl.textContent = CSSManager.formatRulesForStylesheet(rules)
+    styleEl.textContent = formatRulesForStylesheet(rules)
   }
 
   /**
@@ -92,10 +78,8 @@ export class CSSManager {
     if (!styleEl) return false
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
-    const unsetRule = `:root { ${cssVarName}: unset !important; }`
-
     const currentRules = this.getCurrentRules()
-    currentRules.push(unsetRule)
+    currentRules.push(createUnsetRule(cssVarName))
     this.setRules(currentRules)
 
     return true
@@ -111,8 +95,7 @@ export class CSSManager {
     if (!styleEl) return false
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
-    const currentRules = this.getCurrentRules()
-    const filteredRules = currentRules.filter((rule) => !rule.includes(cssVarName))
+    const filteredRules = filterRulesByVariable(this.getCurrentRules(), cssVarName)
     this.setRules(filteredRules)
 
     return true
@@ -129,15 +112,10 @@ export class CSSManager {
     if (!styleEl) return false
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
-    const cssRule = `:root { ${cssVarName}: ${clampFormula}; }`
 
-    const currentRules = this.getCurrentRules()
-
-    // Remove any existing rules for this variable
-    const filteredRules = currentRules.filter((rule) => !rule.includes(cssVarName))
-
-    // Add the new rule
-    filteredRules.push(cssRule)
+    // Remove any existing rules for this variable and add the new one
+    const filteredRules = filterRulesByVariable(this.getCurrentRules(), cssVarName)
+    filteredRules.push(createVariableRule(cssVarName, clampFormula))
     this.setRules(filteredRules)
 
     return true

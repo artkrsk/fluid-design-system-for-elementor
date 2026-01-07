@@ -4,33 +4,14 @@
  * Extracted for testability and easier TypeScript migration.
  */
 
-/**
- * @typedef {Object} ParsedControlName
- * @property {string} baseName - Base control name without device suffix
- * @property {string | null} deviceSuffix - Device suffix (e.g., 'tablet', 'mobile') or null for desktop
- */
-
-/**
- * @typedef {Object} InheritedValue
- * @property {string} [unit] - Unit value
- * @property {string} __inheritedFrom - Device the value was inherited from
- * @property {string} __directParentDevice - Direct parent device in hierarchy
- * @property {string[]} __inheritPath - Path of devices traversed
- * @property {string} [__sourceUnit] - Original unit from source value
- * @property {string} [top] - Dimension value
- * @property {string} [right] - Dimension value
- * @property {string} [bottom] - Dimension value
- * @property {string} [left] - Dimension value
- * @property {string} [row] - Gap value
- * @property {string} [column] - Gap value
- * @property {string} [size] - Slider value
- */
+/** @typedef {import('../types').TParsedControlName} TParsedControlName */
+/** @typedef {import('../interfaces').IInheritedControlValue} IInheritedControlValue */
 
 /**
  * Parse control name to extract base name and device suffix
  * @param {string} controlName - Full control name (e.g., 'padding_tablet')
  * @param {string[]} deviceOrder - Device order from largest to smallest
- * @returns {ParsedControlName}
+ * @returns {TParsedControlName}
  */
 export function parseControlNameDevice(controlName, deviceOrder) {
   for (const device of deviceOrder) {
@@ -63,7 +44,7 @@ export function getDeviceControlName(baseName, device) {
  * @param {string} inheritedFrom - Device the value was inherited from
  * @param {string} directParent - Direct parent device
  * @param {string[]} inheritPath - Path of devices traversed
- * @returns {InheritedValue}
+ * @returns {IInheritedControlValue}
  */
 export function buildInheritanceResult(value, inheritedFrom, directParent, inheritPath) {
   return {
@@ -92,7 +73,7 @@ export function getAncestorDevices(deviceSuffix, deviceOrder) {
  * @param {string[]} ancestorDevices - Ancestor devices from largest to smallest
  * @param {(controlName: string) => Record<string, any> | null} getValueFn - Function to get control value
  * @param {(value: any) => boolean} isEmptyFn - Function to check if value is empty
- * @returns {InheritedValue | null}
+ * @returns {IInheritedControlValue | null}
  */
 export function findInheritedValue(baseName, ancestorDevices, getValueFn, isEmptyFn) {
   if (ancestorDevices.length === 0) {
@@ -136,7 +117,7 @@ export function findInheritedValue(baseName, ancestorDevices, getValueFn, isEmpt
  * Handle widescreen inheritance (inherits from desktop)
  * @param {string} baseName - Base control name
  * @param {(controlName: string) => Record<string, any> | null} getValueFn - Function to get control value
- * @returns {InheritedValue | null}
+ * @returns {IInheritedControlValue | null}
  */
 export function getWidescreenInheritedValue(baseName, getValueFn) {
   const desktopValue = getValueFn(baseName)
@@ -152,7 +133,7 @@ export function getWidescreenInheritedValue(baseName, getValueFn) {
  * @param {string[]} deviceOrder - Device order from largest to smallest
  * @param {(controlName: string) => Record<string, any> | null} getValueFn - Function to get control value
  * @param {(value: any) => boolean} isEmptyFn - Function to check if value is empty
- * @returns {InheritedValue | null}
+ * @returns {IInheritedControlValue | null}
  */
 export function resolveInheritedValue(controlName, deviceOrder, getValueFn, isEmptyFn) {
   const { baseName, deviceSuffix } = parseControlNameDevice(controlName, deviceOrder)
