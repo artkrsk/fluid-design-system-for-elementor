@@ -137,8 +137,8 @@ export class InlineInputManager {
     /** @type {HTMLInputElement|null} */
     const maxInput = container.querySelector('[data-fluid-role="max"]')
 
-    const minValue = minInput?.value
-    const maxValue = maxInput?.value
+    const minValue = minInput?.value ?? ''
+    const maxValue = maxInput?.value ?? ''
 
     const minParsed = ValidationService.parseValueWithUnit(minValue)
     const maxParsed = ValidationService.parseValueWithUnit(maxValue)
