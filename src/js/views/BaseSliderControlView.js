@@ -7,6 +7,8 @@ import { PresetDropdownManager } from '../utils/presetDropdown.js'
 import { PresetAPIService } from '../services/presetAPI.js'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { PresetDialogManager } from '../managers/PresetDialogManager.js'
+import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData.js'
+import { isCustomUnit } from '../utils/controls.js'
 import { CUSTOM_FLUID_VALUE } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/STYLES'
@@ -173,15 +175,7 @@ export const BaseSliderControlView = {
       return
     }
 
-    // Prepare data for AJAX
-    const ajaxData = {
-      title: title.trim() || `Custom ${minParsed.size}${minParsed.unit} ~ ${maxParsed.size}${maxParsed.unit}`,
-      min_size: minParsed.size,
-      min_unit: minParsed.unit,
-      max_size: maxParsed.size,
-      max_unit: maxParsed.unit,
-      group: group || 'spacing'
-    }
+    const ajaxData = buildCreatePresetData(title, minParsed, maxParsed, group)
 
     try {
       const response = await PresetAPIService.savePreset(ajaxData)
@@ -254,15 +248,7 @@ export const BaseSliderControlView = {
     )
     cssManager.setCssVariable(presetId, clampFormula)
 
-    const presetData = {
-      preset_id: presetId,
-      title: title.trim(),
-      min_size: minParsed.size,
-      min_unit: minParsed.unit,
-      max_size: maxParsed.size,
-      max_unit: maxParsed.unit,
-      group: groupId
-    }
+    const presetData = buildUpdatePresetData(presetId, title, minParsed, maxParsed, groupId)
 
     try {
       await PresetAPIService.updatePreset(presetData)

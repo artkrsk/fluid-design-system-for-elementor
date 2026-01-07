@@ -11,6 +11,8 @@ import { InheritanceAttributeManager } from '../utils/inheritanceAttributes.js'
 import { PresetDialogManager } from '../managers/PresetDialogManager.js'
 import { EditIconHandler } from '../utils/editIconHandler.js'
 import { resolveInheritedValue } from '../utils/deviceInheritance.js'
+import { buildCreatePresetData, buildUpdatePresetData } from '../utils/presetData.js'
+import { isFluidUnit, isCustomUnit, hasFluidInUnits } from '../utils/controls.js'
 import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants/VALUES'
 import { dataManager, cssManager } from '../managers'
 import { STYLES } from '../constants/STYLES'
@@ -544,15 +546,7 @@ export const BaseControlView = {
       return
     }
 
-    // Prepare data for AJAX
-    const ajaxData = {
-      title: title.trim() || `Custom ${minParsed.size}${minParsed.unit} ~ ${maxParsed.size}${maxParsed.unit}`,
-      min_size: minParsed.size,
-      min_unit: minParsed.unit,
-      max_size: maxParsed.size,
-      max_unit: maxParsed.unit,
-      group: group || 'spacing'
-    }
+    const ajaxData = buildCreatePresetData(title, minParsed, maxParsed, group)
 
     try {
       const response = await PresetAPIService.savePreset(ajaxData)
@@ -637,15 +631,7 @@ export const BaseControlView = {
     )
     cssManager.setCssVariable(presetId, clampFormula)
 
-    const presetData = {
-      preset_id: presetId,
-      title: title.trim(),
-      min_size: minParsed.size,
-      min_unit: minParsed.unit,
-      max_size: maxParsed.size,
-      max_unit: maxParsed.unit,
-      group: groupId
-    }
+    const presetData = buildUpdatePresetData(presetId, title, minParsed, maxParsed, groupId)
 
     try {
       await PresetAPIService.updatePreset(presetData)
@@ -873,17 +859,14 @@ export const BaseControlView = {
   },
 
   isFluidUnit() {
-    const currentUnit = this.getCurrentUnit()
-    return currentUnit === 'fluid'
+    return isFluidUnit(this.getCurrentUnit())
   },
 
   hasFluidUnit() {
-    const sizeUnits = this.model.get('size_units')
-    return sizeUnits && sizeUnits.includes('fluid')
+    return hasFluidInUnits(this.model.get('size_units'))
   },
 
   isCustomUnit() {
-    const currentUnit = this.getCurrentUnit()
-    return this.isFluidUnit() || currentUnit === 'custom'
+    return isCustomUnit(this.getCurrentUnit())
   }
 }
