@@ -1,4 +1,4 @@
-import type { ElementorEditor, ElementorCommon, $e } from '@arts/elementor-types'
+import type { ElementorEditor, ElementorCommon, $e } from '@artemsemkin/elementor-types'
 import type { IArtsFluidDSStrings, IArtsFluidDesignSystem } from './interfaces'
 
 declare global {

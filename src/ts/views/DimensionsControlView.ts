@@ -1,4 +1,4 @@
-import type { ElementorEditor } from '@arts/elementor-types'
+import type { ElementorEditor } from '@artemsemkin/elementor-types'
 import { BaseControlView } from './BaseControlView'
 import { BaseControlViewStatic } from './BaseControlViewStatic'
 import { BaseDimensionsControlView } from './BaseDimensionsControlView'

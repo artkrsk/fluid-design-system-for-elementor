@@ -1,4 +1,4 @@
-import type { Container, BackboneCollection, BackboneModel } from '@arts/elementor-types'
+import type { Container, BackboneCollection, BackboneModel } from '@artemsemkin/elementor-types'
 
 /** Checks if a unit value is fluid */
 export function isFluidUnit(unit: string | undefined): boolean {

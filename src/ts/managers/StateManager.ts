@@ -1,4 +1,4 @@
-import type { Container } from '@arts/elementor-types'
+import type { Container } from '@artemsemkin/elementor-types'
 import type { ISaveChangesDialog } from '../interfaces'
 
 export class StateManager {

@@ -2,7 +2,7 @@ import { stateManager, cssManager } from '../managers'
 import { getItemId } from '../utils'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
 import { isFluidPresetRepeater } from '../utils/controls'
-import type { HookArgs, BackboneCollection } from '@arts/elementor-types'
+import type { HookArgs, BackboneCollection } from '@artemsemkin/elementor-types'
 
 const commandSystem = window.$e!
 

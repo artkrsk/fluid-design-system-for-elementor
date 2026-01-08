@@ -1,4 +1,4 @@
-import type { ElementorEditor } from '@arts/elementor-types'
+import type { ElementorEditor } from '@artemsemkin/elementor-types'
 import { callSuper } from '../utils/backbone'
 
 const createFluidPresetRepeaterRow = () => {

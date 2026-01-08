@@ -1,4 +1,4 @@
-import type { BackboneModel } from '@arts/elementor-types'
+import type { BackboneModel } from '@artemsemkin/elementor-types'
 import type { IInheritedControlValue } from '../interfaces'
 
 /** Manages inheritance attribute setup for fluid control selectors */

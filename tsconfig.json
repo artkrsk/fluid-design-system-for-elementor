@@ -13,7 +13,6 @@
     "types": ["jquery", "select2", "vitest/globals", "node"],
     "baseUrl": ".",
     "paths": {
-      "@arts/elementor-types": ["../elementor-types/src"],
       "@/*": ["src/ts/*"]
     }
   },

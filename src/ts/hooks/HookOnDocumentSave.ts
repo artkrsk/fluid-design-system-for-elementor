@@ -1,6 +1,6 @@
 import stateManager from '../managers/StateManager'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
-import type { HookArgs } from '@arts/elementor-types'
+import type { HookArgs } from '@artemsemkin/elementor-types'
 
 const commandSystem = window.$e!
 
