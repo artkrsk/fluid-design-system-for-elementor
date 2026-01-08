@@ -29,6 +29,6 @@ export function isFluidPresetRepeater(
   return (
     controlName === 'fluid_spacing_presets' ||
     controlName === 'fluid_typography_presets' ||
-    Boolean(controlName?.startsWith('fluid_custom_') && controlName?.endsWith('_presets'))
+    /^fluid_custom_.+_presets$/.test(controlName ?? '')
   )
 }

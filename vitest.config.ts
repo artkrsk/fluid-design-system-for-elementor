@@ -18,7 +18,10 @@ export default defineConfig({
         'src/ts/views/**',
         'src/ts/hooks/**',
         'src/ts/components/**',
-        'src/ts/managers/**',
+        'src/ts/managers/CSSManager.ts',
+        'src/ts/managers/DataManager.ts',
+        'src/ts/managers/PresetDialogManager.ts',
+        'src/ts/managers/index.ts',
         'src/ts/services/**',
         // DOM/jQuery dependent utils (require integration tests)
         'src/ts/utils/backbone.ts',

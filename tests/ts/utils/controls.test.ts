@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isFluidUnit, requiresTextInput, hasFluidInUnits } from '@/utils/controls'
+import { isFluidUnit, requiresTextInput, hasFluidInUnits, isFluidPresetRepeater } from '@/utils/controls'
 
 describe('controls utilities', () => {
   describe('isFluidUnit', () => {
@@ -96,6 +96,72 @@ describe('controls utilities', () => {
     })
   })
 
-  // Note: isFluidPresetRepeater is not tested here as it requires
-  // Backbone Container/Model mocks. It would need integration tests.
+  describe('isFluidPresetRepeater', () => {
+    // Testing fallback logic when container is undefined
+    // The function checks name patterns when Backbone model lookup fails
+
+    describe('built-in preset repeaters', () => {
+      it('returns true for fluid_spacing_presets', () => {
+        expect(isFluidPresetRepeater('fluid_spacing_presets', undefined)).toBe(true)
+      })
+
+      it('returns true for fluid_typography_presets', () => {
+        expect(isFluidPresetRepeater('fluid_typography_presets', undefined)).toBe(true)
+      })
+    })
+
+    describe('custom group preset repeaters', () => {
+      it('returns true for fluid_custom_abc_presets', () => {
+        expect(isFluidPresetRepeater('fluid_custom_abc_presets', undefined)).toBe(true)
+      })
+
+      it('returns true for fluid_custom_my-group_presets (with hyphen)', () => {
+        expect(isFluidPresetRepeater('fluid_custom_my-group_presets', undefined)).toBe(true)
+      })
+
+      it('returns true for fluid_custom_123_presets (numeric ID)', () => {
+        expect(isFluidPresetRepeater('fluid_custom_123_presets', undefined)).toBe(true)
+      })
+
+      it('returns true for fluid_custom_a_presets (single char ID)', () => {
+        expect(isFluidPresetRepeater('fluid_custom_a_presets', undefined)).toBe(true)
+      })
+    })
+
+    describe('invalid patterns', () => {
+      it('returns false for fluid_custom_ (missing _presets suffix)', () => {
+        expect(isFluidPresetRepeater('fluid_custom_', undefined)).toBe(false)
+      })
+
+      it('returns false for fluid_custom_presets (empty group ID)', () => {
+        // Matches PHP regex /^fluid_custom_(.+)_presets$/ which requires non-empty group_id
+        expect(isFluidPresetRepeater('fluid_custom_presets', undefined)).toBe(false)
+      })
+
+      it('returns false for other_control', () => {
+        expect(isFluidPresetRepeater('other_control', undefined)).toBe(false)
+      })
+
+      it('returns false for undefined controlName', () => {
+        expect(isFluidPresetRepeater(undefined, undefined)).toBe(false)
+      })
+
+      it('returns false for empty string', () => {
+        expect(isFluidPresetRepeater('', undefined)).toBe(false)
+      })
+
+      it('returns false for partial match at start only', () => {
+        expect(isFluidPresetRepeater('fluid_custom_abc', undefined)).toBe(false)
+      })
+
+      it('returns false for partial match at end only', () => {
+        expect(isFluidPresetRepeater('abc_presets', undefined)).toBe(false)
+      })
+
+      it('returns false for similar but incorrect patterns', () => {
+        expect(isFluidPresetRepeater('fluid_spacing_preset', undefined)).toBe(false)
+        expect(isFluidPresetRepeater('fluid_typography_preset', undefined)).toBe(false)
+      })
+    })
+  })
 })
