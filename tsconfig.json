@@ -10,13 +10,13 @@
     "strictNullChecks": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "types": ["jquery", "select2", "vitest/globals"],
+    "types": ["jquery", "select2", "vitest/globals", "node"],
     "baseUrl": ".",
     "paths": {
       "@arts/elementor-types": ["../elementor-types/src"],
       "@/*": ["src/ts/*"]
     }
   },
-  "include": ["src/ts/**/*.js", "src/ts/**/*.ts", "src/ts/**/*.d.ts", "src/ts/global.d.ts", "tests/ts/**/*.ts"],
+  "include": ["src/ts/**/*.js", "src/ts/**/*.ts", "src/ts/**/*.d.ts", "src/ts/global.d.ts", "tests/ts/**/*.ts", "tests/e2e/**/*.ts", "playwright.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

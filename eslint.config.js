@@ -24,7 +24,9 @@ export default [
       '__tests__/',
       'vendor/',
       'src/ts/www',
-      'src/php'
+      'src/php',
+      'src/ts/**/*.ts', // TypeScript handles these
+      'tests/**/*.ts'
     ]
   },
   // Configuration for build/config files
