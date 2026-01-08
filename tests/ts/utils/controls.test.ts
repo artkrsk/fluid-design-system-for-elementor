@@ -97,10 +97,89 @@ describe('controls utilities', () => {
   })
 
   describe('isFluidPresetRepeater', () => {
-    // Testing fallback logic when container is undefined
-    // The function checks name patterns when Backbone model lookup fails
+    describe('with Backbone container (primary path)', () => {
+      it('returns true when kitControls has is_fluid_preset_repeater=true', () => {
+        const mockContainer = {
+          view: {
+            model: {
+              controls: {
+                get: (name: string) => ({
+                  get: (prop: string) => prop === 'is_fluid_preset_repeater' ? true : undefined
+                })
+              }
+            }
+          }
+        }
 
-    describe('built-in preset repeaters', () => {
+        expect(isFluidPresetRepeater('any_control', mockContainer as any)).toBe(true)
+      })
+
+      it('returns false when kitControls has is_fluid_preset_repeater=false', () => {
+        const mockContainer = {
+          view: {
+            model: {
+              controls: {
+                get: (name: string) => ({
+                  get: (prop: string) => prop === 'is_fluid_preset_repeater' ? false : undefined
+                })
+              }
+            }
+          }
+        }
+
+        expect(isFluidPresetRepeater('any_control', mockContainer as any)).toBe(false)
+      })
+
+      it('falls back to pattern matching when controls.get returns undefined', () => {
+        const mockContainer = {
+          view: {
+            model: {
+              controls: {
+                get: () => undefined
+              }
+            }
+          }
+        }
+
+        // Falls back to pattern matching
+        expect(isFluidPresetRepeater('fluid_spacing_presets', mockContainer as any)).toBe(true)
+        expect(isFluidPresetRepeater('other_control', mockContainer as any)).toBe(false)
+      })
+
+      it('falls back to pattern matching when controls property is missing', () => {
+        const mockContainer = {
+          view: {
+            model: {}  // No controls property
+          }
+        }
+
+        expect(isFluidPresetRepeater('fluid_spacing_presets', mockContainer as any)).toBe(true)
+        expect(isFluidPresetRepeater('other_control', mockContainer as any)).toBe(false)
+      })
+
+      it('uses empty string for controlName when undefined with container', () => {
+        const mockContainer = {
+          view: {
+            model: {
+              controls: {
+                get: (name: string) => {
+                  // Only return model for empty string (controlName ?? '' fallback)
+                  if (name === '') {
+                    return { get: () => true }
+                  }
+                  return undefined
+                }
+              }
+            }
+          }
+        }
+
+        // controlName undefined → falls back to '' → controls.get('') returns model
+        expect(isFluidPresetRepeater(undefined, mockContainer as any)).toBe(true)
+      })
+    })
+
+    describe('fallback pattern matching (when container is undefined)', () => {
       it('returns true for fluid_spacing_presets', () => {
         expect(isFluidPresetRepeater('fluid_spacing_presets', undefined)).toBe(true)
       })
@@ -108,9 +187,7 @@ describe('controls utilities', () => {
       it('returns true for fluid_typography_presets', () => {
         expect(isFluidPresetRepeater('fluid_typography_presets', undefined)).toBe(true)
       })
-    })
 
-    describe('custom group preset repeaters', () => {
       it('returns true for fluid_custom_abc_presets', () => {
         expect(isFluidPresetRepeater('fluid_custom_abc_presets', undefined)).toBe(true)
       })

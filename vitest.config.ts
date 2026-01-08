@@ -33,8 +33,6 @@ export default defineConfig({
         'src/ts/utils/preset.ts',
         'src/ts/utils/presetActions.ts',
         'src/ts/utils/presetDropdown.ts',
-        'src/ts/utils/presetLookup.ts',
-        'src/ts/utils/presetOptions.ts',
         'src/ts/utils/select2.ts',
         'src/ts/utils/spinner.ts',
         'src/ts/utils/templates.ts'

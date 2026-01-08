@@ -10,7 +10,7 @@ describe('clamp utilities', () => {
       expect(result).toContain('min(16px, 24px)')
       expect(result).toContain('max(16px, 24px)')
       expect(result).toContain('calc((16px)')
-      expect(result).toContain('(24 - 16)')
+      expect(result).toContain('(24px - 16px)')
     })
 
     it('generates clamp formula with rem units', () => {
@@ -37,7 +37,7 @@ describe('clamp utilities', () => {
       const result = generateClampFormula(1.5, 'rem', 2.5, 'rem')
 
       expect(result).toContain('min(1.5rem, 2.5rem)')
-      expect(result).toContain('(2.5 - 1.5)')
+      expect(result).toContain('(2.5rem - 1.5rem)')
     })
 
     it('handles inverted values (max < min)', () => {

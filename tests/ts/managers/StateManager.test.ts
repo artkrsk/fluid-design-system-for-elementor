@@ -248,5 +248,140 @@ describe('StateManager', () => {
         expect(stateManager.hasDocumentChanges('doc-2')).toBe(true)
       })
     })
+
+    describe('getSaveChangesDialog', () => {
+      const originalElementorCommon = (window as any).elementorCommon
+      const originalArtsFluidDSStrings = (window as any).ArtsFluidDSStrings
+
+      beforeEach(() => {
+        ;(window as any).ArtsFluidDSStrings = {
+          saveChanges: 'Save Changes',
+          saveChangesMessage: 'You have unsaved changes',
+          save: 'Save',
+          discard: 'Discard'
+        }
+      })
+
+      afterEach(() => {
+        ;(window as any).elementorCommon = originalElementorCommon
+        ;(window as any).ArtsFluidDSStrings = originalArtsFluidDSStrings
+      })
+
+      it('returns null when elementorCommon is undefined', () => {
+        ;(window as any).elementorCommon = undefined
+
+        const onConfirm = vi.fn()
+        const onCancel = vi.fn()
+        const result = stateManager.getSaveChangesDialog(onConfirm, onCancel)
+
+        expect(result).toBeNull()
+      })
+
+      it('returns null when dialogsManager.createWidget returns undefined', () => {
+        ;(window as any).elementorCommon = {
+          dialogsManager: {
+            createWidget: vi.fn().mockReturnValue(undefined)
+          }
+        }
+
+        const result = stateManager.getSaveChangesDialog(vi.fn(), vi.fn())
+
+        expect(result).toBeNull()
+      })
+
+      it('creates dialog with correct configuration', () => {
+        const mockCreateWidget = vi.fn().mockReturnValue({
+          onConfirm: null,
+          onCancel: null,
+          setSettings: vi.fn()
+        })
+        ;(window as any).elementorCommon = {
+          dialogsManager: { createWidget: mockCreateWidget }
+        }
+
+        stateManager.getSaveChangesDialog(vi.fn(), vi.fn())
+
+        expect(mockCreateWidget).toHaveBeenCalledWith('confirm', {
+          id: 'elementor-fluid-spacing-save-changes-dialog',
+          headerMessage: 'Save Changes',
+          message: 'You have unsaved changes',
+          position: { my: 'center center', at: 'center center' },
+          strings: { confirm: 'Save', cancel: 'Discard' }
+        })
+      })
+
+      it('returns dialog and sets event handlers', () => {
+        const mockDialog = {
+          onConfirm: null as any,
+          onCancel: null as any,
+          setSettings: vi.fn()
+        }
+        ;(window as any).elementorCommon = {
+          dialogsManager: { createWidget: vi.fn().mockReturnValue(mockDialog) }
+        }
+
+        const onConfirm = vi.fn()
+        const onCancel = vi.fn()
+        const result = stateManager.getSaveChangesDialog(onConfirm, onCancel)
+
+        expect(result).toBe(mockDialog)
+        expect(mockDialog.onConfirm).toBe(onConfirm)
+        expect(mockDialog.onCancel).toBe(onCancel)
+      })
+
+      it('calls setSettings with escape key behavior', () => {
+        const mockSetSettings = vi.fn()
+        const mockDialog = {
+          onConfirm: null,
+          onCancel: null,
+          setSettings: mockSetSettings
+        }
+        ;(window as any).elementorCommon = {
+          dialogsManager: { createWidget: vi.fn().mockReturnValue(mockDialog) }
+        }
+
+        stateManager.getSaveChangesDialog(vi.fn(), vi.fn())
+
+        expect(mockSetSettings).toHaveBeenCalledWith('hide', { onEscKeyPress: false })
+      })
+
+      it('caches dialog and reuses on subsequent calls', () => {
+        const mockCreateWidget = vi.fn().mockReturnValue({
+          onConfirm: null,
+          onCancel: null,
+          setSettings: vi.fn()
+        })
+        ;(window as any).elementorCommon = {
+          dialogsManager: { createWidget: mockCreateWidget }
+        }
+
+        stateManager.getSaveChangesDialog(vi.fn(), vi.fn())
+        stateManager.getSaveChangesDialog(vi.fn(), vi.fn())
+
+        expect(mockCreateWidget).toHaveBeenCalledTimes(1)
+      })
+
+      it('updates handlers on cached dialog', () => {
+        const mockDialog = {
+          onConfirm: null as any,
+          onCancel: null as any,
+          setSettings: vi.fn()
+        }
+        ;(window as any).elementorCommon = {
+          dialogsManager: { createWidget: vi.fn().mockReturnValue(mockDialog) }
+        }
+
+        const onConfirm1 = vi.fn()
+        const onCancel1 = vi.fn()
+        stateManager.getSaveChangesDialog(onConfirm1, onCancel1)
+
+        const onConfirm2 = vi.fn()
+        const onCancel2 = vi.fn()
+        stateManager.getSaveChangesDialog(onConfirm2, onCancel2)
+
+        expect(mockDialog.onConfirm).toBe(onConfirm2)
+        expect(mockDialog.onCancel).toBe(onCancel2)
+      })
+    })
   })
 })
