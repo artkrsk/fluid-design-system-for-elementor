@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "19472ebf6aa2971f6123a85add8b6cdc",
+    "content-hash": "4e0c6fe3726c9da5605a234c46d1d399",
     "packages": [
         {
             "name": "arts/base",
@@ -166,11 +166,17 @@
     "packages-dev": [
         {
             "name": "arts/elementor-stubs",
-            "version": "dev-master",
-            "dist": {
-                "type": "path",
-                "url": "../elementor-stubs",
+            "version": "v3.34.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/artkrsk/elementor-stubs.git",
                 "reference": "a471e08e25a4d4b713e481d0b2e300c34182ca8d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/artkrsk/elementor-stubs/zipball/a471e08e25a4d4b713e481d0b2e300c34182ca8d",
+                "reference": "a471e08e25a4d4b713e481d0b2e300c34182ca8d",
+                "shasum": ""
             },
             "require": {
                 "php": ">=8.0",
@@ -189,40 +195,7 @@
                 "wp-coding-standards/wpcs": "^3.0"
             },
             "type": "library",
-            "scripts": {
-                "post-install-cmd": [
-                    "vendor/bin/captainhook install -f -s"
-                ],
-                "post-update-cmd": [
-                    "vendor/bin/captainhook install -f -s"
-                ],
-                "changelog": [
-                    "git-cliff --output CHANGELOG.md"
-                ],
-                "generate": [
-                    "php generate.php"
-                ],
-                "normalize": [
-                    "composer-normalize"
-                ],
-                "test": [
-                    "@test:phpunit",
-                    "@test:phpstan",
-                    "@test:cs"
-                ],
-                "test:cs": [
-                    "phpcs"
-                ],
-                "test:cs:fix": [
-                    "phpcbf"
-                ],
-                "test:phpstan": [
-                    "phpstan analyze -c tests/phpstan.neon --memory-limit=2G"
-                ],
-                "test:phpunit": [
-                    "phpunit"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0-or-later"
             ],
@@ -234,21 +207,29 @@
             ],
             "description": "Comprehensive PHPStan stubs for Elementor and Elementor Pro WordPress page builder - auto-generated, self-contained, plug & play",
             "keywords": [
+                "PHPStan",
                 "elementor",
                 "elementor-pro",
                 "ide-autocomplete",
                 "intellisense",
                 "page-builder",
-                "phpstan",
                 "static-analysis",
                 "stubs",
                 "type-definitions",
                 "type-safety",
                 "wordpress"
             ],
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/artkrsk/elementor-stubs/issues",
+                "source": "https://github.com/artkrsk/elementor-stubs/tree/v3.34.0.4"
+            },
+            "funding": [
+                {
+                    "url": "https://www.buymeacoffee.com/artemsemkin",
+                    "type": "buy_me_a_coffee"
+                }
+            ],
+            "time": "2025-12-24T07:19:27+00:00"
         },
         {
             "name": "captainhook/captainhook",
@@ -2766,7 +2747,6 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "arts/elementor-extension": 20,
-        "arts/elementor-stubs": 20,
         "arts/utilities": 20
     },
     "prefer-stable": false,

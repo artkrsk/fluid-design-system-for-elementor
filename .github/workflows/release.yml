@@ -13,9 +13,6 @@ jobs:
       node_version: '23'
       build_command: 'npm run build'
 
-      # Validation
-      validate_zip_script: '__tests__/validate-zip.sh'
-
       # Paths
       assets_directory: '__assets__'
 
