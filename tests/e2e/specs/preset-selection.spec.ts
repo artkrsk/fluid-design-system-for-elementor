@@ -47,7 +47,7 @@ test.describe('Site Settings Tab', () => {
   }) => {
     // Use programmatic command to open Site Settings (more reliable than UI clicks)
     await editor.page.evaluate(() => {
-      return window.$e.run('panel/global/open')
+      return window.$e?.run('panel/global/open')
     })
 
     // Wait for Site Settings menu to load
@@ -67,7 +67,7 @@ test.describe('Site Settings Tab', () => {
   }) => {
     // Open Site Settings (switches to Kit document and loads tabs)
     await editor.page.evaluate(() => {
-      return window.$e.run('panel/global/open')
+      return window.$e?.run('panel/global/open')
     })
 
     // Wait for menu to appear
@@ -77,7 +77,7 @@ test.describe('Site Settings Tab', () => {
 
     // Verify our tab is registered in the component
     const availableTabs = await editor.page.evaluate(() => {
-      const tabs = window.$e.components.get('panel/global')?.getTabs() || {}
+      const tabs = window.$e?.components.get('panel/global')?.getTabs() || {}
       return Object.keys(tabs)
     })
 
