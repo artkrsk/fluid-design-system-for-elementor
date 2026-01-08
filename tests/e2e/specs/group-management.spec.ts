@@ -31,6 +31,9 @@ test.describe('Group Management Admin Panel', () => {
     await page.waitForLoadState('networkidle')
     await page.waitForSelector('#fluid-main-groups-table', { timeout: 10000 })
 
+    // Wait for table body to have rows (Firefox needs more time)
+    await page.waitForSelector('#fluid-groups-tbody tr', { timeout: 10000 })
+
     // Verify our E2E Test Group created in setup-presets.php appears
     const testGroupRow = page.locator('tr').filter({ hasText: 'E2E Test Group' })
     await expect(testGroupRow).toBeVisible()

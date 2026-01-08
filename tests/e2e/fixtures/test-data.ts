@@ -48,6 +48,12 @@ export const TEST_PRESETS: Record<string, TestPreset[]> = {
       title: 'E2E REM Units',
       min: { size: 1, unit: 'rem' },
       max: { size: 3, unit: 'rem' }
+    },
+    {
+      _id: 'e2e_static_value',
+      title: 'E2E Static (min = max)',
+      min: { size: 20, unit: 'px' },
+      max: { size: 20, unit: 'px' }
     }
   ],
   fluid_spacing_presets: [

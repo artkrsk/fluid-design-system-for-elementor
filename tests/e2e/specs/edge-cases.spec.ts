@@ -375,6 +375,20 @@ test.describe('CSS Formula Structure', () => {
     // REM units are preserved in the formula (not converted to px)
   })
 
+  test('e2e_static_value formula simplifies when min equals max', async ({
+    page
+  }) => {
+    const cssVar = await page.evaluate(() => {
+      return getComputedStyle(document.documentElement).getPropertyValue(
+        '--arts-fluid-preset--e2e_static_value'
+      )
+    })
+
+    // When min = max (20px), the plugin optimizes the formula to just "20px"
+    // instead of the full clamp(20px, calc(...), 20px)
+    expect(cssVar.trim()).toBe('20px')
+  })
+
   test('all formulas use clamp with three arguments', async ({ page }) => {
     const cssVars = await page.evaluate(() => {
       const style = getComputedStyle(document.documentElement)

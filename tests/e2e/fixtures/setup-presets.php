@@ -88,6 +88,18 @@ $test_presets = array(
 				'unit' => 'rem',
 			),
 		),
+		array(
+			'_id'   => 'e2e_static_value',
+			'title' => 'E2E Static (min = max)',
+			'min'   => array(
+				'size' => 20,
+				'unit' => 'px',
+			),
+			'max'   => array(
+				'size' => 20,
+				'unit' => 'px',
+			),
+		),
 	),
 	'fluid_spacing_presets'               => array(
 		array(
