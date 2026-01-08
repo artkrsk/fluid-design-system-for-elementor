@@ -62,8 +62,6 @@ test.describe('Admin-to-Elementor Sync', () => {
         .filter((name) => name !== '')
     })
 
-    console.log('Admin groups:', adminGroups)
-
     // Verify we have at least the built-in groups + our custom E2E group
     expect(adminGroups).toContain('Typography Presets')
     expect(adminGroups).toContain('Spacing Presets')

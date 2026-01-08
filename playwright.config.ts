@@ -25,6 +25,20 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: './tests/e2e/.auth/admin.json'
       }
+    },
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: './tests/e2e/.auth/admin.json'
+      }
+    },
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: './tests/e2e/.auth/admin.json'
+      }
     }
   ],
   globalSetup: './tests/e2e/global-setup.ts',

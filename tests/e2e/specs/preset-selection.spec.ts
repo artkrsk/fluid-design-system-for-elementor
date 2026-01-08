@@ -75,13 +75,11 @@ test.describe('Site Settings Tab', () => {
       timeout: 10000
     })
 
-    // Debug: List all available tabs after opening
+    // Verify our tab is registered in the component
     const availableTabs = await editor.page.evaluate(() => {
       const tabs = window.$e.components.get('panel/global')?.getTabs() || {}
       return Object.keys(tabs)
     })
-
-    console.log('Available Site Settings tabs:', availableTabs)
 
     // Verify our tab is registered
     expect(availableTabs).toContain(
