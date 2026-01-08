@@ -96,13 +96,12 @@ describe('getItemId utility', () => {
 
     it('handles Backbone-like model structure', () => {
       // Simulating Backbone.Model structure
+      const attributes: Record<string, string> = { _id: 'preset_custom_123' }
       const model = {
         cid: 'c1',
-        attributes: {
-          _id: 'preset_custom_123'
-        },
+        attributes,
         get: function (attr: string) {
-          return this.attributes[attr]
+          return attributes[attr]
         }
       }
 
