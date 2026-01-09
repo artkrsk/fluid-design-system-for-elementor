@@ -27,7 +27,7 @@ const VALUE_TOLERANCE = 1
 test.describe('Fluid Typography Font Size', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('renders correct font-size at min viewport (360px)', async ({
@@ -100,7 +100,7 @@ test.describe('Fluid Typography Font Size', () => {
 test.describe('Fluid Spacing', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('spacer height scales with viewport', async ({ page }) => {
@@ -176,7 +176,7 @@ test.describe('Multiple Fluid Elements', () => {
   test('all fluid elements on page render correctly', async ({ page }) => {
     await page.setViewportSize(TEST_VIEWPORTS.midpoint)
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Check heading
     const heading = page.locator(getHeadingTitleSelector(TEST_ELEMENT_IDS.headingXl))

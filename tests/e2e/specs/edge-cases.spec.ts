@@ -28,7 +28,7 @@ const VALUE_TOLERANCE = 1
 test.describe('Inverted Min/Max (min > max)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('clamps correctly when min > max at small viewport', async ({
@@ -87,7 +87,7 @@ test.describe('Inverted Min/Max (min > max)', () => {
     )
 
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // At small viewport
     await page.setViewportSize(TEST_VIEWPORTS.mobile)
@@ -110,7 +110,7 @@ test.describe('Inverted Min/Max (min > max)', () => {
 test.describe('Custom Breakpoints', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('respects custom min breakpoint', async ({ page }) => {
@@ -209,7 +209,7 @@ test.describe('Custom Breakpoints', () => {
 test.describe('Extreme Viewports', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('handles viewport smaller than min breakpoint', async ({ page }) => {
@@ -298,7 +298,7 @@ test.describe('CSS Variable Presence', () => {
 test.describe('CSS Formula Structure', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(TEST_PAGE_URL)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('e2e_heading_xl formula contains correct min/max values', async ({

@@ -5,15 +5,14 @@
  * then verifies those groups sync correctly to Elementor Site Settings.
  */
 
-import { test, expect } from '../fixtures'
+import { test, expect, waitForWpAdmin } from '../fixtures'
 
 const ADMIN_PAGE_URL = '/wp-admin/admin.php?page=fluid-design-system'
 
 test.describe('Group Management Admin Panel', () => {
   test('built-in groups appear in table', async ({ page }) => {
     await page.goto(ADMIN_PAGE_URL)
-    await page.waitForLoadState('networkidle')
-    await page.waitForSelector('#fluid-main-groups-table', { timeout: 10000 })
+    await waitForWpAdmin(page, '#fluid-main-groups-table')
 
     // Verify Typography Presets group exists
     const typographyRow = page
@@ -28,10 +27,9 @@ test.describe('Group Management Admin Panel', () => {
 
   test('custom E2E test group appears in table', async ({ page }) => {
     await page.goto(ADMIN_PAGE_URL)
-    await page.waitForLoadState('networkidle')
-    await page.waitForSelector('#fluid-main-groups-table', { timeout: 10000 })
+    await waitForWpAdmin(page, '#fluid-main-groups-table')
 
-    // Wait for table body to have rows (Firefox needs more time)
+    // Wait for table body to have rows
     await page.waitForSelector('#fluid-groups-tbody tr', { timeout: 10000 })
 
     // Verify our E2E Test Group created in setup-presets.php appears
@@ -48,8 +46,7 @@ test.describe('Admin-to-Elementor Sync', () => {
   }) => {
     // Step 1: Get group list from WordPress admin
     await page.goto(ADMIN_PAGE_URL)
-    await page.waitForLoadState('networkidle')
-    await page.waitForSelector('#fluid-main-groups-table', { timeout: 10000 })
+    await waitForWpAdmin(page, '#fluid-main-groups-table')
 
     const adminGroups = await page.evaluate(() => {
       const rows = Array.from(

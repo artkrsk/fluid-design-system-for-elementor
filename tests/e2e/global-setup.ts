@@ -55,7 +55,7 @@ async function globalSetup(config: FullConfig) {
       const activateLink = pluginRow.locator('a.activate')
       if ((await activateLink.count()) > 0) {
         await activateLink.click()
-        await page.waitForLoadState('networkidle')
+        await page.waitForLoadState('load')
         console.log('[E2E Setup] Activated Fluid Design System plugin')
       } else {
         console.log('[E2E Setup] Plugin already active')
@@ -68,7 +68,7 @@ async function globalSetup(config: FullConfig) {
       const activateLink = elementorRow.locator('a.activate')
       if ((await activateLink.count()) > 0) {
         await activateLink.click()
-        await page.waitForLoadState('networkidle')
+        await page.waitForLoadState('load')
         console.log('[E2E Setup] Activated Elementor plugin')
       }
     }
