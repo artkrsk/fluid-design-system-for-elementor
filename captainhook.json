@@ -3,13 +3,13 @@
     "enabled": true,
     "actions": [
       {
-        "action": "composer fix",
+        "action": "sh -c 'FILES=\"{$STAGED_FILES|of-type:php|separated-by: }\"; if [ -n \"$FILES\" ]; then vendor/bin/phpcbf --standard=phpcs.xml $FILES && git add $FILES; fi'",
         "config": {
-          "run-mode": "docker"
+          "run-mode": "local"
         }
       },
       {
-        "action": "npm run format",
+        "action": "npx lint-staged",
         "config": {
           "run-mode": "local"
         }
