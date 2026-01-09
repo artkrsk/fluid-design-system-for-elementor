@@ -24,15 +24,16 @@
    * Decode HTML entities and convert escaped newlines to actual newlines
    */
   function decodeHtmlString(str) {
-    if (!str) return str
+    if (!str) { return str }
 
+    // Decode &amp; LAST to prevent double-unescaping
     return str
       .replace(/&quot;/g, '"')
       .replace(/&#039;/g, "'")
-      .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/\\n/g, '\n')
+      .replace(/&amp;/g, '&')
   }
 
   /**
@@ -655,11 +656,15 @@
    * Sanitize input to prevent XSS attacks
    */
   function sanitizeInput(input) {
-    // Remove HTML tags and dangerous characters
-    return input
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/[<>"'&]/g, '') // Remove dangerous characters
-      .trim()
+    // Apply tag removal repeatedly until stable (prevents nested tag bypass)
+    let result = input
+    let prev
+    do {
+      prev = result
+      result = result.replace(/<[^>]*>/g, '')
+    } while (result !== prev)
+    // Remove dangerous characters
+    return result.replace(/[<>"'&]/g, '').trim()
   }
 
   /**

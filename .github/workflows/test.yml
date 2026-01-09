@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   plugin-check:
     name: WordPress.org Plugin Check

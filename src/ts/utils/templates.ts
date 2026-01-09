@@ -4,6 +4,14 @@ import type { TSelect2State } from '../types'
 
 /** HTML template generation utilities for Select2 preset options */
 export class TemplateRenderer {
+  /** Escapes HTML special characters to prevent XSS */
+  private static escapeHtml(str: string | null | undefined): string {
+    if (!str) { return '' }
+    const div = document.createElement('div')
+    div.textContent = str
+    return div.innerHTML
+  }
+
   /** Creates a base template container */
   static createBaseTemplate(className: string = '', content: string = ''): JQuery<HTMLElement> {
     return jQuery(`
@@ -49,7 +57,7 @@ export class TemplateRenderer {
   /** Creates simple inherit template */
   static createSimpleInheritTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
     const inheritedTitle =
-      element.getAttribute('data-inherited-title') || text || window.ArtsFluidDSStrings?.inherit
+      TemplateRenderer.escapeHtml(element.getAttribute('data-inherited-title')) || text || window.ArtsFluidDSStrings?.inherit
 
     return TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',
@@ -100,7 +108,7 @@ export class TemplateRenderer {
 
   /** Handles empty value template */
   static handleEmptyValueTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
-    const valueDisplay = element.getAttribute('data-value-display')
+    const valueDisplay = TemplateRenderer.escapeHtml(element.getAttribute('data-value-display'))
 
     if (valueDisplay) {
       const isInheritedPreset = element.getAttribute('data-inherited-preset')
@@ -126,7 +134,7 @@ export class TemplateRenderer {
     const minUnit = element.getAttribute('data-min-unit')
     const maxSize = element.getAttribute('data-max-size')
     const maxUnit = element.getAttribute('data-max-unit')
-    const inheritedTitle = element.getAttribute('data-inherited-title')
+    const inheritedTitle = TemplateRenderer.escapeHtml(element.getAttribute('data-inherited-title'))
 
     // For simple values without min/max sizes
     if (!minSize || !maxSize) {
@@ -192,7 +200,7 @@ export class TemplateRenderer {
     const headerContent = ValueFormatter.formatSizeRange(minSize, minUnit, maxSize, maxUnit, {
       includeSpan: true
     })
-    const inheritedTitle = element.getAttribute('data-inherited-title')
+    const inheritedTitle = TemplateRenderer.escapeHtml(element.getAttribute('data-inherited-title'))
 
     const markup = TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',
@@ -315,13 +323,13 @@ export class TemplateRenderer {
   ): JQuery<HTMLElement> {
     const isInheritedPreset = element.getAttribute('data-inherited-preset')
     const isInheritedValue = element.getAttribute('data-inherited-value')
-    const title = element.getAttribute('data-title') || ''
+    const title = TemplateRenderer.escapeHtml(element.getAttribute('data-title')) || ''
     const minSize = element.getAttribute('data-min-size') || ''
     const minUnit = element.getAttribute('data-min-unit') || ''
     const maxSize = element.getAttribute('data-max-size') || ''
     const maxUnit = element.getAttribute('data-max-unit') || ''
-    const valueDisplay = element.getAttribute('data-value-display') || ''
-    const customDisplayValue = element.getAttribute('data-display-value') || ''
+    const valueDisplay = TemplateRenderer.escapeHtml(element.getAttribute('data-value-display')) || ''
+    const customDisplayValue = TemplateRenderer.escapeHtml(element.getAttribute('data-display-value')) || ''
 
     if (isInheritedValue) {
       return TemplateRenderer.createInheritedValueTemplate(element, valueDisplay, title)

@@ -213,11 +213,15 @@
    * Sanitize input to prevent XSS attacks
    */
   function sanitizeInput(input) {
-    // Remove HTML tags and dangerous characters
-    return input
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/[<>"'&]/g, '') // Remove dangerous characters
-      .trim()
+    // Apply tag removal repeatedly until stable (prevents nested tag bypass)
+    let result = input
+    let prev
+    do {
+      prev = result
+      result = result.replace(/<[^>]*>/g, '')
+    } while (result !== prev)
+    // Remove dangerous characters
+    return result.replace(/[<>"'&]/g, '').trim()
   }
 
   /**
