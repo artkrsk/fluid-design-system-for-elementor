@@ -3,9 +3,15 @@
     "enabled": true,
     "actions": [
       {
-        "action": "composer phpcs",
+        "action": "composer fix",
         "config": {
           "run-mode": "docker"
+        }
+      },
+      {
+        "action": "npm run format",
+        "config": {
+          "run-mode": "local"
         }
       },
       {
