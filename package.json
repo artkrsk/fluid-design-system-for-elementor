@@ -51,7 +51,7 @@
   "scripts": {
     "dev": "node __build__/index.js dev",
     "build": "node __build__/index.js build",
-    "version": "npm run build && git add dist/ src/wordpress-plugin/readme.txt src/wordpress-plugin/fluid-design-system-for-elementor.php",
+    "version": "npm run build && node scripts/sync-changelog.js && git add dist/ src/wordpress-plugin/readme.txt src/wordpress-plugin/fluid-design-system-for-elementor.php CHANGELOG.md",
     "deps:check": "npx npm-check-updates",
     "deps:update": "npx npm-check-updates -u && npm install",
     "format": "prettier --write 'src/ts/**/*.{ts,js,jsx,json,css}'",

@@ -6,12 +6,16 @@ on:
       - 'v*'
 
 jobs:
+  # First create the release using reusable workflow
   release:
     uses: artkrsk/wordpress-plugin-release-action/.github/workflows/release.yml@main
     with:
       # Build configuration
       node_version: '23'
       build_command: 'npm run build'
+
+      # Changelog
+      changelog_since_last_tag: false
 
       # Paths
       assets_directory: '__assets__'
