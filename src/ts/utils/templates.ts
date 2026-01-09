@@ -130,10 +130,10 @@ export class TemplateRenderer {
     title: string
   ): JQuery<HTMLElement> {
     const isCustomValue = element.getAttribute('data-custom-value') === 'true'
-    const minSize = element.getAttribute('data-min-size')
-    const minUnit = element.getAttribute('data-min-unit')
-    const maxSize = element.getAttribute('data-max-size')
-    const maxUnit = element.getAttribute('data-max-unit')
+    const minSize = TemplateRenderer.escapeHtml(element.getAttribute('data-min-size'))
+    const minUnit = TemplateRenderer.escapeHtml(element.getAttribute('data-min-unit'))
+    const maxSize = TemplateRenderer.escapeHtml(element.getAttribute('data-max-size'))
+    const maxUnit = TemplateRenderer.escapeHtml(element.getAttribute('data-max-unit'))
     const inheritedTitle = TemplateRenderer.escapeHtml(element.getAttribute('data-inherited-title'))
 
     // For simple values without min/max sizes
@@ -278,10 +278,14 @@ export class TemplateRenderer {
         let footerContent = `<span class="select2-result-fluid-spacing-formatted__title">${title}</span>`
 
         if (isTemplateResult) {
-          const minScreenWidthSize = element.getAttribute('data-min-screen-width-size') || ''
-          const minScreenWidthUnit = element.getAttribute('data-min-screen-width-unit') || ''
-          const maxScreenWidthSize = element.getAttribute('data-max-screen-width-size') || ''
-          const maxScreenWidthUnit = element.getAttribute('data-max-screen-width-unit') || ''
+          const minScreenWidthSize =
+            TemplateRenderer.escapeHtml(element.getAttribute('data-min-screen-width-size')) || ''
+          const minScreenWidthUnit =
+            TemplateRenderer.escapeHtml(element.getAttribute('data-min-screen-width-unit')) || ''
+          const maxScreenWidthSize =
+            TemplateRenderer.escapeHtml(element.getAttribute('data-max-screen-width-size')) || ''
+          const maxScreenWidthUnit =
+            TemplateRenderer.escapeHtml(element.getAttribute('data-max-screen-width-unit')) || ''
 
           footerContent += `
             <span class="select2-result-fluid-spacing-formatted__divider"></span>
@@ -324,10 +328,10 @@ export class TemplateRenderer {
     const isInheritedPreset = element.getAttribute('data-inherited-preset')
     const isInheritedValue = element.getAttribute('data-inherited-value')
     const title = TemplateRenderer.escapeHtml(element.getAttribute('data-title')) || ''
-    const minSize = element.getAttribute('data-min-size') || ''
-    const minUnit = element.getAttribute('data-min-unit') || ''
-    const maxSize = element.getAttribute('data-max-size') || ''
-    const maxUnit = element.getAttribute('data-max-unit') || ''
+    const minSize = TemplateRenderer.escapeHtml(element.getAttribute('data-min-size')) || ''
+    const minUnit = TemplateRenderer.escapeHtml(element.getAttribute('data-min-unit')) || ''
+    const maxSize = TemplateRenderer.escapeHtml(element.getAttribute('data-max-size')) || ''
+    const maxUnit = TemplateRenderer.escapeHtml(element.getAttribute('data-max-unit')) || ''
     const valueDisplay = TemplateRenderer.escapeHtml(element.getAttribute('data-value-display')) || ''
     const customDisplayValue = TemplateRenderer.escapeHtml(element.getAttribute('data-display-value')) || ''
 
