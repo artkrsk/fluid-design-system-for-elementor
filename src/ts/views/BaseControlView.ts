@@ -12,7 +12,7 @@ import { EditIconHandler } from '../utils/editIconHandler'
 import { resolveInheritedValue } from '../utils/deviceInheritance'
 import { handleUpdatePreset, handleCreatePreset } from '../utils/presetActions'
 import { isFluidUnit, requiresTextInput, hasFluidInUnits } from '../utils/controls'
-import { CUSTOM_FLUID_VALUE, UI_TIMING } from '../constants'
+import { CUSTOM_FLUID_VALUE } from '../constants'
 import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
 
 /** Mixin for fluid unit support in Elementor dimension/gap controls */

@@ -13,10 +13,7 @@ import {
   TEST_PAGE_SLUG,
   TEST_ELEMENT_IDS,
   TEST_VIEWPORTS,
-  EXPECTED_VALUES,
-  TEST_BREAKPOINTS,
-  calculateExpectedValue,
-  getElementSelector,
+  getExpectedValue,
   getHeadingTitleSelector
 } from '../fixtures/test-data'
 
@@ -46,7 +43,7 @@ test.describe('Inverted Min/Max (min > max)', () => {
     )
 
     // At 360px with preset (min: 80, max: 20), value should be 80
-    expect(fontSize).toBeCloseTo(EXPECTED_VALUES.e2e_inverted[360], VALUE_TOLERANCE)
+    expect(fontSize).toBeCloseTo(getExpectedValue('e2e_inverted', 360), VALUE_TOLERANCE)
   })
 
   test('clamps correctly when min > max at large viewport', async ({
@@ -62,7 +59,7 @@ test.describe('Inverted Min/Max (min > max)', () => {
     )
 
     // At 1920px with preset (min: 80, max: 20), value should be 20
-    expect(fontSize).toBeCloseTo(EXPECTED_VALUES.e2e_inverted[1920], VALUE_TOLERANCE)
+    expect(fontSize).toBeCloseTo(getExpectedValue('e2e_inverted', 1920), VALUE_TOLERANCE)
   })
 
   test('interpolates correctly between inverted values', async ({ page }) => {
@@ -76,7 +73,7 @@ test.describe('Inverted Min/Max (min > max)', () => {
     )
 
     // At midpoint, should be 50 (halfway between 80 and 20)
-    expect(fontSize).toBeCloseTo(EXPECTED_VALUES.e2e_inverted[1140], VALUE_TOLERANCE)
+    expect(fontSize).toBeCloseTo(getExpectedValue('e2e_inverted', 1140), VALUE_TOLERANCE)
   })
 
   test('values decrease as viewport increases (inverted scaling)', async ({
@@ -128,7 +125,7 @@ test.describe('Custom Breakpoints', () => {
 
     // At custom min (400px), value should be 10px
     expect(fontSize).toBeCloseTo(
-      EXPECTED_VALUES.e2e_custom_breakpoints[400],
+      getExpectedValue('e2e_custom_breakpoints', 400),
       VALUE_TOLERANCE
     )
   })
@@ -146,7 +143,7 @@ test.describe('Custom Breakpoints', () => {
 
     // At custom max (1600px), value should be 100px
     expect(fontSize).toBeCloseTo(
-      EXPECTED_VALUES.e2e_custom_breakpoints[1600],
+      getExpectedValue('e2e_custom_breakpoints', 1600),
       VALUE_TOLERANCE
     )
   })
@@ -164,7 +161,7 @@ test.describe('Custom Breakpoints', () => {
 
     // At midpoint of custom range, should be 55px
     expect(fontSize).toBeCloseTo(
-      EXPECTED_VALUES.e2e_custom_breakpoints[1000],
+      getExpectedValue('e2e_custom_breakpoints', 1000),
       VALUE_TOLERANCE
     )
   })
@@ -182,7 +179,7 @@ test.describe('Custom Breakpoints', () => {
 
     // Below custom min, should clamp to min value (10px)
     expect(fontSize).toBeCloseTo(
-      EXPECTED_VALUES.e2e_custom_breakpoints[360],
+      getExpectedValue('e2e_custom_breakpoints', 360),
       VALUE_TOLERANCE
     )
   })
@@ -200,7 +197,7 @@ test.describe('Custom Breakpoints', () => {
 
     // Above custom max, should clamp to max value (100px)
     expect(fontSize).toBeCloseTo(
-      EXPECTED_VALUES.e2e_custom_breakpoints[1920],
+      getExpectedValue('e2e_custom_breakpoints', 1920),
       VALUE_TOLERANCE
     )
   })

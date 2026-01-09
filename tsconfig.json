@@ -3,11 +3,16 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "checkJs": true,
-    "allowJs": true,
     "noEmit": true,
+
     "strict": true,
-    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
     "skipLibCheck": true,
     "esModuleInterop": true,
     "types": ["jquery", "select2", "vitest/globals", "node"],
@@ -16,6 +21,12 @@
       "@/*": ["src/ts/*"]
     }
   },
-  "include": ["src/ts/**/*.js", "src/ts/**/*.ts", "src/ts/**/*.d.ts", "src/ts/global.d.ts", "tests/ts/**/*.ts", "tests/e2e/**/*.ts", "playwright.config.ts"],
+  "include": [
+    "src/ts/**/*.ts",
+    "src/ts/**/*.d.ts",
+    "tests/ts/**/*.ts",
+    "tests/e2e/**/*.ts",
+    "playwright.config.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

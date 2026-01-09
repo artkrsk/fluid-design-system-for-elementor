@@ -103,7 +103,7 @@ describe('controls utilities', () => {
           view: {
             model: {
               controls: {
-                get: (name: string) => ({
+                get: (_name: string) => ({
                   get: (prop: string) => prop === 'is_fluid_preset_repeater' ? true : undefined
                 })
               }
@@ -119,7 +119,7 @@ describe('controls utilities', () => {
           view: {
             model: {
               controls: {
-                get: (name: string) => ({
+                get: (_name: string) => ({
                   get: (prop: string) => prop === 'is_fluid_preset_repeater' ? false : undefined
                 })
               }

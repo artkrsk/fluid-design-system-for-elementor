@@ -14,7 +14,7 @@ const PLUGIN_PATH =
   '/var/www/html/wp-content/plugins/fluid-design-system-for-elementor'
 
 async function globalSetup(config: FullConfig) {
-  const { baseURL } = config.projects[0].use
+  const { baseURL } = config.projects[0]!.use
 
   console.log('[E2E Setup] Starting global setup...')
 
