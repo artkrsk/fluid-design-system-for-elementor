@@ -181,13 +181,14 @@
     }
 
     // Decode HTML entities that might come from WordPress localization
+    // Decode &amp; LAST to prevent double-unescaping
     message = message
       .replace(/&quot;/g, '"')
       .replace(/&#039;/g, "'")
-      .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/\\n/g, '\n')
+      .replace(/&amp;/g, '&')
 
     return message
   }
