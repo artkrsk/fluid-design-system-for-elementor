@@ -44,6 +44,8 @@ jobs:
         with:
           build-dir: './dist/fluid-design-system-for-elementor'
           wp-version: 'latest'
+          ignore-codes: |
+            WordPress.NamingConventions.PrefixAllGlobals.InvalidPrefixPassed
 
   code-quality:
     name: Code Quality

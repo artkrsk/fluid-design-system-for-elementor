@@ -345,7 +345,7 @@ class Module extends Module_Base {
 		foreach ( $required_fields as $field ) {
 			if ( ! isset( $data[ $field ] ) || $data[ $field ] === '' ) {
 				/* translators: %s: Field name */
-				throw new \Exception( sprintf( esc_html__( 'Missing required field: %s', 'fluid-design-system-for-elementor' ), $field ) );
+				throw new \Exception( sprintf( esc_html__( 'Missing required field: %s', 'fluid-design-system-for-elementor' ), esc_html( $field ) ) );
 			}
 		}
 
@@ -431,7 +431,7 @@ class Module extends Module_Base {
 		foreach ( $required as $field ) {
 			if ( ! isset( $data[ $field ] ) || $data[ $field ] === '' ) {
 				/* translators: %s: Field name */
-				throw new \Exception( sprintf( esc_html__( 'Missing required field: %s', 'fluid-design-system-for-elementor' ), $field ) );
+				throw new \Exception( sprintf( esc_html__( 'Missing required field: %s', 'fluid-design-system-for-elementor' ), esc_html( $field ) ) );
 			}
 		}
 
