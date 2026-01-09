@@ -10,7 +10,7 @@ import {
   TEST_PAGE_SLUG,
   TEST_ELEMENT_IDS,
   TEST_VIEWPORTS,
-  EXPECTED_VALUES,
+  getExpectedValue,
   calculateExpectedValue,
   getHeadingTitleSelector,
   getSpacerSelector,
@@ -40,7 +40,7 @@ test.describe('Fluid Typography Font Size', () => {
       el => parseFloat(getComputedStyle(el).fontSize)
     )
 
-    expect(fontSize).toBeCloseTo(EXPECTED_VALUES.e2e_heading_xl[360], VALUE_TOLERANCE)
+    expect(fontSize).toBeCloseTo(getExpectedValue('e2e_heading_xl', 360), VALUE_TOLERANCE)
   })
 
   test('renders correct font-size at max viewport (1920px)', async ({
@@ -53,7 +53,7 @@ test.describe('Fluid Typography Font Size', () => {
       el => parseFloat(getComputedStyle(el).fontSize)
     )
 
-    expect(fontSize).toBeCloseTo(EXPECTED_VALUES.e2e_heading_xl[1920], VALUE_TOLERANCE)
+    expect(fontSize).toBeCloseTo(getExpectedValue('e2e_heading_xl', 1920), VALUE_TOLERANCE)
   })
 
   test('interpolates correctly at midpoint (1140px)', async ({ page }) => {
@@ -64,7 +64,7 @@ test.describe('Fluid Typography Font Size', () => {
       el => parseFloat(getComputedStyle(el).fontSize)
     )
 
-    expect(fontSize).toBeCloseTo(EXPECTED_VALUES.e2e_heading_xl[1140], VALUE_TOLERANCE)
+    expect(fontSize).toBeCloseTo(getExpectedValue('e2e_heading_xl', 1140), VALUE_TOLERANCE)
   })
 
   test('interpolates correctly at tablet (768px)', async ({ page }) => {
@@ -108,7 +108,7 @@ test.describe('Fluid Spacing', () => {
     const heightMobile = await spacer.evaluate(
       el => parseFloat(getComputedStyle(el).height)
     )
-    expect(heightMobile).toBeCloseTo(EXPECTED_VALUES.e2e_gap_standard[360], VALUE_TOLERANCE)
+    expect(heightMobile).toBeCloseTo(getExpectedValue('e2e_gap_standard', 360), VALUE_TOLERANCE)
 
     // At max viewport
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
@@ -117,7 +117,7 @@ test.describe('Fluid Spacing', () => {
     const heightDesktop = await spacer.evaluate(
       el => parseFloat(getComputedStyle(el).height)
     )
-    expect(heightDesktop).toBeCloseTo(EXPECTED_VALUES.e2e_gap_standard[1920], VALUE_TOLERANCE)
+    expect(heightDesktop).toBeCloseTo(getExpectedValue('e2e_gap_standard', 1920), VALUE_TOLERANCE)
   })
 
   test('container gap scales with viewport', async ({ page }) => {
@@ -128,7 +128,7 @@ test.describe('Fluid Spacing', () => {
     const gapMobile = await container.evaluate(
       el => parseFloat(getComputedStyle(el).gap)
     )
-    expect(gapMobile).toBeCloseTo(EXPECTED_VALUES.e2e_gap_large[360], VALUE_TOLERANCE)
+    expect(gapMobile).toBeCloseTo(getExpectedValue('e2e_gap_large', 360), VALUE_TOLERANCE)
 
     // At max viewport
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
@@ -136,7 +136,7 @@ test.describe('Fluid Spacing', () => {
     const gapDesktop = await container.evaluate(
       el => parseFloat(getComputedStyle(el).gap)
     )
-    expect(gapDesktop).toBeCloseTo(EXPECTED_VALUES.e2e_gap_large[1920], VALUE_TOLERANCE)
+    expect(gapDesktop).toBeCloseTo(getExpectedValue('e2e_gap_large', 1920), VALUE_TOLERANCE)
   })
 })
 

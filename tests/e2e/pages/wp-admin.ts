@@ -41,7 +41,7 @@ export class WPAdminPage {
 
     // Extract ID from "post-123" format
     const match = postId.match(/post-(\d+)/)
-    return match ? parseInt(match[1], 10) : null
+    return match ? parseInt(match[1]!, 10) : null
   }
 
   async openElementorEditor(postId: number) {

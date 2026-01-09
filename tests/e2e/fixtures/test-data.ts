@@ -175,6 +175,16 @@ export const EXPECTED_VALUES: Record<string, Record<number, number>> = {
   }
 }
 
+/** Type-safe accessor for expected values - throws if key missing */
+export function getExpectedValue(presetId: keyof typeof EXPECTED_VALUES, viewport: number): number {
+  const preset = EXPECTED_VALUES[presetId]
+  const value = preset[viewport]
+  if (value === undefined) {
+    throw new Error(`No expected value for ${presetId} at ${viewport}px`)
+  }
+  return value
+}
+
 /** CSS variable name for a preset */
 export function getCssVarName(presetId: string): string {
   return `--arts-fluid-preset--${presetId}`
