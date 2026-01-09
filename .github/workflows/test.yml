@@ -136,11 +136,11 @@ jobs:
       - name: Install Composer dependencies (production only)
         run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-
       - name: Build plugin
         run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
       - name: Start wp-env
         run: npm run wp-env start
