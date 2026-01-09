@@ -2,9 +2,8 @@
 
 [![Tests](https://img.shields.io/github/actions/workflow/status/artkrsk/fluid-design-system-for-elementor/test.yml?style=flat-square&logo=githubactions&logoColor=white&label=tests)](https://github.com/artkrsk/fluid-design-system-for-elementor/actions/workflows/test.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/artkrsk/fluid-design-system-for-elementor?style=flat-square&logo=codecov&logoColor=white)](https://codecov.io/gh/artkrsk/fluid-design-system-for-elementor)
+[![PHP](https://img.shields.io/packagist/dependency-v/arts/fluid-design-system/php?style=flat-square&logo=php&logoColor=white&label=PHP)](https://packagist.org/packages/arts/fluid-design-system)
 [![WordPress](https://img.shields.io/badge/WordPress-6.0+-21759b?style=flat-square&logo=wordpress&logoColor=white)](https://wordpress.org)
-[![PHP](https://img.shields.io/badge/PHP-8.0+-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
-[![Elementor](https://img.shields.io/badge/Elementor-compatible-92003B?style=flat-square&logo=elementor&logoColor=white)](https://elementor.com)
 
 Fluid typography and spacing presets for Elementor using CSS `clamp()` — smooth responsive scaling without breakpoints.
 
