@@ -6,7 +6,9 @@ import type { TSelect2State } from '../types'
 export class TemplateRenderer {
   /** Escapes HTML special characters to prevent XSS */
   private static escapeHtml(str: string | null | undefined): string {
-    if (!str) { return '' }
+    if (!str) {
+      return ''
+    }
     const div = document.createElement('div')
     div.textContent = str
     return div.innerHTML
@@ -57,7 +59,9 @@ export class TemplateRenderer {
   /** Creates simple inherit template */
   static createSimpleInheritTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
     const inheritedTitle =
-      TemplateRenderer.escapeHtml(element.getAttribute('data-inherited-title')) || text || window.ArtsFluidDSStrings?.inherit
+      TemplateRenderer.escapeHtml(element.getAttribute('data-inherited-title')) ||
+      text ||
+      window.ArtsFluidDSStrings?.inherit
 
     return TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',
@@ -332,8 +336,10 @@ export class TemplateRenderer {
     const minUnit = TemplateRenderer.escapeHtml(element.getAttribute('data-min-unit')) || ''
     const maxSize = TemplateRenderer.escapeHtml(element.getAttribute('data-max-size')) || ''
     const maxUnit = TemplateRenderer.escapeHtml(element.getAttribute('data-max-unit')) || ''
-    const valueDisplay = TemplateRenderer.escapeHtml(element.getAttribute('data-value-display')) || ''
-    const customDisplayValue = TemplateRenderer.escapeHtml(element.getAttribute('data-display-value')) || ''
+    const valueDisplay =
+      TemplateRenderer.escapeHtml(element.getAttribute('data-value-display')) || ''
+    const customDisplayValue =
+      TemplateRenderer.escapeHtml(element.getAttribute('data-display-value')) || ''
 
     if (isInheritedValue) {
       return TemplateRenderer.createInheritedValueTemplate(element, valueDisplay, title)
