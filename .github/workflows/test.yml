@@ -11,6 +11,40 @@ on:
       - main
 
 jobs:
+  plugin-check:
+    name: WordPress.org Plugin Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Composer dependencies (production only)
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Build plugin
+        run: npm run build
+
+      - name: Run WordPress Plugin Check
+        uses: wordpress/plugin-check-action@v1
+        with:
+          build-dir: './dist/fluid-design-system-for-elementor'
+          wp-version: 'latest'
+
   code-quality:
     name: Code Quality
     runs-on: ubuntu-latest
