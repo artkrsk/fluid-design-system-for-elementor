@@ -36,7 +36,7 @@ export class DataManager {
     this.request = elementorAjaxRequest<IPresetGroup[]>(
       AJAX_ACTIONS.FETCH_PRESETS,
       AJAX_DEFAULTS.FETCH_PRESETS
-    ).then((response) => {
+    ).then(response => {
       this.presets = response
       return response
     })

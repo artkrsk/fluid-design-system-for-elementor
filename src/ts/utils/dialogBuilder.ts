@@ -107,7 +107,7 @@ export class DialogBuilder {
 
   /** Attaches Enter key handler for form submission */
   static attachEnterKeyHandler($input: JQuery, $button: JQuery): void {
-    $input.on('keydown', (e) => {
+    $input.on('keydown', e => {
       if (e.key === 'Enter' && !$button.prop('disabled')) {
         e.preventDefault()
         $button.click()

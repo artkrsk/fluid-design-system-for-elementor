@@ -172,7 +172,7 @@ export class InlineInputManager {
       return
     }
 
-    containers.forEach((container) => {
+    containers.forEach(container => {
       if (!container) {
         return
       }

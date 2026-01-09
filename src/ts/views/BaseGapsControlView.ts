@@ -6,6 +6,6 @@ export const BaseGapsControlView = {
       return true
     }
 
-    return (['column', 'row'] as const).every((prop) => !value[prop] || value[prop] === '')
+    return (['column', 'row'] as const).every(prop => !value[prop] || value[prop] === '')
   }
 }

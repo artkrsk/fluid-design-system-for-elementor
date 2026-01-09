@@ -7,7 +7,7 @@ export const BaseDimensionsControlView = {
     }
 
     return (['top', 'right', 'bottom', 'left'] as const).every(
-      (prop) => !value[prop] || value[prop] === ''
+      prop => !value[prop] || value[prop] === ''
     )
   }
 }
