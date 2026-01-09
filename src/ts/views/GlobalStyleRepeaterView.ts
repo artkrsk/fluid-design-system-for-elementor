@@ -54,21 +54,24 @@ const createGlobalStyleRepeater = () => {
 
           const translatedMessage = window.ArtsFluidDSStrings?.deletePresetMessage
 
-          const confirmDeleteModal = window.elementorCommon?.dialogsManager.createWidget('confirm', {
-            className: 'e-global__confirm-delete',
-            headerMessage: window.ArtsFluidDSStrings?.deleteFluidPreset,
-            message: '<i class="eicon-info-circle"></i> ' + translatedMessage,
-            strings: {
-              confirm: window.ArtsFluidDSStrings?.delete,
-              cancel: window.ArtsFluidDSStrings?.cancel
-            },
-            hide: {
-              onBackgroundClick: false
-            },
-            onConfirm: () => {
-              childView.trigger('click:remove')
+          const confirmDeleteModal = window.elementorCommon?.dialogsManager.createWidget(
+            'confirm',
+            {
+              className: 'e-global__confirm-delete',
+              headerMessage: window.ArtsFluidDSStrings?.deleteFluidPreset,
+              message: '<i class="eicon-info-circle"></i> ' + translatedMessage,
+              strings: {
+                confirm: window.ArtsFluidDSStrings?.delete,
+                cancel: window.ArtsFluidDSStrings?.cancel
+              },
+              hide: {
+                onBackgroundClick: false
+              },
+              onConfirm: () => {
+                childView.trigger('click:remove')
+              }
             }
-          })
+          )
 
           if (confirmDeleteModal) {
             confirmDeleteModal.show()

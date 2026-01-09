@@ -8,7 +8,9 @@ export function isFluidPreset(preset: IFluidPreset | ICustomPreset): preset is I
 }
 
 /** Async lookup for inherited preset data */
-export async function getInheritedPreset(inheritedSize: string | null): Promise<TInheritedPresetResult> {
+export async function getInheritedPreset(
+  inheritedSize: string | null
+): Promise<TInheritedPresetResult> {
   const presetsData = await dataManager.getPresetsData()
 
   if (!presetsData) {

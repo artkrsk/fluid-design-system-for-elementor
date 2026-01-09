@@ -181,10 +181,9 @@ export const BaseControlView: Record<string, unknown> = {
         return
       }
 
-      ;(jQuery(selectEl).select2(select2Options as any) as unknown as JQuery)
-        .on('change', () => {
-          this.onSelectChange(selectEl)
-        })
+      ;(jQuery(selectEl).select2(select2Options as any) as unknown as JQuery).on('change', () => {
+        this.onSelectChange(selectEl)
+      })
 
       const editIconHandler = new EditIconHandler(selectEl, (presetId: string) =>
         this.onEditPresetClick(selectEl, presetId)
@@ -474,7 +473,11 @@ export const BaseControlView: Record<string, unknown> = {
   },
 
   /** Opens unified preset dialog (delegates to PresetDialogManager) */
-  async openPresetDialog(this: any, mode: 'create' | 'edit', data: IPresetDialogData): Promise<unknown> {
+  async openPresetDialog(
+    this: any,
+    mode: 'create' | 'edit',
+    data: IPresetDialogData
+  ): Promise<unknown> {
     return PresetDialogManager.open(mode, data, {
       onCreate: (name: string, group: string, minVal: string, maxVal: string, setting: string) =>
         this.onConfirmCreatePreset(name, group, minVal, maxVal, setting),
@@ -515,7 +518,11 @@ export const BaseControlView: Record<string, unknown> = {
       return
     }
 
-    const presetData = PresetDialogManager.extractPresetData(option as HTMLOptionElement, presetId, setting)
+    const presetData = PresetDialogManager.extractPresetData(
+      option as HTMLOptionElement,
+      presetId,
+      setting
+    )
     const dialog = await this.openPresetDialog('edit', presetData)
     dialog.show()
   },
@@ -632,7 +639,12 @@ export const BaseControlView: Record<string, unknown> = {
         }
 
         if (linkedContainers.length > 0) {
-          InlineInputManager.syncLinkedContainers(linkedContainers, { minSize, minUnit, maxSize, maxUnit })
+          InlineInputManager.syncLinkedContainers(linkedContainers, {
+            minSize,
+            minUnit,
+            maxSize,
+            maxUnit
+          })
         }
       }
 
@@ -651,11 +663,8 @@ export const BaseControlView: Record<string, unknown> = {
   },
 
   setupInheritanceAttributes(this: any, fluidSelector: HTMLSelectElement, setting: string): void {
-    InheritanceAttributeManager.setupAttributes(
-      fluidSelector,
-      setting,
-      this.model,
-      () => this.getParentControlValue()
+    InheritanceAttributeManager.setupAttributes(fluidSelector, setting, this.model, () =>
+      this.getParentControlValue()
     )
   },
 

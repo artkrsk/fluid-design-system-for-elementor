@@ -49,9 +49,7 @@ export class TemplateRenderer {
   /** Creates simple inherit template */
   static createSimpleInheritTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
     const inheritedTitle =
-      element.getAttribute('data-inherited-title') ||
-      text ||
-      window.ArtsFluidDSStrings?.inherit
+      element.getAttribute('data-inherited-title') || text || window.ArtsFluidDSStrings?.inherit
 
     return TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',
@@ -155,7 +153,9 @@ export class TemplateRenderer {
     const headerContent = isCustomValue
       ? valueDisplay
       : minSize && maxSize
-        ? ValueFormatter.formatSizeRange(minSize, minUnit ?? 'px', maxSize, maxUnit ?? 'px', { includeSpan: true })
+        ? ValueFormatter.formatSizeRange(minSize, minUnit ?? 'px', maxSize, maxUnit ?? 'px', {
+            includeSpan: true
+          })
         : valueDisplay || title
 
     const headerMarkup = isCustomValue
@@ -354,7 +354,10 @@ export class TemplateRenderer {
   }
 
   /** Main template selection function for Select2 */
-  static getTemplateSelect2(state: TSelect2State, isTemplateResult: boolean): JQuery<HTMLElement> | string {
+  static getTemplateSelect2(
+    state: TSelect2State,
+    isTemplateResult: boolean
+  ): JQuery<HTMLElement> | string {
     if (!state.element) {
       return state.text
     }

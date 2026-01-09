@@ -85,9 +85,19 @@ export function parseClampFormula(clampFormula: string): TParsedClamp | null {
   if (calcMatch) {
     const calcBase = calcMatch[1].trim()
     if (calcBase === firstValue) {
-      return { minSize: first.size, minUnit: first.unit, maxSize: second.size, maxUnit: second.unit }
+      return {
+        minSize: first.size,
+        minUnit: first.unit,
+        maxSize: second.size,
+        maxUnit: second.unit
+      }
     } else {
-      return { minSize: second.size, minUnit: second.unit, maxSize: first.size, maxUnit: first.unit }
+      return {
+        minSize: second.size,
+        minUnit: second.unit,
+        maxSize: first.size,
+        maxUnit: first.unit
+      }
     }
   }
 

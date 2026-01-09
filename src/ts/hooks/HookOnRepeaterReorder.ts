@@ -32,14 +32,20 @@ export class HookOnRepeaterReorder extends commandSystem.modules.hookUI.After {
 
     // Get the collection
     const collection = container.settings.get(presetName) as BackboneCollection | undefined
-    if (!collection) { return }
+    if (!collection) {
+      return
+    }
 
     // Get the item that was moved
     const presetModel = collection.at(targetIndex)
-    if (!presetModel) { return }
+    if (!presetModel) {
+      return
+    }
 
     const movedItemId = getItemId(presetModel)
-    if (!movedItemId) { return }
+    if (!movedItemId) {
+      return
+    }
 
     // Restore the CSS variable since this was just a reorder
     cssManager.restoreCssVariable(movedItemId)

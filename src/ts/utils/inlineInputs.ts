@@ -78,7 +78,11 @@ export class InlineInputManager {
   }
 
   /** Updates separator text based on value equality */
-  static updateSeparator(minInput: HTMLInputElement, maxInput: HTMLInputElement, separator: HTMLElement): void {
+  static updateSeparator(
+    minInput: HTMLInputElement,
+    maxInput: HTMLInputElement,
+    separator: HTMLElement
+  ): void {
     const minParsed = ValidationService.parseValueWithUnit(minInput.value)
     const maxParsed = ValidationService.parseValueWithUnit(maxInput.value)
 
@@ -160,7 +164,10 @@ export class InlineInputManager {
   }
 
   /** Syncs values across multiple linked containers (for linked dimensions) */
-  static syncLinkedContainers(containers: HTMLElement[] | null, values: IInlineInputValues | null): void {
+  static syncLinkedContainers(
+    containers: HTMLElement[] | null,
+    values: IInlineInputValues | null
+  ): void {
     if (!containers || !values) {
       return
     }

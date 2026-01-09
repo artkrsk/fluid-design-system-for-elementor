@@ -44,7 +44,9 @@ export class CSSManager {
   /** Gets current CSS rules */
   getCurrentRules(): string[] {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) { return [] }
+    if (!styleEl) {
+      return []
+    }
 
     return parseRulesFromText(styleEl.textContent ?? '')
   }
@@ -52,7 +54,9 @@ export class CSSManager {
   /** Sets CSS rules */
   setRules(rules: string[]): void {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) { return }
+    if (!styleEl) {
+      return
+    }
 
     styleEl.textContent = formatRulesForStylesheet(rules)
   }
@@ -60,7 +64,9 @@ export class CSSManager {
   /** Unsets CSS variable by adding unset rule */
   unsetCssVariable(id: string): boolean {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) { return false }
+    if (!styleEl) {
+      return false
+    }
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
     const currentRules = this.getCurrentRules()
@@ -73,7 +79,9 @@ export class CSSManager {
   /** Restores CSS variable by removing unset rules */
   restoreCssVariable(id: string): boolean {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) { return false }
+    if (!styleEl) {
+      return false
+    }
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
     const filteredRules = filterRulesByVariable(this.getCurrentRules(), cssVarName)
@@ -85,7 +93,9 @@ export class CSSManager {
   /** Sets CSS variable with clamp formula */
   setCssVariable(id: string, clampFormula: string): boolean {
     const styleEl = this.createOrGetStyleElement()
-    if (!styleEl) { return false }
+    if (!styleEl) {
+      return false
+    }
 
     const cssVarName = `${STYLES.VAR_PREFIX}${id}`
     const filteredRules = filterRulesByVariable(this.getCurrentRules(), cssVarName)

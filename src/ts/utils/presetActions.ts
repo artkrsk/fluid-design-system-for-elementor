@@ -31,7 +31,11 @@ export async function handleEditPresetClick(
     return
   }
 
-  const presetData = PresetDialogManager.extractPresetData(option as HTMLOptionElement, presetId, setting)
+  const presetData = PresetDialogManager.extractPresetData(
+    option as HTMLOptionElement,
+    presetId,
+    setting
+  )
   const dialog = await openDialog('edit', presetData)
   dialog.show()
 }
@@ -117,7 +121,9 @@ export async function handleCreatePreset(
       }
     }, UI_TIMING.PRESET_AUTO_SELECT_DELAY)
   } catch (error) {
-    showErrorDialog((error as string) || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset')
+    showErrorDialog(
+      (error as string) || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset'
+    )
   }
 }
 

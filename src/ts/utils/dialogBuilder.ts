@@ -4,7 +4,12 @@ import { SELECT2_CONFIG } from '../constants'
 /** Preset dialog UI builders */
 export class DialogBuilder {
   /** Creates read-only preview display of min/max values */
-  static createPreviewDisplay(minSize: string, minUnit: string, maxSize: string, maxUnit: string): JQuery {
+  static createPreviewDisplay(
+    minSize: string,
+    minUnit: string,
+    maxSize: string,
+    maxUnit: string
+  ): JQuery {
     const previewText = `${minSize}${minUnit} ~ ${maxSize}${maxUnit}`
     return jQuery('<div>', {
       class: 'e-fluid-preset-preview',
@@ -31,15 +36,24 @@ export class DialogBuilder {
   }
 
   /** Populates group selector with available groups */
-  static async populateGroupSelector($select: JQuery, defaultGroup: string | null = null): Promise<void> {
+  static async populateGroupSelector(
+    $select: JQuery,
+    defaultGroup: string | null = null
+  ): Promise<void> {
     try {
       const groups = await PresetAPIService.fetchGroups()
 
       if (!groups || !Array.isArray(groups) || groups.length === 0) {
         // Fallback to default groups
         $select.append(
-          jQuery('<option>', { value: 'fluid_spacing_presets', text: window.ArtsFluidDSStrings?.spacingPresets }),
-          jQuery('<option>', { value: 'fluid_typography_presets', text: window.ArtsFluidDSStrings?.typographyPresets })
+          jQuery('<option>', {
+            value: 'fluid_spacing_presets',
+            text: window.ArtsFluidDSStrings?.spacingPresets
+          }),
+          jQuery('<option>', {
+            value: 'fluid_typography_presets',
+            text: window.ArtsFluidDSStrings?.typographyPresets
+          })
         )
         return
       }
@@ -61,8 +75,14 @@ export class DialogBuilder {
     } catch {
       // Fallback on error
       $select.append(
-        jQuery('<option>', { value: 'fluid_spacing_presets', text: window.ArtsFluidDSStrings?.spacingPresets }),
-        jQuery('<option>', { value: 'fluid_typography_presets', text: window.ArtsFluidDSStrings?.typographyPresets })
+        jQuery('<option>', {
+          value: 'fluid_spacing_presets',
+          text: window.ArtsFluidDSStrings?.spacingPresets
+        }),
+        jQuery('<option>', {
+          value: 'fluid_typography_presets',
+          text: window.ArtsFluidDSStrings?.typographyPresets
+        })
       )
     }
   }

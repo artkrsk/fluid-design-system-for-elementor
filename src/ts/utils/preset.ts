@@ -10,7 +10,10 @@ import { getInheritedPreset, getInheritedPresetSync, isFluidPreset } from './pre
 import type { IInheritanceData } from '../interfaces'
 
 /** Builds select options from preset data */
-export async function buildSelectOptions(selectEl: HTMLSelectElement, el?: HTMLElement): Promise<HTMLSelectElement> {
+export async function buildSelectOptions(
+  selectEl: HTMLSelectElement,
+  el?: HTMLElement
+): Promise<HTMLSelectElement> {
   const presetsData = await dataManager.getPresetsData(el)
 
   if (!presetsData) {

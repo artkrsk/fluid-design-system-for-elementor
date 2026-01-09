@@ -14,7 +14,9 @@ export class StateManager {
   private saveChangesDialog: ISaveChangesDialog | null = null
 
   markDocumentAsChanged(container: Container): void {
-    if (!container?.document?.id) { return }
+    if (!container?.document?.id) {
+      return
+    }
     this.changedDocuments.set(container.document.id, true)
   }
 
@@ -61,19 +63,20 @@ export class StateManager {
 
   getSaveChangesDialog(onConfirm: () => void, onCancel: () => void): ISaveChangesDialog | null {
     if (!this.saveChangesDialog) {
-      this.saveChangesDialog = (window.elementorCommon?.dialogsManager.createWidget('confirm', {
-        id: 'elementor-fluid-spacing-save-changes-dialog',
-        headerMessage: window.ArtsFluidDSStrings?.saveChanges,
-        message: window.ArtsFluidDSStrings?.saveChangesMessage,
-        position: {
-          my: 'center center',
-          at: 'center center'
-        },
-        strings: {
-          confirm: window.ArtsFluidDSStrings?.save,
-          cancel: window.ArtsFluidDSStrings?.discard
-        }
-      }) as ISaveChangesDialog | undefined) ?? null
+      this.saveChangesDialog =
+        (window.elementorCommon?.dialogsManager.createWidget('confirm', {
+          id: 'elementor-fluid-spacing-save-changes-dialog',
+          headerMessage: window.ArtsFluidDSStrings?.saveChanges,
+          message: window.ArtsFluidDSStrings?.saveChangesMessage,
+          position: {
+            my: 'center center',
+            at: 'center center'
+          },
+          strings: {
+            confirm: window.ArtsFluidDSStrings?.save,
+            cancel: window.ArtsFluidDSStrings?.discard
+          }
+        }) as ISaveChangesDialog | undefined) ?? null
     }
 
     if (!this.saveChangesDialog) {

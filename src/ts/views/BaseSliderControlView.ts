@@ -112,7 +112,11 @@ export const BaseSliderControlView: Record<string, unknown> = {
     }
   },
 
-  async openPresetDialog(this: any, mode: 'create' | 'edit', data: IPresetDialogData): Promise<unknown> {
+  async openPresetDialog(
+    this: any,
+    mode: 'create' | 'edit',
+    data: IPresetDialogData
+  ): Promise<unknown> {
     return PresetDialogManager.open(mode, data, {
       onCreate: (name: string, group: string, minVal: string, maxVal: string, setting: string) =>
         this.onConfirmCreatePreset(name, group, minVal, maxVal, setting),
@@ -143,7 +147,11 @@ export const BaseSliderControlView: Record<string, unknown> = {
       return
     }
 
-    const presetData = PresetDialogManager.extractPresetData(option as HTMLOptionElement, presetId, setting)
+    const presetData = PresetDialogManager.extractPresetData(
+      option as HTMLOptionElement,
+      presetId,
+      setting
+    )
     const dialog = await this.openPresetDialog('edit', presetData)
     ;(dialog as { show: () => void }).show()
   },
@@ -265,11 +273,8 @@ export const BaseSliderControlView: Record<string, unknown> = {
   },
 
   _setupSliderInheritanceAttributes(this: any, fluidSelector: HTMLSelectElement): void {
-    InheritanceAttributeManager.setupAttributes(
-      fluidSelector,
-      'size',
-      this.model,
-      () => this.getParentControlValue()
+    InheritanceAttributeManager.setupAttributes(fluidSelector, 'size', this.model, () =>
+      this.getParentControlValue()
     )
   },
 

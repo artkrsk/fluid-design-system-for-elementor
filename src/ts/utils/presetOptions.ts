@@ -68,7 +68,10 @@ export function createPresetOption(preset: IFluidPreset, currentValue: string): 
 }
 
 /** Creates option element for custom preset */
-export function createCustomPresetOption(preset: ICustomPreset, currentValue: string): HTMLOptionElement {
+export function createCustomPresetOption(
+  preset: ICustomPreset,
+  currentValue: string
+): HTMLOptionElement {
   const { id, value, title, display_value } = preset
 
   const optionEl = createBaseOption(value, currentValue, {
@@ -94,18 +97,27 @@ function handleMixedUnitsInheritance(
   optionEl: HTMLOptionElement,
   inheritanceData: IInheritanceData & { name?: string }
 ): void {
-  const { inheritedSize, sourceUnit, inheritedFrom, inheritedVia, inheritedDevice, name } = inheritanceData
+  const { inheritedSize, sourceUnit, inheritedFrom, inheritedVia, inheritedDevice, name } =
+    inheritanceData
 
   optionEl.setAttribute('data-mixed-units', 'true')
   optionEl.setAttribute('data-inherited-title', name ?? '')
 
-  if (inheritedFrom) { optionEl.setAttribute('data-inherited-from', inheritedFrom) }
-  if (inheritedVia) { optionEl.setAttribute('data-inherited-via', inheritedVia) }
-  if (inheritedDevice) { optionEl.setAttribute('data-inherited-device', inheritedDevice) }
+  if (inheritedFrom) {
+    optionEl.setAttribute('data-inherited-from', inheritedFrom)
+  }
+  if (inheritedVia) {
+    optionEl.setAttribute('data-inherited-via', inheritedVia)
+  }
+  if (inheritedDevice) {
+    optionEl.setAttribute('data-inherited-device', inheritedDevice)
+  }
 
   const displayValue =
     sourceUnit === 'custom' ? inheritedSize : inheritedSize ? `${inheritedSize}${sourceUnit}` : ''
-  if (sourceUnit === 'custom') { optionEl.setAttribute('data-custom-value', 'true') }
+  if (sourceUnit === 'custom') {
+    optionEl.setAttribute('data-custom-value', 'true')
+  }
 
   optionEl.setAttribute('data-title', displayValue ?? '')
   if (displayValue) {
@@ -116,7 +128,10 @@ function handleMixedUnitsInheritance(
 }
 
 /** Handles complex preset inheritance display */
-function handleComplexPresetInheritance(optionEl: HTMLOptionElement, preset: IFluidPreset): HTMLOptionElement {
+function handleComplexPresetInheritance(
+  optionEl: HTMLOptionElement,
+  preset: IFluidPreset
+): HTMLOptionElement {
   const {
     value,
     min_size,
@@ -156,9 +171,15 @@ function handleFluidInheritance(
   const inheritedPreset = getInheritedPresetSync(inheritedSize)
 
   optionEl.setAttribute('data-inherited-title', name ?? '')
-  if (inheritedFrom) { optionEl.setAttribute('data-inherited-from', inheritedFrom) }
-  if (inheritedVia) { optionEl.setAttribute('data-inherited-via', inheritedVia) }
-  if (inheritedDevice) { optionEl.setAttribute('data-inherited-device', inheritedDevice) }
+  if (inheritedFrom) {
+    optionEl.setAttribute('data-inherited-from', inheritedFrom)
+  }
+  if (inheritedVia) {
+    optionEl.setAttribute('data-inherited-via', inheritedVia)
+  }
+  if (inheritedDevice) {
+    optionEl.setAttribute('data-inherited-device', inheritedDevice)
+  }
 
   if (inheritedPreset) {
     if (inheritedPreset.isComplex) {

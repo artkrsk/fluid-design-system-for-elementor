@@ -33,12 +33,13 @@ export class DataManager {
 
     this.isPending = true
 
-    this.request = elementorAjaxRequest<IPresetGroup[]>(AJAX_ACTIONS.FETCH_PRESETS, AJAX_DEFAULTS.FETCH_PRESETS).then(
-      (response) => {
-        this.presets = response
-        return response
-      }
-    )
+    this.request = elementorAjaxRequest<IPresetGroup[]>(
+      AJAX_ACTIONS.FETCH_PRESETS,
+      AJAX_DEFAULTS.FETCH_PRESETS
+    ).then((response) => {
+      this.presets = response
+      return response
+    })
 
     try {
       const result = await this.request

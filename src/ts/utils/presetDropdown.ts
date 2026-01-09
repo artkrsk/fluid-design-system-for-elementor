@@ -15,7 +15,10 @@ export class PresetDropdownManager {
   }
 
   /** Refreshes multiple dropdowns with fresh preset data */
-  static async refreshDropdowns(selectElements: HTMLSelectElement[] | null, controlEl: HTMLElement): Promise<void> {
+  static async refreshDropdowns(
+    selectElements: HTMLSelectElement[] | null,
+    controlEl: HTMLElement
+  ): Promise<void> {
     if (!selectElements || !Array.isArray(selectElements)) {
       return
     }

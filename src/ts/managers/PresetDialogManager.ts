@@ -4,7 +4,12 @@ import { generateClampFormula } from '../utils/clamp'
 import { UI_DEFAULTS } from '../constants'
 import { ValueFormatter } from '../utils/formatters'
 import cssManager from './CSSManager'
-import type { IDialogConfig, IPresetData, IPresetDialogData, IPresetDialogCallbacks } from '../interfaces'
+import type {
+  IDialogConfig,
+  IPresetData,
+  IPresetDialogData,
+  IPresetDialogCallbacks
+} from '../interfaces'
 
 /** Manages preset dialog creation and lifecycle */
 export class PresetDialogManager {
@@ -27,12 +32,11 @@ export class PresetDialogManager {
       originalFormula = generateClampFormula(data.minSize, data.minUnit, data.maxSize, data.maxUnit)
     }
 
-    const { $message, $input, $minInput, $maxInput, $groupSelect, $separator } = this._createDialogMessage(
-      config,
-      mode
-    )
+    const { $message, $input, $minInput, $maxInput, $groupSelect, $separator } =
+      this._createDialogMessage(config, mode)
 
-    const modeClass = mode === 'create' ? 'e-fluid-create-preset-dialog' : 'e-fluid-edit-preset-dialog'
+    const modeClass =
+      mode === 'create' ? 'e-fluid-create-preset-dialog' : 'e-fluid-edit-preset-dialog'
     const dialog = window.elementorCommon?.dialogsManager.createWidget('confirm', {
       className: `e-fluid-save-preset-dialog ${modeClass}`,
       headerMessage: config.headerMessage,
@@ -72,7 +76,12 @@ export class PresetDialogManager {
           if (mode === 'edit' && data.presetId) {
             this._attachLivePreviewListeners($minInput, $maxInput, data.presetId)
           } else if (mode === 'create' && data.setting && callbacks.getInlineContainer) {
-            this._attachCreateModeLivePreview($minInput, $maxInput, data.setting, callbacks.getInlineContainer)
+            this._attachCreateModeLivePreview(
+              $minInput,
+              $maxInput,
+              data.setting,
+              callbacks.getInlineContainer
+            )
           }
         } catch {
           // Silently handle setup errors - dialog will still function
@@ -114,7 +123,13 @@ export class PresetDialogManager {
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
         onConfirm: (name: string, group: string, minVal: string, maxVal: string) => {
-          callbacks.onUpdate?.(data.presetId ?? '', name, group || (data.groupId ?? ''), minVal, maxVal)
+          callbacks.onUpdate?.(
+            data.presetId ?? '',
+            name,
+            group || (data.groupId ?? ''),
+            minVal,
+            maxVal
+          )
         }
       }
     }
@@ -155,7 +170,8 @@ export class PresetDialogManager {
     $valuesRow.append($minInput, $separator, $maxInput)
 
     const $input = DialogBuilder.createNameInput(config.defaultName)
-    const $groupSelect = mode === 'create' ? DialogBuilder.createGroupSelector() : jQuery('<select>')
+    const $groupSelect =
+      mode === 'create' ? DialogBuilder.createGroupSelector() : jQuery('<select>')
 
     $inputWrapper.append($valuesRow, $input)
 
@@ -216,7 +232,11 @@ export class PresetDialogManager {
   }
 
   /** Updates CSS variable on input change for live preview */
-  private static _attachLivePreviewListeners($minInput: JQuery, $maxInput: JQuery, presetId: string): void {
+  private static _attachLivePreviewListeners(
+    $minInput: JQuery,
+    $maxInput: JQuery,
+    presetId: string
+  ): void {
     if (!presetId) {
       return
     }
@@ -256,8 +276,12 @@ export class PresetDialogManager {
         return
       }
 
-      const inlineMinInput = container.querySelector('[data-fluid-role="min"]') as HTMLInputElement | null
-      const inlineMaxInput = container.querySelector('[data-fluid-role="max"]') as HTMLInputElement | null
+      const inlineMinInput = container.querySelector(
+        '[data-fluid-role="min"]'
+      ) as HTMLInputElement | null
+      const inlineMaxInput = container.querySelector(
+        '[data-fluid-role="max"]'
+      ) as HTMLInputElement | null
 
       if (!inlineMinInput || !inlineMaxInput) {
         return

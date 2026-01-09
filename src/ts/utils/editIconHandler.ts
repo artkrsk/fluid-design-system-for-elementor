@@ -74,7 +74,9 @@ export class EditIconHandler {
         e.stopImmediatePropagation()
         e.preventDefault()
 
-        const presetId = e.currentTarget ? jQuery(e.currentTarget).data('preset-id') as string : null
+        const presetId = e.currentTarget
+          ? (jQuery(e.currentTarget).data('preset-id') as string)
+          : null
 
         // Close dropdown first, then open dialog
         jQuery(this.selectEl).one('select2:close', () => {

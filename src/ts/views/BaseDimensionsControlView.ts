@@ -6,6 +6,8 @@ export const BaseDimensionsControlView = {
       return true
     }
 
-    return (['top', 'right', 'bottom', 'left'] as const).every((prop) => !value[prop] || value[prop] === '')
+    return (['top', 'right', 'bottom', 'left'] as const).every(
+      (prop) => !value[prop] || value[prop] === ''
+    )
   }
 }

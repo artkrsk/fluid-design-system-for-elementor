@@ -28,7 +28,9 @@ export class HookOnRepeaterAdd extends commandSystem.modules.hookUI.After {
     const { isRestored } = args
     const addedItemId = getItemId(args.model)
 
-    if (!addedItemId) { return }
+    if (!addedItemId) {
+      return
+    }
 
     // Mark document as having changes
     stateManager.markDocumentAsChanged(args.container)

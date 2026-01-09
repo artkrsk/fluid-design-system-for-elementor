@@ -32,13 +32,19 @@ export class HookOnRepeaterRemove extends commandSystem.modules.hookUI.Before {
 
     // Get the model before it's removed
     const collection = container.settings.get(presetName) as BackboneCollection | undefined
-    if (!collection || index === undefined) { return true }
+    if (!collection || index === undefined) {
+      return true
+    }
 
     const presetModel = collection.at(index)
-    if (!presetModel) { return true }
+    if (!presetModel) {
+      return true
+    }
 
     const removedItemId = getItemId(presetModel)
-    if (!removedItemId) { return true }
+    if (!removedItemId) {
+      return true
+    }
 
     // Track this removal with a timestamp for reordering detection
     stateManager.setRecentRemoval(removedItemId)

@@ -10,7 +10,10 @@ import type {
 export type { TSelect2State as Select2State } from '../types'
 
 class Select2Utils {
-  static getTemplateSelect2(state: TSelect2State, isTemplateResult: boolean): JQuery<HTMLElement> | string {
+  static getTemplateSelect2(
+    state: TSelect2State,
+    isTemplateResult: boolean
+  ): JQuery<HTMLElement> | string {
     return TemplateRenderer.getTemplateSelect2(state, isTemplateResult)
   }
 
@@ -22,7 +25,10 @@ class Select2Utils {
       containerCssClass: 'select2-selection--height-large',
       templateResult: (state: TSelect2State) => Select2Utils.getTemplateSelect2(state, true),
       templateSelection: (state: TSelect2State) => Select2Utils.getTemplateSelect2(state, false),
-      matcher: (params: TSelect2SearchOptions, data: TSelect2MatcherData): TSelect2MatcherData | null => {
+      matcher: (
+        params: TSelect2SearchOptions,
+        data: TSelect2MatcherData
+      ): TSelect2MatcherData | null => {
         // No search term - show everything
         if (jQuery.trim(params.term) === '') {
           return data
