@@ -42,10 +42,10 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "vendor/bin/captainhook install -f -s"
+      "@php -r \"if (file_exists('vendor/bin/captainhook')) { system('vendor/bin/captainhook install -f -s'); }\""
     ],
     "post-update-cmd": [
-      "vendor/bin/captainhook install -f -s"
+      "@php -r \"if (file_exists('vendor/bin/captainhook')) { system('vendor/bin/captainhook install -f -s'); }\""
     ],
     "check": [
       "@phpcs",
