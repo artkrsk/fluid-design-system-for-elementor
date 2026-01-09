@@ -58,14 +58,14 @@ export function parseClampFormula(clampFormula: string): TParsedClamp | null {
   }
 
   // Parse first value (could be min or max depending on values)
-  const firstValue = match[1].trim()
-  const secondValue = match[2].trim()
+  const firstValue = match[1]!.trim()
+  const secondValue = match[2]!.trim()
 
   // Parse value and unit from strings like "20px" or "1.5rem"
   const parseValueUnit = (str: string): { size: string; unit: string } | null => {
     const valueMatch = str.match(/^(-?[\d.]+)(.+)$/)
     if (valueMatch) {
-      return { size: valueMatch[1], unit: valueMatch[2] }
+      return { size: valueMatch[1]!, unit: valueMatch[2]! }
     }
     return null
   }
@@ -83,7 +83,7 @@ export function parseClampFormula(clampFormula: string): TParsedClamp | null {
   const calcMatch = clampFormula.match(calcPattern)
 
   if (calcMatch) {
-    const calcBase = calcMatch[1].trim()
+    const calcBase = calcMatch[1]!.trim()
     if (calcBase === firstValue) {
       return {
         minSize: first.size,

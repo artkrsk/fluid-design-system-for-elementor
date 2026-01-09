@@ -36,8 +36,8 @@ export class ValidationService {
     }
 
     return {
-      size: match[1],
-      unit: match[2] || 'px' // Default to px if no unit
+      size: match[1]!,
+      unit: match[2] ?? 'px' // Default to px if no unit
     }
   }
 

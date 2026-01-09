@@ -65,10 +65,10 @@ export function findInheritedValue(
   }
 
   const inheritPath: string[] = []
-  const directParent = ancestorDevices[ancestorDevices.length - 1]
+  const directParent = ancestorDevices[ancestorDevices.length - 1]!
 
   // First check direct parent
-  const parentDevice = ancestorDevices[ancestorDevices.length - 1]
+  const parentDevice = ancestorDevices[ancestorDevices.length - 1]!
   const parentControlName = getDeviceControlName(baseName, parentDevice)
   const parentValue = getValueFn(parentControlName)
   inheritPath.push(parentDevice)
@@ -79,7 +79,7 @@ export function findInheritedValue(
 
   // Traverse up the hierarchy looking for non-empty value
   for (let i = ancestorDevices.length - 2; i >= 0; i--) {
-    const device = ancestorDevices[i]
+    const device = ancestorDevices[i]!
     const deviceControlName = getDeviceControlName(baseName, device)
     const deviceValue = getValueFn(deviceControlName)
     inheritPath.unshift(device)
