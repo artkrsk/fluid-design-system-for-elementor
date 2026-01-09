@@ -3,7 +3,22 @@
     "enabled": true,
     "actions": [
       {
-        "action": "composer check"
+        "action": "composer fix",
+        "config": {
+          "run-mode": "docker"
+        }
+      },
+      {
+        "action": "npm run format",
+        "config": {
+          "run-mode": "local"
+        }
+      },
+      {
+        "action": "npx tsc --noEmit",
+        "config": {
+          "run-mode": "local"
+        }
       }
     ]
   },
@@ -11,8 +26,21 @@
     "enabled": true,
     "actions": [
       {
-        "action": "composer check"
+        "action": "composer phpstan",
+        "config": {
+          "run-mode": "docker"
+        }
+      },
+      {
+        "action": "npm run test:unit:run",
+        "config": {
+          "run-mode": "local"
+        }
       }
     ]
+  },
+  "commit-msg": {
+    "enabled": false,
+    "actions": []
   }
 }
