@@ -1,140 +1,75 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## 2.1.0
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+* added: faster workflow - adjust preset values without leaving Elementor editor
+* improved: see how changes affect your design as you type
 
+## 2.0.1
 
-## [2.1.0]
+* fixed: custom fluid values now sync correctly when dimensions are linked
 
-### Added
+## 2.0.0
 
-- faster workflow - adjust preset values without leaving Elementor editor
+* added: set fluid values directly in controls ("20px ~ 100px") without visiting Site Settings
+* added: save inline values as reusable presets with one click
+* improved: full support for linked dimensions and gaps
 
-### Changed
+## 1.2.1
 
-- see how changes affect your design as you type
+* fixed: preset min/max values are now preserved when switching between different units
+* improved: better validation for preset data to prevent display issues
 
+## 1.2.0
 
-## [2.0.1]
+* improved: enhanced code quality and reliability for better performance
+* improved: updated to modern PHP standards for improved security
+* updated: minimum PHP requirement is now 8.0 (WordPress and Elementor fully support PHP 8.0+)
 
-### Fixed
+## 1.1.2
 
-- custom fluid values now sync correctly when dimensions are linked
+* improved: preset search now shows all presets when group name matches
 
+## 1.1.1
 
-## [2.0.0]
+* improved: security fixes
 
-### Added
+## 1.1.0
 
-- set fluid values directly in controls ("20px ~ 100px") without visiting Site Settings
-- save inline values as reusable presets with one click
+* added: Admin interface for managing preset groups (Elementor > Fluid Design System)
+* added: Cross-group preset management with drag and drop functionality
+* added: Custom preset groups creation, editing, and deletion
+* added: Developer-friendly filter-based groups with code examples
+* improved: optimize CSS generation for formulas with equal min/max values
+* improved: improve fluid preset display for equal min/max values
+* improved: add display_value support for custom presets added via hooks
 
-### Changed
+## 1.0.6
 
-- full support for linked dimensions and gaps
+* added: 'em' unit support to size options in Fluid Typography and Spacing controls
+* added: full support for negative values
+* improved: proper scale when min value is larger than max value
 
+## 1.0.5
 
-## [1.2.1]
+* fixed: improve performance in Elementor editor when working with "fluid" unit
 
-### Changed
+## 1.0.4
 
-- better validation for preset data to prevent display issues
+* fixed: "custom" units stopped to render correct values in Elementor editor when the plugin is active
 
-### Fixed
+## 1.0.3
 
-- preset min/max values are now preserved when switching between different units
+* fixed: PHP Warning "Undefined array key" when saving presets
 
+## 1.0.2
 
-## [1.2.0]
+* fixed: plugin error when Elementor is not active
 
-### Changed
+## 1.0.1
 
-- enhanced code quality and reliability for better performance
-- updated to modern PHP standards for improved security
-- minimum PHP requirement is now 8.0 (WordPress and Elementor fully support PHP 8.0+)
+* added: plugin action links to WordPress admin plugins page
 
+## 1.0.0
 
-## [1.1.2]
-
-### Changed
-
-- preset search now shows all presets when group name matches
-
-
-## [1.1.1]
-
-### Changed
-
-- security fixes
-
-
-## [1.1.0]
-
-### Added
-
-- Admin interface for managing preset groups (Elementor > Fluid Design System)
-- Cross-group preset management with drag and drop functionality
-- Custom preset groups creation, editing, and deletion
-- Developer-friendly filter-based groups with code examples
-
-### Changed
-
-- optimize CSS generation for formulas with equal min/max values
-- improve fluid preset display for equal min/max values
-- add display_value support for custom presets added via hooks
-
-
-## [1.0.6]
-
-### Added
-
-- 'em' unit support to size options in Fluid Typography and Spacing controls
-- full support for negative values
-
-### Changed
-
-- proper scale when min value is larger than max value
-
-
-## [1.0.5]
-
-### Fixed
-
-- improve performance in Elementor editor when working with "fluid" unit
-
-
-## [1.0.4]
-
-### Fixed
-
-- "custom" units stopped to render correct values in Elementor editor when the plugin is active
-
-
-## [1.0.3]
-
-### Fixed
-
-- PHP Warning "Undefined array key" when saving presets
-
-
-## [1.0.2]
-
-### Fixed
-
-- plugin error when Elementor is not active
-
-
-## [1.0.1]
-
-### Added
-
-- plugin action links to WordPress admin plugins page
-
-
-## [1.0.0]
-
-### Changed
-
-- Initial release
+* Initial release
