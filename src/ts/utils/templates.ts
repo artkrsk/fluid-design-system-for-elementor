@@ -198,7 +198,7 @@ export class TemplateRenderer {
     minUnit: string,
     maxSize: string,
     maxUnit: string,
-    title: string,
+    _title: string,
     element: HTMLElement
   ): JQuery<HTMLElement> {
     const headerContent = ValueFormatter.formatSizeRange(minSize, minUnit, maxSize, maxUnit, {

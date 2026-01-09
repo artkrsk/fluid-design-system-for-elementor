@@ -14,9 +14,6 @@ import {
   TEST_ELEMENT_IDS,
   TEST_VIEWPORTS,
   EXPECTED_VALUES,
-  TEST_BREAKPOINTS,
-  calculateExpectedValue,
-  getElementSelector,
   getHeadingTitleSelector
 } from '../fixtures/test-data'
 

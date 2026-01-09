@@ -1,7 +1,7 @@
 import { createElement } from './dom'
 import { parseClampFormula } from './clamp'
 import { ValueFormatter } from './formatters'
-import { getInheritedPresetSync, isFluidPreset } from './presetLookup'
+import { getInheritedPresetSync } from './presetLookup'
 import { CUSTOM_FLUID_VALUE } from '../constants'
 import type { IFluidPreset, ICustomPreset, IInheritanceData } from '../interfaces'
 

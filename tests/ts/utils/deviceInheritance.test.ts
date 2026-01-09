@@ -178,7 +178,7 @@ describe('deviceInheritance utilities', () => {
       })
       const isEmptyFn = vi.fn().mockReturnValue(true)
 
-      const result = findInheritedValue('font_size', ['desktop', 'tablet'], getValueFn, isEmptyFn)
+      findInheritedValue('font_size', ['desktop', 'tablet'], getValueFn, isEmptyFn)
 
       expect(getValueFn).toHaveBeenCalledWith('font_size_tablet')
       expect(getValueFn).toHaveBeenCalledWith('font_size') // desktop
@@ -289,7 +289,7 @@ describe('deviceInheritance utilities', () => {
       })
       const isEmptyFn = vi.fn().mockReturnValue(true)
 
-      const result = resolveInheritedValue(
+      resolveInheritedValue(
         'font_size_tablet',
         DEVICE_ORDER,
         getValueFn,

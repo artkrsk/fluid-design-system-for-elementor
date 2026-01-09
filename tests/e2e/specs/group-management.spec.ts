@@ -40,9 +40,9 @@ test.describe('Group Management Admin Panel', () => {
 
 test.describe('Admin-to-Elementor Sync', () => {
   test('groups from admin sync to Elementor Site Settings', async ({
-    editor,
+    editor: _editor,
     page,
-    testPageId
+    testPageId: _testPageId
   }) => {
     // Step 1: Get group list from WordPress admin
     await page.goto(ADMIN_PAGE_URL)

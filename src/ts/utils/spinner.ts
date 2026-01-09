@@ -19,6 +19,8 @@ class SpinnerUtils {
       titleEl.insertAdjacentHTML('afterend', spinnerMarkup)
       return titleEl.nextElementSibling
     }
+
+    return null
   }
 
   static showControlSpinner(el: HTMLElement | undefined): HTMLElement | null {

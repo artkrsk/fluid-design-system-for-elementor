@@ -11,9 +11,7 @@ import {
   TEST_ELEMENT_IDS,
   TEST_VIEWPORTS,
   EXPECTED_VALUES,
-  getCssVarName,
   calculateExpectedValue,
-  getElementSelector,
   getHeadingTitleSelector,
   getSpacerSelector,
   getContainerSelector
@@ -86,7 +84,6 @@ test.describe('Fluid Typography Font Size', () => {
     await page.goto(TEST_PAGE_URL)
 
     const cssVarValue = await page.evaluate(() => {
-      const style = document.documentElement.style
       return getComputedStyle(document.documentElement).getPropertyValue(
         '--arts-fluid-preset--e2e_heading_xl'
       )
