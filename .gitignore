@@ -35,6 +35,9 @@ pnpm-lock.yaml
 /.nyc_output
 /cypress/videos/
 /cypress/screenshots/
+/test-results/
+/playwright-report/
+/tests/e2e/.auth/
 
 # Environment files
 .env

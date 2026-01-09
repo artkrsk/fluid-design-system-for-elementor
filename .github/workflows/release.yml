@@ -6,15 +6,38 @@ on:
       - 'v*'
 
 jobs:
+  # Extract changelog from readme.txt
+  prepare-changelog:
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.extract.outputs.changelog }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Extract changelog from readme.txt
+        id: extract
+        run: |
+          CHANGELOG=$(node scripts/extract-changelog.js latest)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  # Create release using reusable workflow with custom changelog
   release:
+    needs: prepare-changelog
     uses: artkrsk/wordpress-plugin-release-action/.github/workflows/release.yml@main
     with:
       # Build configuration
       node_version: '23'
       build_command: 'npm run build'
 
-      # Validation
-      validate_zip_script: '__tests__/validate-zip.sh'
+      # Changelog from readme.txt
+      custom_changelog: ${{ needs.prepare-changelog.outputs.changelog }}
 
       # Paths
       assets_directory: '__assets__'

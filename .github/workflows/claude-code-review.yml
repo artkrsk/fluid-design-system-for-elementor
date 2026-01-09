@@ -40,18 +40,34 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Please review this pull request and provide feedback on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
+            Review this PR. Be BRIEF and focus ONLY on critical issues.
 
-            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+            REPORT ONLY:
+            - Breaking changes (API/behavior affecting existing code)
+            - Runtime errors (null access, crashes, unhandled exceptions)
+            - Logic bugs (wrong conditions, race conditions)
+            - Security vulnerabilities
+            - Type mismatches
 
-            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+            DO NOT REPORT:
+            - Code style, formatting, naming preferences
+            - Documentation suggestions (JSDoc, comments)
+            - "Nice to have" improvements
+            - Accessibility suggestions
+            - Testing suggestions
+            - Performance micro-optimizations
+            - Praise or "strengths" sections
+            - Scores, checklists
+
+            FORMAT:
+            - If issues found: List each with file:line, problem, fix
+            - If no issues: Just say "No critical issues. LGTM."
+            - Maximum 10 lines for clean PRs, 20 lines for problematic ones
+            - Use emojis and formatting responsibly.
+
+            Use `gh pr comment` to post. Reference CLAUDE.md for conventions.
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
 

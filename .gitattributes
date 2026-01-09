@@ -15,12 +15,12 @@ __assets__ export-ignore
 .github export-ignore
 
 # Testing and documentation
-__tests__ export-ignore
-__e2e__ export-ignore
 tests export-ignore
 docs export-ignore
 coverage export-ignore
 drafts export-ignore
+test-results export-ignore
+playwright-report export-ignore
 
 # Config files
 /*.yml export-ignore
@@ -38,7 +38,6 @@ drafts export-ignore
 
 # Source files not needed in the Composer package
 src/ts export-ignore
-src/js export-ignore
 src/styles export-ignore
 src/wordpress-plugin export-ignore
 
@@ -51,6 +50,8 @@ project.*.js export-ignore
 .github export-ignore
 .taskmaster export-ignore
 .vscode export-ignore
-fixtures export-ignore
+.wp-env.json export-ignore
 captainhook.json export-ignore
 phpstan.neon export-ignore
+playwright.config.ts export-ignore
+vitest.config.ts export-ignore

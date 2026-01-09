@@ -17,7 +17,7 @@
     "arts/utilities": "@dev"
   },
   "require-dev": {
-    "arts/elementor-stubs": "@dev",
+    "arts/elementor-stubs": "^3.34",
     "captainhook/captainhook": "^5.27",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "ergebnis/composer-normalize": "^2.48",
@@ -26,12 +26,6 @@
     "szepeviktor/phpstan-wordpress": "^2.0",
     "wp-coding-standards/wpcs": "^3.0"
   },
-  "repositories": [
-    {
-      "type": "path",
-      "url": "../elementor-stubs"
-    }
-  ],
   "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
@@ -48,10 +42,10 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "vendor/bin/captainhook install -f -s"
+      "@php -r \"if (file_exists('vendor/bin/captainhook')) { system('vendor/bin/captainhook install -f -s'); }\""
     ],
     "post-update-cmd": [
-      "vendor/bin/captainhook install -f -s"
+      "@php -r \"if (file_exists('vendor/bin/captainhook')) { system('vendor/bin/captainhook install -f -s'); }\""
     ],
     "check": [
       "@phpcs",

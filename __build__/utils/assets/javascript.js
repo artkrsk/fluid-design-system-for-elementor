@@ -169,7 +169,7 @@ async function copyUmdToLibrary(outputFile, config, isDev) {
  * @returns {Object} - Watcher instance
  */
 export async function watchJavaScript(config, liveReloadServer) {
-  const jsDir = path.resolve(config.paths.js)
+  const jsDir = path.resolve(config.paths.ts)
 
   logger.info(`👀 Watching JavaScript files in ${path.relative(process.cwd(), jsDir)}`)
 
