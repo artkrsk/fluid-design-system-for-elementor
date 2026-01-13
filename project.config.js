@@ -103,6 +103,13 @@ export default {
       delete: true,
       watch: true
     },
+    vendorPrefixed: {
+      source: './vendor-prefixed',
+      target: 'vendor-prefixed',
+      extensions: ['.php', '.js', '.css', '.json', '.txt', '.md'],
+      delete: true,
+      watch: true
+    },
     packageName: 'fluid-design-system-for-elementor',
     zipOutputName: 'fluid-design-system-for-elementor.zip',
     packageExclude: [
@@ -137,6 +144,7 @@ export default {
     sourceFiles: {
       php: './src/php',
       vendor: './vendor',
+      vendorPrefixed: './vendor-prefixed',
       dist: {
         files: ['index.umd.js', 'index.css']
       },

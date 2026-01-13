@@ -147,6 +147,24 @@ export class Builder {
       // Sync files to target directories (if any)
       await syncFiles(this.config, false)
 
+      // Generate autoloader in dist (loads plugin classes + vendor-prefixed via classmap)
+      if (shouldCreateDistFolder(this.config)) {
+        const { execSync } = await import('child_process')
+        const pluginDest = path.join(
+          this.config.paths.dist,
+          this.config.wordpressPlugin.packageName
+        )
+
+        if (await fs.pathExists(path.join(pluginDest, 'composer.json'))) {
+          logger.info('Generating autoloader in dist...')
+          execSync('composer dump-autoload --optimize --no-dev', {
+            cwd: pluginDest,
+            stdio: 'inherit'
+          })
+          logger.success('Autoloader generated in dist')
+        }
+      }
+
       // Force copy library files to ensure they're in the right place
       if (shouldCreateDistFolder(this.config)) {
         logger.info('🔄 Ensuring library files are correctly placed...')

@@ -56,6 +56,14 @@ export async function syncFiles(config, isDev = null) {
       tasks.push(syncVendorFiles(config, isDev))
     }
 
+    // Sync vendor-prefixed if configured (for dev mode with both vendor dirs)
+    if (
+      config.wordpressPlugin?.vendorPrefixed?.watch &&
+      (shouldCreateDistFolder(config) || (isDev && config.wordpressPlugin?.target))
+    ) {
+      tasks.push(syncVendorPrefixedFiles(config, isDev))
+    }
+
     // Sync composer files if needed
     if (shouldCreateDistFolder(config) || (isDev && config.wordpressPlugin?.target)) {
       tasks.push(syncComposerFiles(config, isDev))
@@ -175,50 +183,50 @@ async function syncWordPressPluginFiles(config, isDev) {
  */
 async function syncVendorFiles(config, isDev) {
   const source = config.wordpressPlugin?.vendor?.source || './vendor'
-  const isProductionBuild = !isDev && shouldCreateDistFolder(config)
-  const backupPath = './vendor_dev_backup'
-
-  // For production builds, backup vendor and reinstall without dev dependencies
-  if (isProductionBuild && (await fs.pathExists(source))) {
-    logger.info('Production build: backing up vendor directory...')
-    await fs.move(source, backupPath, { overwrite: true })
-  }
 
   try {
-    // Check if vendor directory exists, install if not
+    // Check if source directory exists
     if (!(await fs.pathExists(source))) {
-    logger.warn(`Vendor directory not found: ${source}, running composer install...`)
-
-    try {
-      // Use the project root from config or fall back to current working directory
-      const projectRoot = config._absoluteProjectRoot || process.cwd()
-
-      // Run composer install if composer.json exists
-      if (await fs.pathExists(path.join(projectRoot, 'composer.json'))) {
-        const { execSync } = await import('child_process')
-        const cmd = 'composer install --no-dev --no-scripts --optimize-autoloader'
-
-        logger.info(`Running: ${cmd}`)
-        execSync(cmd, { cwd: projectRoot, stdio: 'inherit' })
-
-        // Verify vendor directory exists after composer install
-        if (!(await fs.pathExists(source))) {
-          logger.error(`Composer install completed but vendor directory still not found: ${source}`)
-          throw new Error('Vendor directory not created after composer install')
-        }
-
-        logger.success('Composer dependencies installed successfully')
-      } else {
-        logger.error('composer.json not found, cannot install vendor dependencies')
-        throw new Error('composer.json not found, cannot proceed with vendor sync')
+      // Special handling for vendor-prefixed
+      if (source.includes('vendor-prefixed')) {
+        logger.error(`vendor-prefixed not found: ${source}`)
+        logger.error('Run "composer prefix-namespaces" or "npm run build:release" to create it first')
+        throw new Error('vendor-prefixed directory not found. Run Strauss first.')
       }
-    } catch (error) {
-      logger.error(`Failed to install composer dependencies: ${error.message}`)
-      throw error
-    }
-  }
 
-  // Always sync vendor files during builds regardless of settings
+      // For regular vendor, try to install
+      logger.warn(`Vendor directory not found: ${source}, running composer install...`)
+
+      try {
+        // Use the project root from config or fall back to current working directory
+        const projectRoot = config._absoluteProjectRoot || process.cwd()
+
+        // Run composer install if composer.json exists
+        if (await fs.pathExists(path.join(projectRoot, 'composer.json'))) {
+          const { execSync } = await import('child_process')
+          const cmd = 'composer install --no-dev --no-scripts --optimize-autoloader'
+
+          logger.info(`Running: ${cmd}`)
+          execSync(cmd, { cwd: projectRoot, stdio: 'inherit' })
+
+          // Verify vendor directory exists after composer install
+          if (!(await fs.pathExists(source))) {
+            logger.error(`Composer install completed but vendor directory still not found: ${source}`)
+            throw new Error('Vendor directory not created after composer install')
+          }
+
+          logger.success('Composer dependencies installed successfully')
+        } else {
+          logger.error('composer.json not found, cannot install vendor dependencies')
+          throw new Error('composer.json not found, cannot proceed with vendor sync')
+        }
+      } catch (error) {
+        logger.error(`Failed to install composer dependencies: ${error.message}`)
+        throw error
+      }
+    }
+
+    // Always sync vendor files during builds regardless of settings
   // This ensures vendor directory is included in the ZIP
   const pluginDest = getPluginDestPath(config, isDev)
   const vendorTarget = config.wordpressPlugin?.vendor?.target || 'vendor'
@@ -280,16 +288,46 @@ async function syncVendorFiles(config, isDev) {
   } else {
     logger.success(`Verified autoload.php exists in target: ${autoloadPath}`)
   }
-  } finally {
-    // Restore development vendor for production builds
-    if (isProductionBuild && (await fs.pathExists(backupPath))) {
-      if (await fs.pathExists(source)) {
-        await fs.remove(source)
-      }
-      await fs.move(backupPath, source)
-      logger.info('Development vendor restored')
-    }
+  } catch (error) {
+    logger.error('Failed to sync vendor files:', error)
+    throw error
   }
+}
+
+/**
+ * Sync vendor-prefixed files to target directories
+ * @param {Object} config - Project configuration
+ * @param {boolean} isDev - Whether this is a development build
+ * @returns {Promise<void>}
+ */
+async function syncVendorPrefixedFiles(config, isDev) {
+  const source = config.wordpressPlugin?.vendorPrefixed?.source
+  if (!source || !(await fs.pathExists(source))) {
+    logger.debug(`vendor-prefixed not found: ${source}, skipping sync`)
+    return
+  }
+
+  const pluginDest = getPluginDestPath(config, isDev)
+  const vendorTarget = config.wordpressPlugin?.vendorPrefixed?.target || 'vendor-prefixed'
+  const targetDir = path.join(pluginDest, vendorTarget)
+
+  logger.info(`Syncing vendor-prefixed from ${source} to ${targetDir}`)
+
+  if (config.wordpressPlugin?.vendorPrefixed?.delete && (await fs.pathExists(targetDir))) {
+    await fs.emptyDir(targetDir)
+  }
+
+  await fs.ensureDir(targetDir)
+  await fs.copy(source, targetDir, {
+    overwrite: true,
+    preserveTimestamps: true,
+    filter: (src) => {
+      const basename = path.basename(src)
+      return !basename.startsWith('.')
+    }
+  })
+
+  logger.success(`Synced vendor-prefixed to ${targetDir}`)
 }
 
 /**
