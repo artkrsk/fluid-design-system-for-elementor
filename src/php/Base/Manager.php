@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use Arts\ElementorExtension\Plugins\BaseManager;
+use ArtsFluidDS\Arts\ElementorExtension\Plugins\BaseManager;
 
 /**
  * Abstract base class for Fluid Design System managers.

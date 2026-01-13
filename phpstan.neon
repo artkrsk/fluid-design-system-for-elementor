@@ -9,9 +9,15 @@ parameters:
 		- src/php
 
 	bootstrapFiles:
+		- vendor/autoload.php
 		- vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- vendor/arts/elementor-stubs/elementor-stubs.php
 
 	treatPhpDocTypesAsCertain: false
+
+	ignoreErrors:
+		# Strauss limitation: Generic types and @template constraints aren't fully updated in vendor
+		- '#Class Arts\\FluidDesignSystem\\Base\\Plugin extends generic class .* but does not specify its types#'
+		- '#PHPDoc type .* is not covariant with PHPDoc type Arts\\Base\\Containers\\ManagersContainer#'
 

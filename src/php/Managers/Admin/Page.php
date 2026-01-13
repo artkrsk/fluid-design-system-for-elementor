@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
  * Registers submenu under Elementor and renders tab-based admin page.

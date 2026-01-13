@@ -20,7 +20,7 @@ use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use Arts\FluidDesignSystem\Elementor\Units\Fluid\Module as FluidUnitModule;
 use Arts\FluidDesignSystem\Managers\ControlRegistry;
 use Arts\FluidDesignSystem\Managers\Data;
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
  * Aggregates all preset group types for admin display.

@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use Arts\Base\Containers\ManagersContainer as BaseManagersContainer;
+use ArtsFluidDS\Arts\Base\Containers\ManagersContainer as BaseManagersContainer;
 
 /**
  * Container for manager instances in the Fluid Design System plugin.

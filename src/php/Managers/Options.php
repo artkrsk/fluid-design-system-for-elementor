@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
 

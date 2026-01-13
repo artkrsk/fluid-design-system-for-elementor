@@ -10,6 +10,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
+  /* Fail fast: stop after first failure (namespace conflict = critical) */
+  maxFailures: process.env.CI ? 1 : 0,
   reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
   outputDir: 'test-results',
   use: {

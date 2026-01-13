@@ -6,18 +6,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use Arts\ElementorExtension\Plugins\BasePlugin;
+use ArtsFluidDS\Arts\ElementorExtension\Plugins\BasePlugin;
 
 /**
  * Abstract base class for Fluid Design System plugin.
- *
- * @extends BasePlugin<ManagersContainer>
  */
 abstract class Plugin extends BasePlugin {
 	/**
 	 * Container for manager instances.
 	 *
-	 * @var ManagersContainer
+	 * @var \Arts\FluidDesignSystem\Base\ManagersContainer
 	 */
 	protected $managers;
 }

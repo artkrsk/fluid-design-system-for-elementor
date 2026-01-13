@@ -13,13 +13,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Elementor\Core\Kits\Controls\Repeater as Global_Style_Repeater;
-use Arts\ElementorExtension\Tabs\BaseTab;
+use ArtsFluidDS\Arts\ElementorExtension\Tabs\BaseTab;
 use Elementor\Controls_Manager;
 use Elementor\Repeater;
 use Arts\FluidDesignSystem\Managers\CSSVariables;
 use Arts\FluidDesignSystem\Managers\ControlRegistry;
 use Arts\FluidDesignSystem\Managers\GroupsData;
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
  * Elementor Site Settings tab for fluid typography and spacing presets.

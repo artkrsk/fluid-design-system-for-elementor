@@ -101,6 +101,16 @@ export default {
       target: 'vendor',
       extensions: ['.php', '.js', '.css', '.json', '.txt', '.md'],
       delete: true,
+      watch: true,
+      // Only copy autoloader (autoload.php + composer/) for production builds
+      // when using Strauss (vendor-prefixed contains the actual packages)
+      autoloaderOnly: true
+    },
+    vendorPrefixed: {
+      source: './vendor-prefixed',
+      target: 'vendor-prefixed',
+      extensions: ['.php', '.js', '.css', '.json', '.txt', '.md'],
+      delete: true,
       watch: true
     },
     packageName: 'fluid-design-system-for-elementor',
@@ -137,6 +147,7 @@ export default {
     sourceFiles: {
       php: './src/php',
       vendor: './vendor',
+      vendorPrefixed: './vendor-prefixed',
       dist: {
         files: ['index.umd.js', 'index.css']
       },

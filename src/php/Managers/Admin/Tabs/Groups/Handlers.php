@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use Arts\FluidDesignSystem\Managers\Data;
 use Arts\FluidDesignSystem\Managers\GroupsData;
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
  * Handles synchronous form submissions: batch saves, create/delete actions.

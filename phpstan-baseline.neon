@@ -1,0 +1,19 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Class Arts\\FluidDesignSystem\\Base\\Plugin extends generic class ArtsFluidDS\\Arts\\ElementorExtension\\Plugins\\BasePlugin but does not specify its types\: TManagers$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/php/Base/Plugin.php
+
+		-
+			message: '#^PHPDoc type Arts\\FluidDesignSystem\\Base\\ManagersContainer of property Arts\\FluidDesignSystem\\Base\\Plugin\:\:\$managers is not covariant with PHPDoc type Arts\\Base\\Containers\\ManagersContainer of overridden property ArtsFluidDS\\Arts\\Base\\Plugins\\BasePlugin\<Arts\\Base\\Containers\\ManagersContainer\>\:\:\$managers\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/php/Base/Plugin.php
+
+		-
+			message: '#^The @extends tag of class Arts\\FluidDesignSystem\\Base\\Plugin describes Arts\\FluidDesignSystem\\Base\\ArtsFluidDS\\Arts\\ElementorExtension\\Plugins\\BasePlugin but the class extends ArtsFluidDS\\Arts\\ElementorExtension\\Plugins\\BasePlugin\.$#'
+			identifier: generics.wrongParent
+			count: 1
+			path: src/php/Base/Plugin.php

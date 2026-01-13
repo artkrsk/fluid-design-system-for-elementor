@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
 use Elementor\Core\Base\Module as Module_Base;
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 use Arts\FluidDesignSystem\Managers\CSSVariables;
 use Arts\FluidDesignSystem\Managers\ControlRegistry;
 use Arts\FluidDesignSystem\Services\KitRepeaterService;

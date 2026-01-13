@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 use Arts\FluidDesignSystem\Plugin;
 
 define( 'ARTS_FLUID_DS_PLUGIN_FILE', __FILE__ );
