@@ -2,6 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/wp-env.json",
   "core": "WordPress/WordPress#6.9",
   "plugins": [
+    "./tests/e2e/fixtures/conflict-plugin/aaaa-arts-utilities-conflict-test",
     "./dist/fluid-design-system-for-elementor",
     "https://downloads.wordpress.org/plugin/elementor.latest-stable.zip"
   ],
