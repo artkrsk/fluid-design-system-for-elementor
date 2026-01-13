@@ -18,6 +18,7 @@
   },
   "require-dev": {
     "arts/elementor-stubs": "^3.34",
+    "brianhenryie/strauss": "^0.19",
     "captainhook/captainhook": "^5.27",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "ergebnis/composer-normalize": "^2.48",
@@ -28,6 +29,9 @@
   },
   "minimum-stability": "stable",
   "autoload": {
+    "classmap": [
+      "vendor-prefixed/"
+    ],
     "psr-4": {
       "Arts\\FluidDesignSystem\\": "src/php/"
     }
@@ -40,12 +44,45 @@
     "optimize-autoloader": true,
     "sort-packages": true
   },
+  "extra": {
+    "strauss": {
+      "target_directory": "vendor-prefixed",
+      "namespace_prefix": "ArtsFluidDS\\",
+      "classmap_prefix": "ArtsFluidDS_",
+      "constant_prefix": "ARTS_FLUID_DS_VENDOR_",
+      "classmap_output": true,
+      "include_modified_date": true,
+      "include_author": true,
+      "packages": [
+        "arts/utilities",
+        "arts/base",
+        "arts/elementor-extension"
+      ],
+      "update_call_sites": [
+        "src/php",
+        "src/wordpress-plugin"
+      ],
+      "delete_vendor_packages": false,
+      "exclude_from_copy": {
+        "file_patterns": [
+          "/^tests\\//",
+          "/phpcs\\.xml/",
+          "/phpstan/",
+          "/\\.github/",
+          "/\\.gitignore/"
+        ]
+      }
+    }
+  },
   "scripts": {
     "post-install-cmd": [
       "@php -r \"if (file_exists('vendor/bin/captainhook')) { system('vendor/bin/captainhook install -f -s'); }\""
     ],
     "post-update-cmd": [
       "@php -r \"if (file_exists('vendor/bin/captainhook')) { system('vendor/bin/captainhook install -f -s'); }\""
+    ],
+    "prefix-namespaces": [
+      "@php vendor/bin/strauss"
     ],
     "check": [
       "@phpcs",
