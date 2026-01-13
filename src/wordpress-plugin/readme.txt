@@ -4,7 +4,7 @@ Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 license: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
