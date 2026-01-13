@@ -38,6 +38,7 @@ jobs:
     with:
       # Build configuration
       node_version: '23'
+      php_version: '8.4'
       build_command: 'composer --version && npm run build'
 
       # Changelog from readme.txt
