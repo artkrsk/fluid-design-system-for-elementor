@@ -34,11 +34,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Composer dependencies (production only)
-        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+      - name: Install Composer dependencies (with dev for Strauss)
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Strauss to prefix namespaces
+        run: composer prefix-namespaces
 
       - name: Build plugin
-        run: npm run build
+        run: npm run build:js
 
       - name: Run WordPress Plugin Check
         uses: wordpress/plugin-check-action@v1
@@ -72,6 +75,9 @@ jobs:
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress
+
+      - name: Run Strauss to prefix namespaces (required for PHPStan)
+        run: composer prefix-namespaces
 
       - name: Run PHP CodeSniffer
         run: composer phpcs
@@ -135,11 +141,14 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Install Composer dependencies (production only)
-        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+      - name: Install Composer dependencies (with dev for Strauss)
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Strauss to prefix namespaces
+        run: composer prefix-namespaces
 
       - name: Build plugin
-        run: npm run build
+        run: npm run build:js
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
