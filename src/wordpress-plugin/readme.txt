@@ -196,6 +196,11 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.2.0 =
+* fixed: resolved conflicts with themes and plugins using older shared libraries
+* improved: enhanced security with better input validation
+* improved: overall code quality and reliability
+
 = 2.1.0 =
 * added: faster workflow - adjust preset values without leaving Elementor editor
 * improved: see how changes affect your design as you type
