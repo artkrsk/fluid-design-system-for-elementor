@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
  * Control ID generation and metadata registry.

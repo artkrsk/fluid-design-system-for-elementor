@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
 use Arts\FluidDesignSystem\Managers\GroupsData;
-use Arts\Utilities\Utilities;
+use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
  * Renders sortable groups table with inline editing and accordion presets.
