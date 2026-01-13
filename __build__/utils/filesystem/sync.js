@@ -231,8 +231,9 @@ async function syncVendorFiles(config, isDev) {
   const pluginDest = getPluginDestPath(config, isDev)
   const vendorTarget = config.wordpressPlugin?.vendor?.target || 'vendor'
   const targetDir = path.join(pluginDest, vendorTarget)
+  const autoloaderOnly = config.wordpressPlugin?.vendor?.autoloaderOnly && !isDev
 
-  logger.info(`Syncing vendor files from ${source} to ${targetDir}`)
+  logger.info(`Syncing vendor files from ${source} to ${targetDir}${autoloaderOnly ? ' (autoloader only)' : ''}`)
 
   // Delete target vendor directories if configured
   if (config.wordpressPlugin?.vendor?.delete) {
@@ -242,28 +243,70 @@ async function syncVendorFiles(config, isDev) {
     }
   }
 
-  // Copy vendor files
   await fs.ensureDir(targetDir)
-  await fs.copy(source, targetDir, {
-    overwrite: true,
-    preserveTimestamps: true,
-    filter: (src) => {
-      // Skip node_modules and git directories
-      if (src.includes('node_modules') || src.includes('.git')) {
-        return false
-      }
 
-      // Skip hidden files and directories (like .DS_Store)
-      const basename = path.basename(src)
-      if (basename.startsWith('.')) {
-        return false
-      }
-
-      return true
+  // If autoloaderOnly mode, only copy essential autoloader files
+  if (autoloaderOnly) {
+    // Copy autoload.php
+    const autoloadSrc = path.join(source, 'autoload.php')
+    const autoloadDest = path.join(targetDir, 'autoload.php')
+    if (await fs.pathExists(autoloadSrc)) {
+      await fs.copyFile(autoloadSrc, autoloadDest)
+      logger.debug('Copied vendor/autoload.php')
     }
-  })
 
-  logger.success(`Synced vendor files to ${targetDir}`)
+    // Copy only essential files from composer/ directory (not subdirectories which are packages)
+    const composerSrc = path.join(source, 'composer')
+    const composerDest = path.join(targetDir, 'composer')
+    await fs.ensureDir(composerDest)
+
+    // Essential autoloader files only
+    const essentialFiles = [
+      'ClassLoader.php',
+      'InstalledVersions.php',
+      'LICENSE',
+      'autoload_classmap.php',
+      'autoload_files.php',
+      'autoload_namespaces.php',
+      'autoload_psr4.php',
+      'autoload_real.php',
+      'autoload_static.php',
+      'installed.php',
+      'platform_check.php'
+    ]
+
+    for (const file of essentialFiles) {
+      const fileSrc = path.join(composerSrc, file)
+      const fileDest = path.join(composerDest, file)
+      if (await fs.pathExists(fileSrc)) {
+        await fs.copyFile(fileSrc, fileDest)
+      }
+    }
+
+    logger.success(`Synced vendor autoloader to ${targetDir}`)
+  } else {
+    // Copy all vendor files
+    await fs.copy(source, targetDir, {
+      overwrite: true,
+      preserveTimestamps: true,
+      filter: (src) => {
+        // Skip node_modules and git directories
+        if (src.includes('node_modules') || src.includes('.git')) {
+          return false
+        }
+
+        // Skip hidden files and directories (like .DS_Store)
+        const basename = path.basename(src)
+        if (basename.startsWith('.')) {
+          return false
+        }
+
+        return true
+      }
+    })
+
+    logger.success(`Synced vendor files to ${targetDir}`)
+  }
 
   // Verify the autoload.php file exists in the target
   const autoloadPath = path.join(targetDir, 'autoload.php')

@@ -46,8 +46,8 @@ jobs:
       - name: Run Strauss to prefix namespaces
         run: composer prefix-namespaces
 
-      - name: Regenerate autoloader with prefixed classes
-        run: composer dump-autoload --optimize
+      - name: Reinstall Composer dependencies without dev for production
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
 
       - name: Build plugin
         run: npm run build:js
@@ -179,8 +179,8 @@ jobs:
       - name: Run Strauss to prefix namespaces
         run: composer prefix-namespaces
 
-      - name: Regenerate autoloader with prefixed classes
-        run: composer dump-autoload --optimize
+      - name: Reinstall Composer dependencies without dev for production
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
 
       - name: Build plugin
         run: npm run build:js

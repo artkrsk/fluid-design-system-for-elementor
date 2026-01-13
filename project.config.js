@@ -101,7 +101,10 @@ export default {
       target: 'vendor',
       extensions: ['.php', '.js', '.css', '.json', '.txt', '.md'],
       delete: true,
-      watch: true
+      watch: true,
+      // Only copy autoloader (autoload.php + composer/) for production builds
+      // when using Strauss (vendor-prefixed contains the actual packages)
+      autoloaderOnly: true
     },
     vendorPrefixed: {
       source: './vendor-prefixed',
