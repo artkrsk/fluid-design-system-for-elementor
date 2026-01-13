@@ -37,13 +37,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Composer dependencies (without autoloader for Strauss)
-        run: composer install --prefer-dist --no-progress --no-autoloader
+      - name: Create vendor-prefixed directory for Strauss classmap
+        run: mkdir -p vendor-prefixed
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
 
       - name: Run Strauss to prefix namespaces
         run: composer prefix-namespaces
 
-      - name: Generate optimized autoloader
+      - name: Regenerate autoloader with prefixed classes
         run: composer dump-autoload --optimize
 
       - name: Build plugin
@@ -92,13 +95,16 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Install Composer dependencies (without autoloader for Strauss)
-        run: composer install --prefer-dist --no-progress --no-autoloader
+      - name: Create vendor-prefixed directory for Strauss classmap
+        run: mkdir -p vendor-prefixed
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
 
       - name: Run Strauss to prefix namespaces (required for PHPStan)
         run: composer prefix-namespaces
 
-      - name: Generate optimized autoloader
+      - name: Regenerate autoloader with prefixed classes
         run: composer dump-autoload --optimize
 
       - name: Run PHP CodeSniffer
@@ -164,13 +170,16 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Install Composer dependencies (without autoloader for Strauss)
-        run: composer install --prefer-dist --no-progress --no-autoloader
+      - name: Create vendor-prefixed directory for Strauss classmap
+        run: mkdir -p vendor-prefixed
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
 
       - name: Run Strauss to prefix namespaces
         run: composer prefix-namespaces
 
-      - name: Generate optimized autoloader
+      - name: Regenerate autoloader with prefixed classes
         run: composer dump-autoload --optimize
 
       - name: Build plugin
