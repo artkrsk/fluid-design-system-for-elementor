@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a6971d5ae54b1a851ab57a2b0ea45b2c",
+    "content-hash": "367ceebee70bbc0f0051ec53457991ed",
     "packages": [
         {
             "name": "arts/base",
