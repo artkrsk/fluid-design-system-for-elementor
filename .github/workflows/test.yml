@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
 
+env:
+  MAX_ZIP_SIZE_MB: 1.0
+
 jobs:
   plugin-check:
     name: WordPress.org Plugin Check
@@ -42,6 +45,19 @@ jobs:
 
       - name: Build plugin
         run: npm run build:js
+
+      - name: Validate ZIP size
+        run: |
+          ZIP_FILE="dist/fluid-design-system-for-elementor.zip"
+          SIZE_BYTES=$(stat -f%z "$ZIP_FILE" 2>/dev/null || stat -c%s "$ZIP_FILE")
+          SIZE_MB=$(echo "scale=2; $SIZE_BYTES / 1024 / 1024" | bc)
+
+          if (( $(echo "$SIZE_MB > $MAX_ZIP_SIZE_MB" | bc -l) )); then
+            echo "❌ ZIP too large: ${SIZE_MB} MB (max ${MAX_ZIP_SIZE_MB} MB)"
+            exit 1
+          fi
+
+          echo "✅ ZIP size: ${SIZE_MB} MB"
 
       - name: Run WordPress Plugin Check
         uses: wordpress/plugin-check-action@v1
@@ -117,6 +133,7 @@ jobs:
 
   e2e-tests:
     name: E2E Tests (${{ matrix.browser }})
+    needs: plugin-check
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
