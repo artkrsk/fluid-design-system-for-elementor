@@ -39,7 +39,7 @@ jobs:
       # Build configuration
       node_version: '23'
       php_version: '8.4'
-      build_command: 'composer --version && npm run build'
+      build_command: 'mkdir -p vendor-prefixed && composer --version && npm run build'
 
       # Changelog from readme.txt
       custom_changelog: ${{ needs.prepare-changelog.outputs.changelog }}
