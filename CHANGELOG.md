@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.1
+
+- fixed: prevent duplicate widget handler scripts when multiple plugins bundle arts/elementor-extension
+
 ## 2.2.0
 
 - fixed: resolved conflicts with themes and plugins using older shared libraries

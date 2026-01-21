@@ -61,12 +61,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "44a35b885dcf9779503b7006a8ff588bd4ffd160"
+                "reference": "1200bd47db20972d50d2b7791af7dc4074e19a6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/44a35b885dcf9779503b7006a8ff588bd4ffd160",
-                "reference": "44a35b885dcf9779503b7006a8ff588bd4ffd160",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/1200bd47db20972d50d2b7791af7dc4074e19a6d",
+                "reference": "1200bd47db20972d50d2b7791af7dc4074e19a6d",
                 "shasum": ""
             },
             "require": {
@@ -109,7 +109,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2026-01-12T07:41:34+00:00"
+            "time": "2026-01-21T16:37:34+00:00"
         },
         {
             "name": "arts/utilities",
@@ -117,12 +117,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "25bc7c080c82c6d942691e242310dd4f7c42bd7d"
+                "reference": "fb9e7d657bccdaeebe1a1313e4798ba97ee35ed2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/25bc7c080c82c6d942691e242310dd4f7c42bd7d",
-                "reference": "25bc7c080c82c6d942691e242310dd4f7c42bd7d",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/fb9e7d657bccdaeebe1a1313e4798ba97ee35ed2",
+                "reference": "fb9e7d657bccdaeebe1a1313e4798ba97ee35ed2",
                 "shasum": ""
             },
             "require": {
@@ -160,22 +160,22 @@
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
                 "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2026-01-13T00:56:27+00:00"
+            "time": "2026-01-16T04:44:39+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "arts/elementor-stubs",
-            "version": "v3.34.0.4",
+            "version": "v3.34.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/elementor-stubs.git",
-                "reference": "a471e08e25a4d4b713e481d0b2e300c34182ca8d"
+                "reference": "705f2a1f93911bf7b550600f5b343b2e6277e254"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/elementor-stubs/zipball/a471e08e25a4d4b713e481d0b2e300c34182ca8d",
-                "reference": "a471e08e25a4d4b713e481d0b2e300c34182ca8d",
+                "url": "https://api.github.com/repos/artkrsk/elementor-stubs/zipball/705f2a1f93911bf7b550600f5b343b2e6277e254",
+                "reference": "705f2a1f93911bf7b550600f5b343b2e6277e254",
                 "shasum": ""
             },
             "require": {
@@ -221,7 +221,7 @@
             ],
             "support": {
                 "issues": "https://github.com/artkrsk/elementor-stubs/issues",
-                "source": "https://github.com/artkrsk/elementor-stubs/tree/v3.34.0.4"
+                "source": "https://github.com/artkrsk/elementor-stubs/tree/v3.34.1"
             },
             "funding": [
                 {
@@ -229,7 +229,7 @@
                     "type": "buy_me_a_coffee"
                 }
             ],
-            "time": "2025-12-24T07:19:27+00:00"
+            "time": "2026-01-15T01:58:38+00:00"
         },
         {
             "name": "brianhenryie/strauss",
@@ -2790,11 +2790,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.33",
+            "version": "2.1.36",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9e800e6bee7d5bd02784d4c6069b48032d16224f",
-                "reference": "9e800e6bee7d5bd02784d4c6069b48032d16224f",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2132e5e2361d11d40af4c17faa16f043269a4cf3",
+                "reference": "2132e5e2361d11d40af4c17faa16f043269a4cf3",
                 "shasum": ""
             },
             "require": {
@@ -2839,7 +2839,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-05T10:24:31+00:00"
+            "time": "2026-01-21T13:58:26+00:00"
         },
         {
             "name": "psr/cache",
@@ -5074,16 +5074,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "bdbabc199a7ba9965484e4725d66170e5711323b"
+                "reference": "ce6a2f100c404b2d32a1dd1270f9b59ad4f57649"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/bdbabc199a7ba9965484e4725d66170e5711323b",
-                "reference": "bdbabc199a7ba9965484e4725d66170e5711323b",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/ce6a2f100c404b2d32a1dd1270f9b59ad4f57649",
+                "reference": "ce6a2f100c404b2d32a1dd1270f9b59ad4f57649",
                 "shasum": ""
             },
             "require": {
@@ -5130,9 +5130,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.1.1"
+                "source": "https://github.com/webmozarts/assert/tree/2.1.2"
             },
-            "time": "2026-01-08T11:28:40+00:00"
+            "time": "2026-01-13T14:02:24+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
