@@ -78,5 +78,8 @@
     "src/ts/**/*.{ts,js,json,css}": "prettier --write",
     "docs/**/*.md": "prettier --write",
     "*.md": "prettier --write"
+  },
+  "dependencies": {
+    "change-case": "^5.4.4"
   }
 }
