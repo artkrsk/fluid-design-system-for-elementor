@@ -61,12 +61,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "bb4f39fb8b4f14cf0e05ea633162ae7d7fd50bdd"
+                "reference": "e684b87b9531e85aa3cb815ddfc36a0248039be1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/bb4f39fb8b4f14cf0e05ea633162ae7d7fd50bdd",
-                "reference": "bb4f39fb8b4f14cf0e05ea633162ae7d7fd50bdd",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/e684b87b9531e85aa3cb815ddfc36a0248039be1",
+                "reference": "e684b87b9531e85aa3cb815ddfc36a0248039be1",
                 "shasum": ""
             },
             "require": {
@@ -109,7 +109,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2026-01-29T06:11:28+00:00"
+            "time": "2026-01-29T08:38:20+00:00"
         },
         {
             "name": "arts/utilities",
@@ -117,12 +117,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "c2e112a0a164f04e64d5b2f0763f76c5a753b8b9"
+                "reference": "19d72cd3e079bf44a7aa5d37580df266a3894b1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/c2e112a0a164f04e64d5b2f0763f76c5a753b8b9",
-                "reference": "c2e112a0a164f04e64d5b2f0763f76c5a753b8b9",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/19d72cd3e079bf44a7aa5d37580df266a3894b1d",
+                "reference": "19d72cd3e079bf44a7aa5d37580df266a3894b1d",
                 "shasum": ""
             },
             "require": {
@@ -160,22 +160,22 @@
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
                 "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2026-01-21T17:38:49+00:00"
+            "time": "2026-01-29T08:41:44+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "arts/elementor-stubs",
-            "version": "v3.34.1",
+            "version": "v3.34.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/elementor-stubs.git",
-                "reference": "705f2a1f93911bf7b550600f5b343b2e6277e254"
+                "reference": "aae62a2dbe918a89c3c11862e6fc57de31e6dc83"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/elementor-stubs/zipball/705f2a1f93911bf7b550600f5b343b2e6277e254",
-                "reference": "705f2a1f93911bf7b550600f5b343b2e6277e254",
+                "url": "https://api.github.com/repos/artkrsk/elementor-stubs/zipball/aae62a2dbe918a89c3c11862e6fc57de31e6dc83",
+                "reference": "aae62a2dbe918a89c3c11862e6fc57de31e6dc83",
                 "shasum": ""
             },
             "require": {
@@ -221,7 +221,7 @@
             ],
             "support": {
                 "issues": "https://github.com/artkrsk/elementor-stubs/issues",
-                "source": "https://github.com/artkrsk/elementor-stubs/tree/v3.34.1"
+                "source": "https://github.com/artkrsk/elementor-stubs/tree/v3.34.4"
             },
             "funding": [
                 {
@@ -229,7 +229,7 @@
                     "type": "buy_me_a_coffee"
                 }
             ],
-            "time": "2026-01-15T01:58:38+00:00"
+            "time": "2026-01-30T12:10:34+00:00"
         },
         {
             "name": "brianhenryie/strauss",
@@ -580,16 +580,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "2.9.4",
+            "version": "2.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "d4225153940b7c06f0e825195bdbdc312c67d917"
+                "reference": "72a8f8e653710e18d83e5dd531eb5a71fc3223e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/d4225153940b7c06f0e825195bdbdc312c67d917",
-                "reference": "d4225153940b7c06f0e825195bdbdc312c67d917",
+                "url": "https://api.github.com/repos/composer/composer/zipball/72a8f8e653710e18d83e5dd531eb5a71fc3223e6",
+                "reference": "72a8f8e653710e18d83e5dd531eb5a71fc3223e6",
                 "shasum": ""
             },
             "require": {
@@ -677,7 +677,7 @@
                 "irc": "ircs://irc.libera.chat:6697/composer",
                 "issues": "https://github.com/composer/composer/issues",
                 "security": "https://github.com/composer/composer/security/policy",
-                "source": "https://github.com/composer/composer/tree/2.9.4"
+                "source": "https://github.com/composer/composer/tree/2.9.5"
             },
             "funding": [
                 {
@@ -689,7 +689,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-22T13:08:50+00:00"
+            "time": "2026-01-29T10:40:53+00:00"
         },
         {
             "name": "composer/metadata-minifier",
@@ -2790,11 +2790,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.37",
+            "version": "2.1.38",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/28cd424c5ea984128c95cfa7ea658808e8954e49",
-                "reference": "28cd424c5ea984128c95cfa7ea658808e8954e49",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/dfaf1f530e1663aa167bc3e52197adb221582629",
+                "reference": "dfaf1f530e1663aa167bc3e52197adb221582629",
                 "shasum": ""
             },
             "require": {
@@ -2839,7 +2839,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-24T08:21:55+00:00"
+            "time": "2026-01-30T17:12:46+00:00"
         },
         {
             "name": "psr/cache",
