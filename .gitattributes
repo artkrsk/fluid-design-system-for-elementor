@@ -46,7 +46,7 @@ project.*.js export-ignore
 
 # Markdown files
 /*.md export-ignore
-README.md -export-ignore
+README.md export-ignore
 .claude export-ignore
 .github export-ignore
 .taskmaster export-ignore
