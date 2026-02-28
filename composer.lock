@@ -61,12 +61,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "213d9ef98633935292afe8d26e1abe75cfc7ff01"
+                "reference": "e4769ad21554c5c48d91277e638ea23a8f18f466"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/213d9ef98633935292afe8d26e1abe75cfc7ff01",
-                "reference": "213d9ef98633935292afe8d26e1abe75cfc7ff01",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/e4769ad21554c5c48d91277e638ea23a8f18f466",
+                "reference": "e4769ad21554c5c48d91277e638ea23a8f18f466",
                 "shasum": ""
             },
             "require": {
@@ -80,6 +80,7 @@
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
                 "ergebnis/composer-normalize": "^2.48",
                 "php-stubs/acf-pro-stubs": "^6.5",
+                "php-stubs/woocommerce-stubs": "^10.5",
                 "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^9.6",
                 "squizlabs/php_codesniffer": "^3.13.4",
@@ -109,7 +110,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2026-02-27T06:40:35+00:00"
+            "time": "2026-02-28T19:05:33+00:00"
         },
         {
             "name": "arts/utilities",
@@ -117,12 +118,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "f32510677c0bd300c27b19936176a4d17ba8d17e"
+                "reference": "d98c91cb9e4afe7efc2ae528fdf68104de834c25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/f32510677c0bd300c27b19936176a4d17ba8d17e",
-                "reference": "f32510677c0bd300c27b19936176a4d17ba8d17e",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/d98c91cb9e4afe7efc2ae528fdf68104de834c25",
+                "reference": "d98c91cb9e4afe7efc2ae528fdf68104de834c25",
                 "shasum": ""
             },
             "require": {
@@ -133,6 +134,8 @@
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
                 "ergebnis/composer-normalize": "^2.48",
                 "php-stubs/acf-pro-stubs": "^6.5",
+                "php-stubs/woocommerce-stubs": "^10.5",
+                "php-stubs/wp-cli-stubs": "^2.12",
                 "phpstan/phpstan": "^2.0",
                 "squizlabs/php_codesniffer": "^3.13.4",
                 "szepeviktor/phpstan-wordpress": "^2.0",
@@ -160,7 +163,7 @@
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
                 "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2026-02-03T06:34:48+00:00"
+            "time": "2026-02-28T19:09:07+00:00"
         }
     ],
     "packages-dev": [
