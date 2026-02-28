@@ -46,6 +46,7 @@ project.*.js export-ignore
 
 # Markdown files
 /*.md export-ignore
+README.md -export-ignore
 .claude export-ignore
 .github export-ignore
 .taskmaster export-ignore
@@ -53,5 +54,6 @@ project.*.js export-ignore
 .wp-env.json export-ignore
 captainhook.json export-ignore
 phpstan.neon export-ignore
+phpstan-baseline.neon export-ignore
 playwright.config.ts export-ignore
 vitest.config.ts export-ignore
