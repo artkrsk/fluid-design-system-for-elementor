@@ -13,6 +13,7 @@ permissions:
 
 env:
   MAX_ZIP_SIZE_MB: 1.0
+  NODE_OPTIONS: '--dns-result-order=ipv4first --no-network-family-autoselection'
 
 jobs:
   plugin-check:
@@ -77,8 +78,6 @@ jobs:
           wp-version: 'latest'
           ignore-codes: |
             WordPress.NamingConventions.PrefixAllGlobals.InvalidPrefixPassed
-        env:
-          NODE_OPTIONS: '--dns-result-order=ipv4first --no-network-family-autoselection'
 
   code-quality:
     name: Code Quality
@@ -206,8 +205,12 @@ jobs:
       - name: Build plugin
         run: npm run build:js
 
+      - name: Install Playwright system dependencies
+        if: runner.environment == 'github-hosted'
+        run: npx playwright install-deps ${{ matrix.browser }}
+
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install ${{ matrix.browser }}
 
       - name: Start wp-env
         run: npm run wp-env start
