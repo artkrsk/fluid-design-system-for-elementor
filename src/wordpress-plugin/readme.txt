@@ -196,6 +196,9 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.2.2 =
+* fixed: prevent double widget initialization in Elementor editor when used alongside themes bundling arts/elementor-extension
+
 = 2.2.1 =
 * fixed: prevent duplicate widget handler scripts when multiple plugins bundle arts/elementor-extension
 

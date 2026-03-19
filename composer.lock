@@ -61,18 +61,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-elementor-extension.git",
-                "reference": "b81a51d4f71a3bb8b82845249bd1fc5856d7b138"
+                "reference": "d6deeabede313f94a89bdffecbb9d379ff3148d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/b81a51d4f71a3bb8b82845249bd1fc5856d7b138",
-                "reference": "b81a51d4f71a3bb8b82845249bd1fc5856d7b138",
+                "url": "https://api.github.com/repos/artkrsk/arts-elementor-extension/zipball/d6deeabede313f94a89bdffecbb9d379ff3148d3",
+                "reference": "d6deeabede313f94a89bdffecbb9d379ff3148d3",
                 "shasum": ""
             },
             "require": {
                 "arts/base": "@dev",
                 "arts/utilities": "@dev",
-                "php": ">=7.4"
+                "php": ">=8.0"
             },
             "require-dev": {
                 "arts/elementor-stubs": "@dev",
@@ -110,7 +110,7 @@
                 "issues": "https://github.com/artkrsk/arts-elementor-extension/issues",
                 "source": "https://github.com/artkrsk/arts-elementor-extension/tree/master"
             },
-            "time": "2026-03-05T09:51:24+00:00"
+            "time": "2026-03-19T13:28:10+00:00"
         },
         {
             "name": "arts/utilities",
@@ -118,12 +118,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-utilities.git",
-                "reference": "fac1765e376b50251c05787b4a4dfff74ca4b7c4"
+                "reference": "1655cfb53efa31b370f8925ae5e00e53db63ebb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/fac1765e376b50251c05787b4a4dfff74ca4b7c4",
-                "reference": "fac1765e376b50251c05787b4a4dfff74ca4b7c4",
+                "url": "https://api.github.com/repos/artkrsk/arts-utilities/zipball/1655cfb53efa31b370f8925ae5e00e53db63ebb7",
+                "reference": "1655cfb53efa31b370f8925ae5e00e53db63ebb7",
                 "shasum": ""
             },
             "require": {
@@ -163,26 +163,27 @@
                 "issues": "https://github.com/artkrsk/arts-utilities/issues",
                 "source": "https://github.com/artkrsk/arts-utilities/tree/master"
             },
-            "time": "2026-03-05T09:55:08+00:00"
+            "time": "2026-03-05T12:49:55+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "arts/elementor-stubs",
-            "version": "v3.35.4",
+            "version": "v3.35.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/elementor-stubs.git",
-                "reference": "fdf2feb4df5cdb4e523e3d1bf2e6f45378d18bc6"
+                "reference": "a4493b64ed43b430dde55394087f233e7aeb552e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/elementor-stubs/zipball/fdf2feb4df5cdb4e523e3d1bf2e6f45378d18bc6",
-                "reference": "fdf2feb4df5cdb4e523e3d1bf2e6f45378d18bc6",
+                "url": "https://api.github.com/repos/artkrsk/elementor-stubs/zipball/a4493b64ed43b430dde55394087f233e7aeb552e",
+                "reference": "a4493b64ed43b430dde55394087f233e7aeb552e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.0",
+                "php-stubs/woocommerce-stubs": "^10.5",
                 "php-stubs/wordpress-stubs": "^6.9",
                 "php-stubs/wp-cli-stubs": "^2.12"
             },
@@ -190,7 +191,6 @@
                 "captainhook/captainhook": "^5.27",
                 "ergebnis/composer-normalize": "^2.48",
                 "php-stubs/generator": "^0.8",
-                "php-stubs/woocommerce-stubs": "10.4.2",
                 "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^9.5",
                 "squizlabs/php_codesniffer": "^3.0",
@@ -224,7 +224,7 @@
             ],
             "support": {
                 "issues": "https://github.com/artkrsk/elementor-stubs/issues",
-                "source": "https://github.com/artkrsk/elementor-stubs/tree/v3.35.4"
+                "source": "https://github.com/artkrsk/elementor-stubs/tree/v3.35.7"
             },
             "funding": [
                 {
@@ -232,7 +232,7 @@
                     "type": "buy_me_a_coffee"
                 }
             ],
-            "time": "2026-02-13T05:57:05+00:00"
+            "time": "2026-03-15T00:44:02+00:00"
         },
         {
             "name": "brianhenryie/strauss",
@@ -2257,16 +2257,16 @@
         },
         {
             "name": "php-stubs/woocommerce-stubs",
-            "version": "v10.5.2",
+            "version": "v10.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/woocommerce-stubs.git",
-                "reference": "4b01d69e3bd0e22e125973e3049b1cd7249a86f3"
+                "reference": "ef96143054f60a2f0b2cfe8351f5d78448729e98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/4b01d69e3bd0e22e125973e3049b1cd7249a86f3",
-                "reference": "4b01d69e3bd0e22e125973e3049b1cd7249a86f3",
+                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/ef96143054f60a2f0b2cfe8351f5d78448729e98",
+                "reference": "ef96143054f60a2f0b2cfe8351f5d78448729e98",
                 "shasum": ""
             },
             "require": {
@@ -2295,9 +2295,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/woocommerce-stubs/issues",
-                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v10.5.2"
+                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v10.6.1"
             },
-            "time": "2026-02-16T20:45:34+00:00"
+            "time": "2026-03-12T19:28:12+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -2625,16 +2625,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "5.6.6",
+            "version": "5.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "5cee1d3dfc2d2aa6599834520911d246f656bcb8"
+                "reference": "31a105931bc8ffa3a123383829772e832fd8d903"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/5cee1d3dfc2d2aa6599834520911d246f656bcb8",
-                "reference": "5cee1d3dfc2d2aa6599834520911d246f656bcb8",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/31a105931bc8ffa3a123383829772e832fd8d903",
+                "reference": "31a105931bc8ffa3a123383829772e832fd8d903",
                 "shasum": ""
             },
             "require": {
@@ -2683,9 +2683,9 @@
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
             "support": {
                 "issues": "https://github.com/phpDocumentor/ReflectionDocBlock/issues",
-                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.6.6"
+                "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/5.6.7"
             },
-            "time": "2025-12-22T21:13:58+00:00"
+            "time": "2026-03-18T20:47:46+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -2794,11 +2794,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.40",
+            "version": "2.1.42",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
-                "reference": "9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/1279e1ce86ba768f0780c9d889852b4e02ff40d0",
+                "reference": "1279e1ce86ba768f0780c9d889852b4e02ff40d0",
                 "shasum": ""
             },
             "require": {
@@ -2843,7 +2843,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-23T15:04:35+00:00"
+            "time": "2026-03-17T14:58:32+00:00"
         },
         {
             "name": "psr/cache",
@@ -3551,16 +3551,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "1d06192e8f164e2729b0031e6807d72a6195b8bb"
+                "reference": "665522ec357540e66c294c08583b40ee576574f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/1d06192e8f164e2729b0031e6807d72a6195b8bb",
-                "reference": "1d06192e8f164e2729b0031e6807d72a6195b8bb",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/665522ec357540e66c294c08583b40ee576574f0",
+                "reference": "665522ec357540e66c294c08583b40ee576574f0",
                 "shasum": ""
             },
             "require": {
@@ -3631,7 +3631,7 @@
                 "psr6"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache/tree/v7.4.6"
+                "source": "https://github.com/symfony/cache/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -3651,7 +3651,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-21T23:29:27+00:00"
+            "time": "2026-03-06T08:14:57+00:00"
         },
         {
             "name": "symfony/cache-contracts",
@@ -3731,16 +3731,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27"
+                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/6d643a93b47398599124022eb24d97c153c12f27",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27",
+                "url": "https://api.github.com/repos/symfony/console/zipball/e1e6770440fb9c9b0cf725f81d1361ad1835329d",
+                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d",
                 "shasum": ""
             },
             "require": {
@@ -3805,7 +3805,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.6"
+                "source": "https://github.com/symfony/console/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -3825,7 +3825,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-25T17:02:47+00:00"
+            "time": "2026-03-06T14:06:20+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
