@@ -26,18 +26,18 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node.js
+        if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Setup PHP
+        if: runner.environment == 'github-hosted'
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           tools: composer
-        env:
-          runner: self-hosted
 
       - name: Install dependencies
         run: npm ci
@@ -89,18 +89,18 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node.js
+        if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Setup PHP
+        if: runner.environment == 'github-hosted'
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           tools: composer
-        env:
-          runner: self-hosted
 
       - name: Install Node dependencies
         run: npm ci
@@ -137,6 +137,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node.js
+        if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -172,18 +173,18 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node.js
+        if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Setup PHP
+        if: runner.environment == 'github-hosted'
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           tools: composer
-        env:
-          runner: self-hosted
 
       - name: Install Node dependencies
         run: npm ci
