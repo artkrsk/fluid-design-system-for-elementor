@@ -77,6 +77,8 @@ jobs:
           wp-version: 'latest'
           ignore-codes: |
             WordPress.NamingConventions.PrefixAllGlobals.InvalidPrefixPassed
+        env:
+          NODE_OPTIONS: '--dns-result-order=ipv4first'
 
   code-quality:
     name: Code Quality
