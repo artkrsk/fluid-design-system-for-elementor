@@ -48,7 +48,7 @@ async function globalSetup(config: FullConfig) {
     // Activate plugin if not already active
     await page.goto(`${baseURL}/wp-admin/plugins.php`)
     const pluginRow = page.locator(
-      '[data-slug="fluid-design-system-for-elementor"]'
+      'tr[data-slug="fluid-design-system-for-elementor"]:not(.plugin-update-tr)'
     )
 
     if ((await pluginRow.count()) > 0) {
@@ -63,7 +63,7 @@ async function globalSetup(config: FullConfig) {
     }
 
     // Activate Elementor if not already active
-    const elementorRow = page.locator('[data-slug="elementor"]')
+    const elementorRow = page.locator('tr[data-slug="elementor"]:not(.plugin-update-tr)')
     if ((await elementorRow.count()) > 0) {
       const activateLink = elementorRow.locator('a.activate')
       if ((await activateLink.count()) > 0) {

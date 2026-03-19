@@ -17,10 +17,13 @@ env:
 jobs:
   plugin-check:
     name: WordPress.org Plugin Check
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
+      - name: Disable git hooks
+        run: git config --global core.hooksPath /dev/null
+
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -75,10 +78,13 @@ jobs:
 
   code-quality:
     name: Code Quality
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
+      - name: Disable git hooks
+        run: git config --global core.hooksPath /dev/null
+
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -118,10 +124,13 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
+      - name: Disable git hooks
+        run: git config --global core.hooksPath /dev/null
+
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -146,14 +155,17 @@ jobs:
   e2e-tests:
     name: E2E Tests (${{ matrix.browser }})
     needs: plugin-check
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
         browser: [chromium, firefox, webkit]
     steps:
+      - name: Disable git hooks
+        run: git config --global core.hooksPath /dev/null
+
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

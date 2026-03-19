@@ -50,12 +50,12 @@ test.describe('Namespace Conflict Handling', () => {
 
     // Verify both plugins are listed
     await expect(
-      page.locator('[data-slug="aaaa-arts-utilities-conflict-test"]'),
+      page.locator('tr[data-slug="aaaa-arts-utilities-conflict-test"]:not(.plugin-update-tr)'),
       'Conflict test plugin should be listed'
     ).toBeVisible()
 
     await expect(
-      page.locator('[data-slug="fluid-design-system-for-elementor"]'),
+      page.locator('tr[data-slug="fluid-design-system-for-elementor"]:not(.plugin-update-tr)'),
       'Fluid Design System should be listed'
     ).toBeVisible()
   })
@@ -65,7 +65,7 @@ test.describe('Namespace Conflict Handling', () => {
 
     // Check if conflict plugin is active (has 'active' class or Deactivate link)
     const conflictPluginRow = page.locator(
-      '[data-slug="aaaa-arts-utilities-conflict-test"]'
+      'tr[data-slug="aaaa-arts-utilities-conflict-test"]:not(.plugin-update-tr)'
     )
     const conflictIsActive = await conflictPluginRow
       .locator('.deactivate a')
@@ -86,7 +86,7 @@ test.describe('Namespace Conflict Handling', () => {
 
     // Check if FDS is active
     const fdsPluginRow = page.locator(
-      '[data-slug="fluid-design-system-for-elementor"]'
+      'tr[data-slug="fluid-design-system-for-elementor"]:not(.plugin-update-tr)'
     )
     const fdsIsActive = await fdsPluginRow
       .locator('.deactivate a')
@@ -115,14 +115,14 @@ test.describe('Namespace Conflict Handling', () => {
 
     await expect(
       page.locator(
-        '[data-slug="aaaa-arts-utilities-conflict-test"] .deactivate a'
+        'tr[data-slug="aaaa-arts-utilities-conflict-test"]:not(.plugin-update-tr) .deactivate a'
       ),
       'Conflict plugin should be active'
     ).toBeVisible()
 
     await expect(
       page.locator(
-        '[data-slug="fluid-design-system-for-elementor"] .deactivate a'
+        'tr[data-slug="fluid-design-system-for-elementor"]:not(.plugin-update-tr) .deactivate a'
       ),
       'Fluid Design System should be active'
     ).toBeVisible()
