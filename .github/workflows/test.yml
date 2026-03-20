@@ -212,11 +212,18 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install ${{ matrix.browser }}
 
+      - name: Destroy previous wp-env
+        run: npm run wp-env destroy -- --force || true
+
       - name: Start wp-env
         run: npm run wp-env start
 
       - name: Run E2E tests
         run: npx playwright test --project=${{ matrix.browser }}
+
+      - name: Stop wp-env
+        if: always()
+        run: npm run wp-env stop || true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
