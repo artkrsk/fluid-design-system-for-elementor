@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/ts/index.ts"],
+  "project": ["src/ts/**/*.ts"],
+  "ignore": ["tests/**", "__build__/**"],
+  "ignoreBinaries": ["composer"],
+  "ignoreDependencies": [
+    "lint-staged",
+    "vitepress-plugin-lightbox",
+    "vitepress-sidebar",
+    "archiver",
+    "browser-sync",
+    "chalk",
+    "chokidar",
+    "debounce",
+    "esbuild",
+    "fs-extra",
+    "sass",
+    "wp-pot"
+  ]
+}
