@@ -14,6 +14,7 @@ import {
   TEST_ELEMENT_IDS,
   TEST_VIEWPORTS,
   getExpectedValue,
+  getElementSelector,
   getHeadingTitleSelector
 } from '../fixtures/test-data'
 
@@ -417,5 +418,51 @@ test.describe('CSS Formula Structure', () => {
       expect(trimmed, `${name} should contain max() wrapper`).toMatch(/max\([^)]+\)/)
       expect(trimmed, `${name} should end with )`).toMatch(/\)$/)
     }
+  })
+})
+
+/**
+ * Compound CSS Property tests (Issue #23).
+ * Verifies the custom "fluid" unit is stripped from CSS output
+ * when used in multi-value properties like background-position.
+ */
+test.describe('Compound CSS Properties (Issue #23)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(TEST_PAGE_URL)
+    await page.waitForLoadState('load')
+  })
+
+  test('fluid unit is not leaked into generated CSS', async ({ page }) => {
+    // Scan all stylesheets for the leaked "fluid" unit pattern.
+    // The regex matches "fluid" appearing right after a closing paren —
+    // this is the exact pattern produced by cross-control {{NAME.UNIT}} refs.
+    const leakedRule = await page.evaluate(() => {
+      const pattern = /\)\s*fluid[\s;]/
+      for (const sheet of document.styleSheets) {
+        try {
+          for (const rule of sheet.cssRules) {
+            if (pattern.test(rule.cssText)) {
+              return rule.cssText
+            }
+          }
+        } catch {
+          // Cross-origin stylesheet, skip
+        }
+      }
+      return null
+    })
+
+    expect(leakedRule, 'No CSS rule should contain a leaked "fluid" unit').toBeNull()
+  })
+
+  test('background-position renders without fluid keyword', async ({ page }) => {
+    const el = page.locator(getElementSelector(TEST_ELEMENT_IDS.bgPosition))
+    await expect(el).toBeVisible()
+
+    const bgPosition = await el.evaluate(
+      el => getComputedStyle(el).backgroundPosition
+    )
+
+    expect(bgPosition).not.toContain('fluid')
   })
 })
