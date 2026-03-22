@@ -1,7 +1,7 @@
 {
   "name": "@arts/fluid-design-system",
   "author": "Artem Semkin",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "type": "module",
   "license": "GPL-3.0-or-later",
   "description": "",
@@ -25,7 +25,6 @@
     "@types/select2": "^4.0.63",
     "@types/underscore": "^1.13.0",
     "@vitest/coverage-v8": "^4.0.16",
-    "@wordpress/e2e-test-utils-playwright": "^1.37.0",
     "@wordpress/env": "^10.37.0",
     "archiver": "^7.0.1",
     "browser-sync": "^3.0.4",
@@ -79,7 +78,5 @@
     "docs/**/*.md": "prettier --write",
     "*.md": "prettier --write"
   },
-  "dependencies": {
-    "change-case": "^5.4.4"
-  }
+  "dependencies": {}
 }

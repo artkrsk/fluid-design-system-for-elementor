@@ -1,10 +1,10 @@
 === Fluid Design System for Elementor ===
 Contributors: artemsemkin
-Tags: typography, spacing, responsive, fluid, elementor
+Tags: typography, spacing, responsive, fluid, elementor, ai
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.2.2
+Stable tag: 2.3.0
 license: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -175,6 +175,10 @@ Yes! You can mix different units in your presets, like using "3em" as a minimum 
 
 Yes! You can set global breakpoints or define custom breakpoints for each individual preset. The default values (360px to 1920px) are just suggestions - you can set any values that work best for your design.
 
+= Does this plugin support AI agents / MCP? =
+
+Yes. On WordPress 6.9+ with the [MCP Adapter](https://github.com/WordPress/mcp-adapter) plugin active, the plugin registers a `fluid-design-system` MCP server for managing presets and preset groups. AI agents like Claude Code can list, create, update, move, and delete presets programmatically. See the [Developer Reference](https://artkrsk.github.io/fluid-design-system-for-elementor/developers) for connection details.
+
 = What browsers are supported? =
 
 The plugin uses the CSS `clamp()` function, which is supported by all modern browsers, including:
@@ -195,6 +199,10 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 5. Applying fluid unit for "gaps" control
 
 == Changelog ==
+
+= 2.3.0 =
+* added: AI agent integration via WordPress Abilities API and MCP server
+* added: MCP tools for programmatic preset and group management (list, create, update, delete, move)
 
 = 2.2.2 =
 * fixed: prevent double widget initialization in Elementor editor when used alongside themes bundling arts/elementor-extension

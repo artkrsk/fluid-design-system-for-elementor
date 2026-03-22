@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Artem Semkin\n"
 "Last-Translator: Artem Semkin\n"
-"POT-Creation-Date: 2026-01-07T14:21:53.579Z"
+"POT-Creation-Date: 2026-03-22T17:19:13.362Z"
 "Report-Msgid-Bugs-To: https://artemsemkin.com\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -16,6 +16,238 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/php/Managers/Abilities.php:38, src/php/Managers/Abilities.php:98, src/php/Managers/Admin/Page.php:29, src/php/Managers/Admin/Page.php:30
+msgid "Fluid Design System"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:39
+msgid "Manage fluid typography and spacing presets."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:99
+msgid "Manage fluid typography and spacing presets — create, organize, and inspect design tokens."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:151
+msgid "List Preset Groups"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:152
+msgid "Lists all preset groups with metadata. Does not include presets — use get-preset-group for that."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:186
+msgid "Get Preset Group"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:187
+msgid "Returns a single group and its presets. Use group_id or control_id from list-preset-groups."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:196
+msgid "Group identifier — either the group_id (e.g. \"spacing\") or control_id (e.g. \"fluid_spacing_presets\")."
+msgstr ""
+
+#. translators: %s: Group ID that was not found
+#: src/php/Managers/Abilities.php:241, src/php/Managers/Abilities.php:377, src/php/Managers/Abilities.php:458
+msgid "Group \"%s\" not found. Call list-preset-groups to see available groups."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:250
+msgid "Create Preset Group"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:251
+msgid "Creates a custom preset group. Names must be unique. Use create-preset to populate it."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:261
+msgid "Display name for the group. Must be unique."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:265
+msgid "Optional description of the group's purpose."
+msgstr ""
+
+#. translators: %s: Duplicate group name
+#: src/php/Managers/Abilities.php:296, src/php/Managers/Abilities.php:386
+msgid "A group named \"%s\" already exists. Call list-preset-groups to see current names."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:307
+msgid "Failed to create preset group."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:329
+msgid "Rename Preset Group"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:330
+msgid "Renames a custom group. Built-in groups (Spacing, Typography) cannot be renamed."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:339
+msgid "ID of the custom group to rename."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:344
+msgid "New display name. Must be unique."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:398
+msgid "Failed to save group changes."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:418
+msgid "Delete Preset Group"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:419
+msgid "Deletes a custom group and its presets. Built-in groups cannot be deleted."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:428
+msgid "ID of the custom group to delete."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:466
+msgid "Failed to delete preset group."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:482
+msgid "List Presets"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:483
+msgid "Lists presets across all groups or filtered by group_id. Returns name, min/max values, units, and CSS variable per preset."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:492
+msgid "Optional. Filter presets to a specific group by group_id or control_id."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:555
+msgid "Get Preset"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:556
+msgid "Returns a single preset by ID. Requires preset_id and group_id from list-presets."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:565
+msgid "The preset _id (e.g. \"fluid-abc123\")."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:569, src/php/Managers/Abilities.php:834
+msgid "The group containing this preset (group_id or control_id)."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:618
+msgid "Create Preset"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:619
+msgid "Creates a fluid preset. Provide min/max values and units — the plugin computes the CSS clamp() formula."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:629
+msgid "Display name for the preset."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:633
+msgid "Minimum size value (at the smallest breakpoint)."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:638
+msgid "Unit for min_size."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:642
+msgid "Maximum size value (at the largest breakpoint)."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:647
+msgid "Unit for max_size."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:651
+msgid "Target group (group_id or control_id). Defaults to spacing."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:721
+msgid "Update Preset"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:722
+msgid "Renames a preset or moves it to another group. Fluid values (min/max) can only be set at creation time via this API."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:731
+msgid "The preset _id to update."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:735
+msgid "Current group of the preset (group_id or control_id)."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:740
+msgid "New display name for the preset."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:744
+msgid "Move preset to this group (group_id or control_id)."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:820
+msgid "Delete Preset"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:821
+msgid "Removes a preset by ID. Requires preset_id and group_id from list-presets. Elements using it will fall back to non-fluid values."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:830
+msgid "The preset _id to delete."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:882
+msgid "Move Preset to Group"
+msgstr ""
+
+#: src/php/Managers/Abilities.php:883
+msgid "Moves a preset between groups atomically. Values are preserved. Use for bulk reorganization; for rename+move use update-preset instead."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:892
+msgid "The preset _id to move."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:896
+msgid "Current group (group_id or control_id)."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:900
+msgid "Target group (group_id or control_id)."
+msgstr ""
+
+#. translators: %s: The group identifier
+#: src/php/Managers/Abilities.php:940
+msgid "Source and target are the same group (\"%s\"). No move needed."
+msgstr ""
+
+#. translators: %s: Invalid group identifier
+#: src/php/Managers/Abilities.php:1011
+msgid "Could not resolve \"%s\" to a group. Call list-preset-groups to see valid group IDs."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:1021
+msgid "Elementor is not active."
+msgstr ""
+
+#: src/php/Managers/Abilities.php:1030
+msgid "Could not load active Elementor Kit."
+msgstr ""
 
 #: src/php/Managers/Compatibility.php:71
 msgid "Delete Fluid Preset"
@@ -113,16 +345,24 @@ msgstr ""
 msgid "Manage"
 msgstr ""
 
-#: src/php/Services/KitRepeaterService.php:33
-msgid "Invalid Kit settings."
-msgstr ""
-
-#: src/php/Services/KitRepeaterService.php:39
+#: src/php/Services/KitRepeaterService.php:32, src/php/Services/KitRepeaterService.php:64, src/php/Services/KitRepeaterService.php:106
 msgid "Preset group not found."
 msgstr ""
 
-#: src/php/Services/KitRepeaterService.php:60
+#: src/php/Services/KitRepeaterService.php:48, src/php/Services/KitRepeaterService.php:85, src/php/Services/KitRepeaterService.php:128
 msgid "Preset not found."
+msgstr ""
+
+#: src/php/Services/KitRepeaterService.php:152
+msgid "Source preset group not found."
+msgstr ""
+
+#: src/php/Services/KitRepeaterService.php:175
+msgid "Preset not found in source group."
+msgstr ""
+
+#: src/php/Services/KitRepeaterService.php:203
+msgid "Invalid Kit settings."
 msgstr ""
 
 #: src/php/Elementor/Tabs/FluidTypographySpacing.php:35
@@ -300,10 +540,6 @@ msgstr ""
 
 #: src/php/Managers/Admin/Frontend.php:227
 msgid "Failed to save changes. Please try again."
-msgstr ""
-
-#: src/php/Managers/Admin/Page.php:29, src/php/Managers/Admin/Page.php:30
-msgid "Fluid Design System"
 msgstr ""
 
 #: src/php/Managers/Admin/Page.php:42

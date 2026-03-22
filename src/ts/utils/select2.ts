@@ -6,9 +6,6 @@ import type {
   TSelect2OptionData
 } from '../types'
 
-// Re-export for JSDoc compatibility in templates.js
-export type { TSelect2State as Select2State } from '../types'
-
 class Select2Utils {
   static getTemplateSelect2(
     state: TSelect2State,

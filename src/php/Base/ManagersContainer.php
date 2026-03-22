@@ -26,5 +26,6 @@ use ArtsFluidDS\Arts\Base\Containers\ManagersContainer as BaseManagersContainer;
  * @property \Arts\FluidDesignSystem\Managers\GroupsData $groups_data
  * @property \Arts\FluidDesignSystem\Managers\CSSVariables $css_variables
  * @property \Arts\FluidDesignSystem\Managers\ControlRegistry $control_registry
+ * @property \Arts\FluidDesignSystem\Managers\Abilities $abilities
  */
 class ManagersContainer extends BaseManagersContainer {}
