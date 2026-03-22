@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Artem Semkin\n"
 "Last-Translator: Artem Semkin\n"
-"POT-Creation-Date: 2026-03-22T14:43:03.008Z"
+"POT-Creation-Date: 2026-03-22T17:19:13.362Z"
 "Report-Msgid-Bugs-To: https://artemsemkin.com\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,264 +17,235 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/php/Managers/Abilities.php:39, src/php/Managers/Abilities.php:107, src/php/Managers/Admin/Page.php:29, src/php/Managers/Admin/Page.php:30
+#: src/php/Managers/Abilities.php:38, src/php/Managers/Abilities.php:98, src/php/Managers/Admin/Page.php:29, src/php/Managers/Admin/Page.php:30
 msgid "Fluid Design System"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:40
+#: src/php/Managers/Abilities.php:39
 msgid "Manage fluid typography and spacing presets."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:108
+#: src/php/Managers/Abilities.php:99
 msgid "Manage fluid typography and spacing presets — create, organize, and inspect design tokens."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:122
-msgid "Fluid Design System (Full)"
-msgstr ""
-
-#: src/php/Managers/Abilities.php:123
-msgid "Full preset management including rename, update, and delete operations."
-msgstr ""
-
-#: src/php/Managers/Abilities.php:175
+#: src/php/Managers/Abilities.php:151
 msgid "List Preset Groups"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:176
-msgid "Returns all preset groups (built-in, custom, and filter-added) with their metadata. Use this to discover what groups exist before creating presets or to audit a site's design token structure."
+#: src/php/Managers/Abilities.php:152
+msgid "Lists all preset groups with metadata. Does not include presets — use get-preset-group for that."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:210
+#: src/php/Managers/Abilities.php:186
 msgid "Get Preset Group"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:211
-msgid "Returns a single preset group with its presets. Accepts either the group_id (e.g. \"spacing\", \"my_group_123\") or the control_id (e.g. \"fluid_spacing_presets\"). Use this to inspect all presets within a specific group."
+#: src/php/Managers/Abilities.php:187
+msgid "Returns a single group and its presets. Use group_id or control_id from list-preset-groups."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:220
+#: src/php/Managers/Abilities.php:196
 msgid "Group identifier — either the group_id (e.g. \"spacing\") or control_id (e.g. \"fluid_spacing_presets\")."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:264, src/php/Managers/Abilities.php:398, src/php/Managers/Abilities.php:477, src/php/Services/KitRepeaterService.php:32, src/php/Services/KitRepeaterService.php:64, src/php/Services/KitRepeaterService.php:106
-msgid "Preset group not found."
+#. translators: %s: Group ID that was not found
+#: src/php/Managers/Abilities.php:241, src/php/Managers/Abilities.php:377, src/php/Managers/Abilities.php:458
+msgid "Group \"%s\" not found. Call list-preset-groups to see available groups."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:273
+#: src/php/Managers/Abilities.php:250
 msgid "Create Preset Group"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:274
-msgid "Creates a new custom preset group. Group names must be unique across all group types (built-in, custom, filter-added). After creating a group, use create-preset to add presets to it."
+#: src/php/Managers/Abilities.php:251
+msgid "Creates a custom preset group. Names must be unique. Use create-preset to populate it."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:284
+#: src/php/Managers/Abilities.php:261
 msgid "Display name for the group. Must be unique."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:288
+#: src/php/Managers/Abilities.php:265
 msgid "Optional description of the group's purpose."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:318, src/php/Managers/Abilities.php:406, src/php/Managers/Admin/Tabs/Groups/AJAX.php:112
-msgid "A group with this name already exists."
+#. translators: %s: Duplicate group name
+#: src/php/Managers/Abilities.php:296, src/php/Managers/Abilities.php:386
+msgid "A group named \"%s\" already exists. Call list-preset-groups to see current names."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:329
+#: src/php/Managers/Abilities.php:307
 msgid "Failed to create preset group."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:351
+#: src/php/Managers/Abilities.php:329
 msgid "Rename Preset Group"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:352
-msgid "Renames a custom preset group. Built-in groups (Spacing, Typography) cannot be renamed. The new name must be unique across all group types."
+#: src/php/Managers/Abilities.php:330
+msgid "Renames a custom group. Built-in groups (Spacing, Typography) cannot be renamed."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:361
+#: src/php/Managers/Abilities.php:339
 msgid "ID of the custom group to rename."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:366
+#: src/php/Managers/Abilities.php:344
 msgid "New display name. Must be unique."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:418
+#: src/php/Managers/Abilities.php:398
 msgid "Failed to save group changes."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:438
+#: src/php/Managers/Abilities.php:418
 msgid "Delete Preset Group"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:439
-msgid "Deletes a custom preset group and its metadata. Built-in groups cannot be deleted. Presets within the group are removed from Kit settings."
+#: src/php/Managers/Abilities.php:419
+msgid "Deletes a custom group and its presets. Built-in groups cannot be deleted."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:448
+#: src/php/Managers/Abilities.php:428
 msgid "ID of the custom group to delete."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:485
+#: src/php/Managers/Abilities.php:466
 msgid "Failed to delete preset group."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:501
+#: src/php/Managers/Abilities.php:482
 msgid "List Presets"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:502
-msgid "Returns all presets across all groups, or filtered to a specific group. Each preset includes its name, min/max values, units, and the CSS custom property it generates. Use this for auditing, duplicate detection, or scaffolding workflows."
+#: src/php/Managers/Abilities.php:483
+msgid "Lists presets across all groups or filtered by group_id. Returns name, min/max values, units, and CSS variable per preset."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:511
+#: src/php/Managers/Abilities.php:492
 msgid "Optional. Filter presets to a specific group by group_id or control_id."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:574
+#: src/php/Managers/Abilities.php:555
 msgid "Get Preset"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:575
-msgid "Returns a single preset by ID within a specific group. Includes the full preset data: name, min/max values, units, CSS custom property name, and computed clamp formula."
+#: src/php/Managers/Abilities.php:556
+msgid "Returns a single preset by ID. Requires preset_id and group_id from list-presets."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:584
+#: src/php/Managers/Abilities.php:565
 msgid "The preset _id (e.g. \"fluid-abc123\")."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:588, src/php/Managers/Abilities.php:853
+#: src/php/Managers/Abilities.php:569, src/php/Managers/Abilities.php:834
 msgid "The group containing this preset (group_id or control_id)."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:637
+#: src/php/Managers/Abilities.php:618
 msgid "Create Preset"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:638
-msgid "Creates a new fluid preset in a group. Provide the raw min/max values and units — the plugin computes the CSS clamp() formula automatically. Ideal for scaffolding presets from a Figma spec or replicating presets from another site."
+#: src/php/Managers/Abilities.php:619
+msgid "Creates a fluid preset. Provide min/max values and units — the plugin computes the CSS clamp() formula."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:648
+#: src/php/Managers/Abilities.php:629
 msgid "Display name for the preset."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:652
+#: src/php/Managers/Abilities.php:633
 msgid "Minimum size value (at the smallest breakpoint)."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:657
+#: src/php/Managers/Abilities.php:638
 msgid "Unit for min_size."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:661
+#: src/php/Managers/Abilities.php:642
 msgid "Maximum size value (at the largest breakpoint)."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:666
+#: src/php/Managers/Abilities.php:647
 msgid "Unit for max_size."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:670
+#: src/php/Managers/Abilities.php:651
 msgid "Target group (group_id or control_id). Defaults to spacing."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:740
+#: src/php/Managers/Abilities.php:721
 msgid "Update Preset"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:741
-msgid "Updates a preset's name and/or group assignment. Does NOT allow changing fluid values (min/max sizes, units) — editing visual values requires the Elementor UI for verification. To move a preset to another group, you can also use the dedicated move-preset-to-group tool."
+#: src/php/Managers/Abilities.php:722
+msgid "Renames a preset or moves it to another group. Fluid values (min/max) can only be set at creation time via this API."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:750
+#: src/php/Managers/Abilities.php:731
 msgid "The preset _id to update."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:754
+#: src/php/Managers/Abilities.php:735
 msgid "Current group of the preset (group_id or control_id)."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:759
+#: src/php/Managers/Abilities.php:740
 msgid "New display name for the preset."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:763
+#: src/php/Managers/Abilities.php:744
 msgid "Move preset to this group (group_id or control_id)."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:839
+#: src/php/Managers/Abilities.php:820
 msgid "Delete Preset"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:840
-msgid "Permanently removes a preset from its group. The CSS custom property it generated will no longer be available. Elements using this preset will fall back to their non-fluid values."
+#: src/php/Managers/Abilities.php:821
+msgid "Removes a preset by ID. Requires preset_id and group_id from list-presets. Elements using it will fall back to non-fluid values."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:849
+#: src/php/Managers/Abilities.php:830
 msgid "The preset _id to delete."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:901
-msgid "Duplicate Preset"
-msgstr ""
-
-#: src/php/Managers/Abilities.php:902
-msgid "Creates a copy of an existing preset with a new ID. Optionally set a different title. The duplicate is added to the same group as the original. Useful for creating variations of existing design tokens."
-msgstr ""
-
-#: src/php/Managers/Abilities.php:911
-msgid "The preset _id to duplicate."
-msgstr ""
-
-#: src/php/Managers/Abilities.php:915
-msgid "The group containing the source preset (group_id or control_id)."
-msgstr ""
-
-#: src/php/Managers/Abilities.php:919
-msgid "Optional title for the copy. Defaults to \"Copy of {original title}\"."
-msgstr ""
-
-#. translators: %s: Original preset title
-#: src/php/Managers/Abilities.php:965
-msgid "Copy of %s"
-msgstr ""
-
-#: src/php/Managers/Abilities.php:983
+#: src/php/Managers/Abilities.php:882
 msgid "Move Preset to Group"
 msgstr ""
 
-#: src/php/Managers/Abilities.php:984
-msgid "Moves a preset from one group to another. The preset keeps all its values — only its group assignment changes. This is an atomic operation. Use this for organizing presets or consolidating stray design tokens into the correct group."
+#: src/php/Managers/Abilities.php:883
+msgid "Moves a preset between groups atomically. Values are preserved. Use for bulk reorganization; for rename+move use update-preset instead."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:993
+#: src/php/Managers/Abilities.php:892
 msgid "The preset _id to move."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:997
+#: src/php/Managers/Abilities.php:896
 msgid "Current group (group_id or control_id)."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:1001
+#: src/php/Managers/Abilities.php:900
 msgid "Target group (group_id or control_id)."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:1040
-msgid "Source and target groups are the same."
+#. translators: %s: The group identifier
+#: src/php/Managers/Abilities.php:940
+msgid "Source and target are the same group (\"%s\"). No move needed."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:1110
-msgid "Could not resolve group identifier to a valid control ID."
+#. translators: %s: Invalid group identifier
+#: src/php/Managers/Abilities.php:1011
+msgid "Could not resolve \"%s\" to a group. Call list-preset-groups to see valid group IDs."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:1120
+#: src/php/Managers/Abilities.php:1021
 msgid "Elementor is not active."
 msgstr ""
 
-#: src/php/Managers/Abilities.php:1129
+#: src/php/Managers/Abilities.php:1030
 msgid "Could not load active Elementor Kit."
 msgstr ""
 
@@ -372,6 +343,10 @@ msgstr ""
 
 #: src/php/Managers/Options.php:62
 msgid "Manage"
+msgstr ""
+
+#: src/php/Services/KitRepeaterService.php:32, src/php/Services/KitRepeaterService.php:64, src/php/Services/KitRepeaterService.php:106
+msgid "Preset group not found."
 msgstr ""
 
 #: src/php/Services/KitRepeaterService.php:48, src/php/Services/KitRepeaterService.php:85, src/php/Services/KitRepeaterService.php:128
@@ -614,6 +589,10 @@ msgstr ""
 
 #: src/php/Managers/Admin/Tabs/Groups/AJAX.php:103
 msgid "Title cannot be empty."
+msgstr ""
+
+#: src/php/Managers/Admin/Tabs/Groups/AJAX.php:112
+msgid "A group with this name already exists."
 msgstr ""
 
 #: src/php/Managers/Admin/Tabs/Groups/AJAX.php:122, src/php/Managers/Admin/Tabs/Groups/AJAX.php:179

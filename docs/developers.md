@@ -125,6 +125,80 @@ add_action('arts/fluid_design_system/controls/after_add_fluid_unit', function($e
 }, 10, 4);
 ```
 
+## AI Agents (MCP)
+
+The plugin registers a dedicated [MCP](https://modelcontextprotocol.io/) server that lets AI agents manage presets and preset groups programmatically.
+
+### Requirements
+
+- WordPress 6.9+ (ships with the Abilities API)
+- [MCP Adapter](https://github.com/WordPress/mcp-adapter) plugin installed and active
+
+### Available Tools
+
+| Tool                         | Description                                          |
+| ---------------------------- | ---------------------------------------------------- |
+| `fluid/list-preset-groups`   | Lists all groups with metadata                       |
+| `fluid/get-preset-group`     | Returns a group and its presets                      |
+| `fluid/create-preset-group`  | Creates a custom group                               |
+| `fluid/rename-preset-group`  | Renames a custom group                               |
+| `fluid/delete-preset-group`  | Deletes a custom group and its presets               |
+| `fluid/list-presets`         | Lists presets across all or a specific group         |
+| `fluid/get-preset`           | Returns a single preset by ID                        |
+| `fluid/create-preset`        | Creates a preset (plugin computes the clamp formula) |
+| `fluid/update-preset`        | Renames a preset or moves it to another group        |
+| `fluid/delete-preset`        | Removes a preset                                     |
+| `fluid/move-preset-to-group` | Moves a preset between groups atomically             |
+
+Read tools require `edit_posts`, write tools require `manage_options`.
+
+### Connecting via WP-CLI
+
+```bash
+# List available MCP servers
+wp mcp-adapter list
+
+# Start STDIO session
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | \
+  wp mcp-adapter serve --user=admin --server=fluid-design-system
+```
+
+### Connecting Claude Code
+
+Create a `.mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "fluid-design-system": {
+      "command": "wp",
+      "args": [
+        "--path=/path/to/wordpress",
+        "mcp-adapter",
+        "serve",
+        "--server=fluid-design-system",
+        "--user=admin"
+      ]
+    }
+  }
+}
+```
+
+Adjust `--path` and `--user` for your environment. If using Local by Flywheel, you'll need the full PHP binary path and a `-d mysqli.default_socket=...` argument.
+
+### Logging
+
+Every tool execution fires the `arts/fluid_design_system/ability_executed` action:
+
+```php
+add_action('arts/fluid_design_system/ability_executed', function($log_entry) {
+    // $log_entry contains: ability, user_id, timestamp, input, success
+    error_log('Fluid DS: ' . $log_entry['ability'] . ' by user ' . $log_entry['user_id']);
+});
+```
+
+When `WP_DEBUG_LOG` is enabled, executions are also written to the WordPress debug log automatically.
+
 ## Complete Example
 
 Add fluid support to a custom widget:

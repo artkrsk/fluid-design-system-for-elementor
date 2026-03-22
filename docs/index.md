@@ -32,4 +32,7 @@ features:
   - icon: ⚙️
     title: Admin Panel
     details: Comprehensive management interface accessible via Elementor > Fluid Design System for organizing your design tokens.
+  - icon: 🤖
+    title: AI Agent Ready
+    details: MCP server for AI-assisted preset management. Scaffold design tokens from specs, audit existing presets, or organize at scale.
 ---

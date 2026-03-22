@@ -41,7 +41,7 @@ class Abilities extends BaseManager {
 		);
 	}
 
-	/** Registers all 11 abilities with schemas, callbacks, and MCP meta. */
+	/** Registers abilities with schemas, callbacks, and MCP meta. */
 	public function register_abilities(): void {
 		if ( ! function_exists( 'wp_register_ability' ) ) {
 			return;
