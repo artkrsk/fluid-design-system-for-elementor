@@ -28,13 +28,14 @@ $test_page_slug = 'e2e-fluid-test';
 
 // Element IDs matching test-data.ts TEST_ELEMENT_IDS
 $element_ids = array(
-	'headingXl'             => 'e2e-heading-xl',
-	'headingInverted'       => 'e2e-heading-inverted',
-	'containerNegative'     => 'e2e-container-negative', // Separate container for negative margin (not in flex)
-	'spacerStandard'        => 'e2e-spacer-standard',
-	'containerGap'          => 'e2e-container-gap',
-	'buttonDimensions'      => 'e2e-button-dimensions',
-	'customBreakpoint'      => 'e2e-custom-breakpoint',
+	'headingXl'         => 'e2e-heading-xl',
+	'headingInverted'   => 'e2e-heading-inverted',
+	'containerNegative' => 'e2e-container-negative', // Separate container for negative margin (not in flex)
+	'spacerStandard'    => 'e2e-spacer-standard',
+	'containerGap'      => 'e2e-container-gap',
+	'buttonDimensions'  => 'e2e-button-dimensions',
+	'customBreakpoint'  => 'e2e-custom-breakpoint',
+	'bgPosition'        => 'e2e-bg-position',
 );
 
 /**
@@ -55,20 +56,22 @@ function e2e_get_preset_var( string $preset_id ): string {
 }
 
 // Build Elementor elements structure
-$main_container_id       = e2e_generate_id();
-$heading_xl_id           = e2e_generate_id();
-$heading_inverted_id     = e2e_generate_id();
-$negative_container_id   = e2e_generate_id(); // Separate top-level container for negative margin
-$negative_inner_text_id  = e2e_generate_id();
-$spacer_id               = e2e_generate_id();
-$gap_container_id        = e2e_generate_id();
-$gap_child1_id           = e2e_generate_id();
-$gap_child2_id           = e2e_generate_id();
-$button_id               = e2e_generate_id();
-$custom_breakpoint_id    = e2e_generate_id();
-$inner_text1_id          = e2e_generate_id();
-$inner_text2_id          = e2e_generate_id();
-$custom_bp_heading_id    = e2e_generate_id();
+$main_container_id      = e2e_generate_id();
+$heading_xl_id          = e2e_generate_id();
+$heading_inverted_id    = e2e_generate_id();
+$negative_container_id  = e2e_generate_id(); // Separate top-level container for negative margin
+$negative_inner_text_id = e2e_generate_id();
+$spacer_id              = e2e_generate_id();
+$gap_container_id       = e2e_generate_id();
+$gap_child1_id          = e2e_generate_id();
+$gap_child2_id          = e2e_generate_id();
+$button_id              = e2e_generate_id();
+$custom_breakpoint_id   = e2e_generate_id();
+$inner_text1_id         = e2e_generate_id();
+$inner_text2_id         = e2e_generate_id();
+$custom_bp_heading_id   = e2e_generate_id();
+$bg_position_id         = e2e_generate_id();
+$bg_position_text_id    = e2e_generate_id();
 
 $elements = array(
 	// Main container
@@ -92,11 +95,11 @@ $elements = array(
 				'elType'     => 'widget',
 				'widgetType' => 'heading',
 				'settings'   => array(
-					'title'                   => 'Fluid Heading XL',
-					'_element_id'             => $element_ids['headingXl'],
-					'header_size'             => 'h1',
-					'typography_typography'   => 'custom',
-					'typography_font_size'    => array(
+					'title'                 => 'Fluid Heading XL',
+					'_element_id'           => $element_ids['headingXl'],
+					'header_size'           => 'h1',
+					'typography_typography' => 'custom',
+					'typography_font_size'  => array(
 						'unit' => 'fluid',
 						'size' => e2e_get_preset_var( 'e2e_heading_xl' ),
 					),
@@ -108,11 +111,11 @@ $elements = array(
 				'elType'     => 'widget',
 				'widgetType' => 'heading',
 				'settings'   => array(
-					'title'                   => 'Inverted Preset (shrinks on desktop)',
-					'_element_id'             => $element_ids['headingInverted'],
-					'header_size'             => 'h2',
-					'typography_typography'   => 'custom',
-					'typography_font_size'    => array(
+					'title'                 => 'Inverted Preset (shrinks on desktop)',
+					'_element_id'           => $element_ids['headingInverted'],
+					'header_size'           => 'h2',
+					'typography_typography' => 'custom',
+					'typography_font_size'  => array(
 						'unit' => 'fluid',
 						'size' => e2e_get_preset_var( 'e2e_inverted' ),
 					),
@@ -136,9 +139,9 @@ $elements = array(
 				'id'       => $gap_container_id,
 				'elType'   => 'container',
 				'settings' => array(
-					'_element_id'     => $element_ids['containerGap'],
-					'flex_direction'  => 'row',
-					'flex_gap'        => array(
+					'_element_id'      => $element_ids['containerGap'],
+					'flex_direction'   => 'row',
+					'flex_gap'         => array(
 						'unit'     => 'fluid',
 						'size'     => e2e_get_preset_var( 'e2e_gap_large' ),
 						'column'   => e2e_get_preset_var( 'e2e_gap_large' ),
@@ -179,8 +182,8 @@ $elements = array(
 				'elType'     => 'widget',
 				'widgetType' => 'button',
 				'settings'   => array(
-					'_element_id'      => $element_ids['buttonDimensions'],
-					'text'             => 'Fluid Padding Button',
+					'_element_id'         => $element_ids['buttonDimensions'],
+					'text'                => 'Fluid Padding Button',
 					'button_text_padding' => array(
 						'unit'     => 'fluid',
 						'top'      => e2e_get_preset_var( 'e2e_gap_standard' ),
@@ -197,14 +200,51 @@ $elements = array(
 				'elType'     => 'widget',
 				'widgetType' => 'heading',
 				'settings'   => array(
-					'title'                   => 'Custom Breakpoints (400-1600)',
-					'_element_id'             => $element_ids['customBreakpoint'],
-					'header_size'             => 'h2',
-					'typography_typography'   => 'custom',
-					'typography_font_size'    => array(
+					'title'                 => 'Custom Breakpoints (400-1600)',
+					'_element_id'           => $element_ids['customBreakpoint'],
+					'header_size'           => 'h2',
+					'typography_typography' => 'custom',
+					'typography_font_size'  => array(
 						'unit' => 'fluid',
 						'size' => e2e_get_preset_var( 'e2e_custom_breakpoints' ),
 					),
+				),
+			),
+		),
+	),
+	// Container with fluid background-position (Issue #23: cross-control unit leak)
+	array(
+		'id'       => $bg_position_id,
+		'elType'   => 'container',
+		'settings' => array(
+			'_element_id'           => $element_ids['bgPosition'],
+			'content_width'         => 'full',
+			'min_height'            => array(
+				'unit' => 'px',
+				'size' => 100,
+			),
+			'background_background' => 'classic',
+			'background_image'      => array(
+				'url' => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+				'id'  => '',
+			),
+			'background_position'   => 'initial',
+			'background_xpos'       => array(
+				'unit' => 'fluid',
+				'size' => e2e_get_preset_var( 'e2e_gap_standard' ),
+			),
+			'background_ypos'       => array(
+				'unit' => '%',
+				'size' => 100,
+			),
+		),
+		'elements' => array(
+			array(
+				'id'         => $bg_position_text_id,
+				'elType'     => 'widget',
+				'widgetType' => 'text-editor',
+				'settings'   => array(
+					'editor' => '<p>Container with fluid background-position X</p>',
 				),
 			),
 		),
@@ -215,17 +255,17 @@ $elements = array(
 		'id'       => $negative_container_id,
 		'elType'   => 'container',
 		'settings' => array(
-			'_element_id'     => $element_ids['containerNegative'],
-			'content_width'   => 'full',
+			'_element_id'      => $element_ids['containerNegative'],
+			'content_width'    => 'full',
 			'background_color' => '#ffe0e0',
-			'padding'         => array(
+			'padding'          => array(
 				'unit'   => 'px',
 				'top'    => '20',
 				'right'  => '20',
 				'bottom' => '20',
 				'left'   => '20',
 			),
-			'margin'          => array(
+			'margin'           => array(
 				'unit'     => 'fluid',
 				'top'      => e2e_get_preset_var( 'e2e_negative_margin' ),
 				'right'    => '',

@@ -203,6 +203,7 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 = 2.3.0 =
 * added: AI agent integration via WordPress Abilities API and MCP server
 * added: MCP tools for programmatic preset and group management (list, create, update, delete, move)
+* fixed: background position and similar styles could render incorrectly when using fluid presets
 
 = 2.2.2 =
 * fixed: prevent double widget initialization in Elementor editor when used alongside themes bundling arts/elementor-extension

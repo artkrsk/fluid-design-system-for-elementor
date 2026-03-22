@@ -204,7 +204,8 @@ export const TEST_ELEMENT_IDS = {
   spacerStandard: 'e2e-spacer-standard',
   containerGap: 'e2e-container-gap',
   buttonDimensions: 'e2e-button-dimensions',
-  customBreakpoint: 'e2e-custom-breakpoint'
+  customBreakpoint: 'e2e-custom-breakpoint',
+  bgPosition: 'e2e-bg-position' // Container with fluid background-position (Issue #23)
 }
 
 /** Get CSS selector for element ID */

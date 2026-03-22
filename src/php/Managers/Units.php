@@ -167,7 +167,9 @@ class Units extends BaseManager {
 	}
 
 	/**
-	 * Hooked to elementor/css-file/post-parse. Simplifies clamp() when min=max.
+	 * Hooked to elementor/css-file/post-parse.
+	 * 1. Strips leaked 'fluid' unit from compound CSS properties (e.g. background-position).
+	 * 2. Simplifies clamp() when min=max for :root preset variables.
 	 */
 	public function optimize_fluid_css_post_parse( \Elementor\Core\Files\CSS\Base $css_file ): void {
 		$stylesheet = $css_file->get_stylesheet();
@@ -185,12 +187,13 @@ class Units extends BaseManager {
 			}
 
 			foreach ( $selectors as $selector => $properties ) {
-				if ( ! is_array( $properties ) || empty( $properties ) || ! is_string( $selector ) || $selector !== ':root' ) {
+				if ( ! is_array( $properties ) || empty( $properties ) || ! is_string( $selector ) ) {
 					continue;
 				}
 
 				$optimized_properties = array();
 				$needs_update         = false;
+				$is_root              = $selector === ':root';
 
 				foreach ( $properties as $property => $value ) {
 					if ( ! is_string( $property ) || ! is_string( $value ) ) {
@@ -198,7 +201,19 @@ class Units extends BaseManager {
 						continue;
 					}
 
-					if ( strpos( $property, $preset_prefix ) === 0 && strpos( $value, 'clamp(' ) === 0 ) {
+					// Strip leaked 'fluid' unit from cross-control CSS references
+					if ( strpos( $value, 'fluid' ) !== false ) {
+						$cleaned = preg_replace( '/(?<=\))\s*fluid(?=\s|;|$)/', '', $value );
+
+						if ( is_string( $cleaned ) && $cleaned !== $value ) {
+							$optimized_properties[ $property ] = $cleaned;
+							$needs_update                      = true;
+							$value                             = $cleaned;
+						}
+					}
+
+					// Simplify clamp() when min=max for :root preset variables
+					if ( $is_root && strpos( $property, $preset_prefix ) === 0 && strpos( $value, 'clamp(' ) === 0 ) {
 						$simplified_value = $this->simplify_clamp_formula( $value );
 
 						if ( $simplified_value !== $value ) {
@@ -208,7 +223,9 @@ class Units extends BaseManager {
 							$optimized_properties[ $property ] = $value;
 						}
 					} else {
-						$optimized_properties[ $property ] = $value;
+						if ( ! isset( $optimized_properties[ $property ] ) ) {
+							$optimized_properties[ $property ] = $value;
+						}
 					}
 				}
 
