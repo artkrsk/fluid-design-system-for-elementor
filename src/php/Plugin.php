@@ -53,6 +53,7 @@ class Plugin extends BasePlugin {
 			'groups_data'                => Managers\GroupsData::class,
 			'css_variables'              => Managers\CSSVariables::class,
 			'control_registry'           => Managers\ControlRegistry::class,
+			'abilities'                  => Managers\Abilities::class,
 		);
 	}
 
@@ -72,6 +73,12 @@ class Plugin extends BasePlugin {
 		add_action( 'admin_menu', array( $this->managers->admin_page, 'add_admin_menu' ), 80 );
 		add_action( 'admin_enqueue_scripts', array( $this->managers->admin_frontend, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_fluid_design_system_admin_action', array( $this->managers->admin_tabs_groups_ajax, 'handle_ajax_requests' ) );
+
+		// WordPress Abilities API + MCP Adapter
+		add_action( 'wp_abilities_api_categories_init', array( $this->managers->abilities, 'register_category' ) );
+		add_action( 'wp_abilities_api_init', array( $this->managers->abilities, 'register_abilities' ) );
+		add_action( 'wp_after_execute_ability', array( $this->managers->abilities, 'log_execution' ), 10, 3 );
+		add_action( 'mcp_adapter_init', array( $this->managers->abilities, 'register_mcp_servers' ) );
 	}
 
 	protected function add_filters(): void {
