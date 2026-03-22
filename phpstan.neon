@@ -13,6 +13,7 @@ parameters:
 		- vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- vendor/arts/elementor-stubs/elementor-stubs.php
+		- stubs/mcp-adapter.php
 
 	treatPhpDocTypesAsCertain: false
 
