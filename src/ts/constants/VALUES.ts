@@ -1,14 +1,8 @@
 /** Supported CSS units for fluid values */
-export const CSS_UNITS = ['px', 'rem', 'em', '%', 'vw', 'vh'] as const
+const CSS_UNITS = ['px', 'rem', 'em', '%', 'vw', 'vh'] as const
 
 /** Regex pattern for parsing value with unit (e.g., "20px", "1.5rem") */
 export const VALUE_WITH_UNIT_PATTERN = new RegExp(`^(-?[\\d.]+)\\s?(${CSS_UNITS.join('|')})?$`, 'i')
-
-/** Control name constants for fluid preset repeaters */
-export const FLUID_REPEATER_CONTROLS = {
-  SPACING: 'fluid_spacing_presets',
-  TYPOGRAPHY: 'fluid_typography_presets'
-} as const
 
 /** Special value identifier for custom/inline fluid mode in dropdown */
 export const CUSTOM_FLUID_VALUE = '__custom__' as const

@@ -6,7 +6,7 @@ import {
   createSimpleOption,
   createCustomValueOption
 } from './presetOptions'
-import { getInheritedPreset, getInheritedPresetSync, isFluidPreset } from './presetLookup'
+import { getInheritedPresetSync, isFluidPreset } from './presetLookup'
 import type { IInheritanceData } from '../interfaces'
 
 /** Builds select options from preset data */
@@ -80,5 +80,4 @@ export async function buildSelectOptions(
   return selectEl
 }
 
-// Re-export lookup functions for backward compatibility
-export { getInheritedPreset, getInheritedPresetSync }
+export { getInheritedPresetSync }

@@ -7,7 +7,7 @@ import {
   createUnsetRule
 } from '../utils/cssRules'
 
-export class CSSManager {
+class CSSManager {
   private styleElement: HTMLElement | null = null
   private styleElementId: string = STYLES.STYLE_ID
 

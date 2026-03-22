@@ -1,43 +1,14 @@
 import { ValidationService } from './validation'
 import { generateClampFormula } from './clamp'
-import { PresetDialogManager } from '../managers/PresetDialogManager'
 import { PresetAPIService } from '../services/presetAPI'
 import { buildCreatePresetData, buildUpdatePresetData } from './presetData'
 import { dataManager, cssManager } from '../managers'
 import { STYLES, UI_TIMING } from '../constants'
-import type { IPresetData } from '../interfaces'
-
-type DialogInstance = { show: () => void }
 
 interface ICreatePresetCallbacks {
   refreshDropdowns: () => Promise<void>
   selectPreset: (setting: string, value: string) => void
   getLinkedSelects?: () => { setting: string }[]
-}
-
-/** Handles edit icon click - extracts preset data and opens dialog */
-export async function handleEditPresetClick(
-  selectEl: HTMLSelectElement,
-  openDialog: (mode: 'edit', data: IPresetData) => Promise<DialogInstance>
-): Promise<void> {
-  const presetId = selectEl.querySelector('option:checked')?.getAttribute('data-id')
-  if (!presetId) {
-    return
-  }
-
-  const setting = selectEl.getAttribute('data-setting') ?? ''
-  const option = selectEl.querySelector(`option[data-id="${presetId}"]`)
-  if (!option) {
-    return
-  }
-
-  const presetData = PresetDialogManager.extractPresetData(
-    option as HTMLOptionElement,
-    presetId,
-    setting
-  )
-  const dialog = await openDialog('edit', presetData)
-  dialog.show()
 }
 
 /** Handles preset update with CSS injection and refresh */

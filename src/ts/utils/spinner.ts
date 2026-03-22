@@ -56,4 +56,4 @@ class SpinnerUtils {
   }
 }
 
-export const { addControlSpinner, showControlSpinner, hideControlSpinner } = SpinnerUtils
+export const { showControlSpinner, hideControlSpinner } = SpinnerUtils
