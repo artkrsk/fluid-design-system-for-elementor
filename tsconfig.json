@@ -19,7 +19,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/ts/*"]
-    }
+    },
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "src/ts/**/*.ts",

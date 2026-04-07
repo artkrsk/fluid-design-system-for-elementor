@@ -27,7 +27,7 @@ class Select2Utils {
         data: TSelect2MatcherData
       ): TSelect2MatcherData | null => {
         // No search term - show everything
-        if (jQuery.trim(params.term) === '') {
+        if ((params.term ?? '').trim() === '') {
           return data
         }
 
