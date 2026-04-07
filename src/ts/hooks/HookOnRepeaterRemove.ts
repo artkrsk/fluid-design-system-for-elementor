@@ -2,7 +2,7 @@ import { stateManager, cssManager } from '../managers'
 import { getItemId } from '../utils'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
 import { isFluidPresetRepeater } from '../utils/controls'
-import type { HookArgs, BackboneCollection } from '@artemsemkin/elementor-types'
+import type { HookArgs, ThirdParty } from '@artemsemkin/elementor-types'
 
 const commandSystem = window.$e!
 
@@ -31,7 +31,9 @@ export class HookOnRepeaterRemove extends commandSystem.modules.hookUI.Before {
     stateManager.markDocumentAsChanged(container)
 
     // Get the model before it's removed
-    const collection = container.settings.get(presetName) as BackboneCollection | undefined
+    const collection = container.settings.get(presetName) as
+      | ThirdParty.BackboneCollection
+      | undefined
     if (!collection || index === undefined) {
       return true
     }
