@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["src/ts/index.ts"],
+  "entry": ["src/ts/index.ts", "tests/**/*.test.ts"],
   "project": ["src/ts/**/*.ts"],
   "ignore": ["tests/**", "__build__/**"],
   "ignoreBinaries": ["composer"],

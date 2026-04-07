@@ -7,6 +7,7 @@ import {
   registerSliderControlView
 } from './views'
 import { dataManager } from './managers'
+import { applyStyleguideCompat } from './utils/styleguideCompat'
 
 // Expose DataManager globally for dialog access
 window.artsFluidDesignSystem = window.artsFluidDesignSystem || {}
@@ -22,4 +23,8 @@ window.addEventListener('elementor/init', () => {
   registerDimensionsControlView()
   registerGapsControlView()
   registerSliderControlView()
+
+  window.elementor!.on('preview:loaded', () => {
+    applyStyleguideCompat()
+  })
 })
