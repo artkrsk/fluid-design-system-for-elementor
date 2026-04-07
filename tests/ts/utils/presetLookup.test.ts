@@ -1,6 +1,12 @@
-import { describe, it, expect } from 'vitest'
-import { isFluidPreset } from '@/utils/presetLookup'
-import type { IFluidPreset, ICustomPreset } from '@/interfaces'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+vi.mock('@/managers', () => ({
+  dataManager: { presets: null as any }
+}))
+
+import { isFluidPreset, getInheritedPresetSync } from '@/utils/presetLookup'
+import { dataManager } from '@/managers'
+import type { IFluidPreset, ICustomPreset, IPresetGroup } from '@/interfaces'
 
 describe('presetLookup utilities', () => {
   describe('isFluidPreset', () => {
@@ -128,6 +134,95 @@ describe('presetLookup utilities', () => {
       }
 
       expect(isFluidPreset(mixedUnitsPreset)).toBe(true)
+    })
+  })
+
+  describe('getInheritedPresetSync', () => {
+    const fluidPreset: IFluidPreset = {
+      id: 'fluid-1',
+      value: 'var(--arts-fluid-preset--fluid-1)',
+      title: 'Fluid 1',
+      min_size: '16',
+      min_unit: 'px',
+      max_size: '24',
+      max_unit: 'px'
+    }
+
+    const customPreset: ICustomPreset = {
+      id: 'custom-1',
+      value: 'inherit',
+      title: 'Inherit'
+    }
+
+    beforeEach(() => {
+      dataManager.presets = null
+    })
+
+    it('returns null when presets are not loaded', () => {
+      expect(getInheritedPresetSync('some-value')).toBeNull()
+    })
+
+    it('returns complex result when matching fluid preset in array group', () => {
+      dataManager.presets = [
+        { name: 'Typography', value: [fluidPreset, customPreset] }
+      ] as IPresetGroup[]
+
+      const result = getInheritedPresetSync(fluidPreset.value)
+
+      expect(result).toEqual({ ...fluidPreset, isComplex: true })
+    })
+
+    it('returns simple result when matching string group', () => {
+      dataManager.presets = [
+        { name: 'Simple', value: 'simple-token' }
+      ] as IPresetGroup[]
+
+      const result = getInheritedPresetSync('simple-token')
+
+      expect(result).toEqual({ isComplex: false, id: 'simple-token', name: 'Simple' })
+    })
+
+    it('returns null when no preset matches', () => {
+      dataManager.presets = [
+        { name: 'Typography', value: [fluidPreset] }
+      ] as IPresetGroup[]
+
+      expect(getInheritedPresetSync('non-existent')).toBeNull()
+    })
+
+    it('skips custom presets in array groups', () => {
+      dataManager.presets = [
+        { name: 'Mixed', value: [customPreset] }
+      ] as IPresetGroup[]
+
+      expect(getInheritedPresetSync(customPreset.value)).toBeNull()
+    })
+
+    it('searches across multiple groups', () => {
+      dataManager.presets = [
+        { name: 'Group A', value: 'token-a' },
+        { name: 'Group B', value: [fluidPreset] }
+      ] as IPresetGroup[]
+
+      const result = getInheritedPresetSync(fluidPreset.value)
+
+      expect(result).toEqual({ ...fluidPreset, isComplex: true })
+    })
+
+    it('returns null for null inheritedSize', () => {
+      dataManager.presets = [
+        { name: 'Group', value: [fluidPreset] }
+      ] as IPresetGroup[]
+
+      expect(getInheritedPresetSync(null)).toBeNull()
+    })
+
+    it('does not match string group when value differs', () => {
+      dataManager.presets = [
+        { name: 'Simple', value: 'token-x' }
+      ] as IPresetGroup[]
+
+      expect(getInheritedPresetSync('token-y')).toBeNull()
     })
   })
 })
