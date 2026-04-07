@@ -1,4 +1,4 @@
-import type { Container, BackboneCollection, BackboneModel } from '@artemsemkin/elementor-types'
+import type { Container, ThirdParty } from '@artemsemkin/elementor-types'
 
 /** Checks if a unit value is fluid */
 export function isFluidUnit(unit: string | undefined): boolean {
@@ -20,8 +20,10 @@ export function isFluidPresetRepeater(
   controlName: string | undefined,
   container: Container | undefined
 ): boolean {
-  const controls = (container?.view?.model as any)?.controls as BackboneCollection | undefined
-  const kitControls = controls?.get(controlName ?? '') as BackboneModel | undefined
+  const controls = (container?.view?.model as any)?.controls as
+    | ThirdParty.BackboneCollection
+    | undefined
+  const kitControls = controls?.get(controlName ?? '') as ThirdParty.BackboneModel | undefined
   if (kitControls) {
     return kitControls.get('is_fluid_preset_repeater') === true
   }

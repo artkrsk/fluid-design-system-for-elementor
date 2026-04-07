@@ -1,4 +1,4 @@
-import type { BackboneModel } from '@artemsemkin/elementor-types'
+import type { ThirdParty } from '@artemsemkin/elementor-types'
 import type { IInheritedControlValue } from '../interfaces'
 
 /** Manages inheritance attribute setup for fluid control selectors */
@@ -7,7 +7,7 @@ export class InheritanceAttributeManager {
   static setupAttributes(
     fluidSelector: HTMLElement,
     propertyName: string,
-    controlModel: BackboneModel,
+    controlModel: ThirdParty.BackboneModel,
     getParentValueFn: () => IInheritedControlValue | null
   ): void {
     const controlName = controlModel.get('name') as string | undefined
