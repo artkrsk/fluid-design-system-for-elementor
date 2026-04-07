@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { sanitizeFluidCSS } from '@/utils/styleguideCompat'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { sanitizeFluidCSS, applyStyleguideCompat } from '@/utils/styleguideCompat'
 
 describe('sanitizeFluidCSS', () => {
   it('strips "fluid" after var() with semicolon', () => {
@@ -77,5 +77,107 @@ describe('sanitizeFluidCSS', () => {
     expect(result).toBe(
       '.ecSLNa{font-family:Roboto,sans-serif;font-size:var(--arts-fluid-preset--fluid-9446699a-33ac-4826-925f-da57395047d8);font-weight:600;}'
     )
+  })
+})
+
+describe('applyStyleguideCompat', () => {
+  let originalElementor: any
+
+  beforeEach(() => {
+    originalElementor = (window as any).elementor
+  })
+
+  afterEach(() => {
+    (window as any).elementor = originalElementor
+  })
+
+  it('does nothing when elementor is not available', () => {
+    ;(window as any).elementor = undefined
+
+    expect(() => applyStyleguideCompat()).not.toThrow()
+  })
+
+  it('does nothing when $preview is not available', () => {
+    ;(window as any).elementor = {}
+
+    expect(() => applyStyleguideCompat()).not.toThrow()
+  })
+
+  it('does nothing when iframe has no contentWindow', () => {
+    ;(window as any).elementor = { $preview: [{}] }
+
+    expect(() => applyStyleguideCompat()).not.toThrow()
+  })
+
+  it('patches insertRule to sanitize CSS', () => {
+    const originalInsertRule = vi.fn().mockReturnValue(0)
+    const mockProto = { insertRule: originalInsertRule }
+    const mockWindow = {
+      CSSStyleSheet: { prototype: mockProto }
+    }
+
+    ;(window as any).elementor = {
+      $preview: [{ contentWindow: mockWindow }]
+    }
+
+    applyStyleguideCompat()
+
+    // insertRule should now be patched
+    expect(mockProto.insertRule).not.toBe(originalInsertRule)
+
+    // Call the patched insertRule with a leaked "fluid" rule
+    mockProto.insertRule('.foo { font-size: var(--x) fluid; }', 0)
+
+    expect(originalInsertRule).toHaveBeenCalledWith('.foo { font-size: var(--x); }', 0)
+  })
+
+  it('passes clean CSS through unchanged', () => {
+    const originalInsertRule = vi.fn().mockReturnValue(0)
+    const mockProto = { insertRule: originalInsertRule }
+    const mockWindow = {
+      CSSStyleSheet: { prototype: mockProto }
+    }
+
+    ;(window as any).elementor = {
+      $preview: [{ contentWindow: mockWindow }]
+    }
+
+    applyStyleguideCompat()
+
+    mockProto.insertRule('.foo { color: red; }', 0)
+
+    expect(originalInsertRule).toHaveBeenCalledWith('.foo { color: red; }', 0)
+  })
+
+  it('sets __fluidCSSPatched flag', () => {
+    const mockWindow: any = {
+      CSSStyleSheet: { prototype: { insertRule: vi.fn() } }
+    }
+
+    ;(window as any).elementor = {
+      $preview: [{ contentWindow: mockWindow }]
+    }
+
+    applyStyleguideCompat()
+
+    expect(mockWindow.__fluidCSSPatched).toBe(true)
+  })
+
+  it('does not patch twice', () => {
+    const originalInsertRule = vi.fn()
+    const mockProto = { insertRule: originalInsertRule }
+    const mockWindow: any = {
+      __fluidCSSPatched: true,
+      CSSStyleSheet: { prototype: mockProto }
+    }
+
+    ;(window as any).elementor = {
+      $preview: [{ contentWindow: mockWindow }]
+    }
+
+    applyStyleguideCompat()
+
+    // insertRule should remain the original since __fluidCSSPatched is true
+    expect(mockProto.insertRule).toBe(originalInsertRule)
   })
 })
