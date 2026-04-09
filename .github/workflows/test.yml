@@ -71,6 +71,9 @@ jobs:
 
           echo "✅ ZIP size: ${SIZE_MB} MB"
 
+      - name: Clean up stale wp-env Docker resources
+        run: npx wp-env destroy --force 2>/dev/null || true
+
       - name: Run WordPress Plugin Check
         uses: wordpress/plugin-check-action@v1
         with:
