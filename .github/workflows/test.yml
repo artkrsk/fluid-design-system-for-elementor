@@ -210,7 +210,11 @@ jobs:
         run: npx playwright install-deps ${{ matrix.browser }}
 
       - name: Install Playwright browsers
-        run: npx playwright install ${{ matrix.browser }}
+        run: |
+          npx playwright install ${{ matrix.browser }}
+          if [ "${{ matrix.browser }}" != "chromium" ]; then
+            npx playwright install chromium
+          fi
 
       - name: Destroy previous wp-env
         run: npm run wp-env destroy -- --force || true
