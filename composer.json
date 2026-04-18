@@ -17,8 +17,8 @@
     "arts/utilities": "@dev"
   },
   "require-dev": {
-    "arts/elementor-stubs": "^3.34",
-    "brianhenryie/strauss": "^0.19",
+    "arts/elementor-stubs": "^4.0",
+    "brianhenryie/strauss": "^0.27",
     "captainhook/captainhook": "^5.27",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "ergebnis/composer-normalize": "^2.48",
