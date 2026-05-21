@@ -72,7 +72,13 @@ jobs:
           echo "✅ ZIP size: ${SIZE_MB} MB"
 
       - name: Clean up stale wp-env Docker resources
-        run: npx wp-env destroy --force 2>/dev/null || true
+        run: |
+          # The plugin-check action generates its own hashed .wp-env.json, so a prior
+          # run's containers can orphan under a hash `wp-env destroy` won't match and
+          # keep 8880/8881 bound. Remove them by project name and published port.
+          docker rm -f $(docker ps -aq --filter "name=wp-env-fluid-design-system-for-elementor") 2>/dev/null || true
+          docker rm -f $(docker ps -aq --filter "publish=8880" --filter "publish=8881") 2>/dev/null || true
+          npx wp-env destroy --force 2>/dev/null || true
 
       - name: Run WordPress Plugin Check
         uses: wordpress/plugin-check-action@v1
