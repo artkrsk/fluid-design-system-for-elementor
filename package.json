@@ -78,5 +78,8 @@
     "docs/**/*.md": "prettier --write",
     "*.md": "prettier --write"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "overrides": {
+    "qs": "^6.15.2"
+  }
 }
