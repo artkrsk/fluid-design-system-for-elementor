@@ -1,6 +1,6 @@
 === Fluid Design System for Elementor ===
 Contributors: artemsemkin
-Tags: typography, spacing, responsive, fluid, elementor, ai
+Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0

@@ -85,8 +85,14 @@ jobs:
         with:
           build-dir: './dist/fluid-design-system-for-elementor'
           wp-version: 'latest'
+          # wp_function_not_compatible_with_requires_wp: the Abilities API
+          # (wp_register_ability*) is WP 6.9+, but every call sits behind a
+          # function_exists() guard so it stays inert on WP 6.0-6.8. This check
+          # ignores guards by design, so it false-positives while we keep
+          # "Requires at least: 6.0".
           ignore-codes: |
             WordPress.NamingConventions.PrefixAllGlobals.InvalidPrefixPassed
+            wp_function_not_compatible_with_requires_wp
 
   code-quality:
     name: Code Quality
