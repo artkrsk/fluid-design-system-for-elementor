@@ -9,7 +9,7 @@ type TAnchor = 'min' | 'max'
  * re-renders. Tracks one active "owner" switcher so the highlight reflects which
  * control triggered the resize.
  */
-class PreviewSizeManager {
+export class PreviewSizeManager {
   private switchers = new Set<HTMLElement>()
   private activeAnchor: TAnchor | null = null
   private activeOwner: HTMLElement | null = null
