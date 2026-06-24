@@ -20,9 +20,8 @@ export function isFluidPresetRepeater(
   controlName: string | undefined,
   container: Container | undefined
 ): boolean {
-  const controls = (container?.view?.model as any)?.controls as
-    | ThirdParty.BackboneCollection
-    | undefined
+  const model = container?.view?.model as { controls?: ThirdParty.BackboneCollection } | undefined
+  const controls = model?.controls
   const kitControls = controls?.get(controlName ?? '') as ThirdParty.BackboneModel | undefined
   if (kitControls) {
     return kitControls.get('is_fluid_preset_repeater') === true

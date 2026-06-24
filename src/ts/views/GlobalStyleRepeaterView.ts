@@ -1,9 +1,21 @@
 import type { ElementorEditor } from '@artemsemkin/elementor-types'
 import { callSuper } from '../utils/backbone'
 
+/** The control-view constructor shape `addControlView` accepts */
+type TControlViewClass = Parameters<ElementorEditor['addControlView']>[1]
+
+/** Backbone control constructor exposing `.extend()` (not surfaced on the typed controls map) */
+type TExtendableControl = {
+  extend(protoProps: object, staticProps?: object): TControlViewClass
+}
+
 const createGlobalStyleRepeater = () => {
   const editor = window.elementor as ElementorEditor
-  const GlobalStyleRepeaterBase = (editor.modules.controls as any)['Global-style-repeater']
+  const controls = editor.modules.controls as unknown as Record<
+    'Global-style-repeater',
+    TExtendableControl
+  >
+  const GlobalStyleRepeaterBase = controls['Global-style-repeater']
 
   return GlobalStyleRepeaterBase.extend({
     initialize(this: any) {
@@ -104,5 +116,5 @@ const createGlobalStyleRepeater = () => {
 export function registerRepeaterGlobalStyleView(): void {
   const GlobalStyleRepeater = createGlobalStyleRepeater()
   const editor = window.elementor as ElementorEditor
-  editor.addControlView('global-style-repeater', GlobalStyleRepeater as any)
+  editor.addControlView('global-style-repeater', GlobalStyleRepeater)
 }

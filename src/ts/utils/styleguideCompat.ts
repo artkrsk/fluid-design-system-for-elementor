@@ -15,20 +15,26 @@ export function sanitizeFluidCSS(css: string): string {
   return css.replace(FLUID_UNIT_PATTERN, '$1')
 }
 
+/** Preview iframe window with our one-time patch flag */
+interface PatchableWindow extends Window {
+  __fluidCSSPatched?: boolean
+  CSSStyleSheet: typeof CSSStyleSheet
+}
+
 /** Applies insertRule override to the preview iframe */
 export function applyStyleguideCompat(): void {
   const iframe = window.elementor?.$preview?.[0] as HTMLIFrameElement | undefined
-  const previewWindow = iframe?.contentWindow
+  const previewWindow = iframe?.contentWindow as PatchableWindow | null | undefined
 
-  if (!previewWindow || (previewWindow as any).__fluidCSSPatched) {
+  if (!previewWindow || previewWindow.__fluidCSSPatched) {
     return
   }
 
-  const proto = (previewWindow as any).CSSStyleSheet.prototype as CSSStyleSheet
+  const proto = previewWindow.CSSStyleSheet.prototype
   const OriginalInsertRule = proto.insertRule
 
   proto.insertRule = function (rule: string, index?: number): number {
     return OriginalInsertRule.call(this, sanitizeFluidCSS(rule), index)
   }
-  ;(previewWindow as any).__fluidCSSPatched = true
+  previewWindow.__fluidCSSPatched = true
 }

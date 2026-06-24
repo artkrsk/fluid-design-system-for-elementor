@@ -266,7 +266,10 @@ export const BaseControlView: Record<string, unknown> = {
         return
       }
 
-      ;(jQuery(selectEl).select2(select2Options as any) as unknown as JQuery).on('change', () => {
+      const $selectEl = jQuery(selectEl)
+      // select2 options use custom matcher/template return types that don't satisfy @types/select2 Options
+      $selectEl.select2(select2Options as any)
+      $selectEl.on('change', () => {
         this.onSelectChange(selectEl)
       })
 
