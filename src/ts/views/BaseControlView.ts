@@ -9,6 +9,9 @@ import { PresetDropdownManager } from '../utils/presetDropdown'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
 import { PresetDialogManager } from '../managers/PresetDialogManager'
 import { EditIconHandler } from '../utils/editIconHandler'
+import { PreviewSwitcherManager } from '../utils/previewSwitcher'
+import { resolveAnchorWidths } from '../utils/screenAnchors'
+import previewSizeManager from '../managers/PreviewSizeManager'
 import { resolveInheritedValue } from '../utils/deviceInheritance'
 import { handleUpdatePreset, handleCreatePreset } from '../utils/presetActions'
 import { isFluidUnit, requiresTextInput, hasFluidInUnits } from '../utils/controls'
@@ -19,11 +22,13 @@ import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
 export const BaseControlView: Record<string, unknown> = {
   isDestroyed: false,
   abortControllers: new Map<string, AbortController>(),
+  previewSwitcherEl: null,
 
   initialize(this: any): void {
     callSuper(this, 'initialize', arguments)
     this.isDestroyed = false
     this.abortControllers = new Map<string, AbortController>()
+    this.previewSwitcherEl = null
   },
 
   ui(this: any): Record<string, string> {
@@ -44,6 +49,11 @@ export const BaseControlView: Record<string, unknown> = {
 
   onDestroy(this: any): void {
     this.isDestroyed = true
+
+    if (this.previewSwitcherEl) {
+      previewSizeManager.unregister(this.previewSwitcherEl)
+      this.previewSwitcherEl = null
+    }
 
     if (this.abortControllers && this.abortControllers.size > 0) {
       for (const [_setting, controller] of this.abortControllers) {
@@ -87,6 +97,81 @@ export const BaseControlView: Record<string, unknown> = {
     await this.populateSelectElements()
     this.attachSelectElementsListeners()
     this.initializeInlineInputsState()
+    this.renderPreviewSwitcher()
+    this.updatePreviewSwitcherVisibility()
+  },
+
+  /** Mounts the per-control Min/Max/Reset preview-width switcher (once) */
+  renderPreviewSwitcher(this: any): void {
+    if (this.isDestroyed || this.previewSwitcherEl) {
+      return
+    }
+
+    // Mount in the control content (a flex column) so the switcher always gets
+    // its own full-width row below the field — slider input-wrappers are nowrap
+    // flex rows that would otherwise squish it inline.
+    const content = this.el.querySelector('.elementor-control-content')
+    if (!content) {
+      return
+    }
+
+    const { container, abortController } = PreviewSwitcherManager.createSwitcher({
+      onAnchor: (anchor: 'min' | 'max') => this.onPreviewAnchor(anchor),
+      onReset: () => previewSizeManager.reset()
+    })
+
+    this.abortControllers.set('__preview_switcher__', abortController)
+    this.previewSwitcherEl = container
+    content.appendChild(container)
+    previewSizeManager.register(container)
+  },
+
+  /** Resizes the preview to the resolved anchor width for the active fluid value */
+  onPreviewAnchor(this: any, anchor: 'min' | 'max'): void {
+    if (!this.previewSwitcherEl) {
+      return
+    }
+
+    const selectEl = this.getActiveFluidSelect()
+    const iframe = window.elementor?.$preview?.[0] as HTMLIFrameElement | undefined
+    const previewDoc = iframe?.contentDocument ?? null
+    const { min, max } = resolveAnchorWidths(selectEl, previewDoc)
+
+    previewSizeManager.applyAnchor(anchor, anchor === 'min' ? min : max, this.previewSwitcherEl)
+  },
+
+  /** Picks the fluid selector that carries a concrete value (preset or custom) */
+  getActiveFluidSelect(this: any): HTMLSelectElement | null {
+    for (const selectEl of this.ui.selectControls || []) {
+      if (selectEl.value && selectEl.value !== '') {
+        return selectEl
+      }
+    }
+
+    return this.ui.selectControls?.[0] ?? null
+  },
+
+  /** Shows the switcher only when a concrete fluid value (preset/custom) is set */
+  updatePreviewSwitcherVisibility(this: any): void {
+    if (!this.previewSwitcherEl) {
+      return
+    }
+
+    let hasConcreteValue = false
+    if (this.isFluidUnit()) {
+      for (const selectEl of this.ui.selectControls || []) {
+        if (selectEl.value && selectEl.value !== '') {
+          hasConcreteValue = true
+          break
+        }
+      }
+    }
+
+    this.previewSwitcherEl.classList.toggle('e-hidden', !hasConcreteValue)
+
+    if (!hasConcreteValue) {
+      previewSizeManager.resetIfOwner(this.previewSwitcherEl)
+    }
   },
 
   initializeInlineInputsState(this: any): void {
@@ -241,6 +326,7 @@ export const BaseControlView: Record<string, unknown> = {
           this.setInlineInputValues(dimensionName, parsed)
         }
       }
+      this.updatePreviewSwitcherVisibility()
       return
     }
 
@@ -267,6 +353,7 @@ export const BaseControlView: Record<string, unknown> = {
     }
 
     this.updateDimensions()
+    this.updatePreviewSwitcherVisibility()
   },
 
   handleLinkedDimensionsChange(
@@ -326,6 +413,8 @@ export const BaseControlView: Record<string, unknown> = {
         }
       }
     }
+
+    this.updatePreviewSwitcherVisibility()
   },
 
   onLinkDimensionsClicked(this: any, evt: Event): void {
@@ -565,6 +654,7 @@ export const BaseControlView: Record<string, unknown> = {
     this.setValue(newValue)
 
     this.toggleInlineInputs(setting, false)
+    this.updatePreviewSwitcherVisibility()
   },
 
   /** Validates an inline input and toggles invalid state */

@@ -22,4 +22,10 @@ export interface IArtsFluidDSStrings {
   cancel?: string
   discard?: string
   delete?: string
+  previewLabel?: string
+  previewMin?: string
+  previewMax?: string
+  previewMinTitle?: string
+  previewMaxTitle?: string
+  previewReset?: string
 }
