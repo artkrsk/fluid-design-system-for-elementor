@@ -191,7 +191,9 @@ jobs:
     needs: plugin-check
     runs-on: self-hosted
     strategy:
-      fail-fast: false
+      # One browser failing means the change is broken; cancel the rest so the
+      # single self-hosted runner isn't wasted on runs that can't pass anyway.
+      fail-fast: true
       matrix:
         browser: [chromium, firefox, webkit]
     steps:
