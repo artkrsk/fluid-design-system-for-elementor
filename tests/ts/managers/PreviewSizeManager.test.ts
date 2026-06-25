@@ -222,4 +222,20 @@ describe('PreviewSizeManager', () => {
 
     expect(isActive()).toBe(true)
   })
+
+  it('skips visibility observation when IntersectionObserver is unavailable', () => {
+    const sw = makeSwitcher()
+    manager.register(sw)
+    vi.stubGlobal('IntersectionObserver', undefined)
+
+    expect(() => manager.applyAnchor('min', 360, sw)).not.toThrow()
+    expect(isActive()).toBe(true)
+  })
+
+  it('skips binding when the device-mode channel is unavailable', () => {
+    ;(window as any).elementor = {}
+    const m = new PreviewSizeManager()
+
+    expect(() => m.register(makeSwitcher())).not.toThrow()
+  })
 })
