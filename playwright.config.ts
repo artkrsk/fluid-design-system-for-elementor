@@ -4,7 +4,8 @@ export default defineConfig({
   testDir: './tests/e2e/specs',
   timeout: 60000,
   expect: {
-    timeout: 10000
+    // Headroom for elements that render slowly on the CI runner (e.g. AJAX-populated controls)
+    timeout: 15000
   },
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
@@ -18,7 +19,11 @@ export default defineConfig({
     baseURL: process.env.WP_BASE_URL || 'http://localhost:8888',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
+    // The default navigation timeout is 30s; bump it for the slow self-hosted runner so
+    // a sluggish page load doesn't flake the suite. Covers every page.goto / waitForURL /
+    // waitForLoadState (e.g. the heavy Elementor editor and wp-admin pages).
+    navigationTimeout: 60000
   },
   projects: [
     {
