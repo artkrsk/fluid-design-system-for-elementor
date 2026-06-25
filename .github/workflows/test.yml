@@ -78,7 +78,9 @@ jobs:
           # keep 8880/8881 bound. Remove them by project name and published port.
           docker rm -f $(docker ps -aq --filter "name=wp-env-fluid-design-system-for-elementor") 2>/dev/null || true
           docker rm -f $(docker ps -aq --filter "publish=8880" --filter "publish=8881") 2>/dev/null || true
-          npx wp-env destroy --force 2>/dev/null || true
+          # `|| true` only catches a non-zero exit, not a hang; wp-env destroy can wedge
+          # on Docker I/O, so bound it (TERM at 180s, KILL 30s later) to free the runner.
+          timeout --kill-after=30 180 npx wp-env destroy --force 2>/dev/null || true
           # The action's hashed wp-env dirs are populated via Docker (root-owned), so a
           # stale plugin-check/LICENSE from a prior run causes EACCES on re-setup and a
           # plain rm can't remove it. Delete them from inside a container as root.
@@ -237,7 +239,9 @@ jobs:
           fi
 
       - name: Destroy previous wp-env
-        run: npm run wp-env destroy -- --force || true
+        # Bound the teardown so a wp-env/Docker hang can't wedge the runner (||true ignores
+        # exit codes but not hangs).
+        run: timeout --kill-after=30 180 npm run wp-env destroy -- --force || true
 
       - name: Start wp-env
         run: npm run wp-env start
