@@ -93,23 +93,34 @@ test.describe('Preview-width switcher', () => {
     expect(await previewIsActive(page)).toBe(true)
   })
 
-  test('switching native device mode clears our override', async ({ page, editor }) => {
+  test('switching native device mode clears our override', async ({ page }) => {
     await visibleSwitcher(page).locator('[data-anchor="min"]').click()
     expect(await previewIsActive(page)).toBe(true)
 
-    await editor.switchDevice('tablet')
+    // changeDeviceMode is what the native device buttons call; it fires the deviceMode
+    // 'change' event the switcher listens to. (The device tabs are icon-only, so clicking
+    // them by text is unreliable, and setDeviceMode isn't present on this build.)
+    await page.evaluate(() => {
+      ;(
+        window.elementor as unknown as { changeDeviceMode: (mode: string) => void }
+      ).changeDeviceMode('tablet')
+    })
 
     await expect.poll(() => previewIsActive(page)).toBe(false)
   })
 
   test('switcher sits on its own row without overflowing the panel', async ({ page }) => {
     const box = await visibleSwitcher(page).boundingBox()
-    const panelRight = await page.evaluate(
-      () => document.getElementById('elementor-panel')!.getBoundingClientRect().right
-    )
-
     expect(box).not.toBeNull()
-    expect(box!.x + box!.width).toBeLessThanOrEqual(panelRight + 1)
+
+    const panelRight = await page.evaluate(() => {
+      const panel = document.getElementById('elementor-panel')
+      return panel ? panel.getBoundingClientRect().right : 0
+    })
+
+    if (box) {
+      expect(box.x + box.width).toBeLessThanOrEqual(panelRight + 1)
+    }
   })
 })
 
