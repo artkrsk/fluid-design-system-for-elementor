@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.5.0
+
+- added: preview the smallest and largest screen sizes of a fluid value while editing, without switching device mode
+
+## 2.4.1
+
+- improved: full compatibility with WordPress 7.0
+
+## 2.4.0
+
+- fixed: fluid presets now display correctly in the "Show global settings" styleguide preview
+- fixed: plugin styles and scripts not loading on some hosting providers with symlinked directories (e.g. Hostinger)
+- improved: updated internal dependencies with latest security patches
+
+## 2.3.0
+
+- added: AI agent integration via WordPress Abilities API and MCP server
+- added: MCP tools for programmatic preset and group management (list, create, update, delete, move)
+- fixed: background position and similar styles could render incorrectly when using fluid presets
+
+## 2.2.2
+
+- fixed: prevent double widget initialization in Elementor editor when used alongside themes bundling arts/elementor-extension
+
 ## 2.2.1
 
 - fixed: prevent duplicate widget handler scripts when multiple plugins bundle arts/elementor-extension

@@ -71,6 +71,10 @@ As shown in the video:
 
 The tilde (`~`) between fields is a visual separator showing the relationship between min and max values.
 
+::: tip Preview the min and max
+While you're editing a custom value, a **Preview** row with **Min**, **Max**, and **Reset** buttons appears. Click **Min** or **Max** to resize the editor preview to the smallest and largest screen widths of your fluid range and see exactly what the value renders at each end of the scale — without switching Elementor's device mode, so the min/max inputs stay editable. **Reset** returns to the normal width.
+:::
+
 ::: tip Save as Preset
 Want to reuse this value? Click the **+** button, enter a name, and click Save. Your inline value becomes a preset instantly available everywhere in Elementor.
 :::
