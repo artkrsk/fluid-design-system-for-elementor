@@ -8,6 +8,12 @@ on:
     branches:
       - main
 
+# Supersede in-flight runs for the same PR/branch so pushes don't pile up on the
+# single self-hosted runner.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
