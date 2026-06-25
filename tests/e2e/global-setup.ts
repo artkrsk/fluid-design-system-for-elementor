@@ -41,8 +41,10 @@ async function globalSetup(config: FullConfig) {
     await page.fill('#user_pass', WP_PASSWORD)
     await page.click('#wp-submit')
 
-    // Wait for admin dashboard
-    await page.waitForURL('**/wp-admin/**', { timeout: 30000 })
+    // Confirm the login redirect landed. Wait only for `domcontentloaded`, not the
+    // default `load` — the full dashboard load is slow on the CI runner (and we
+    // navigate away to plugins.php next anyway), which made this flaky in Firefox.
+    await page.waitForURL('**/wp-admin/**', { timeout: 60000, waitUntil: 'domcontentloaded' })
     console.log('[E2E Setup] Successfully logged in')
 
     // Activate plugin if not already active
