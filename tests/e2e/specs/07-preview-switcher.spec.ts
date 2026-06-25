@@ -5,18 +5,30 @@
  * preview iframe to the fluid range's screen anchors WITHOUT switching device
  * mode, so the editable min/max stay in place. Targets the seeded spacer (a
  * fluid slider rendered directly in the panel — no popover needed).
+ *
+ * The preview wrapper has a CSS width transition and its rendered width can be
+ * clamped by the editor viewport, so anchor assertions check the width CSS var
+ * the switcher sets (deterministic) rather than the rendered pixel width.
  */
 
 import { test, expect } from '../fixtures'
 import type { Page } from '@playwright/test'
 import { TEST_ELEMENT_IDS } from '../fixtures/test-data'
 
-/** Width of the editor preview wrapper (top frame), rounded */
+/** Time for the preview wrapper's width transition to settle (CSS is 0.2s) */
+const TRANSITION_MS = 350
+
+/** Rendered width of the editor preview wrapper (top frame), rounded */
 function previewWrapperWidth(page: Page): Promise<number> {
   return page.evaluate(() => {
     const el = document.getElementById('elementor-preview-responsive-wrapper')
     return el ? Math.round(el.getBoundingClientRect().width) : 0
   })
+}
+
+/** The preview-width override CSS var the switcher sets on <body> (window-independent) */
+function previewWidthVar(page: Page): Promise<string> {
+  return page.evaluate(() => document.body.style.getPropertyValue('--arts-fluid-preview-width'))
 }
 
 /** Whether our preview-resize override is currently applied */
@@ -43,20 +55,32 @@ test.describe('Preview-width switcher', () => {
     await expect(switcher.locator('[data-anchor="reset"]')).toBeVisible()
   })
 
-  test('Min / Max resize the preview to the screen anchors, Reset restores', async ({ page }) => {
+  test('Min / Max set the preview to the screen anchors, Reset restores', async ({ page }) => {
     const switcher = visibleSwitcher(page)
     const initialWidth = await previewWrapperWidth(page)
 
+    // Max anchor — assert the width var; the rendered width may be clamped by the editor viewport
     await switcher.locator('[data-anchor="max"]').click()
     expect(await previewIsActive(page)).toBe(true)
-    expect(await previewWrapperWidth(page)).toBe(1920)
+    expect(await previewWidthVar(page)).toBe('1920px')
+    await page.waitForTimeout(TRANSITION_MS)
+    const maxWidth = await previewWrapperWidth(page)
 
+    // Min anchor (360) always fits, so the wrapper actually shrinks to it
     await switcher.locator('[data-anchor="min"]').click()
-    expect(await previewWrapperWidth(page)).toBe(360)
+    expect(await previewWidthVar(page)).toBe('360px')
+    await page.waitForTimeout(TRANSITION_MS)
+    const minWidth = await previewWrapperWidth(page)
 
+    expect(minWidth).toBe(360)
+    expect(maxWidth).toBeGreaterThan(minWidth) // Max renders wider than Min (real resize, viewport-agnostic)
+
+    // Reset — override cleared, wrapper restored
     await switcher.locator('[data-anchor="reset"]').click()
     expect(await previewIsActive(page)).toBe(false)
-    expect(await previewWrapperWidth(page)).toBe(initialWidth)
+    expect(await previewWidthVar(page)).toBe('')
+    await page.waitForTimeout(TRANSITION_MS)
+    expect(Math.abs((await previewWrapperWidth(page)) - initialWidth)).toBeLessThanOrEqual(2)
   })
 
   test('device mode stays Desktop while previewing (no real switch)', async ({ page }) => {
@@ -75,7 +99,7 @@ test.describe('Preview-width switcher', () => {
 
     await editor.switchDevice('tablet')
 
-    expect(await previewIsActive(page)).toBe(false)
+    await expect.poll(() => previewIsActive(page)).toBe(false)
   })
 
   test('switcher sits on its own row without overflowing the panel', async ({ page }) => {
@@ -104,7 +128,7 @@ test.describe('Preview-width switcher in a popover', () => {
       ) as HTMLElement | null
       pencil?.click()
     })
-    await page.waitForTimeout(400)
+    await page.waitForTimeout(500)
   }
 
   test('closing the popover while active resets the preview', async ({ page }) => {
@@ -119,6 +143,6 @@ test.describe('Preview-width switcher in a popover', () => {
     expect(await previewIsActive(page)).toBe(true)
 
     await toggleTypographyPopover(page) // close
-    expect(await previewIsActive(page)).toBe(false)
+    await expect.poll(() => previewIsActive(page)).toBe(false)
   })
 })
