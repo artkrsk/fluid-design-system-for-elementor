@@ -1,0 +1,53 @@
+@use 'variables'
+
+// Per-control Min/Max/Reset preview-width switcher (issue #18)
+.e-fluid-preview-switcher
+	display: flex
+	align-items: center
+	gap: variables.$spacing-small
+	margin-top: variables.$spacing-gap
+	width: 100%
+
+	&.e-hidden
+		display: none
+
+.e-fluid-preview-switcher__label
+	color: variables.$color-txt-muted
+	font-size: variables.$control-title-size
+	margin-inline-end: auto
+
+.e-fluid-preview-switcher__btn
+	display: inline-flex
+	align-items: center
+	justify-content: center
+	gap: variables.$spacing-tiny
+	padding: variables.$spacing-tiny variables.$spacing-gap
+	background-color: variables.$bg-default
+	border: variables.$border-bold
+	border-radius: variables.$border-radius
+	color: variables.$color-txt
+	font-family: inherit
+	font-size: variables.$control-title-size
+	line-height: 1.5
+	cursor: pointer
+	transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease
+
+	i
+		font-size: 12px
+
+	&:hover
+		border-color: variables.$border-color-bold
+
+	&.is-active
+		background-color: variables.$bg-active-bold
+		border-color: variables.$border-color-bold
+		color: variables.$color-txt-accent
+
+// Editor-side resize: width override consumed when PreviewSizeManager toggles the
+// body class. !important + min-width:0 beat Elementor's desktop rule
+// (.elementor-device-desktop #elementor-preview-responsive-wrapper { min-width: lg; width: 100% }).
+body.arts-fluid-preview-active #elementor-preview-responsive-wrapper
+	width: var(--arts-fluid-preview-width) !important
+	min-width: 0 !important
+	margin-inline: auto
+	transition: width 0.2s ease

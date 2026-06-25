@@ -189,6 +189,7 @@ export const BaseSliderControlView: Record<string, unknown> = {
     this.setValue(newValue)
     this._toggleSliderInlineInputs('size', false)
     this.ui.input.val(presetValue)
+    this.updatePreviewSwitcherVisibility()
   },
 
   _validateSliderInlineInput(this: any, input: HTMLInputElement): boolean {
@@ -307,6 +308,7 @@ export const BaseSliderControlView: Record<string, unknown> = {
           this._setSliderInlineInputValues(setting, parsed)
         }
       }
+      this.updatePreviewSwitcherVisibility()
       return
     }
 
@@ -321,6 +323,7 @@ export const BaseSliderControlView: Record<string, unknown> = {
     this.setValue(newValue)
     this.ui.input.val(value)
     this.ui.input.trigger('change')
+    this.updatePreviewSwitcherVisibility()
   },
 
   updateUnitChoices(this: any): void {
@@ -358,6 +361,8 @@ export const BaseSliderControlView: Record<string, unknown> = {
     if (wasFluid && !isNowFluid) {
       this._toggleSliderInlineInputs('size', false)
     }
+
+    this.updatePreviewSwitcherVisibility()
   },
 
   /** Traverses view hierarchy to check parent repeater type */
