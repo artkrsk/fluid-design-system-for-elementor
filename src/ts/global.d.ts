@@ -7,7 +7,7 @@ declare global {
     $e?: $e
     /** Elementor editor instance (available after elementor/init) */
     elementor?: ElementorEditor
-    /** Elementor common utilities (available after elementor/init) */
+    /** Elementor common utilities (available before elementor/init-components) */
     elementorCommon?: ElementorCommon
     /** Underscore.js */
     _?: typeof import('underscore')

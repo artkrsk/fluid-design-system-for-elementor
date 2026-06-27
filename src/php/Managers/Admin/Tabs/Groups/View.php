@@ -183,7 +183,7 @@ class View extends BaseManager {
 		return is_string( $output ) ? $output : '';
 	}
 
-	/** Returns full table HTML for AJAX table refresh. */
+	/** Returns the main (sortable) groups table HTML for AJAX table refresh. */
 	public function get_main_groups_table_html(): string {
 		ob_start();
 		?>
@@ -198,7 +198,7 @@ class View extends BaseManager {
 		return is_string( $output ) ? $output : '';
 	}
 
-	/** Returns full table HTML for AJAX table refresh. */
+	/** Returns the developer groups table HTML for AJAX table refresh. */
 	public function get_developer_groups_table_html(): string {
 		ob_start();
 		?>

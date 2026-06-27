@@ -5,7 +5,7 @@
  * Group types:
  * - builtin: Spacing/Typography (from ControlRegistry)
  * - custom: User-created via admin UI (from Data manager)
- * - filter: Developer-added via arts/fluid_design_system/preset_groups filter
+ * - filter: Developer-added via arts/fluid_design_system/custom_presets filter
  *
  * @package Arts\FluidDesignSystem
  */

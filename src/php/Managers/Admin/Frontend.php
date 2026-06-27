@@ -92,7 +92,7 @@ class Frontend extends BaseManager {
 			$version
 		);
 
-		// Enqueue AJAX CSS (now simplified, depends on status notices)
+		// Enqueue accordion CSS (depends on status notices)
 		wp_enqueue_style(
 			'fluid-design-system-admin-accordion',
 			$this->plugin_dir_url . 'admin/css/accordion.css',

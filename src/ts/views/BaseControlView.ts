@@ -505,7 +505,6 @@ export const BaseControlView: Record<string, unknown> = {
     dimension.appendChild(labelEl)
   },
 
-  /** Creates inline min/max input container */
   createInlineInputsContainer(this: any, setting: string): HTMLElement {
     const { container, abortController } = InlineInputManager.createContainer(
       setting,
@@ -523,7 +522,6 @@ export const BaseControlView: Record<string, unknown> = {
     InlineInputManager.updateSaveButtonState(container)
   },
 
-  /** Handles Save as Preset button click */
   async onSaveAsPresetClick(this: any, setting: string): Promise<void> {
     const values = this.getInlineInputValues(setting)
     if (!values) {
@@ -579,7 +577,6 @@ export const BaseControlView: Record<string, unknown> = {
     })
   },
 
-  /** Handles preset create confirmation */
   async onConfirmCreatePreset(
     this: any,
     title: string,
@@ -665,12 +662,10 @@ export const BaseControlView: Record<string, unknown> = {
     return ValidationService.validateInputElement(input)
   },
 
-  /** Gets the inline container for a specific setting */
   getInlineContainer(this: any, setting: string): HTMLElement | null {
     return this.$el[0].querySelector(`.e-fluid-inline-container[data-setting="${setting}"]`)
   },
 
-  /** Toggles visibility of inline inputs */
   toggleInlineInputs(this: any, setting: string, show: boolean): void {
     const container = this.getInlineContainer(setting)
     InlineInputManager.toggleVisibility(container, show)
@@ -681,7 +676,6 @@ export const BaseControlView: Record<string, unknown> = {
     return ValidationService.parseValueWithUnit(value)
   },
 
-  /** Gets inline input values for a setting */
   getInlineInputValues(this: any, setting: string): IInlineInputValues | null {
     const container = this.getInlineContainer(setting)
     return InlineInputManager.getInputValues(container)
@@ -697,7 +691,6 @@ export const BaseControlView: Record<string, unknown> = {
     InlineInputManager.setInputValues(container, values)
   },
 
-  /** Handles inline input value changes */
   onInlineInputChange(this: any, setting: string): void {
     const values = this.getInlineInputValues(setting)
     if (!values) {
@@ -750,7 +743,6 @@ export const BaseControlView: Record<string, unknown> = {
     }
   },
 
-  /** Checks if a value is a custom inline value */
   isCustomFluidValue(this: any, value: string): boolean {
     return isCustomFluidValue(value)
   },

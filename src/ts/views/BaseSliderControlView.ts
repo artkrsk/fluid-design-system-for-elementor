@@ -57,7 +57,6 @@ export const BaseSliderControlView: Record<string, unknown> = {
     inputWrapperEl.appendChild(inlineContainer)
   },
 
-  /** Creates inline min/max input container */
   _createSliderInlineInputsContainer(this: any, setting: string): HTMLElement {
     const { container } = InlineInputManager.createContainer(
       setting,

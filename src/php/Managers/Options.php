@@ -20,7 +20,7 @@ use Arts\FluidDesignSystem\Elementor\Tabs\FluidTypographySpacing;
  */
 class Options extends BaseManager {
 	/**
-	 * Hooked to elementor/kit/additional_settings_tabs.
+	 * Hooked to arts/elementor_extension/tabs/tabs (ArtsElementorExtension).
 	 *
 	 * @param array<int|string, mixed> $tabs
 	 * @return array<int|string, mixed>

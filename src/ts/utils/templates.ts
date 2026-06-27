@@ -14,7 +14,6 @@ export class TemplateRenderer {
     return div.innerHTML
   }
 
-  /** Creates a base template container */
   static createBaseTemplate(className: string = '', content: string = ''): JQuery<HTMLElement> {
     return jQuery(`
       <span class="select2-result-fluid-spacing-formatted ${className}">
@@ -23,7 +22,6 @@ export class TemplateRenderer {
     `)
   }
 
-  /** Creates a header section */
   static createHeader(content: string): string {
     return `
       <span class="select2-result-fluid-spacing-formatted__header">
@@ -32,7 +30,6 @@ export class TemplateRenderer {
     `
   }
 
-  /** Creates a footer section */
   static createFooter(content: string): string {
     return `
       <span class="select2-result-fluid-spacing-formatted__footer">
@@ -41,7 +38,6 @@ export class TemplateRenderer {
     `
   }
 
-  /** Creates template for inherited value */
   static createInheritTemplate(valueDisplay: string): JQuery<HTMLElement> {
     return TemplateRenderer.createBaseTemplate(
       'select2-result-fluid-spacing-formatted--inherit',
@@ -56,7 +52,6 @@ export class TemplateRenderer {
     )
   }
 
-  /** Creates simple inherit template */
   static createSimpleInheritTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
     const inheritedTitle =
       TemplateRenderer.escapeHtml(element.getAttribute('data-inherited-title')) ||
@@ -71,7 +66,6 @@ export class TemplateRenderer {
     )
   }
 
-  /** Creates template for complex preset (with min/max values) */
   static createComplexPresetTemplate(
     minSize: string,
     minUnit: string,
@@ -92,7 +86,6 @@ export class TemplateRenderer {
     )
   }
 
-  /** Handles fluid preset template rendering */
   static handleFluidPresetTemplate(valueDisplay: string): JQuery<HTMLElement> {
     const inheritedPreset = getInheritedPresetSync(valueDisplay)
 
@@ -110,7 +103,6 @@ export class TemplateRenderer {
     return TemplateRenderer.createInheritTemplate(valueDisplay)
   }
 
-  /** Handles empty value template */
   static handleEmptyValueTemplate(element: HTMLElement, text: string): JQuery<HTMLElement> {
     const valueDisplay = TemplateRenderer.escapeHtml(element.getAttribute('data-value-display'))
 
@@ -127,7 +119,6 @@ export class TemplateRenderer {
     return TemplateRenderer.createSimpleInheritTemplate(element, text)
   }
 
-  /** Creates template for inherited value */
   static createInheritedValueTemplate(
     element: HTMLElement,
     valueDisplay: string,
@@ -192,7 +183,6 @@ export class TemplateRenderer {
     return markup
   }
 
-  /** Creates template for inherited preset */
   static createInheritedPresetTemplate(
     minSize: string,
     minUnit: string,
@@ -224,7 +214,6 @@ export class TemplateRenderer {
     return markup
   }
 
-  /** Creates template for custom preset */
   static createCustomPresetTemplate(displayValue: string, title: string): JQuery<HTMLElement> {
     const markup = TemplateRenderer.createBaseTemplate(
       '',
@@ -245,7 +234,6 @@ export class TemplateRenderer {
     return markup
   }
 
-  /** Creates template for normal value */
   static createNormalValueTemplate(
     minSize: string,
     minUnit: string,
@@ -323,7 +311,6 @@ export class TemplateRenderer {
     )
   }
 
-  /** Handles non-empty value template */
   static handleNonEmptyValueTemplate(
     element: HTMLElement,
     text: string,

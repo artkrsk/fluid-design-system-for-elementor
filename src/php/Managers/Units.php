@@ -119,7 +119,7 @@ class Units extends BaseManager {
 	}
 
 	/**
-	 * Hooked to elementor/element/parse_css. Strips {{UNIT}} for fluid values.
+	 * Hooked to elementor/files/css/selectors. Strips {{UNIT}} for fluid values.
 	 *
 	 * @param array<string, mixed>                  $control
 	 * @param array<string, mixed>|string           $value
@@ -167,7 +167,7 @@ class Units extends BaseManager {
 	}
 
 	/**
-	 * Hooked to elementor/css-file/post-parse.
+	 * Hooked to elementor/css-file/post/parse.
 	 * 1. Strips leaked 'fluid' unit from compound CSS properties (e.g. background-position).
 	 * 2. Simplifies clamp() when min=max for :root preset variables.
 	 */

@@ -23,7 +23,7 @@ class Compatibility extends BaseManager {
 	/** @var string */
 	private $handle = 'arts-fluid-design-system-editor';
 
-	/** Hooked to elementor/editor/after_enqueue_scripts. */
+	/** Hooked to elementor/editor/before_enqueue_scripts. */
 	public function elementor_enqueue_editor_scripts(): void {
 		/** @var string|false $version */
 		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) && is_string( constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) )
