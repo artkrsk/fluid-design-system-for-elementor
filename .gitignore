@@ -101,5 +101,3 @@ tasks/
 .cursor/
 .taskmaster/
 .env*
-
-CLAUDE.md
