@@ -15,7 +15,7 @@ export class HookOnKitSettingsSave extends commandSystem.modules.hookUI.After {
   }
 
   getConditions(args: HookArgs): boolean {
-    return args.document?.config?.type === 'kit'
+    return args.document?.config?.type === 'kit' && args.status === 'publish'
   }
 
   apply(): void {

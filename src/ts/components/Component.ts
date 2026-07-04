@@ -2,7 +2,6 @@ import {
   HookOnRepeaterAdd,
   HookOnRepeaterRemove,
   HookOnRepeaterReorder,
-  HookOnDocumentSave,
   HookOnKitSettingsSave
 } from '../hooks'
 import { NAMESPACES, COMMANDS } from '../constants'
@@ -19,8 +18,7 @@ class Component extends commandSystem.modules.ComponentBase {
       [COMMANDS.REPEATER.INSERT]: HookOnRepeaterAdd,
       [COMMANDS.REPEATER.REMOVE]: HookOnRepeaterRemove,
       [COMMANDS.REPEATER.MOVE]: HookOnRepeaterReorder,
-      [COMMANDS.DOCUMENT.SAVE]: HookOnDocumentSave,
-      [COMMANDS.DOCUMENT.UPDATE]: HookOnKitSettingsSave
+      [COMMANDS.DOCUMENT.SAVE]: HookOnKitSettingsSave
     })
   }
 }

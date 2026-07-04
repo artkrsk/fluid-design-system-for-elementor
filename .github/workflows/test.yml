@@ -152,6 +152,9 @@ jobs:
       - name: Run PHPStan
         run: composer phpstan
 
+      - name: Run PHP unit tests
+        run: composer test:php:unit
+
       - name: TypeScript type check
         run: npx tsc --noEmit
 

@@ -102,5 +102,8 @@ tasks/
 .taskmaster/
 .env*
 
+# PHPUnit
+.phpunit.result.cache
+
 # wp-env local override (written by the weekly canary job)
 .wp-env.override.json
