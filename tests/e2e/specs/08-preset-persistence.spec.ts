@@ -38,6 +38,22 @@ async function openSiteSettings(page: Page): Promise<void> {
   )
 }
 
+/**
+ * Saves the Kit (Site Settings) document via its save command.
+ *
+ * The top-bar save button (`editor.save()`) tracks the primary page document's
+ * changed state, so it stays disabled for Kit-only edits. Running the Kit's
+ * save command directly is the reliable way to persist Site Settings.
+ */
+async function saveSiteSettings(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const w = window as any
+    const kitId = w.elementor.config.kit_id
+    const kitDoc = w.elementor.documents.get(kitId)
+    await w.$e.run('document/save/update', { document: kitDoc })
+  })
+}
+
 test.describe('Preset persistence across save + reload (#40)', () => {
   test('a created preset survives Save Changes and a hard reload', async ({
     editor,
@@ -87,7 +103,7 @@ test.describe('Preset persistence across save + reload (#40)', () => {
     expect(createdId).toBeTruthy()
 
     // Save Site Settings, then hard reload.
-    await editor.save()
+    await saveSiteSettings(page)
     await page.reload()
     await editor.waitForEditor()
     await openSiteSettings(page)
@@ -120,6 +136,6 @@ test.describe('Preset persistence across save + reload (#40)', () => {
       },
       { name: CONTROL_ID, title: PRESET_TITLE }
     )
-    await editor.save()
+    await saveSiteSettings(page)
   })
 })
