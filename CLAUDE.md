@@ -191,4 +191,20 @@ This is what makes undo/redo of preset edits restore the correct CSS variables.
   `src/wordpress-plugin/` (main file `fluid-design-system-for-elementor.php`) and zipped to `dist/`.
   Never run `build` / `dev` yourself.
 
+## Release & version stamping
+
+- **Version headers are stamped, not hand-edited.** Every build (and dev startup / composer.json
+  change while watching) runs `updatePluginMeta` (`__build__/utils/wordpress/plugin-meta.js`), which
+  rewrites the plugin header and readme.txt meta fields: `Version:` / `Stable tag:` come from
+  `package.json` `version` (single source of truth); `Requires PHP` / `Requires at least` /
+  `Tested up to` from composer.json's `wordpress` object; name/description/URI/license/text domain
+  from its `plugin` object. Manual edits to these in `src/wordpress-plugin/` get overwritten.
+- **Changelog is the one manual step.** Hand-write the new entry in `src/wordpress-plugin/readme.txt`
+  under `== Changelog ==` (user-facing, non-technical tone — match existing entries).
+  `scripts/sync-changelog.js` regenerates CHANGELOG.md from readme.txt, never the reverse.
+- **Release flow:** readme.txt changelog entry first, then the user runs `npm version <x.y.z>` — its
+  `version` lifecycle script builds (stamping versions), syncs CHANGELOG.md, and stages; npm then
+  commits and tags. Pushing the `v*` tag runs `.github/workflows/release.yml`: GitHub release + wp.org
+  SVN deploy, validating plugin header / readme.txt / package.json all match the tag version.
+
 **Stack:** PHP 8.0+ · WordPress 6.0+ · Elementor 3.27+ · ES2022 / TypeScript · Sass

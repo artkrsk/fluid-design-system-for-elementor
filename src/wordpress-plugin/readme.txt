@@ -4,7 +4,7 @@ Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 license: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -199,6 +199,11 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 5. Applying fluid unit for "gaps" control
 
 == Changelog ==
+
+= 2.5.1 =
+* fixed: presets created or edited directly in the editor could disappear after saving Site Settings
+* fixed: fatal error when Elementor is deactivated while the plugin is active (WordPress 6.9+)
+* improved: overall stability and reliability
 
 = 2.5.0 =
 * added: preview the smallest and largest screen sizes of a fluid value while editing, without switching device mode
