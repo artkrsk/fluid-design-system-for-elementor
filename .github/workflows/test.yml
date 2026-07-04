@@ -240,10 +240,10 @@ jobs:
 
       - name: Install Playwright system dependencies
         if: runner.environment == 'github-hosted'
-        run: npx playwright install-deps chromium firefox webkit
+        run: npx playwright install-deps chromium
 
       - name: Install Playwright browsers
-        run: npx playwright install chromium firefox webkit
+        run: npx playwright install chromium
 
       - name: Destroy previous wp-env
         # Bound the teardown so a wp-env/Docker hang can't wedge the runner (||true ignores
@@ -254,9 +254,10 @@ jobs:
         run: npm run wp-env start
 
       - name: Run E2E tests
-        # All three browser projects in one invocation: one build, one wp-env,
-        # one global setup. maxFailures in playwright.config.ts keeps fail-fast.
-        run: npx playwright test
+        # Chromium gates PRs: fast, stable feedback, and one WebKit/Firefox
+        # flake can no longer abort the whole gate (maxFailures: 1 is global
+        # per invocation). Firefox + WebKit run in the weekly-e2e workflow.
+        run: npx playwright test --project=chromium
 
       - name: Dump environment diagnostics
         if: failure()

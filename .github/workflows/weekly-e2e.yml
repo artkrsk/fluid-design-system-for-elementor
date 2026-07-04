@@ -1,0 +1,248 @@
+name: Weekly E2E
+
+# Two safety nets that are too slow/noisy for PR gating, on a cadence matched
+# to how fast their risks actually move:
+# - cross-browser: the full e2e suite on Firefox + WebKit against stable
+#   Elementor (PRs gate on chromium only, see test.yml). Engine regressions
+#   can only come from our own merges — a few per week, already gated.
+# - elementor-canary: the chromium suite against the newest Elementor beta.
+#   The wp.org Beta tag changes every week or two and betas bake for at least
+#   that long before stable, so weekly catches each beta before release.
+# Daily runs would mostly re-test unchanged code on the self-hosted runner.
+# workflow_dispatch covers on-demand runs (e.g. right after a big merge).
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_OPTIONS: '--dns-result-order=ipv4first --no-network-family-autoselection'
+
+jobs:
+  cross-browser:
+    name: Cross-browser E2E (stable Elementor)
+    runs-on: self-hosted
+    # Same group as the PR e2e job: wp-env always binds 8888/8889 on this host,
+    # so e2e jobs from any workflow must never overlap.
+    concurrency:
+      group: wp-env-e2e-host
+      cancel-in-progress: false
+    steps:
+      - name: Disable git hooks
+        run: git config --global core.hooksPath /dev/null
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        if: runner.environment == 'github-hosted'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Setup PHP
+        if: runner.environment == 'github-hosted'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Create vendor-prefixed directory for Strauss classmap
+        run: mkdir -p vendor-prefixed
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Strauss to prefix namespaces
+        run: composer prefix-namespaces
+
+      - name: Reinstall Composer dependencies without dev for production
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Build plugin
+        run: npm run build:js
+
+      - name: Install Playwright system dependencies
+        if: runner.environment == 'github-hosted'
+        run: npx playwright install-deps firefox webkit
+
+      - name: Install Playwright browsers
+        run: npx playwright install firefox webkit
+
+      - name: Destroy previous wp-env
+        run: timeout --kill-after=30 180 npm run wp-env destroy -- --force || true
+
+      - name: Start wp-env
+        run: npm run wp-env start
+
+      - name: Run E2E tests on Firefox and WebKit
+        # A laxer failure budget than the PR gate: one engine-specific flake
+        # must not abort the other browser's run overnight.
+        run: PLAYWRIGHT_MAX_FAILURES=10 npx playwright test --project=firefox --project=webkit
+
+      - name: Dump environment diagnostics
+        if: failure()
+        run: |
+          docker ps -a || true
+          npm run wp-env run cli -- tail -n 100 /var/www/html/wp-content/debug.log || true
+
+      - name: Stop wp-env
+        if: always()
+        run: npm run wp-env stop || true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: weekly-cross-browser-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test videos
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: weekly-cross-browser-videos
+          path: test-results/
+          retention-days: 7
+
+  elementor-canary:
+    name: Elementor beta canary (chromium)
+    # Serialized after cross-browser (same single wp-env host); run even if
+    # cross-browser failed — upstream-breakage detection is independent signal.
+    needs: cross-browser
+    if: always()
+    runs-on: self-hosted
+    concurrency:
+      group: wp-env-e2e-host
+      cancel-in-progress: false
+    steps:
+      - name: Disable git hooks
+        run: git config --global core.hooksPath /dev/null
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Detect Elementor beta
+        id: detect
+        # Same mechanism Elementor's own Beta_Testers class uses: the "Beta tag:"
+        # header in the wordpress.org SVN trunk readme, downloadable at
+        # downloads.wordpress.org/plugin/elementor.{tag}.zip.
+        run: |
+          readme=$(curl -fsSL https://plugins.svn.wordpress.org/elementor/trunk/readme.txt || true)
+          stable=$(printf '%s' "$readme" | grep -im1 '^Stable tag:' | sed -E 's/^[Ss]table tag:[[:space:]]*//' | tr -d '[:space:]')
+          beta=$(printf '%s' "$readme" | grep -im1 '^Beta tag:' | sed -E 's/^[Bb]eta tag:[[:space:]]*//' | tr -d '[:space:]')
+          echo "Stable tag: '${stable}' / Beta tag: '${beta}'"
+          if [ -n "$beta" ] && [ -n "$stable" ] && php -r 'exit(version_compare($argv[1], $argv[2], ">") ? 0 : 1);' "$beta" "$stable"; then
+            echo "run_canary=true" >> "$GITHUB_OUTPUT"
+            echo "beta=$beta" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_canary=false" >> "$GITHUB_OUTPUT"
+            echo "No Elementor beta newer than stable — canary skipped."
+          fi
+
+      - name: Setup Node.js
+        if: runner.environment == 'github-hosted' && steps.detect.outputs.run_canary == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Setup PHP
+        if: runner.environment == 'github-hosted' && steps.detect.outputs.run_canary == 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+
+      - name: Install Node dependencies
+        if: steps.detect.outputs.run_canary == 'true'
+        run: npm ci
+
+      - name: Create vendor-prefixed directory for Strauss classmap
+        if: steps.detect.outputs.run_canary == 'true'
+        run: mkdir -p vendor-prefixed
+
+      - name: Install Composer dependencies
+        if: steps.detect.outputs.run_canary == 'true'
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Strauss to prefix namespaces
+        if: steps.detect.outputs.run_canary == 'true'
+        run: composer prefix-namespaces
+
+      - name: Reinstall Composer dependencies without dev for production
+        if: steps.detect.outputs.run_canary == 'true'
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Build plugin
+        if: steps.detect.outputs.run_canary == 'true'
+        run: npm run build:js
+
+      - name: Install Playwright browsers
+        if: steps.detect.outputs.run_canary == 'true'
+        run: npx playwright install chromium
+
+      - name: Point wp-env at the Elementor beta
+        if: steps.detect.outputs.run_canary == 'true'
+        # .wp-env.override.json merges over .wp-env.json; the plugins array must
+        # be repeated in full because arrays replace rather than merge.
+        run: |
+          cat > .wp-env.override.json <<EOF
+          {
+            "plugins": [
+              "./tests/e2e/fixtures/conflict-plugin/aaaa-arts-utilities-conflict-test",
+              "./dist/fluid-design-system-for-elementor",
+              "https://downloads.wordpress.org/plugin/elementor.${{ steps.detect.outputs.beta }}.zip"
+            ]
+          }
+          EOF
+          cat .wp-env.override.json
+
+      - name: Destroy previous wp-env
+        if: steps.detect.outputs.run_canary == 'true'
+        run: timeout --kill-after=30 180 npm run wp-env destroy -- --force || true
+
+      - name: Start wp-env
+        if: steps.detect.outputs.run_canary == 'true'
+        run: npm run wp-env start
+
+      - name: Run E2E tests against the beta
+        if: steps.detect.outputs.run_canary == 'true'
+        run: PLAYWRIGHT_MAX_FAILURES=10 npx playwright test --project=chromium
+
+      - name: Dump environment diagnostics
+        if: failure()
+        run: |
+          docker ps -a || true
+          npm run wp-env run cli -- tail -n 100 /var/www/html/wp-content/debug.log || true
+
+      - name: Stop wp-env and drop the override
+        if: always()
+        run: |
+          npm run wp-env stop || true
+          rm -f .wp-env.override.json
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always() && steps.detect.outputs.run_canary == 'true'
+        with:
+          name: weekly-canary-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test videos
+        uses: actions/upload-artifact@v7
+        if: failure() && steps.detect.outputs.run_canary == 'true'
+        with:
+          name: weekly-canary-videos
+          path: test-results/
+          retention-days: 7
