@@ -11,8 +11,14 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  /* Fail fast: stop after first failure (namespace conflict = critical) */
-  maxFailures: process.env.CI ? 1 : 0,
+  /* Fail fast: stop after first failure (namespace conflict = critical).
+     PLAYWRIGHT_MAX_FAILURES overrides for runs that should keep going after a
+     flake, e.g. the weekly cross-browser job. */
+  maxFailures: process.env.PLAYWRIGHT_MAX_FAILURES
+    ? Number(process.env.PLAYWRIGHT_MAX_FAILURES)
+    : process.env.CI
+      ? 1
+      : 0,
   reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
   outputDir: 'test-results',
   use: {

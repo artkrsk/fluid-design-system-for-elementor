@@ -101,3 +101,6 @@ tasks/
 .cursor/
 .taskmaster/
 .env*
+
+# wp-env local override (written by the weekly canary job)
+.wp-env.override.json
