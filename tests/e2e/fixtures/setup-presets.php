@@ -157,15 +157,12 @@ $test_custom_groups = array(
 	),
 );
 
-// Step 1: Create/update custom group in wp_options
-$existing_groups = get_option( 'arts_fluid_design_system_custom_groups', array() );
-if ( ! is_array( $existing_groups ) ) {
-	$existing_groups = array();
-}
-
-$existing_groups = array_merge( $existing_groups, $test_custom_groups );
-update_option( 'arts_fluid_design_system_custom_groups', $existing_groups );
-echo "Created custom group: e2e_test_group\n";
+// Step 1: Reset custom groups to EXACTLY the seed state. Mutating specs create
+// extra groups; an authoritative replace (not merge) is what makes re-running
+// this script a full reset. The saved main-group ordering is dropped too.
+update_option( 'arts_fluid_design_system_custom_groups', $test_custom_groups );
+delete_option( 'arts_fluid_design_system_main_group_order' );
+echo "Reset custom groups to seed state\n";
 
 // Step 2: Get active Kit
 $kit_id = get_option( 'elementor_active_kit' );
@@ -182,42 +179,51 @@ if ( ! is_array( $settings ) ) {
 	$settings = array();
 }
 
-// Step 4: Merge test presets (replace existing e2e_ prefixed ones)
+// Step 4: Replace the seeded preset arrays WHOLESALE. Presets created by
+// mutating specs (dialog/ability flows) carry no e2e_ prefix, so a
+// filter-and-append would let them accrete across runs.
 foreach ( $test_presets as $control_id => $presets ) {
-	$existing = isset( $settings[ $control_id ] ) && is_array( $settings[ $control_id ] )
-		? $settings[ $control_id ]
-		: array();
-
-	// Remove old e2e_ presets to ensure clean state
-	$existing = array_filter(
-		$existing,
-		function ( $preset ) {
-			return ! isset( $preset['_id'] ) || strpos( $preset['_id'], 'e2e_' ) !== 0;
-		}
-	);
-
-	// Re-index array
-	$existing = array_values( $existing );
-
-	// Add test presets
-	$settings[ $control_id ] = array_merge( $existing, $presets );
-
-	echo "Added " . count( $presets ) . " presets to {$control_id}\n";
+	$settings[ $control_id ] = $presets;
+	echo "Reset {$control_id} to " . count( $presets ) . " seeded presets\n";
 }
 
-// Step 5: Ensure default breakpoints are set
-if ( ! isset( $settings['min_screen_width'] ) ) {
-	$settings['min_screen_width'] = 360;
+// Drop preset arrays for custom groups that are not part of the seed
+// (created by group-CRUD specs), so the Site Settings tab matches the seed.
+foreach ( array_keys( $settings ) as $settings_key ) {
+	if ( preg_match( '/^fluid_custom_.+_presets$/', $settings_key ) && ! isset( $test_presets[ $settings_key ] ) ) {
+		unset( $settings[ $settings_key ] );
+		echo "Dropped stray control {$settings_key}\n";
+	}
 }
-if ( ! isset( $settings['max_screen_width'] ) ) {
-	$settings['max_screen_width'] = 1920;
-}
+
+// Step 5: Pin global breakpoints to the values the specs assume
+$settings['min_screen_width'] = 360;
+$settings['max_screen_width'] = 1920;
 
 // Step 6: Save Kit settings
 update_post_meta( $kit_id, '_elementor_page_settings', $settings );
 echo "Kit settings updated\n";
 
-// Step 7: Clear Elementor CSS cache
+// Step 7: Delete Kit autosave revisions. The editor reads settings through
+// get_doc_or_auto_save, so a stale autosave from a previous editing session
+// would keep showing pre-reset data even though the Kit meta is clean.
+$kit_autosaves = get_posts(
+	array(
+		'post_parent' => $kit_id,
+		'post_type'   => 'revision',
+		'post_status' => 'any',
+		'name__like'  => '',
+		'numberposts' => -1,
+	)
+);
+foreach ( $kit_autosaves as $kit_revision ) {
+	if ( strpos( $kit_revision->post_name, "{$kit_id}-autosave" ) === 0 ) {
+		wp_delete_post_revision( $kit_revision->ID );
+		echo "Deleted Kit autosave revision {$kit_revision->ID}\n";
+	}
+}
+
+// Step 8: Clear Elementor CSS cache
 delete_post_meta( $kit_id, '_elementor_css' );
 
 // Clear CSS files if they exist

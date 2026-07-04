@@ -60,61 +60,10 @@ test.describe('Namespace Conflict Handling', () => {
     ).toBeVisible()
   })
 
-  test('both plugins can be activated simultaneously', async ({ page }) => {
-    await page.goto(`${BASE_URL}/wp-admin/plugins.php`)
-
-    // Check if conflict plugin is active (has 'active' class or Deactivate link)
-    const conflictPluginRow = page.locator(
-      'tr[data-slug="aaaa-arts-utilities-conflict-test"]:not(.plugin-update-tr)'
-    )
-    const conflictIsActive = await conflictPluginRow
-      .locator('.deactivate a')
-      .isVisible()
-      .catch(() => false)
-
-    // If conflict plugin is not active, activate it
-    if (!conflictIsActive) {
-      const activateLink = conflictPluginRow.locator('.activate a')
-      if (await activateLink.isVisible()) {
-        await activateLink.click()
-        await page.waitForLoadState('load')
-      }
-    }
-
-    // Navigate back to plugins page
-    await page.goto(`${BASE_URL}/wp-admin/plugins.php`)
-
-    // Check if FDS is active
-    const fdsPluginRow = page.locator(
-      'tr[data-slug="fluid-design-system-for-elementor"]:not(.plugin-update-tr)'
-    )
-    const fdsIsActive = await fdsPluginRow
-      .locator('.deactivate a')
-      .isVisible()
-      .catch(() => false)
-
-    // If FDS is not active, try to activate it
-    if (!fdsIsActive) {
-      const activateLink = fdsPluginRow.locator('.activate a')
-      if (await activateLink.isVisible()) {
-        // Arm the response wait before clicking (waitForNavigation is deprecated)
-        const responsePromise = page.waitForResponse(
-          response =>
-            response.url().includes('plugins.php') &&
-            response.request().isNavigationRequest()
-        )
-        await activateLink.click()
-        const response = await responsePromise
-
-        // Activation should not cause 500 error
-        expect(
-          response.status(),
-          'Plugin activation should not cause fatal error'
-        ).toBeLessThan(500)
-      }
-    }
-
-    // Both plugins should now be active
+  test('both plugins are active simultaneously', async ({ page }) => {
+    // wp-env auto-activates every configured plugin and global setup hard-fails
+    // if it didn't, so the old conditional activate-if-needed branches here were
+    // dead code — assert the coexistence state directly.
     await page.goto(`${BASE_URL}/wp-admin/plugins.php`)
 
     await expect(

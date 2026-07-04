@@ -40,9 +40,9 @@ test.describe('Group Management Admin Panel', () => {
 
 test.describe('Admin-to-Elementor Sync', () => {
   test('groups from admin sync to Elementor Site Settings', async ({
-    editor: _editor,
+    editor,
     page,
-    testPageId: _testPageId
+    testPageId
   }) => {
     // Step 1: Get group list from WordPress admin
     await page.goto(ADMIN_PAGE_URL)
@@ -67,9 +67,19 @@ test.describe('Admin-to-Elementor Sync', () => {
     expect(adminGroups).toContain('Spacing Presets')
     expect(adminGroups).toContain('E2E Test Group')
 
-    // Step 2: Verify the same groups exist in Elementor Kit settings
-    // We verified this programmatically in the previous test
-    // The frontend CSS tests already prove the presets render correctly
-    // This confirms the admin UI accurately represents the data
+    // Step 2: Verify the custom group actually renders in the Site Settings
+    // panel — its section exists, and expanding it reveals the group's own
+    // preset repeater control.
+    await editor.openPost(testPageId)
+    await editor.openSiteSettingsFluidTab('fluid_custom_e2e_test_group_presets')
+
+    await expect(
+      page.locator('.elementor-control-section_fluid_custom_e2e_test_group_presets'),
+      'Custom group section should render in the fluid tab'
+    ).toBeVisible()
+    await expect(
+      page.locator('.elementor-control-fluid_custom_e2e_test_group_presets'),
+      'Custom group preset repeater should be attached after expanding'
+    ).toBeAttached()
   })
 })

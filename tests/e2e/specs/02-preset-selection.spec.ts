@@ -62,7 +62,7 @@ test.describe('Site Settings Tab', () => {
     await expect(fluidTab).toBeVisible()
   })
 
-  test('custom group from WordPress admin appears in Site Settings', async ({
+  test('fluid tab is registered in the Site Settings component', async ({
     editor
   }) => {
     // Open Site Settings (switches to Kit document and loads tabs)

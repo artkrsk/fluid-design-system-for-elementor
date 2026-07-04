@@ -10,19 +10,14 @@ export class WPAdminPage {
     await this.page.waitForSelector('#wpbody-content', { timeout: 15000 })
   }
 
-  async goToPlugins() {
-    await this.goto('plugins.php')
-  }
-
   async goToPages() {
     await this.goto('edit.php?post_type=page')
   }
 
-  async goToSiteSettings() {
-    // Navigate to Elementor Site Settings
-    await this.page.goto('/wp-admin/admin.php?page=elementor#tab-global-settings')
-    await this.page.waitForLoadState('load')
-    await this.page.waitForSelector('#wpbody-content', { timeout: 15000 })
+  /** Open the plugin's Groups admin page */
+  async goToFluidAdmin() {
+    await this.goto('admin.php?page=fluid-design-system')
+    await this.page.waitForSelector('#fluid-main-groups-table', { timeout: 15000 })
   }
 
   async getTestPageId(): Promise<number | null> {
@@ -42,9 +37,5 @@ export class WPAdminPage {
     // Extract ID from "post-123" format
     const match = postId.match(/post-(\d+)/)
     return match ? parseInt(match[1]!, 10) : null
-  }
-
-  async openElementorEditor(postId: number) {
-    await this.page.goto(`/wp-admin/post.php?post=${postId}&action=elementor`)
   }
 }

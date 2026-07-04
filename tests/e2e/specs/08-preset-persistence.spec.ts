@@ -1,5 +1,4 @@
-import { test, expect } from '../fixtures'
-import type { Page } from '@playwright/test'
+import { test, expect, resetTestState } from '../fixtures'
 
 /**
  * Issue #40 — a preset added to the Kit while Site Settings is open must survive
@@ -24,45 +23,12 @@ import type { Page } from '@playwright/test'
 const CONTROL_ID = 'fluid_typography_presets'
 const PRESET_TITLE = 'E2E Persistence Preset'
 
-/** Opens Site Settings and waits for the Kit document + its settings model. */
-async function openSiteSettings(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    const w = window as any
-    await w.$e.run('panel/global/open')
-  })
-  await page.waitForFunction(
-    () => {
-      const w = window as any
-      const kitId = w.elementor?.config?.kit_id
-      const container = kitId != null ? w.elementor?.documents?.get?.(kitId)?.container : null
-      return !!(
-        container &&
-        container.settings &&
-        container.settings.get('fluid_typography_presets')
-      )
-    },
-    { timeout: 15000 }
-  )
-}
-
-/**
- * Saves the Kit (Site Settings) document via its save command.
- *
- * The top-bar save button (`editor.save()`) tracks the primary page document's
- * changed state, so it stays disabled for Kit-only edits. Running the Kit's save
- * command directly is the reliable way to persist Site Settings; its promise
- * resolves only after the save AJAX has persisted.
- */
-async function saveSiteSettings(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    const w = window as any
-    const kitId = w.elementor.config.kit_id
-    const kitDoc = w.elementor.documents.get(kitId)
-    await w.$e.run('document/save/update', { document: kitDoc })
-  })
-}
-
 test.describe('Preset persistence across save + reload (#40)', () => {
+  // This spec mutates shared Kit state; start from the seeded baseline.
+  test.beforeAll(() => {
+    resetTestState()
+  })
+
   test('a created preset survives Save Changes and a hard reload', async ({
     editor,
     testPageId
@@ -70,7 +36,7 @@ test.describe('Preset persistence across save + reload (#40)', () => {
     const page = editor.page
 
     await editor.openPost(testPageId)
-    await openSiteSettings(page)
+    await editor.openSiteSettings()
 
     // Create through the plugin's server action, then mirror into the Kit model
     // exactly as the fixed create flow does.
@@ -110,12 +76,12 @@ test.describe('Preset persistence across save + reload (#40)', () => {
 
     expect(createdId).toBeTruthy()
 
-    await saveSiteSettings(page)
+    await editor.saveSiteSettings()
 
     // Hard reload: reopen the editor via the page URL (see file header), then load
     // Site Settings fresh so the Kit model reflects the persisted server state.
     await editor.openPost(testPageId)
-    await openSiteSettings(page)
+    await editor.openSiteSettings()
 
     // The freshly loaded Kit model must contain the preset (synchronous model read
     // — no AJAX round trip that could hang).
@@ -146,6 +112,6 @@ test.describe('Preset persistence across save + reload (#40)', () => {
       },
       { name: CONTROL_ID, title: PRESET_TITLE }
     )
-    await saveSiteSettings(page)
+    await editor.saveSiteSettings()
   })
 })
