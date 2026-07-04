@@ -9,7 +9,6 @@ export const COMMANDS = {
     MOVE: 'document/repeater/move'
   },
   DOCUMENT: {
-    UPDATE: 'document/save/update',
     SAVE: 'document/save/save'
   }
 } as const
@@ -20,9 +19,6 @@ export const HOOK_IDS = {
     ADD: `${PREFIX}-hook-on-repeater-add`,
     REMOVE: `${PREFIX}-hook-on-repeater-remove`,
     REORDER: `${PREFIX}-hook-on-repeater-reorder`
-  },
-  DOCUMENT: {
-    SAVE: `${PREFIX}-hook-on-document-save`
   },
   KIT: {
     SAVE: `${PREFIX}-hook-on-kit-save`
