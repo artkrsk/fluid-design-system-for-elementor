@@ -101,3 +101,6 @@ tasks/
 .cursor/
 .taskmaster/
 .env*
+
+# PHPUnit
+.phpunit.result.cache
