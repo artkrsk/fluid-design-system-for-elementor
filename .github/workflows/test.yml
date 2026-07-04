@@ -253,6 +253,25 @@ jobs:
       - name: Start wp-env
         run: npm run wp-env start
 
+      - name: Clean stale test-tooling vendor dirs
+        # wp-env's dev-vendor bind mount can leave root-owned dirs under
+        # tests/php from a prior run, which the runner user then can't overwrite
+        # (EACCES on composer install). Remove them from inside a container as
+        # root, mirroring the plugin-check job's stale wp-env cleanup.
+        run: |
+          docker run --rm -v "$PWD:/w" alpine \
+            sh -c 'rm -rf /w/tests/php/tools/vendor' 2>/dev/null || true
+
+      - name: Install isolated PHPUnit tooling for the integration suites
+        # phpunit 9.6 + Yoast polyfills live in their own Composer project so the
+        # test runner's autoloader can't collide with the plugin's bundled vendor
+        # (same ComposerAutoloaderInit hash => fatal). Mounted into wp-env via the
+        # dev-vendor mapping (tests/php/tools/vendor).
+        run: composer install --prefer-dist --no-progress --working-dir=tests/php/tools
+
+      - name: Run PHP integration tests (WordPress + Elementor tiers)
+        run: npm run test:php:wp && npm run test:php:elementor
+
       - name: Run E2E tests
         # Chromium gates PRs: fast, stable feedback, and one WebKit/Firefox
         # flake can no longer abort the whole gate (maxFailures: 1 is global
