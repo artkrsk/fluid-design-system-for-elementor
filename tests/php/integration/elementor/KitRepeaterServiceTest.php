@@ -128,6 +128,22 @@ class KitRepeaterServiceTest extends ElementorKitTestCase {
 	public function test_writes_mirror_to_autosave(): void {
 		$this->seed_preset( 'mirrored', 'Before Mirror' );
 
+		// Backdate the Kit post so the autosave created below is strictly newer:
+		// Elementor's autosave lookup (Utils::get_post_autosave) requires
+		// post_modified_gmt > the parent's, which same-second creation in a fast
+		// test would otherwise fail, making get_autosave() return false.
+		global $wpdb;
+		$past = gmdate( 'Y-m-d H:i:s', time() - 60 );
+		$wpdb->update(
+			$wpdb->posts,
+			array(
+				'post_modified'     => $past,
+				'post_modified_gmt' => $past,
+			),
+			array( 'ID' => $this->kit->get_id() )
+		);
+		clean_post_cache( $this->kit->get_id() );
+
 		$autosave = $this->kit->get_autosave( get_current_user_id(), true );
 		$this->assertInstanceOf(
 			\Elementor\Core\Kits\Documents\Kit::class,
