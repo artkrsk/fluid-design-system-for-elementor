@@ -1,11 +1,14 @@
 {
   "$schema": "https://getcomposer.org/schema.json",
-  "description": "Isolated PHPUnit + polyfills for the wp-env integration suites. Kept as a separate Composer project so its autoloader hash differs from the plugin's bundled vendor — mounting the plugin's own vendor as the test runner collides on ComposerAutoloaderInit and fatals.",
+  "description": "Isolated PHPUnit + polyfills for the wp-env integration suites. Kept as a separate Composer project so its autoloader hash differs from the plugin's bundled vendor \u2014 mounting the plugin's own vendor as the test runner collides on ComposerAutoloaderInit and fatals.",
   "require": {
     "phpunit/phpunit": "^9.6",
     "yoast/phpunit-polyfills": "^2.0"
   },
   "config": {
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.0"
+    }
   }
 }
