@@ -42,7 +42,13 @@ class GroupsDataTest extends WP_UnitTestCase {
 		$this->assertSame( $group_id, $custom[0]['id'] );
 	}
 
-	public function test_filter_injected_group_is_typed_and_collision_checked(): void {
+	/**
+	 * Filter groups come from FluidUnitModule, which is Elementor-gated, so
+	 * without Elementor loaded they must degrade to empty rather than fatal —
+	 * even when a filter is registered. (The populated path is covered by the
+	 * Elementor tier and by e2e.)
+	 */
+	public function test_filter_groups_degrade_without_elementor(): void {
 		add_filter(
 			'arts/fluid_design_system/custom_presets',
 			function ( $groups ) {
@@ -54,13 +60,8 @@ class GroupsDataTest extends WP_UnitTestCase {
 			}
 		);
 
-		$filter_groups = GroupsData::get_filter_groups();
-		$names         = array_column( $filter_groups, 'name' );
-
-		$this->assertContains( 'Dev Filter Group', $names );
-		$this->assertSame( 'filter', $filter_groups[ array_search( 'Dev Filter Group', $names, true ) ]['type'] );
-
-		$this->assertTrue( GroupsData::is_group_name_taken( 'Dev Filter Group' ) );
+		$this->assertSame( array(), GroupsData::get_filter_groups() );
+		$this->assertFalse( GroupsData::is_group_name_taken( 'Dev Filter Group' ) );
 	}
 
 	public function test_name_collision_across_builtin_and_custom(): void {

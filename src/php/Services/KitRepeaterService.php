@@ -225,6 +225,13 @@ class KitRepeaterService {
 	/**
 	 * Recursively applies operation to autosave document.
 	 *
+	 * $kit->get_autosave() (no user id) resolves to the CURRENT user's autosave,
+	 * matching Elementor core's own Kit::add_repeater_row(). A write by user A
+	 * therefore does not mirror into user B's separate open-editor autosave — the
+	 * same acting-user scope the framework uses. This is an intentional match, not
+	 * an oversight; hardening it to enumerate every user's autosave would diverge
+	 * from Elementor and mutate other users' in-progress drafts.
+	 *
 	 * @param \Elementor\Core\Kits\Documents\Kit $kit
 	 * @param string                              $method
 	 * @param mixed                               ...$args

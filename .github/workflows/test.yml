@@ -253,6 +253,16 @@ jobs:
       - name: Start wp-env
         run: npm run wp-env start
 
+      - name: Restore dev dependencies for PHPUnit
+        # The production build above ran composer --no-dev, but the integration
+        # suites need phpunit 9.6 + Yoast polyfills. They run in-container via the
+        # dev-vendor mapping (a bind mount of ./vendor), so restoring dev deps on
+        # the host makes them available inside wp-env.
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run PHP integration tests (WordPress + Elementor tiers)
+        run: npm run test:php:wp && npm run test:php:elementor
+
       - name: Run E2E tests
         # Chromium gates PRs: fast, stable feedback, and one WebKit/Firefox
         # flake can no longer abort the whole gate (maxFailures: 1 is global

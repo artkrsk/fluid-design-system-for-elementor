@@ -123,6 +123,14 @@ class GroupsData extends BaseManager {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function get_filter_groups(): array {
+		// FluidUnitModule extends an Elementor base class; touching it without
+		// Elementor loaded fatals. Reads that reach here (admin page, fluid/*
+		// abilities) must degrade to "no filter groups", like get_kit_settings
+		// already degrades elsewhere.
+		if ( ! Utilities::is_elementor_plugin_active() ) {
+			return array();
+		}
+
 		$all_groups    = FluidUnitModule::get_all_preset_groups();
 		$builtin_names = self::get_builtin_names();
 
@@ -160,11 +168,16 @@ class GroupsData extends BaseManager {
 	public static function get_builtin_names(): array {
 		$builtin_names = array();
 
-		$default_options = FluidUnitModule::get_default_preset_options();
-		foreach ( $default_options as $option ) {
-			$option_array = Utilities::get_array_value( $option );
-			if ( isset( $option_array['name'] ) ) {
-				$builtin_names[] = Utilities::get_string_value( $option_array['name'] );
+		// The default-option names come from FluidUnitModule (Elementor-gated);
+		// skip them when Elementor is absent. The builtin control mappings below
+		// are pure and always available.
+		if ( Utilities::is_elementor_plugin_active() ) {
+			$default_options = FluidUnitModule::get_default_preset_options();
+			foreach ( $default_options as $option ) {
+				$option_array = Utilities::get_array_value( $option );
+				if ( isset( $option_array['name'] ) ) {
+					$builtin_names[] = Utilities::get_string_value( $option_array['name'] );
+				}
 			}
 		}
 
