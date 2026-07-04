@@ -24,6 +24,7 @@
     "ergebnis/composer-normalize": "^2.48",
     "php-stubs/woocommerce-stubs": "^10.5",
     "phpstan/phpstan": "^2.0",
+    "phpunit/phpunit": "^9.6",
     "squizlabs/php_codesniffer": "^3.13.4",
     "szepeviktor/phpstan-wordpress": "^2.0",
     "wp-coding-standards/wpcs": "^3.0"
@@ -35,6 +36,11 @@
     ],
     "psr-4": {
       "Arts\\FluidDesignSystem\\": "src/php/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Arts\\FluidDesignSystem\\Tests\\": "tests/php/"
     }
   },
   "config": {
@@ -94,7 +100,8 @@
     "phpcbf": "phpcbf --standard=phpcs.xml",
     "phpcs": "phpcs --standard=phpcs.xml",
     "phpstan": "phpstan analyse --memory-limit=1G",
-    "phpstan:baseline": "phpstan analyse --memory-limit=1G --generate-baseline"
+    "phpstan:baseline": "phpstan analyse --memory-limit=1G --generate-baseline",
+    "test:php:unit": "phpunit -c tests/php/phpunit-unit.xml.dist"
   },
   "plugin": {
     "Description": "Provides comprehensive fluid spacing and typography system for Elementor for smoother and consistent responsive design",
