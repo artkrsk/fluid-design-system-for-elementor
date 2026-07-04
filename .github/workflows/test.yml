@@ -187,15 +187,15 @@ jobs:
           flags: unittests
 
   e2e-tests:
-    name: E2E Tests (${{ matrix.browser }})
+    name: E2E Tests
     needs: plugin-check
     runs-on: self-hosted
-    strategy:
-      # One browser failing means the change is broken; cancel the rest so the
-      # single self-hosted runner isn't wasted on runs that can't pass anyway.
-      fail-fast: true
-      matrix:
-        browser: [chromium, firefox, webkit]
+    # The host has multiple runner slots but wp-env always binds 8888/8889, so
+    # e2e jobs from different runs must never overlap. cancel-in-progress stays
+    # off — a running suite finishes; a superseded queued job may be cancelled.
+    concurrency:
+      group: wp-env-e2e-host
+      cancel-in-progress: false
     steps:
       - name: Disable git hooks
         run: git config --global core.hooksPath /dev/null
@@ -237,14 +237,10 @@ jobs:
 
       - name: Install Playwright system dependencies
         if: runner.environment == 'github-hosted'
-        run: npx playwright install-deps ${{ matrix.browser }}
+        run: npx playwright install-deps chromium firefox webkit
 
       - name: Install Playwright browsers
-        run: |
-          npx playwright install ${{ matrix.browser }}
-          if [ "${{ matrix.browser }}" != "chromium" ]; then
-            npx playwright install chromium
-          fi
+        run: npx playwright install chromium firefox webkit
 
       - name: Destroy previous wp-env
         # Bound the teardown so a wp-env/Docker hang can't wedge the runner (||true ignores
@@ -255,7 +251,15 @@ jobs:
         run: npm run wp-env start
 
       - name: Run E2E tests
-        run: npx playwright test --project=${{ matrix.browser }}
+        # All three browser projects in one invocation: one build, one wp-env,
+        # one global setup. maxFailures in playwright.config.ts keeps fail-fast.
+        run: npx playwright test
+
+      - name: Dump environment diagnostics
+        if: failure()
+        run: |
+          docker ps -a || true
+          npm run wp-env run cli -- tail -n 100 /var/www/html/wp-content/debug.log || true
 
       - name: Stop wp-env
         if: always()
@@ -265,7 +269,7 @@ jobs:
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: playwright-report-${{ matrix.browser }}
+          name: playwright-report
           path: playwright-report/
           retention-days: 30
 
@@ -273,6 +277,6 @@ jobs:
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-videos-${{ matrix.browser }}
+          name: playwright-videos
           path: test-results/
           retention-days: 7

@@ -97,14 +97,18 @@ test.describe('Namespace Conflict Handling', () => {
     if (!fdsIsActive) {
       const activateLink = fdsPluginRow.locator('.activate a')
       if (await activateLink.isVisible()) {
-        const [response] = await Promise.all([
-          page.waitForNavigation(),
-          activateLink.click()
-        ])
+        // Arm the response wait before clicking (waitForNavigation is deprecated)
+        const responsePromise = page.waitForResponse(
+          response =>
+            response.url().includes('plugins.php') &&
+            response.request().isNavigationRequest()
+        )
+        await activateLink.click()
+        const response = await responsePromise
 
         // Activation should not cause 500 error
         expect(
-          response?.status(),
+          response.status(),
           'Plugin activation should not cause fatal error'
         ).toBeLessThan(500)
       }

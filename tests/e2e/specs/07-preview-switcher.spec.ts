@@ -15,9 +15,6 @@ import { test, expect } from '../fixtures'
 import type { Page } from '@playwright/test'
 import { TEST_ELEMENT_IDS } from '../fixtures/test-data'
 
-/** Time for the preview wrapper's width transition to settle (CSS is 0.2s) */
-const TRANSITION_MS = 350
-
 /** Rendered width of the editor preview wrapper (top frame), rounded */
 function previewWrapperWidth(page: Page): Promise<number> {
   return page.evaluate(() => {
@@ -42,9 +39,14 @@ function visibleSwitcher(page: Page) {
 }
 
 test.describe('Preview-width switcher', () => {
-  test.beforeEach(async ({ editor, testPageId }) => {
+  test.beforeEach(async ({ editor, testPageId, page }) => {
     await editor.openPost(testPageId)
     await editor.selectWidget(`#${TEST_ELEMENT_IDS.spacerStandard}`)
+    // The wrapper's width transition isn't under test — disable it so width
+    // changes settle instantly instead of sleeping through the animation
+    await page.addStyleTag({
+      content: '#elementor-preview-responsive-wrapper { transition: none !important; }'
+    })
   })
 
   test('renders Min/Max/Reset for a fluid control', async ({ page }) => {
@@ -63,13 +65,13 @@ test.describe('Preview-width switcher', () => {
     await switcher.locator('[data-anchor="max"]').click()
     expect(await previewIsActive(page)).toBe(true)
     expect(await previewWidthVar(page)).toBe('1920px')
-    await page.waitForTimeout(TRANSITION_MS)
+    await expect.poll(() => previewWrapperWidth(page)).toBeGreaterThan(360)
     const maxWidth = await previewWrapperWidth(page)
 
     // Min anchor (360) always fits, so the wrapper actually shrinks to it
     await switcher.locator('[data-anchor="min"]').click()
     expect(await previewWidthVar(page)).toBe('360px')
-    await page.waitForTimeout(TRANSITION_MS)
+    await expect.poll(() => previewWrapperWidth(page)).toBe(360)
     const minWidth = await previewWrapperWidth(page)
 
     expect(minWidth).toBe(360)
@@ -79,8 +81,9 @@ test.describe('Preview-width switcher', () => {
     await switcher.locator('[data-anchor="reset"]').click()
     expect(await previewIsActive(page)).toBe(false)
     expect(await previewWidthVar(page)).toBe('')
-    await page.waitForTimeout(TRANSITION_MS)
-    expect(Math.abs((await previewWrapperWidth(page)) - initialWidth)).toBeLessThanOrEqual(2)
+    await expect
+      .poll(async () => Math.abs((await previewWrapperWidth(page)) - initialWidth))
+      .toBeLessThanOrEqual(2)
   })
 
   test('device mode stays Desktop while previewing (no real switch)', async ({ page }) => {

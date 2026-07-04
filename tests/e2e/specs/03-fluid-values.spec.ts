@@ -110,14 +110,11 @@ test.describe('Fluid Spacing', () => {
     )
     expect(heightMobile).toBeCloseTo(getExpectedValue('e2e_gap_standard', 360), VALUE_TOLERANCE)
 
-    // At max viewport
+    // At max viewport (poll: the resize repaint lands asynchronously)
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
-    // Need to wait for repaint
-    await page.waitForTimeout(100)
-    const heightDesktop = await spacer.evaluate(
-      el => parseFloat(getComputedStyle(el).height)
-    )
-    expect(heightDesktop).toBeCloseTo(getExpectedValue('e2e_gap_standard', 1920), VALUE_TOLERANCE)
+    await expect
+      .poll(() => spacer.evaluate(el => parseFloat(getComputedStyle(el).height)))
+      .toBeCloseTo(getExpectedValue('e2e_gap_standard', 1920), VALUE_TOLERANCE)
   })
 
   test('container gap scales with viewport', async ({ page }) => {
@@ -130,13 +127,11 @@ test.describe('Fluid Spacing', () => {
     )
     expect(gapMobile).toBeCloseTo(getExpectedValue('e2e_gap_large', 360), VALUE_TOLERANCE)
 
-    // At max viewport
+    // At max viewport (poll: the resize repaint lands asynchronously)
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
-    await page.waitForTimeout(100)
-    const gapDesktop = await container.evaluate(
-      el => parseFloat(getComputedStyle(el).gap)
-    )
-    expect(gapDesktop).toBeCloseTo(getExpectedValue('e2e_gap_large', 1920), VALUE_TOLERANCE)
+    await expect
+      .poll(() => container.evaluate(el => parseFloat(getComputedStyle(el).gap)))
+      .toBeCloseTo(getExpectedValue('e2e_gap_large', 1920), VALUE_TOLERANCE)
   })
 })
 
@@ -150,16 +145,18 @@ test.describe('Viewport Transition', () => {
 
     for (const width of viewportWidths) {
       await page.setViewportSize({ width, height: 800 })
-      await page.waitForTimeout(50) // Allow repaint
+
+      // Poll until the resize repaint settles on the expected value, then
+      // record the settled reading for the monotonicity check below
+      const expected = calculateExpectedValue(24, 64, width)
+      await expect
+        .poll(() => heading.evaluate(el => parseFloat(getComputedStyle(el).fontSize)))
+        .toBeCloseTo(expected, VALUE_TOLERANCE)
 
       const fontSize = await heading.evaluate(
         el => parseFloat(getComputedStyle(el).fontSize)
       )
-
-      const expected = calculateExpectedValue(24, 64, width)
       results.push({ width, fontSize, expected })
-
-      expect(fontSize).toBeCloseTo(expected, VALUE_TOLERANCE)
     }
 
     // Verify values are monotonically increasing
