@@ -54,6 +54,25 @@ async function saveSiteSettings(page: Page): Promise<void> {
   })
 }
 
+/**
+ * Waits for the editor to be ready in a Kit-safe way.
+ *
+ * After a reload with `?active-document=<kitId>` the current document is the
+ * Kit, which — being a settings-only document with no elements — never gets a
+ * `$element`. Readiness probes that read `documents.getCurrent().$element`
+ * (like `editor.waitForEditor()`) therefore throw on every poll and hang for the
+ * full timeout. Poll only the always-present `$e` API plus a resolved document id.
+ */
+async function waitForEditorReady(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () => {
+      const w = window as any
+      return typeof w.$e?.run === 'function' && w.elementor?.documents?.getCurrentId?.() > 0
+    },
+    { timeout: 30000 }
+  )
+}
+
 test.describe('Preset persistence across save + reload (#40)', () => {
   test('a created preset survives Save Changes and a hard reload', async ({
     editor,
@@ -105,19 +124,22 @@ test.describe('Preset persistence across save + reload (#40)', () => {
     // Save Site Settings, then hard reload.
     await saveSiteSettings(page)
     await page.reload()
-    await editor.waitForEditor()
+    await waitForEditorReady(page)
     await openSiteSettings(page)
 
-    // The preset must still be in the persisted Kit model after reload.
-    const persisted = await page.evaluate(
-      ({ name, id }) => {
-        const w = window as any
-        const kitId = w.elementor.config.kit_id
-        const coll = w.elementor.documents.get(kitId).container.settings.get(name)
-        return !!(coll && coll.findWhere && coll.findWhere({ _id: id }))
-      },
-      { name: CONTROL_ID, id: createdId }
-    )
+    // The preset must survive in the persisted (canonical) Kit meta. Read it back
+    // through the plugin's server action, which always reads the live post meta —
+    // immune to a reloaded editor model that could load a stale autosave copy.
+    const persisted = await page.evaluate((id: string) => {
+      const w = window as any
+      return new Promise<boolean>((resolve, reject) => {
+        w.elementor.ajax.addRequest('arts_fluid_design_system_presets', {
+          success: (groups: any[]) =>
+            resolve((groups || []).some((g: any) => (g.value || []).some((p: any) => p.id === id))),
+          error: reject
+        })
+      })
+    }, createdId)
 
     expect(persisted).toBe(true)
 
