@@ -7,7 +7,8 @@
     "https://downloads.wordpress.org/plugin/elementor.latest-stable.zip"
   ],
   "mappings": {
-    "wp-content/plugins/fluid-design-system-for-elementor/tests": "./tests"
+    "wp-content/plugins/fluid-design-system-for-elementor/tests": "./tests",
+    "wp-content/mu-plugins": "./tests/e2e/fixtures/mu-plugins"
   },
   "config": {
     "WP_DEBUG": true,

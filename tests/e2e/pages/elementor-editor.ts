@@ -48,35 +48,6 @@ export class ElementorEditorPage {
     return this.previewFrame
   }
 
-  /** Add a widget from the panel */
-  async addWidget(widgetName: string) {
-    // Open add element panel
-    const addButton = this.page.locator('#elementor-panel-header-add-button')
-    await addButton.click()
-
-    // Search for widget
-    const searchInput = this.page.locator('#elementor-panel-elements-search-input')
-    await searchInput.fill(widgetName)
-    await searchInput.press('Enter')
-
-    // Drag widget to canvas (or double-click to add)
-    const widget = this.page.locator(`.elementor-element[data-widget_type="${widgetName}-widget"]`).first()
-
-    if ((await widget.count()) === 0) {
-      // Try alternative selector
-      const widgetAlt = this.page
-        .locator('.elementor-element')
-        .filter({ hasText: new RegExp(`^${widgetName}$`, 'i') })
-        .first()
-      await widgetAlt.dblclick()
-    } else {
-      await widget.dblclick()
-    }
-
-    // Wait for widget to appear in preview
-    await this.previewFrame.locator('.elementor-widget').first().waitFor({ timeout: 10000 })
-  }
-
   /** Select a widget in the preview */
   async selectWidget(selector: string = '.elementor-widget') {
     const widget = this.previewFrame.locator(selector).first()
@@ -102,36 +73,24 @@ export class ElementorEditorPage {
     await this.page.waitForSelector('#elementor-controls .elementor-control', { timeout: 10000 })
   }
 
-  /** Open the Style tab in the panel */
-  async openStyleTab() {
-    // Use data-tab attribute for more reliable selection
-    const styleTab = this.page.locator('.elementor-panel-navigation-tab[data-tab="style"]')
-    await styleTab.click()
-    // Wait for tab to become active
-    await this.page.waitForSelector('.elementor-panel-navigation-tab[data-tab="style"].elementor-active', { timeout: 5000 })
-  }
-
-  /** Expand a control section (accordion) */
-  async expandSection(sectionName: string) {
-    const section = this.page.locator(
-      `.elementor-control-type-section:has(.elementor-panel-heading-title:has-text("${sectionName}"))`
-    )
-    const toggle = section.locator('.elementor-panel-heading-toggle')
-
-    // Check if already expanded
-    const heading = section.locator('.elementor-panel-heading')
-    const isExpanded = await heading.getAttribute('aria-expanded')
-    if (isExpanded !== 'true') {
-      await toggle.click()
-      await expect(heading).toHaveAttribute('aria-expanded', 'true')
-    }
-  }
-
   /** Get a control element by label or name */
   getControl(controlLabel: string): Locator {
     return this.page.locator(
       `.elementor-control:has(.elementor-control-title:has-text("${controlLabel}"))`
     )
+  }
+
+  /**
+   * Switch a control's unit via the units switcher. The open choices overlay
+   * covers the switcher, so it cannot be toggle-closed — selecting a unit is
+   * what closes it.
+   */
+  async switchUnit(controlName: string, unit: string) {
+    const control = this.page.locator(`.elementor-control-${controlName}`)
+    await control.locator('.e-units-switcher').click()
+    await control.locator('.e-units-choices.e-units-choices-open').waitFor({ timeout: 5000 })
+    await control.locator(`.e-units-choices label[data-choose="${unit}"]`).click()
+    await expect(control.locator('.e-units-switcher')).toHaveAttribute('data-selected', unit)
   }
 
   /** Select a fluid preset from a Select2 dropdown */
@@ -158,57 +117,154 @@ export class ElementorEditorPage {
     )
   }
 
-  /** Switch responsive device mode */
-  async switchDevice(device: 'desktop' | 'tablet' | 'mobile') {
-    // Device switcher is in the top bar as a tablist
-    // The tabs have text like "Desktop", "Tablet Portrait", "Mobile Portrait"
-    const deviceLabels = {
-      desktop: 'Desktop',
-      tablet: 'Tablet',
-      mobile: 'Mobile'
-    }
-
-    // Find the device tab in the Switch Device tablist
-    const deviceTab = this.page.locator(`[role="tablist"][aria-label="Switch Device"] [role="tab"]`)
-      .filter({ hasText: deviceLabels[device] })
-
-    await deviceTab.click()
-
-    // Wait for device mode to apply (body class changes)
-    await this.page.waitForSelector(`body.elementor-device-${device}`, { timeout: 5000 })
-  }
-
-  /** Verify a CSS variable exists in the preview iframe */
-  async verifyCssVariable(varName: string, expectedPattern: RegExp | string) {
-    const value = await this.previewFrame.locator('html').evaluate((el, cssVar) => {
-      return getComputedStyle(el).getPropertyValue(cssVar).trim()
-    }, varName)
-
-    if (typeof expectedPattern === 'string') {
-      expect(value).toBe(expectedPattern)
-    } else {
-      expect(value).toMatch(expectedPattern)
-    }
-
-    return value
-  }
-
-  /** Get the value of a CSS variable from preview */
+  /**
+   * Get the value of a CSS variable from the preview iframe's root element.
+   *
+   * NOTE: every seeded preset variable exists on :root regardless of what any
+   * control has selected — reselecting a preset does NOT change these values.
+   * Use this to assert set/unset/restore of a variable itself (CSSManager
+   * contract); to assert a selection took effect, check the widget's applied
+   * computed style or the control's select value instead.
+   */
   async getCssVariableValue(varName: string): Promise<string> {
     return await this.previewFrame.locator('html').evaluate((el, cssVar) => {
       return getComputedStyle(el).getPropertyValue(cssVar).trim()
     }, varName)
   }
 
-  /** Check if inheritance indicator is visible */
-  getInheritIndicator(): Locator {
-    return this.page.locator('[data-inherited-from], .elementor-control-inherit-indicator')
-  }
-
-  /** Save the current page */
+  /**
+   * Save the current PAGE document via the footer button.
+   *
+   * Kit-only edits (Site Settings) leave this button disabled — use
+   * saveSiteSettings() for those.
+   */
   async save() {
     const saveButton = this.page.locator('#elementor-panel-saver-button-publish')
     await saveButton.click()
     await this.page.waitForSelector('.elementor-button-success', { timeout: 30000 })
+  }
+
+  /** Open Site Settings and wait for the Kit document + its settings model */
+  async openSiteSettings() {
+    await this.page.evaluate(async () => {
+      const w = window as unknown as { $e: { run: (cmd: string) => Promise<unknown> } }
+      await w.$e.run('panel/global/open')
+    })
+    await this.page.waitForFunction(
+      () => {
+        const w = window as unknown as {
+          elementor?: {
+            config?: { kit_id?: number }
+            documents?: {
+              get?: (id: number) => { container?: { settings?: { get: (key: string) => unknown } } }
+            }
+          }
+        }
+        const kitId = w.elementor?.config?.kit_id
+        const container = kitId != null ? w.elementor?.documents?.get?.(kitId)?.container : null
+        return Boolean(container && container.settings && container.settings.get('fluid_typography_presets'))
+      },
+      undefined,
+      { timeout: 15000 }
+    )
+  }
+
+  /**
+   * Save the Kit (Site Settings) document via its save command.
+   *
+   * The footer save button tracks the primary page document's changed state,
+   * so it stays disabled for Kit-only edits. Running the Kit's save command
+   * directly is the reliable way to persist Site Settings; its promise
+   * resolves only after the save AJAX has persisted.
+   */
+  async saveSiteSettings() {
+    await this.page.evaluate(async () => {
+      const w = window as unknown as {
+        elementor: { config: { kit_id: number }; documents: { get: (id: number) => unknown } }
+        $e: { run: (cmd: string, args: Record<string, unknown>) => Promise<unknown> }
+      }
+      const kitDoc = w.elementor.documents.get(w.elementor.config.kit_id)
+      await w.$e.run('document/save/update', { document: kitDoc })
+    })
+  }
+
+  /**
+   * Open Site Settings, route to the plugin's fluid tab and expand the section
+   * that owns the given repeater control.
+   *
+   * Repeater controls inside collapsed kit-panel sections are NOT attached to
+   * the DOM until the section expands — routing alone is not enough.
+   */
+  async openSiteSettingsFluidTab(controlName: string = 'fluid_spacing_presets') {
+    await this.openSiteSettings()
+
+    await this.page.evaluate(() => {
+      const w = window as unknown as { $e: { route: (route: string) => void } }
+      w.$e.route('panel/global/arts-fluid-design-system-tab-fluid-typography-spacing')
+    })
+
+    const section = this.page.locator(`.elementor-control-section_${controlName}`)
+    await section.waitFor({ timeout: 15000 })
+
+    const control = this.page.locator(`.elementor-control-${controlName}`)
+    if ((await control.count()) === 0) {
+      await section.locator('.elementor-panel-heading').click()
+    }
+    await control.waitFor({ timeout: 10000 })
+  }
+
+  /**
+   * Add a row to a fluid preset repeater in the open Site Settings tab and
+   * fill its title. Returns the generated _id read from the Kit model.
+   */
+  async addRepeaterRow(controlName: string, title: string): Promise<string> {
+    const control = this.page.locator(`.elementor-control-${controlName}`)
+    const rowsBefore = await control.locator('.elementor-repeater-fields').count()
+
+    await control.locator('button.elementor-repeater-add').click()
+    await expect(control.locator('.elementor-repeater-fields')).toHaveCount(rowsBefore + 1)
+
+    const newRow = control.locator('.elementor-repeater-fields').nth(rowsBefore)
+    await newRow.locator('input[data-setting="title"]').fill(title)
+
+    const itemId = await this.page.evaluate(
+      ({ name, index }) => {
+        const w = window as unknown as {
+          elementor: {
+            config: { kit_id: number }
+            documents: {
+              get: (id: number) => {
+                container: { settings: { get: (key: string) => { models: Array<{ get: (k: string) => string }> } } }
+              }
+            }
+          }
+        }
+        const collection = w.elementor.documents
+          .get(w.elementor.config.kit_id)
+          .container.settings.get(name)
+        return collection.models[index]?.get('_id') ?? ''
+      },
+      { name: controlName, index: rowsBefore }
+    )
+
+    expect(itemId).not.toBe('')
+    return itemId
+  }
+
+  /**
+   * Remove a repeater row via its (hover-revealed) remove tool and confirm
+   * the plugin's delete dialog.
+   */
+  async removeRepeaterRow(controlName: string, index: number) {
+    const control = this.page.locator(`.elementor-control-${controlName}`)
+    const row = control.locator('.elementor-repeater-fields').nth(index)
+
+    await row.hover()
+    await row.locator('.elementor-repeater-tool-remove').click()
+
+    const confirmDialog = this.page.locator('.e-global__confirm-delete')
+    await confirmDialog.waitFor({ timeout: 5000 })
+    await confirmDialog.locator('.dialog-ok').click()
+    await confirmDialog.waitFor({ state: 'hidden', timeout: 5000 })
   }
 }

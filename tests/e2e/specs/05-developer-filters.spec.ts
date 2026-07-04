@@ -1,8 +1,10 @@
 /**
  * Developer Filters and Hooks Tests
  *
- * Tests the Developer Groups table structure that displays filter-based
- * preset groups added programmatically by themes/plugins.
+ * Tests the Developer Groups table with a REAL filter-registered group: the
+ * mu-plugin fixture (tests/e2e/fixtures/mu-plugins/fluid-e2e-filter-group.php)
+ * hooks arts/fluid_design_system/custom_presets, so the table is populated,
+ * not just structurally present.
  */
 
 import { test, expect, waitForWpAdmin } from '../fixtures'
@@ -10,6 +12,20 @@ import { test, expect, waitForWpAdmin } from '../fixtures'
 const ADMIN_PAGE_URL = '/wp-admin/admin.php?page=fluid-design-system'
 
 test.describe('Developer Groups Table', () => {
+  test('filter-registered group renders in the developer table', async ({
+    page
+  }) => {
+    await page.goto(ADMIN_PAGE_URL)
+    await waitForWpAdmin(page)
+
+    const filterRow = page
+      .locator('#fluid-developer-groups-table-list tr.group-row.group-filter')
+      .filter({ hasText: 'E2E Filter Group' })
+
+    await expect(filterRow, 'mu-plugin group should be listed').toBeVisible()
+    await expect(filterRow.locator('.group-type-badge.group-type-filter')).toBeVisible()
+  })
+
   test('developer groups table exists in admin panel', async ({ page }) => {
     await page.goto(ADMIN_PAGE_URL)
     await waitForWpAdmin(page)
