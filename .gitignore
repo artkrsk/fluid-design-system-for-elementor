@@ -110,3 +110,6 @@ tasks/
 
 # In-container shadow of ./vendor (wp-env mapping); never exists as a real host dir
 tests/php/dev-vendor/
+
+# Isolated PHPUnit tooling vendor for integration suites
+tests/php/tools/vendor/

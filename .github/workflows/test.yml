@@ -253,12 +253,12 @@ jobs:
       - name: Start wp-env
         run: npm run wp-env start
 
-      - name: Restore dev dependencies for PHPUnit
-        # The production build above ran composer --no-dev, but the integration
-        # suites need phpunit 9.6 + Yoast polyfills. They run in-container via the
-        # dev-vendor mapping (a bind mount of ./vendor), so restoring dev deps on
-        # the host makes them available inside wp-env.
-        run: composer install --prefer-dist --no-progress
+      - name: Install isolated PHPUnit tooling for the integration suites
+        # phpunit 9.6 + Yoast polyfills live in their own Composer project so the
+        # test runner's autoloader can't collide with the plugin's bundled vendor
+        # (same ComposerAutoloaderInit hash => fatal). Mounted into wp-env via the
+        # dev-vendor mapping (tests/php/tools/vendor).
+        run: composer install --prefer-dist --no-progress --working-dir=tests/php/tools
 
       - name: Run PHP integration tests (WordPress + Elementor tiers)
         run: npm run test:php:wp && npm run test:php:elementor
