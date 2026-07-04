@@ -5,13 +5,20 @@ import type { Page } from '@playwright/test'
  * Issue #40 — a preset added to the Kit while Site Settings is open must survive
  * a Site Settings save + reload.
  *
- * The fix mirrors the newly created row into the editor's in-memory Kit model
- * (via the same document/repeater/insert command the native repeater uses), so
- * the save payload includes it. Without that mirror the stale model overwrites
- * `_elementor_page_settings` on save and the freshly added preset is dropped.
+ * Without the fix, the editor serializes a stale in-memory Kit model on Save and
+ * overwrites `_elementor_page_settings`, dropping the freshly added preset — so it
+ * is gone after a reload. The fix mirrors the new row into the editor's Kit model
+ * (via the same document/repeater/insert command the native repeater uses), so the
+ * save payload includes it.
  *
- * The handleCreatePreset -> insertPresetRow wiring is covered by unit tests; this
- * spec covers the editor save/persist integration the fix depends on.
+ * The reload here reopens the editor via the page URL rather than page.reload():
+ * a plain reload would land on `?active-document=<kit>`, whose multi-step boot
+ * (page -> attach-preview -> switch-to-kit) is racy, and the Kit document has no
+ * `$element` so the standard readiness wait never resolves. Reopening the page
+ * document boots reliably; opening Site Settings then loads the Kit fresh from the
+ * server, so its model reflects the persisted meta.
+ *
+ * (The handleCreatePreset -> insertPresetRow wiring is covered by unit tests.)
  */
 
 const CONTROL_ID = 'fluid_typography_presets'
@@ -42,8 +49,9 @@ async function openSiteSettings(page: Page): Promise<void> {
  * Saves the Kit (Site Settings) document via its save command.
  *
  * The top-bar save button (`editor.save()`) tracks the primary page document's
- * changed state, so it stays disabled for Kit-only edits. Running the Kit's
- * save command directly is the reliable way to persist Site Settings.
+ * changed state, so it stays disabled for Kit-only edits. Running the Kit's save
+ * command directly is the reliable way to persist Site Settings; its promise
+ * resolves only after the save AJAX has persisted.
  */
 async function saveSiteSettings(page: Page): Promise<void> {
   await page.evaluate(async () => {
@@ -52,25 +60,6 @@ async function saveSiteSettings(page: Page): Promise<void> {
     const kitDoc = w.elementor.documents.get(kitId)
     await w.$e.run('document/save/update', { document: kitDoc })
   })
-}
-
-/**
- * Waits for the editor to be ready in a Kit-safe way.
- *
- * After a reload with `?active-document=<kitId>` the current document is the
- * Kit, which — being a settings-only document with no elements — never gets a
- * `$element`. Readiness probes that read `documents.getCurrent().$element`
- * (like `editor.waitForEditor()`) therefore throw on every poll and hang for the
- * full timeout. Poll only the always-present `$e` API plus a resolved document id.
- */
-async function waitForEditorReady(page: Page): Promise<void> {
-  await page.waitForFunction(
-    () => {
-      const w = window as any
-      return typeof w.$e?.run === 'function' && w.elementor?.documents?.getCurrentId?.() > 0
-    },
-    { timeout: 30000 }
-  )
 }
 
 test.describe('Preset persistence across save + reload (#40)', () => {
@@ -121,25 +110,24 @@ test.describe('Preset persistence across save + reload (#40)', () => {
 
     expect(createdId).toBeTruthy()
 
-    // Save Site Settings, then hard reload.
     await saveSiteSettings(page)
-    await page.reload()
-    await waitForEditorReady(page)
+
+    // Hard reload: reopen the editor via the page URL (see file header), then load
+    // Site Settings fresh so the Kit model reflects the persisted server state.
+    await editor.openPost(testPageId)
     await openSiteSettings(page)
 
-    // The preset must survive in the persisted (canonical) Kit meta. Read it back
-    // through the plugin's server action, which always reads the live post meta —
-    // immune to a reloaded editor model that could load a stale autosave copy.
-    const persisted = await page.evaluate((id: string) => {
-      const w = window as any
-      return new Promise<boolean>((resolve, reject) => {
-        w.elementor.ajax.addRequest('arts_fluid_design_system_presets', {
-          success: (groups: any[]) =>
-            resolve((groups || []).some((g: any) => (g.value || []).some((p: any) => p.id === id))),
-          error: reject
-        })
-      })
-    }, createdId)
+    // The freshly loaded Kit model must contain the preset (synchronous model read
+    // — no AJAX round trip that could hang).
+    const persisted = await page.evaluate(
+      ({ name, id }) => {
+        const w = window as any
+        const kitId = w.elementor.config.kit_id
+        const coll = w.elementor.documents.get(kitId).container.settings.get(name)
+        return !!(coll && coll.findWhere && coll.findWhere({ _id: id }))
+      },
+      { name: CONTROL_ID, id: createdId }
+    )
 
     expect(persisted).toBe(true)
 
