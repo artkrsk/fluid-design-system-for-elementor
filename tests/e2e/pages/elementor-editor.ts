@@ -1,4 +1,4 @@
-import { Page, FrameLocator, Locator, expect } from '@playwright/test'
+import { Page, FrameLocator, expect } from '@playwright/test'
 
 export class ElementorEditorPage {
   private previewFrame: FrameLocator
@@ -73,13 +73,6 @@ export class ElementorEditorPage {
     await this.page.waitForSelector('#elementor-controls .elementor-control', { timeout: 10000 })
   }
 
-  /** Get a control element by label or name */
-  getControl(controlLabel: string): Locator {
-    return this.page.locator(
-      `.elementor-control:has(.elementor-control-title:has-text("${controlLabel}"))`
-    )
-  }
-
   /**
    * Switch a control's unit via the units switcher. The open choices overlay
    * covers the switcher, so it cannot be toggle-closed — selecting a unit is
@@ -93,20 +86,42 @@ export class ElementorEditorPage {
     await expect(control.locator('.e-units-switcher')).toHaveAttribute('data-selected', unit)
   }
 
-  /** Select a fluid preset from a Select2 dropdown */
-  async selectFluidPreset(controlLabel: string, presetName: string) {
-    const control = this.getControl(controlLabel)
+  /**
+   * Wait for a fluid control's preset options to finish loading.
+   *
+   * The options are fetched async on control render (DataManager →
+   * arts_fluid_design_system_presets) and appended to the underlying <select>
+   * once they arrive, at which point the `.elementor-loading-option`
+   * placeholder is removed. Select2 reads the <select> at open time, so the
+   * dropdown must be opened AFTER this — otherwise it renders (and stays stuck
+   * on) the loading placeholder.
+   */
+  async waitForPresetOptions(controlName: string) {
+    await this.page
+      .locator(`.elementor-control-${controlName} select .elementor-loading-option`)
+      .waitFor({ state: 'detached', timeout: 15000 })
+  }
 
-    // Find and click the Select2 container
-    const select2 = control.locator('.select2-container')
-    await select2.click()
+  /**
+   * Select a fluid preset from a control's Select2 dropdown.
+   *
+   * Scoped by control name (e.g. "space") rather than title text — a title
+   * like "Space" substring-matches several controls and trips strict mode.
+   */
+  async selectFluidPreset(controlName: string, presetName: string) {
+    const control = this.page.locator(`.elementor-control-${controlName}`)
 
-    // Wait for dropdown
+    await this.waitForPresetOptions(controlName)
+
+    // Open this control's Select2 (dropdown renders at body level)
+    await control.locator('.select2-container').click()
     await this.page.waitForSelector('.select2-results', { timeout: 5000 })
 
-    // Find and click the preset option
-    const option = this.page.locator(`.select2-results__option:has-text("${presetName}")`)
-    await option.click()
+    // role="treeitem" excludes the optgroup header (role="group"), which also
+    // :has-text-matches because it contains the option.
+    await this.page
+      .locator(`.select2-results__option[role="treeitem"]:has-text("${presetName}")`)
+      .click()
 
     // Wait for the dropdown to close and the selection to render
     await this.page
@@ -133,15 +148,23 @@ export class ElementorEditorPage {
   }
 
   /**
-   * Save the current PAGE document via the footer button.
+   * Save the current PAGE document.
    *
-   * Kit-only edits (Site Settings) leave this button disabled — use
-   * saveSiteSettings() for those.
+   * Runs the save command directly rather than clicking the footer publish
+   * button — the button's visibility/enabled state is finicky in headless, and
+   * the command's promise resolves only after the save AJAX persists.
+   * (Kit / Site Settings edits use saveSiteSettings() instead.)
    */
   async save() {
-    const saveButton = this.page.locator('#elementor-panel-saver-button-publish')
-    await saveButton.click()
-    await this.page.waitForSelector('.elementor-button-success', { timeout: 30000 })
+    await this.page.evaluate(async () => {
+      const w = window as unknown as {
+        elementor: { documents: { getCurrent: () => unknown } }
+        $e: { run: (cmd: string, args: Record<string, unknown>) => Promise<unknown> }
+      }
+      await w.$e.run('document/save/update', {
+        document: w.elementor.documents.getCurrent()
+      })
+    })
   }
 
   /** Open Site Settings and wait for the Kit document + its settings model */
@@ -252,15 +275,19 @@ export class ElementorEditorPage {
   }
 
   /**
-   * Remove a repeater row via its (hover-revealed) remove tool and confirm
-   * the plugin's delete dialog.
+   * Remove a repeater row and confirm the plugin's delete dialog.
+   *
+   * The remove tool is CSS hover-gated (and relocated into a nested field
+   * wrapper), so Playwright's actionability check keeps seeing it as hidden.
+   * The plugin rebinds the button's own click handler to open the confirm
+   * dialog, so dispatching the click directly triggers that path without
+   * fighting the hover-visibility gate.
    */
   async removeRepeaterRow(controlName: string, index: number) {
     const control = this.page.locator(`.elementor-control-${controlName}`)
     const row = control.locator('.elementor-repeater-fields').nth(index)
 
-    await row.hover()
-    await row.locator('.elementor-repeater-tool-remove').click()
+    await row.locator('.elementor-repeater-tool-remove').dispatchEvent('click')
 
     const confirmDialog = this.page.locator('.e-global__confirm-delete')
     await confirmDialog.waitFor({ timeout: 5000 })
