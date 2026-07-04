@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.1
+
+- fixed: presets created or edited directly in the editor could disappear after saving Site Settings
+- fixed: fatal error when Elementor is deactivated while the plugin is active (WordPress 6.9+)
+- improved: overall stability and reliability
+
 ## 2.5.0
 
 - added: preview the smallest and largest screen sizes of a fluid value while editing, without switching device mode
