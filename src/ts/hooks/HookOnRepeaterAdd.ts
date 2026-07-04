@@ -32,9 +32,6 @@ export class HookOnRepeaterAdd extends commandSystem.modules.hookUI.After {
       return
     }
 
-    // Mark document as having changes
-    stateManager.markDocumentAsChanged(args.container)
-
     // Handle undo operation first
     if (isRestored && stateManager.hasRemovedItems(addedItemId)) {
       // Restore the CSS variable first

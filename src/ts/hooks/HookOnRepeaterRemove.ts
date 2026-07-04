@@ -27,13 +27,9 @@ export class HookOnRepeaterRemove extends commandSystem.modules.hookUI.Before {
   apply(args: HookArgs): boolean {
     const { container, name: presetName, index } = args
 
-    // Mark document as having changes
-    stateManager.markDocumentAsChanged(container)
-
     // Get the model before it's removed
     const collection = container.settings.get(presetName) as
-      | ThirdParty.BackboneCollection
-      | undefined
+      ThirdParty.BackboneCollection | undefined
     if (!collection || index === undefined) {
       return true
     }

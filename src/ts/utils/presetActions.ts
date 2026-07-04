@@ -2,6 +2,7 @@ import { ValidationService } from './validation'
 import { generateClampFormula } from './clamp'
 import { PresetAPIService } from '../services/presetAPI'
 import { buildCreatePresetData, buildUpdatePresetData } from './presetData'
+import { insertPresetRow, updatePresetRow } from './presetModelSync'
 import { dataManager, cssManager } from '../managers'
 import { STYLES, UI_TIMING } from '../constants'
 
@@ -39,6 +40,15 @@ export async function handleUpdatePreset(
 
   try {
     await PresetAPIService.updatePreset(presetData)
+
+    // Mirror the edited fields onto the editor's Kit model row so a Site
+    // Settings save doesn't overwrite them with the pre-edit snapshot.
+    updatePresetRow(groupId, presetId, {
+      title: presetData.title,
+      min: { size: Number(minParsed.size), unit: minParsed.unit },
+      max: { size: Number(maxParsed.size), unit: maxParsed.unit }
+    })
+
     dataManager.invalidate()
     await refreshDropdowns()
   } catch (error) {
@@ -75,6 +85,15 @@ export async function handleCreatePreset(
       maxParsed.unit
     )
     cssManager.setCssVariable(response.id, clampFormula)
+
+    // Mirror the new row into the editor's Kit model so a Site Settings save
+    // doesn't serialize a stale snapshot and drop the freshly created preset.
+    insertPresetRow(group, {
+      _id: response.id,
+      title: ajaxData.title,
+      min: { size: Number(minParsed.size), unit: minParsed.unit },
+      max: { size: Number(maxParsed.size), unit: maxParsed.unit }
+    })
 
     dataManager.invalidate()
     await callbacks.refreshDropdowns()

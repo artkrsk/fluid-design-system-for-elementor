@@ -1,4 +1,4 @@
-import { stateManager, cssManager } from '../managers'
+import { cssManager } from '../managers'
 import { getItemId } from '../utils'
 import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
 import { isFluidPresetRepeater } from '../utils/controls'
@@ -27,13 +27,9 @@ export class HookOnRepeaterReorder extends commandSystem.modules.hookUI.After {
   apply(args: HookArgs): void {
     const { container, name: presetName, targetIndex } = args
 
-    // Mark document as having changes
-    stateManager.markDocumentAsChanged(container)
-
     // Get the collection
     const collection = container.settings.get(presetName) as
-      | ThirdParty.BackboneCollection
-      | undefined
+      ThirdParty.BackboneCollection | undefined
     if (!collection) {
       return
     }
