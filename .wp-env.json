@@ -8,8 +8,7 @@
   ],
   "mappings": {
     "wp-content/plugins/fluid-design-system-for-elementor/tests": "./tests",
-    "wp-content/mu-plugins": "./tests/e2e/fixtures/mu-plugins",
-    "wp-content/plugins/fluid-design-system-for-elementor/tests/php/dev-vendor": "./tests/php/tools/vendor"
+    "wp-content/mu-plugins": "./tests/e2e/fixtures/mu-plugins"
   },
   "config": {
     "WP_DEBUG": true,

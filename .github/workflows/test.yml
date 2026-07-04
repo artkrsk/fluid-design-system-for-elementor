@@ -260,7 +260,7 @@ jobs:
         # root, mirroring the plugin-check job's stale wp-env cleanup.
         run: |
           docker run --rm -v "$PWD:/w" alpine \
-            sh -c 'rm -rf /w/tests/php/tools/vendor /w/tests/php/dev-vendor' 2>/dev/null || true
+            sh -c 'rm -rf /w/tests/php/tools/vendor' 2>/dev/null || true
 
       - name: Install isolated PHPUnit tooling for the integration suites
         # phpunit 9.6 + Yoast polyfills live in their own Composer project so the

@@ -22,7 +22,7 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 	exit( 1 );
 }
 
-$_polyfills_dir = dirname( __DIR__ ) . '/dev-vendor/yoast/phpunit-polyfills';
+$_polyfills_dir = dirname( __DIR__ ) . '/tools/vendor/yoast/phpunit-polyfills';
 if ( ! defined( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) && file_exists( $_polyfills_dir . '/phpunitpolyfills-autoload.php' ) ) {
 	define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', $_polyfills_dir );
 }
