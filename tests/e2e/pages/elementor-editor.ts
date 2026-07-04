@@ -17,6 +17,24 @@ export class ElementorEditorPage {
     await this.page.waitForSelector('#elementor-panel', { timeout: 30000 })
     // Wait for preview frame
     await this.previewFrame.locator('body').waitFor({ timeout: 30000 })
+    // Wait for attach-preview to finish: document-switching commands (e.g.
+    // panel/global/open) dereference documents.getCurrent().$element via
+    // exitPreviewMode(), and Elementor populates $element asynchronously
+    // after the panel and preview DOM above already exist
+    await this.page.waitForFunction(
+      () => {
+        const doc = (
+          window as unknown as {
+            elementor?: {
+              documents?: { getCurrent?: () => { $element?: { length: number } } }
+            }
+          }
+        ).elementor?.documents?.getCurrent?.()
+        return Boolean(doc && doc.$element && doc.$element.length)
+      },
+      undefined,
+      { timeout: 30000 }
+    )
   }
 
   /** Open Elementor editor for a specific post */
@@ -65,14 +83,16 @@ export class ElementorEditorPage {
 
     // First click to show the edit overlay
     await widget.click()
-    await this.page.waitForTimeout(200)
 
-    // Click the edit button in the overlay (pen/pencil icon)
-    const editButton = widget.locator('.elementor-editor-element-edit, [data-event="edit"]')
-    if (await editButton.count() > 0) {
+    // Click the edit button in the overlay (pen/pencil icon); fall back to
+    // double-clicking the widget if the overlay never shows up
+    const editButton = widget
+      .locator('.elementor-editor-element-edit, [data-event="edit"]')
+      .first()
+    try {
+      await editButton.waitFor({ state: 'visible', timeout: 2000 })
       await editButton.click()
-    } else {
-      // Fallback: double-click the widget directly
+    } catch {
       await widget.dblclick()
     }
 
@@ -99,10 +119,11 @@ export class ElementorEditorPage {
     const toggle = section.locator('.elementor-panel-heading-toggle')
 
     // Check if already expanded
-    const isExpanded = await section.locator('.elementor-panel-heading').getAttribute('aria-expanded')
+    const heading = section.locator('.elementor-panel-heading')
+    const isExpanded = await heading.getAttribute('aria-expanded')
     if (isExpanded !== 'true') {
       await toggle.click()
-      await this.page.waitForTimeout(300)
+      await expect(heading).toHaveAttribute('aria-expanded', 'true')
     }
   }
 
@@ -128,8 +149,13 @@ export class ElementorEditorPage {
     const option = this.page.locator(`.select2-results__option:has-text("${presetName}")`)
     await option.click()
 
-    // Wait for dropdown to close
-    await this.page.waitForTimeout(300)
+    // Wait for the dropdown to close and the selection to render
+    await this.page
+      .locator('.select2-results')
+      .waitFor({ state: 'hidden', timeout: 5000 })
+    await expect(control.locator('.select2-selection__rendered')).toContainText(
+      presetName
+    )
   }
 
   /** Switch responsive device mode */

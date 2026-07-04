@@ -93,9 +93,12 @@ test.describe('Inverted Min/Max (min > max)', () => {
       el => parseFloat(getComputedStyle(el).fontSize)
     )
 
-    // At large viewport
+    // At large viewport: poll until the resize repaint settles on the
+    // expected value, then read the settled reading
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
-    await page.waitForTimeout(100)
+    await expect
+      .poll(() => heading.evaluate(el => parseFloat(getComputedStyle(el).fontSize)))
+      .toBeCloseTo(getExpectedValue('e2e_inverted', 1920), VALUE_TOLERANCE)
     const largeValue = await heading.evaluate(
       el => parseFloat(getComputedStyle(el).fontSize)
     )
