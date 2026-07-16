@@ -3,7 +3,15 @@ import { DialogBuilder } from '../utils/dialogBuilder'
 import { generateClampFormula } from '../utils/clamp'
 import { UI_DEFAULTS } from '../constants'
 import { ValueFormatter } from '../utils/formatters'
+import {
+  setDialogBusy,
+  showDialogError,
+  clearDialogError,
+  toErrorMessage
+} from '../utils/dialogFeedback'
 import cssManager from './CSSManager'
+import dataManager from './DataManager'
+import type { DialogOptions } from '@artemsemkin/elementor-types'
 import type {
   IDialogConfig,
   IPresetData,
@@ -27,6 +35,7 @@ export class PresetDialogManager {
     /** Store for cancel restoration in edit mode */
     let originalFormula = null
     let confirmed = false
+    let busy = false
 
     if (mode === 'edit' && data.presetId) {
       originalFormula = generateClampFormula(data.minSize, data.minUnit, data.maxSize, data.maxUnit)
@@ -45,17 +54,44 @@ export class PresetDialogManager {
         confirm: config.confirmButton,
         cancel: window.ArtsFluidDSStrings?.cancel
       },
+      // onButtonClick is a real dialogs-manager option, just missing from the typings.
+      // It stops the dialog from closing before the save settles — and, since it covers
+      // every button, Cancel has to be closed by hand below.
       hide: {
-        onBackgroundClick: false
+        onBackgroundClick: false,
+        onButtonClick: false
+      } as DialogOptions['hide'],
+      onCancel: () => {
+        dialog?.hide()
       },
-      onConfirm: () => {
-        confirmed = true
-        config.onConfirm(
-          String($input.val() ?? ''),
-          String($groupSelect.val() ?? ''),
-          String($minInput.val() ?? ''),
-          String($maxInput.val() ?? '')
-        )
+      onConfirm: async () => {
+        if (busy || !dialog) {
+          return
+        }
+
+        const widgetEl = dialog.getElements('widget')[0] ?? null
+
+        busy = true
+        clearDialogError(widgetEl)
+        setDialogBusy(widgetEl, true)
+
+        try {
+          await config.onConfirm(
+            String($input.val() ?? ''),
+            String($groupSelect.val() ?? ''),
+            String($minInput.val() ?? ''),
+            String($maxInput.val() ?? '')
+          )
+
+          busy = false
+          confirmed = true
+          dialog.hide()
+          setDialogBusy(widgetEl, false)
+        } catch (error) {
+          busy = false
+          setDialogBusy(widgetEl, false)
+          showDialogError(widgetEl, toErrorMessage(error, config.errorMessage))
+        }
       },
       onShow: async () => {
         if (!dialog) {
@@ -64,6 +100,7 @@ export class PresetDialogManager {
         try {
           const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
           await this._initializeDialogUI(
+            mode,
             $input,
             $minInput,
             $maxInput,
@@ -84,16 +121,32 @@ export class PresetDialogManager {
             )
           }
         } catch {
-          // Silently handle setup errors - dialog will still function
+          /** Setup failed before validateAll ran — don't leave the pre-disabled confirm button dead */
+          dialog.getElements('widget').find('.dialog-ok').prop('disabled', false)
         }
       },
       onHide: () => {
+        /** An in-flight save owns the CSS variable — its own failure path restores it */
+        if (busy) {
+          return
+        }
+
         /** Restore original CSS if cancelled */
         if (mode === 'edit' && !confirmed && originalFormula && data.presetId) {
           cssManager.setCssVariable(data.presetId, originalFormula)
         }
       }
     })
+
+    if (dialog) {
+      /** dialogs-manager has no before-hide veto, so every close path (ESC included) is gated here */
+      const originalHide = dialog.hide.bind(dialog)
+      dialog.hide = (() => {
+        if (!busy) {
+          originalHide()
+        }
+      }) as typeof dialog.hide
+    }
 
     return dialog
   }
@@ -111,8 +164,9 @@ export class PresetDialogManager {
         defaultName: `Custom ${data.minSize}${data.minUnit} ~ ${data.maxSize}${data.maxUnit}`,
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
-        onConfirm: (name: string, group: string, minVal: string, maxVal: string) => {
-          callbacks.onCreate?.(name, group, minVal, maxVal, data.setting ?? '')
+        errorMessage: window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset',
+        onConfirm: async (name: string, group: string, minVal: string, maxVal: string) => {
+          await callbacks.onCreate?.(name, group, minVal, maxVal, data.setting ?? '')
         }
       },
       edit: {
@@ -122,8 +176,9 @@ export class PresetDialogManager {
         defaultName: data.presetTitle || '',
         defaultMin: `${data.minSize}${data.minUnit}`,
         defaultMax: `${data.maxSize}${data.maxUnit}`,
-        onConfirm: (name: string, group: string, minVal: string, maxVal: string) => {
-          callbacks.onUpdate?.(
+        errorMessage: window.ArtsFluidDSStrings?.failedToUpdate || 'Failed to update preset',
+        onConfirm: async (name: string, group: string, minVal: string, maxVal: string) => {
+          await callbacks.onUpdate?.(
             data.presetId ?? '',
             name,
             group || (data.groupId ?? ''),
@@ -185,6 +240,7 @@ export class PresetDialogManager {
   }
 
   private static async _initializeDialogUI(
+    mode: 'create' | 'edit',
     $input: JQuery,
     $minInput: JQuery,
     $maxInput: JQuery,
@@ -193,8 +249,14 @@ export class PresetDialogManager {
     $confirmButton: JQuery,
     data: IPresetDialogData
   ): Promise<void> {
-    if ($groupSelect && $groupSelect.length) {
-      await DialogBuilder.populateGroupSelector($groupSelect, data.groupId)
+    /** Confirming before the groups land would save the preset into a group that doesn't exist */
+    $confirmButton.prop('disabled', true)
+
+    /** Only create mode renders the group selector — edit mode's Save must not wait on the fetch */
+    if (mode === 'create') {
+      const groups = await dataManager.getGroups()
+
+      DialogBuilder.populateGroupSelector($groupSelect, groups, data.groupId)
       DialogBuilder.initializeSelect2($groupSelect)
     }
 

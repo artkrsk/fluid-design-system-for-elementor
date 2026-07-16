@@ -1,10 +1,14 @@
 import { ValidationService } from './validation'
 import { generateClampFormula } from './clamp'
 import { PresetAPIService } from '../services/presetAPI'
-import { buildCreatePresetData, buildUpdatePresetData } from './presetData'
+import { buildCreatePresetData, buildUpdatePresetData, buildCachedPresetRow } from './presetData'
 import { insertPresetRow, updatePresetRow } from './presetModelSync'
 import { dataManager, cssManager } from '../managers'
 import { STYLES, UI_TIMING } from '../constants'
+
+/** Defensive: the dialog already blocks confirming with unparseable values */
+const invalidValuesError = () =>
+  new Error(window.ArtsFluidDSStrings?.invalidValue || 'Invalid min/max value')
 
 interface ICreatePresetCallbacks {
   refreshDropdowns: () => Promise<void>
@@ -25,7 +29,7 @@ export async function handleUpdatePreset(
   const maxParsed = ValidationService.parseValueWithUnit(maxValue)
 
   if (!minParsed || !maxParsed) {
-    return
+    throw invalidValuesError()
   }
 
   const clampFormula = generateClampFormula(
@@ -37,23 +41,40 @@ export async function handleUpdatePreset(
   cssManager.setCssVariable(presetId, clampFormula)
 
   const presetData = buildUpdatePresetData(presetId, title, minParsed, maxParsed, groupId)
+  let response
 
   try {
-    await PresetAPIService.updatePreset(presetData)
+    response = await PresetAPIService.updatePreset(presetData)
+  } catch (error) {
+    cssManager.restoreCssVariable(presetId)
+    throw error
+  }
 
+  const controlId = response.control_id ?? groupId
+
+  // The preset is persisted from here on: a UI-sync failure must not surface
+  // as a failed update, so the cache is invalidated and refetched instead.
+  try {
     // Mirror the edited fields onto the editor's Kit model row so a Site
     // Settings save doesn't overwrite them with the pre-edit snapshot.
-    updatePresetRow(groupId, presetId, {
-      title: presetData.title,
+    // The server-sanitized title wins over the raw client input.
+    updatePresetRow(controlId, presetId, {
+      title: response.title ?? presetData.title,
       min: { size: Number(minParsed.size), unit: minParsed.unit },
       max: { size: Number(maxParsed.size), unit: maxParsed.unit }
     })
 
-    dataManager.invalidate()
+    dataManager.updatePreset(controlId, presetId, {
+      title: response.title ?? presetData.title,
+      min_size: minParsed.size,
+      min_unit: minParsed.unit,
+      max_size: maxParsed.size,
+      max_unit: maxParsed.unit
+    })
+
     await refreshDropdowns()
-  } catch (error) {
-    cssManager.restoreCssVariable(presetId)
-    showErrorDialog((error as string) || 'Failed to update preset')
+  } catch {
+    dataManager.invalidate()
   }
 }
 
@@ -70,14 +91,16 @@ export async function handleCreatePreset(
   const maxParsed = ValidationService.parseValueWithUnit(maxValue)
 
   if (!minParsed || !maxParsed) {
-    return
+    throw invalidValuesError()
   }
 
   const ajaxData = buildCreatePresetData(title, minParsed, maxParsed, group)
+  const response = await PresetAPIService.savePreset(ajaxData)
 
+  // The preset is persisted from here on: a UI-sync failure must not reject the
+  // dialog as a failed save — a retry would duplicate the preset. Invalidate so
+  // the next dropdown open refetches the truth instead.
   try {
-    const response = await PresetAPIService.savePreset(ajaxData)
-
     const clampFormula = generateClampFormula(
       minParsed.size,
       minParsed.unit,
@@ -86,43 +109,40 @@ export async function handleCreatePreset(
     )
     cssManager.setCssVariable(response.id, clampFormula)
 
+    const controlId = response.control_id ?? group
+
     // Mirror the new row into the editor's Kit model so a Site Settings save
     // doesn't serialize a stale snapshot and drop the freshly created preset.
-    insertPresetRow(group, {
+    // The server-sanitized title wins over the raw client input.
+    insertPresetRow(controlId, {
       _id: response.id,
-      title: ajaxData.title,
+      title: response.title ?? ajaxData.title,
       min: { size: Number(minParsed.size), unit: minParsed.unit },
       max: { size: Number(maxParsed.size), unit: maxParsed.unit }
     })
 
-    dataManager.invalidate()
+    dataManager.addPreset(
+      controlId,
+      buildCachedPresetRow(response.id, response.title ?? ajaxData.title, minParsed, maxParsed)
+    )
+
     await callbacks.refreshDropdowns()
 
-    setTimeout(() => {
-      const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
-      callbacks.selectPreset(setting, presetValue)
+    // Resolve only once the preset is selected, so the dialog can stay up for the
+    // whole flow and the auto-select can't overwrite a value picked in the meantime.
+    await new Promise<void>(resolve => setTimeout(resolve, UI_TIMING.PRESET_AUTO_SELECT_DELAY))
 
-      // Apply to linked dimensions if provided
-      const linkedSelects = callbacks.getLinkedSelects?.() ?? []
-      for (const { setting: otherSetting } of linkedSelects) {
-        if (otherSetting !== setting) {
-          callbacks.selectPreset(otherSetting, presetValue)
-        }
+    const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
+    callbacks.selectPreset(setting, presetValue)
+
+    // Apply to linked dimensions if provided
+    const linkedSelects = callbacks.getLinkedSelects?.() ?? []
+    for (const { setting: otherSetting } of linkedSelects) {
+      if (otherSetting !== setting) {
+        callbacks.selectPreset(otherSetting, presetValue)
       }
-    }, UI_TIMING.PRESET_AUTO_SELECT_DELAY)
-  } catch (error) {
-    showErrorDialog(
-      (error as string) || window.ArtsFluidDSStrings?.failedToSave || 'Failed to save preset'
-    )
+    }
+  } catch {
+    dataManager.invalidate()
   }
-}
-
-/** Shows error dialog */
-function showErrorDialog(message: string): void {
-  window.elementorCommon?.dialogsManager
-    .createWidget('alert', {
-      headerMessage: window.ArtsFluidDSStrings?.error,
-      message
-    })
-    .show()
 }

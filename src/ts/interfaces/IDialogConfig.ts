@@ -6,5 +6,8 @@ export interface IDialogConfig {
   defaultName: string
   defaultMin: string
   defaultMax: string
-  onConfirm: (name: string, group: string, minVal: string, maxVal: string) => void
+  /** Shown in the dialog when the request fails without a usable message */
+  errorMessage: string
+  /** Resolves once the preset is saved and selected; rejects to keep the dialog open */
+  onConfirm: (name: string, group: string, minVal: string, maxVal: string) => Promise<void>
 }

@@ -279,10 +279,13 @@ export class TemplateRenderer {
           const maxScreenWidthUnit =
             TemplateRenderer.escapeHtml(element.getAttribute('data-max-screen-width-unit')) || ''
 
-          footerContent += `
+          /** Cache-patched rows carry no screen anchors — skip the badge rather than render ' – ' */
+          if (minScreenWidthSize && maxScreenWidthSize) {
+            footerContent += `
             <span class="select2-result-fluid-spacing-formatted__divider"></span>
             <span class="select2-result-fluid-spacing-formatted__screen-width">${minScreenWidthSize}${minScreenWidthUnit} – ${maxScreenWidthSize}${maxScreenWidthUnit}</span>
           `
+          }
         }
 
         markup.append(TemplateRenderer.createFooter(footerContent))

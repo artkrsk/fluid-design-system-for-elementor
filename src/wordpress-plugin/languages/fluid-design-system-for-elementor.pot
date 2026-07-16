@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Artem Semkin\n"
 "Last-Translator: Artem Semkin\n"
-"POT-Creation-Date: 2026-03-22T17:19:13.362Z"
+"POT-Creation-Date: 2026-07-16T10:17:42.613Z"
 "Report-Msgid-Bugs-To: https://artemsemkin.com\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -330,11 +330,15 @@ msgid "Typography Presets"
 msgstr ""
 
 #: src/php/Managers/Compatibility.php:97
-msgid "Error"
+msgid "Failed to save preset"
 msgstr ""
 
 #: src/php/Managers/Compatibility.php:98
-msgid "Failed to save preset"
+msgid "Failed to update preset"
+msgstr ""
+
+#: src/php/Managers/Compatibility.php:99
+msgid "Invalid min/max value"
 msgstr ""
 
 #: src/php/Managers/Options.php:54, src/php/Managers/Admin/Tabs/Groups/View.php:63

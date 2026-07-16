@@ -1,5 +1,5 @@
-import { PresetAPIService } from '../services/presetAPI'
 import { SELECT2_CONFIG } from '../constants'
+import type { IPresetGroupOption } from '../interfaces'
 
 /** Preset dialog UI builders */
 export class DialogBuilder {
@@ -36,44 +36,13 @@ export class DialogBuilder {
   }
 
   /** Populates group selector with available groups */
-  static async populateGroupSelector(
+  static populateGroupSelector(
     $select: JQuery,
+    groups: IPresetGroupOption[],
     defaultGroup: string | null = null
-  ): Promise<void> {
-    try {
-      const groups = await PresetAPIService.fetchGroups()
-
-      if (!groups || !Array.isArray(groups) || groups.length === 0) {
-        // Fallback to default groups
-        $select.append(
-          jQuery('<option>', {
-            value: 'fluid_spacing_presets',
-            text: window.ArtsFluidDSStrings?.spacingPresets
-          }),
-          jQuery('<option>', {
-            value: 'fluid_typography_presets',
-            text: window.ArtsFluidDSStrings?.typographyPresets
-          })
-        )
-        return
-      }
-
-      // Add all groups with proper IDs
-      for (const group of groups) {
-        $select.append(
-          jQuery('<option>', {
-            value: group.id,
-            text: group.name
-          })
-        )
-      }
-
-      // Pre-select group if provided
-      if (defaultGroup) {
-        $select.val(defaultGroup)
-      }
-    } catch {
-      // Fallback on error
+  ): void {
+    if (!Array.isArray(groups) || groups.length === 0) {
+      // Fallback to default groups
       $select.append(
         jQuery('<option>', {
           value: 'fluid_spacing_presets',
@@ -84,6 +53,30 @@ export class DialogBuilder {
           text: window.ArtsFluidDSStrings?.typographyPresets
         })
       )
+
+      /** A failed groups fetch must not silently retarget the preset away from its custom group */
+      if (defaultGroup) {
+        if ($select.find(`option[value="${defaultGroup}"]`).length === 0) {
+          $select.append(jQuery('<option>', { value: defaultGroup, text: defaultGroup }))
+        }
+        $select.val(defaultGroup)
+      }
+      return
+    }
+
+    // Add all groups with proper IDs
+    for (const group of groups) {
+      $select.append(
+        jQuery('<option>', {
+          value: group.id,
+          text: group.name
+        })
+      )
+    }
+
+    // Pre-select group if provided
+    if (defaultGroup) {
+      $select.val(defaultGroup)
     }
   }
 

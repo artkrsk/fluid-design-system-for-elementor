@@ -1,7 +1,33 @@
 import { describe, it, expect } from 'vitest'
-import { buildCreatePresetData, buildUpdatePresetData } from '@/utils/presetData'
+import {
+  buildCreatePresetData,
+  buildUpdatePresetData,
+  buildCachedPresetRow
+} from '@/utils/presetData'
 
 describe('presetData utilities', () => {
+  describe('buildCachedPresetRow', () => {
+    it('builds a row indistinguishable from a fetched one', () => {
+      const result = buildCachedPresetRow(
+        'fluid-abc',
+        'Heading',
+        { size: '20', unit: 'px' },
+        { size: '48', unit: 'px' }
+      )
+
+      expect(result).toEqual({
+        id: 'fluid-abc',
+        value: 'var(--arts-fluid-preset--fluid-abc)',
+        title: 'Heading',
+        min_size: '20',
+        min_unit: 'px',
+        max_size: '48',
+        max_unit: 'px',
+        editable: true
+      })
+    })
+  })
+
   describe('buildCreatePresetData', () => {
     it('builds preset data with all fields', () => {
       const result = buildCreatePresetData(
@@ -132,11 +158,7 @@ describe('presetData utilities', () => {
       const units = ['px', 'rem', 'em', '%', 'vw', 'vh']
 
       for (const unit of units) {
-        const result = buildCreatePresetData(
-          'Test',
-          { size: '10', unit },
-          { size: '20', unit }
-        )
+        const result = buildCreatePresetData('Test', { size: '10', unit }, { size: '20', unit })
 
         expect(result.min_unit).toBe(unit)
         expect(result.max_unit).toBe(unit)
