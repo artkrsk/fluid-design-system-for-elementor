@@ -70,6 +70,18 @@ describe('dialogFeedback', () => {
     it('ignores a missing widget', () => {
       expect(() => setDialogBusy(null, true)).not.toThrow()
     })
+
+    it('still locks the controls when the widget has no confirm button', () => {
+      widget.querySelector('.dialog-ok')?.remove()
+
+      setDialogBusy(widget, true)
+
+      expect(widget.classList.contains('e-fluid-dialog-busy')).toBe(true)
+      widget
+        .querySelectorAll<HTMLButtonElement>('button, input, select')
+        .forEach(control => expect(control.disabled).toBe(true))
+      expect(widget.querySelector('.e-fluid-dialog-spinner')).toBeNull()
+    })
   })
 
   describe('showDialogError', () => {

@@ -156,6 +156,12 @@ describe('DataManager', () => {
 
       expect(dm.presets).toBeNull()
     })
+
+    it('does nothing on a cold cache, since the next read fetches fresh data', () => {
+      dm.updatePreset('fluid_spacing_presets', 'spacing-1', { title: 'Renamed' })
+
+      expect(dm.presets).toBeNull()
+    })
   })
 
   describe('getPresetsData', () => {

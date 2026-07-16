@@ -303,6 +303,22 @@ describe('presetActions model sync', () => {
       expect(cssManager.restoreCssVariable).not.toHaveBeenCalled()
     })
 
+    it('rejects without calling the API when the values do not parse', async () => {
+      await expect(
+        handleUpdatePreset(
+          'preset-1',
+          'Renamed',
+          'fluid_typography_presets',
+          '10pt',
+          '30px',
+          vi.fn().mockResolvedValue(undefined)
+        )
+      ).rejects.toThrow('Invalid min/max value')
+
+      expect(PresetAPIService.updatePreset).not.toHaveBeenCalled()
+      expect(cssManager.setCssVariable).not.toHaveBeenCalled()
+    })
+
     it('rejects and rolls the CSS variable back when the update AJAX fails', async () => {
       ;(PresetAPIService.updatePreset as any).mockRejectedValue(new Error('nope'))
 
