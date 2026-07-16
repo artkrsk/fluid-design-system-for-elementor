@@ -200,6 +200,13 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.5.2 =
+* fixed: the preset dialog could be closed with the Escape key while saving, hiding save errors
+* fixed: the Save button in the "Edit Preset" dialog could stay disabled on slow connections
+* fixed: preset groups created outside the editor now appear in the save dialog without reloading
+* fixed: retrying after a failed save could create duplicate presets
+* improved: preset names display consistently after saving
+
 = 2.5.1 =
 * fixed: presets created or edited directly in the editor could disappear after saving Site Settings
 * fixed: fatal error when Elementor is deactivated while the plugin is active (WordPress 6.9+)

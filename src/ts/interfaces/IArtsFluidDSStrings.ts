@@ -15,8 +15,9 @@ export interface IArtsFluidDSStrings {
   deletePresetMessage?: string
   saveChanges?: string
   saveChangesMessage?: string
-  error?: string
   failedToSave?: string
+  failedToUpdate?: string
+  invalidValue?: string
   create?: string
   save?: string
   cancel?: string

@@ -138,3 +138,18 @@
 	.e-fluid-dialog-input
 		flex: 1
 		min-width: 0
+
+	// Select2 draws its own UI and ignores the disabled prop on the native select
+	&.e-fluid-dialog-busy
+		.e-global__confirm-message
+			pointer-events: none
+			opacity: 0.6
+
+	.e-fluid-dialog-spinner
+		margin-right: variables.$spacing-small
+
+	.e-fluid-dialog-error
+		margin-top: variables.$spacing-gap
+		color: var(--e-a-color-danger)
+		font-size: 12px
+		line-height: 1.3

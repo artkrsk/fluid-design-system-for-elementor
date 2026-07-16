@@ -94,8 +94,9 @@ class Compatibility extends BaseManager {
 			'customValue'         => esc_html__( 'Custom value...', 'fluid-design-system-for-elementor' ),
 			'spacingPresets'      => esc_html__( 'Spacing Presets', 'fluid-design-system-for-elementor' ),
 			'typographyPresets'   => esc_html__( 'Typography Presets', 'fluid-design-system-for-elementor' ),
-			'error'               => esc_html__( 'Error', 'fluid-design-system-for-elementor' ),
 			'failedToSave'        => esc_html__( 'Failed to save preset', 'fluid-design-system-for-elementor' ),
+			'failedToUpdate'      => esc_html__( 'Failed to update preset', 'fluid-design-system-for-elementor' ),
+			'invalidValue'        => esc_html__( 'Invalid min/max value', 'fluid-design-system-for-elementor' ),
 		);
 	}
 }

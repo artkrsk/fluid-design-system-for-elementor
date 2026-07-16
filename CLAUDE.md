@@ -111,7 +111,9 @@ document. The only correct path for programmatic preset writes.
 - `StateManager` — undo/redo bookkeeping: `markItemAsRemoved/markItemAsRestored/hasRemovedItems`,
   `setRecentRemoval/hasRecentRemoval/cleanupRecentRemovals` (~200ms window separates reorder from
   delete), plus document-change tracking.
-- `DataManager` — caches editor preset data; `invalidate()` on Kit save.
+- `DataManager` — caches editor preset data; `getGroups()` fetches the group list fresh per call
+  (deduping concurrent callers) since groups change outside the editor; `addPreset`/`updatePreset`
+  patch the cache after a write so the dropdowns rebuild without a refetch; `invalidate()` on Kit save.
 - `PreviewSizeManager` — resizes the preview iframe to the min/max screen anchor for in-context editing.
 
 **JS service** — `PresetAPIService` (static): `fetchGroups()`, `savePreset(data)`,
