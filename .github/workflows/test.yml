@@ -77,6 +77,14 @@ jobs:
 
           echo "✅ ZIP size: ${SIZE_MB} MB"
 
+      - name: Acquire cross-repo wp-env lock
+        # This host runs wp-env-based CI for several repos, each on its own
+        # self-hosted runner service, so they can execute concurrently.
+        # GitHub's `concurrency:` key only serializes within this repo -- it
+        # can't stop another repo's wp-env from colliding with this job's
+        # Docker resources. See .github/scripts/wp-env-host-lock.sh.
+        run: bash .github/scripts/wp-env-host-lock.sh acquire
+
       - name: Clean up stale wp-env Docker resources
         run: |
           # The plugin-check action generates its own hashed .wp-env.json, so a prior
@@ -106,6 +114,10 @@ jobs:
           ignore-codes: |
             WordPress.NamingConventions.PrefixAllGlobals.InvalidPrefixPassed
             wp_function_not_compatible_with_requires_wp
+
+      - name: Release cross-repo wp-env lock
+        if: always()
+        run: bash .github/scripts/wp-env-host-lock.sh release
 
   code-quality:
     name: Code Quality
@@ -245,6 +257,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium
 
+      - name: Acquire cross-repo wp-env lock
+        # This host runs wp-env-based CI for several repos, each on its own
+        # self-hosted runner service, so they can execute concurrently.
+        # GitHub's `concurrency:` key only serializes within this repo -- it
+        # can't stop another repo's wp-env from colliding with this job's
+        # Docker resources. See .github/scripts/wp-env-host-lock.sh.
+        run: bash .github/scripts/wp-env-host-lock.sh acquire
+
       - name: Destroy previous wp-env
         # Bound the teardown so a wp-env/Docker hang can't wedge the runner (||true ignores
         # exit codes but not hangs).
@@ -287,6 +307,10 @@ jobs:
       - name: Stop wp-env
         if: always()
         run: npm run wp-env stop || true
+
+      - name: Release cross-repo wp-env lock
+        if: always()
+        run: bash .github/scripts/wp-env-host-lock.sh release
 
       - name: Upload test results
         uses: actions/upload-artifact@v7

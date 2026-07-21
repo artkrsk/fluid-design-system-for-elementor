@@ -77,6 +77,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install firefox webkit
 
+      - name: Acquire cross-repo wp-env lock
+        # This host runs wp-env-based CI for several repos, each on its own
+        # self-hosted runner service, so they can execute concurrently.
+        # GitHub's `concurrency:` key only serializes within this repo -- it
+        # can't stop another repo's wp-env from colliding with this job's
+        # Docker resources. See .github/scripts/wp-env-host-lock.sh.
+        run: bash .github/scripts/wp-env-host-lock.sh acquire
+
       - name: Destroy previous wp-env
         run: timeout --kill-after=30 180 npm run wp-env destroy -- --force || true
 
@@ -97,6 +105,10 @@ jobs:
       - name: Stop wp-env
         if: always()
         run: npm run wp-env stop || true
+
+      - name: Release cross-repo wp-env lock
+        if: always()
+        run: bash .github/scripts/wp-env-host-lock.sh release
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -207,6 +219,15 @@ jobs:
           EOF
           cat .wp-env.override.json
 
+      - name: Acquire cross-repo wp-env lock
+        if: steps.detect.outputs.run_canary == 'true'
+        # This host runs wp-env-based CI for several repos, each on its own
+        # self-hosted runner service, so they can execute concurrently.
+        # GitHub's `concurrency:` key only serializes within this repo -- it
+        # can't stop another repo's wp-env from colliding with this job's
+        # Docker resources. See .github/scripts/wp-env-host-lock.sh.
+        run: bash .github/scripts/wp-env-host-lock.sh acquire
+
       - name: Destroy previous wp-env
         if: steps.detect.outputs.run_canary == 'true'
         run: timeout --kill-after=30 180 npm run wp-env destroy -- --force || true
@@ -230,6 +251,10 @@ jobs:
         run: |
           npm run wp-env stop || true
           rm -f .wp-env.override.json
+
+      - name: Release cross-repo wp-env lock
+        if: always() && steps.detect.outputs.run_canary == 'true'
+        run: bash .github/scripts/wp-env-host-lock.sh release
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
