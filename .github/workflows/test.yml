@@ -36,7 +36,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       - name: Setup PHP
@@ -133,7 +133,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       - name: Setup PHP
@@ -184,7 +184,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
@@ -222,7 +222,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       - name: Setup PHP

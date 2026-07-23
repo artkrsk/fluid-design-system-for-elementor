@@ -16,11 +16,9 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "types": ["jquery", "select2", "vitest/globals", "node"],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/ts/*"]
-    },
-    "ignoreDeprecations": "6.0"
+      "@/*": ["./src/ts/*"]
+    }
   },
   "include": [
     "src/ts/**/*.ts",

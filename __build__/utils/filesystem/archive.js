@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
-import archiver from 'archiver'
+import { ZipArchive } from 'archiver'
 import { logger } from '../../logger/index.js'
 import { isFeatureEnabled } from '../../config/index.js'
 import { shouldCreateDistFolder } from '../common/paths.js'
@@ -35,7 +35,7 @@ export async function createZipArchive(config) {
   try {
     // Create output stream
     const output = fs.createWriteStream(outputZip)
-    const archive = archiver('zip', {
+    const archive = new ZipArchive({
       zlib: { level: 9 } // Highest compression level
     })
 
