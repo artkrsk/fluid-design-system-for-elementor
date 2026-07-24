@@ -75,7 +75,7 @@ src/php/  (namespace Arts\FluidDesignSystem\, PSR-4 → src/php/)
 src/ts/  (all .ts; entry index.ts)
   index.ts                registers control views on 'elementor/init'; hook system on 'elementor/init-components'
   components/Component.ts  $e component; maps Elementor commands → hook classes
-  hooks/                   HookOnRepeater{Add,Remove,Reorder}, HookOnDocumentSave, HookOnKitSettingsSave
+  hooks/                   HookOnRepeater{Add,Remove,Reorder}, HookOnKitSettingsSave
   views/                   Base* mixins + Dimensions/Slider/Gaps/RepeaterRow/GlobalStyleRepeater views
   managers/                CSSManager, StateManager, DataManager, PreviewSizeManager (singletons)
   services/presetAPI.ts    PresetAPIService — editor AJAX wrappers
@@ -110,7 +110,7 @@ document. The only correct path for programmatic preset writes.
   `<style id="fluid-design-system-for-elementor-style">` in the preview iframe.
 - `StateManager` — undo/redo bookkeeping: `markItemAsRemoved/markItemAsRestored/hasRemovedItems`,
   `setRecentRemoval/hasRecentRemoval/cleanupRecentRemovals` (~200ms window separates reorder from
-  delete), plus document-change tracking.
+  delete).
 - `DataManager` — caches editor preset data; `getGroups()` fetches the group list fresh per call
   (deduping concurrent callers) since groups change outside the editor; `addPreset`/`updatePreset`
   patch the cache after a write so the dropdowns rebuild without a refetch; `invalidate()` on Kit save.
@@ -138,12 +138,12 @@ document. The only correct path for programmatic preset writes.
 
 **Internal JS hook system** — registered as `$e` component namespace
 `fluid-design-system-for-elementor-hooks`. Before/After hooks intercept
-`document/repeater/{insert,remove,move}` and `document/save/{save,update}`:
+`document/repeater/{insert,remove,move}` and `document/save/save`:
 
 ```
 remove (Before): StateManager.markItemAsRemoved + setRecentRemoval → CSSManager.unsetCssVariable
 insert (After):  if restored/reordered → CSSManager.restoreCssVariable → markItemAsRestored
-save   (After):  StateManager clears doc changes; DataManager.invalidate()
+save   (After):  DataManager.invalidate()
 ```
 
 This is what makes undo/redo of preset edits restore the correct CSS variables.
