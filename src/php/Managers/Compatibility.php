@@ -32,7 +32,7 @@ class Compatibility extends BaseManager {
 
 		wp_enqueue_script(
 			$this->handle,
-			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/arts-fluid-design-system/index.umd.js' ),
+			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/fluid-design-system-for-elementor/fluid-design-system-for-elementor.js' ),
 			array(),
 			$version,
 			true
@@ -54,7 +54,7 @@ class Compatibility extends BaseManager {
 
 		wp_enqueue_style(
 			$this->handle,
-			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/arts-fluid-design-system/index.css' ),
+			esc_url( untrailingslashit( $this->plugin_dir_url ) . '/libraries/fluid-design-system-for-elementor/fluid-design-system-for-elementor.css' ),
 			array(),
 			$version
 		);

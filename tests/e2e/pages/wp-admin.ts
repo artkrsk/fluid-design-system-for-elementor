@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 export class WPAdminPage {
   constructor(private page: Page) {}
@@ -17,14 +17,18 @@ export class WPAdminPage {
   /** Open the plugin's Groups admin page */
   async goToFluidAdmin() {
     await this.goto('admin.php?page=fluid-design-system')
-    await this.page.waitForSelector('#fluid-main-groups-table', { timeout: 15000 })
+    await this.page.waitForSelector('#fluid-main-groups-table', {
+      timeout: 15000
+    })
   }
 
   async getTestPageId(): Promise<number | null> {
     await this.goToPages()
 
     // Look for either the new fluid test page or the old test page name
-    const testPageRow = this.page.locator('tr:has(a.row-title:has-text("E2E Fluid Test Page")), tr:has(a.row-title:has-text("E2E Test Page"))')
+    const testPageRow = this.page.locator(
+      'tr:has(a.row-title:has-text("E2E Fluid Test Page")), tr:has(a.row-title:has-text("E2E Test Page"))'
+    )
     if ((await testPageRow.count()) === 0) {
       return null
     }

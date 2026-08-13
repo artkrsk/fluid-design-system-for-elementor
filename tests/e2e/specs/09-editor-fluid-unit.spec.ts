@@ -7,7 +7,7 @@
  * variables, which exist regardless of any selection.
  */
 
-import { test, expect, resetTestState, TEST_ELEMENT_IDS } from '../fixtures'
+import { expect, resetTestState, TEST_ELEMENT_IDS, test } from '../fixtures'
 
 const SPACER = `#${TEST_ELEMENT_IDS.spacerStandard}`
 
@@ -52,16 +52,11 @@ test.describe('Editor fluid unit loop', () => {
     await editor.selectWidget(SPACER)
   })
 
-  test('fluid is offered by the units switcher on an eligible control', async ({
-    page
-  }) => {
+  test('fluid is offered by the units switcher on an eligible control', async ({ page }) => {
     const control = page.locator('.elementor-control-space')
 
     // Seeded state: the control is already on the fluid unit
-    await expect(control.locator('.e-units-switcher')).toHaveAttribute(
-      'data-selected',
-      'fluid'
-    )
+    await expect(control.locator('.e-units-switcher')).toHaveAttribute('data-selected', 'fluid')
 
     await control.locator('.e-units-switcher').click()
     await expect(

@@ -8,7 +8,7 @@
  * (insertPresetRow/updatePresetRow mirroring) end-to-end through the dialog.
  */
 
-import { test, expect, resetTestState, TEST_ELEMENT_IDS } from '../fixtures'
+import { expect, resetTestState, TEST_ELEMENT_IDS, test } from '../fixtures'
 
 const SPACER = `#${TEST_ELEMENT_IDS.spacerStandard}`
 
@@ -46,7 +46,7 @@ test.describe('Preset creation dialog', () => {
     await expect(dialog.locator('.dialog-ok')).toBeEnabled()
 
     const saveResponse = page.waitForResponse(
-      response =>
+      (response) =>
         response.url().includes('admin-ajax.php') &&
         (response.request().postData() ?? '').includes('arts_fluid_design_system_save_preset')
     )
@@ -68,10 +68,10 @@ test.describe('Preset creation dialog', () => {
     // Hold the save until the test has asserted the in-flight state — a fixed
     // stall would race the assertions on a slow runner.
     let releaseSave!: () => void
-    const saveGate = new Promise<void>(resolve => {
+    const saveGate = new Promise<void>((resolve) => {
       releaseSave = resolve
     })
-    await page.route('**/admin-ajax.php', async route => {
+    await page.route('**/admin-ajax.php', async (route) => {
       if ((route.request().postData() ?? '').includes('arts_fluid_design_system_save_preset')) {
         await saveGate
       }
@@ -81,7 +81,7 @@ test.describe('Preset creation dialog', () => {
     // A cache patch replaces the post-save refetch, so nothing should re-read the presets.
     let countPresetFetches = false
     let presetFetches = 0
-    page.on('request', request => {
+    page.on('request', (request) => {
       if (
         countPresetFetches &&
         request.url().includes('admin-ajax.php') &&
@@ -107,7 +107,7 @@ test.describe('Preset creation dialog', () => {
     await expect(dialog.locator('.dialog-ok')).toBeEnabled()
 
     const saveResponse = page.waitForResponse(
-      response =>
+      (response) =>
         response.url().includes('admin-ajax.php') &&
         (response.request().postData() ?? '').includes('arts_fluid_design_system_save_preset')
     )
@@ -142,7 +142,7 @@ test.describe('Preset creation dialog', () => {
     const control = page.locator('.elementor-control-space')
 
     let saveRequests = 0
-    page.on('request', request => {
+    page.on('request', (request) => {
       if ((request.postData() ?? '').includes('arts_fluid_design_system_save_preset')) {
         saveRequests += 1
       }
@@ -171,7 +171,7 @@ test.describe('Preset creation dialog', () => {
   test('a failed save keeps the dialog open with the error', async ({ editor, page }) => {
     const control = page.locator('.elementor-control-space')
 
-    await page.route('**/admin-ajax.php', async route => {
+    await page.route('**/admin-ajax.php', async (route) => {
       if ((route.request().postData() ?? '').includes('arts_fluid_design_system_save_preset')) {
         await route.abort()
         return
@@ -226,7 +226,7 @@ test.describe('Preset creation dialog', () => {
     await dialog.locator('input[data-fluid-role="max"]').fill('56')
 
     const updateResponse = page.waitForResponse(
-      response =>
+      (response) =>
         response.url().includes('admin-ajax.php') &&
         (response.request().postData() ?? '').includes('arts_fluid_design_system_update_preset')
     )

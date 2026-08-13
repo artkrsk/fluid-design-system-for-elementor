@@ -1,8 +1,8 @@
-import { stateManager, cssManager } from '../managers'
-import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
+import type { HookArgs } from '@artemsemkin/elementor-types'
+import { COMMANDS, CONTAINER_TYPES, HOOK_IDS } from '../constants'
+import { cssManager, stateManager } from '../managers'
 import { getItemId } from '../utils'
 import { isFluidPresetRepeater } from '../utils/controls'
-import type { HookArgs } from '@artemsemkin/elementor-types'
 
 const commandSystem = window.$e!
 

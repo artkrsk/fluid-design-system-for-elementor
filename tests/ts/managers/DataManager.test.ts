@@ -1,24 +1,24 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/utils', () => ({
+vi.mock('@ts/utils', () => ({
   showControlSpinner: vi.fn(),
   hideControlSpinner: vi.fn(),
   elementorAjaxRequest: vi.fn()
 }))
 
-vi.mock('@/services/presetAPI', () => ({
+vi.mock('@ts/services/presetAPI', () => ({
   PresetAPIService: { fetchGroups: vi.fn() }
 }))
 
-import { DataManager } from '@/managers/DataManager'
-import { elementorAjaxRequest } from '@/utils'
-import { PresetAPIService } from '@/services/presetAPI'
-import type { IFluidPreset, IPresetGroup } from '@/interfaces'
+import type { IFluidPreset, IPresetGroup } from '@ts/interfaces'
+import { DataManager } from '@ts/managers/DataManager'
+import { PresetAPIService } from '@ts/services/presetAPI'
+import { elementorAjaxRequest } from '@ts/utils'
 
 /** A promise plus the handles to settle it later */
 function deferred<T>() {
   let resolve!: (value: T) => void
-  const promise = new Promise<T>(r => {
+  const promise = new Promise<T>((r) => {
     resolve = r
   })
   return { promise, resolve }
@@ -96,8 +96,8 @@ describe('DataManager', () => {
 
       dm.addPreset('fluid_typography_presets', newRow)
 
-      expect(dm.presets![1].value).toEqual([newRow])
-      expect(dm.presets![0].value).toHaveLength(1)
+      expect(dm.presets![1]!.value).toEqual([newRow])
+      expect(dm.presets![0]!.value).toHaveLength(1)
     })
 
     it('drops the cache when the group is not cached', () => {
@@ -137,7 +137,7 @@ describe('DataManager', () => {
         max_size: '30'
       })
 
-      expect((dm.presets![0].value as IFluidPreset[])[0]).toEqual({
+      expect((dm.presets![0]!.value as IFluidPreset[])[0]).toEqual({
         id: 'spacing-1',
         value: 'var(--arts-fluid-preset--spacing-1)',
         title: 'Renamed',
@@ -158,7 +158,9 @@ describe('DataManager', () => {
     })
 
     it('does nothing on a cold cache, since the next read fetches fresh data', () => {
-      dm.updatePreset('fluid_spacing_presets', 'spacing-1', { title: 'Renamed' })
+      dm.updatePreset('fluid_spacing_presets', 'spacing-1', {
+        title: 'Renamed'
+      })
 
       expect(dm.presets).toBeNull()
     })

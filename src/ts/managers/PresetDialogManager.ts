@@ -1,23 +1,23 @@
-import { ValidationService } from '../utils/validation'
-import { DialogBuilder } from '../utils/dialogBuilder'
-import { generateClampFormula } from '../utils/clamp'
-import { UI_DEFAULTS } from '../constants'
-import { ValueFormatter } from '../utils/formatters'
-import {
-  setDialogBusy,
-  showDialogError,
-  clearDialogError,
-  toErrorMessage
-} from '../utils/dialogFeedback'
-import cssManager from './CSSManager'
-import dataManager from './DataManager'
 import type { DialogOptions } from '@artemsemkin/elementor-types'
+import { UI_DEFAULTS } from '../constants'
 import type {
   IDialogConfig,
   IPresetData,
-  IPresetDialogData,
-  IPresetDialogCallbacks
+  IPresetDialogCallbacks,
+  IPresetDialogData
 } from '../interfaces'
+import { generateClampFormula } from '../utils/clamp'
+import { DialogBuilder } from '../utils/dialogBuilder'
+import {
+  clearDialogError,
+  setDialogBusy,
+  showDialogError,
+  toErrorMessage
+} from '../utils/dialogFeedback'
+import { ValueFormatter } from '../utils/formatters'
+import { ValidationService } from '../utils/validation'
+import cssManager from './CSSManager'
+import dataManager from './DataManager'
 
 /** Manages preset dialog creation and lifecycle */
 export class PresetDialogManager {
@@ -30,7 +30,7 @@ export class PresetDialogManager {
       throw new Error(`Invalid mode: ${mode}. Expected 'create' or 'edit'.`)
     }
 
-    const config = this._getDialogConfig(mode, data, callbacks)
+    const config = PresetDialogManager._getDialogConfig(mode, data, callbacks)
 
     /** Store for cancel restoration in edit mode */
     let originalFormula = null
@@ -42,17 +42,26 @@ export class PresetDialogManager {
     }
 
     const { $message, $input, $minInput, $maxInput, $groupSelect, $separator } =
-      this._createDialogMessage(config, mode)
+      PresetDialogManager._createDialogMessage(config, mode)
 
     const modeClass =
       mode === 'create' ? 'e-fluid-create-preset-dialog' : 'e-fluid-edit-preset-dialog'
     const dialog = window.elementorCommon?.dialogsManager.createWidget('confirm', {
       className: `e-fluid-save-preset-dialog ${modeClass}`,
-      headerMessage: config.headerMessage,
+      ...(config.headerMessage !== undefined && {
+        headerMessage: config.headerMessage
+      }),
       message: $message,
+      // Keys are omitted rather than set to undefined: dialogs-manager falls back
+      // to its own labels when a string is absent, and its typings (third-party)
+      // don't accept an explicit undefined.
       strings: {
-        confirm: config.confirmButton,
-        cancel: window.ArtsFluidDSStrings?.cancel
+        ...(config.confirmButton !== undefined && {
+          confirm: config.confirmButton
+        }),
+        ...(window.ArtsFluidDSStrings?.cancel !== undefined && {
+          cancel: window.ArtsFluidDSStrings.cancel
+        })
       },
       // onButtonClick is a real dialogs-manager option, just missing from the typings.
       // It stops the dialog from closing before the save settles — and, since it covers
@@ -60,7 +69,7 @@ export class PresetDialogManager {
       hide: {
         onBackgroundClick: false,
         onButtonClick: false
-      } as DialogOptions['hide'],
+      } as NonNullable<DialogOptions['hide']>,
       onCancel: () => {
         dialog?.hide()
       },
@@ -99,7 +108,7 @@ export class PresetDialogManager {
         }
         try {
           const $confirmButton = dialog.getElements('widget').find('.dialog-ok')
-          await this._initializeDialogUI(
+          await PresetDialogManager._initializeDialogUI(
             mode,
             $input,
             $minInput,
@@ -111,9 +120,9 @@ export class PresetDialogManager {
           )
 
           if (mode === 'edit' && data.presetId) {
-            this._attachLivePreviewListeners($minInput, $maxInput, data.presetId)
+            PresetDialogManager._attachLivePreviewListeners($minInput, $maxInput, data.presetId)
           } else if (mode === 'create' && data.setting && callbacks.getInlineContainer) {
-            this._attachCreateModeLivePreview(
+            PresetDialogManager._attachCreateModeLivePreview(
               $minInput,
               $maxInput,
               data.setting,
@@ -194,11 +203,13 @@ export class PresetDialogManager {
 
   private static _createDialogMessage(config: IDialogConfig, mode: 'create' | 'edit') {
     const $message = jQuery('<div>', { class: 'e-global__confirm-message' })
-    const $messageText = jQuery('<div>', { class: 'e-global__confirm-message-text' }).html(
-      config.messageText ?? ''
-    )
+    const $messageText = jQuery('<div>', {
+      class: 'e-global__confirm-message-text'
+    }).html(config.messageText ?? '')
 
-    const $inputWrapper = jQuery('<div>', { class: 'e-global__confirm-input-wrapper' })
+    const $inputWrapper = jQuery('<div>', {
+      class: 'e-global__confirm-input-wrapper'
+    })
     const $valuesRow = jQuery('<div>', { class: 'e-fluid-dialog-values-row' })
 
     const $minInput = jQuery('<input>', {

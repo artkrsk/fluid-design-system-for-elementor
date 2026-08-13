@@ -4,8 +4,8 @@
  * Extracted for testability and easier TypeScript migration.
  */
 
-import type { TParsedControlName } from '../types'
 import type { IInheritedControlValue } from '../interfaces'
+import type { TParsedControlName } from '../types'
 
 /** Parse control name to extract base name and device suffix */
 export function parseControlNameDevice(
@@ -16,9 +16,9 @@ export function parseControlNameDevice(
     if (device === 'desktop') {
       continue
     }
-    if (controlName.endsWith('_' + device)) {
+    if (controlName.endsWith(`_${device}`)) {
       return {
-        baseName: controlName.replace('_' + device, ''),
+        baseName: controlName.replace(`_${device}`, ''),
         deviceSuffix: device
       }
     }

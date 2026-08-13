@@ -22,7 +22,11 @@ export function insertPresetRow(controlId: string, row: IPresetRow): void {
   if (!container) {
     return
   }
-  window.$e?.run('document/repeater/insert', { container, name: controlId, model: row })
+  window.$e?.run('document/repeater/insert', {
+    container,
+    name: controlId,
+    model: row
+  })
 }
 
 /** Mirrors an edited preset's fields onto the matching row in the editor's Kit model. */

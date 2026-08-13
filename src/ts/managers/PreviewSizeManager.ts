@@ -90,7 +90,7 @@ export class PreviewSizeManager {
       return
     }
 
-    this.ownerVisibilityObserver = new IntersectionObserver(entries => {
+    this.ownerVisibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting && (entry.target as HTMLElement).offsetParent === null) {
           this.reset()

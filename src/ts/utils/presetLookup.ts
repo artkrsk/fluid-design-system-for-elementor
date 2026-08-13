@@ -1,5 +1,5 @@
+import type { ICustomPreset, IFluidPreset } from '../interfaces'
 import { dataManager } from '../managers'
-import type { IFluidPreset, ICustomPreset } from '../interfaces'
 import type { TInheritedPresetResult } from '../types'
 
 /** Type guard to check if preset is IFluidPreset */

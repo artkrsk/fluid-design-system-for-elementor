@@ -1,7 +1,7 @@
-import { request, FullConfig } from '@playwright/test'
-import { execSync } from 'child_process'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
+import { execSync } from 'node:child_process'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { type FullConfig, request } from '@playwright/test'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -10,8 +10,7 @@ const WP_USERNAME = process.env.WP_USERNAME || 'admin'
 const WP_PASSWORD = process.env.WP_PASSWORD || 'password'
 
 /** Plugin path inside wp-env container */
-const PLUGIN_PATH =
-  '/var/www/html/wp-content/plugins/fluid-design-system-for-elementor'
+const PLUGIN_PATH = '/var/www/html/wp-content/plugins/fluid-design-system-for-elementor'
 
 const STORAGE_STATE_PATH = './tests/e2e/.auth/admin.json'
 
@@ -73,9 +72,7 @@ async function loginAndSaveState(baseURL: string): Promise<void> {
       })
 
       const { cookies } = await context.storageState()
-      loggedIn = cookies.some(cookie =>
-        cookie.name.startsWith('wordpress_logged_in_')
-      )
+      loggedIn = cookies.some((cookie) => cookie.name.startsWith('wordpress_logged_in_'))
 
       if (!loggedIn) {
         const body = await response.text()
@@ -84,15 +81,13 @@ async function loginAndSaveState(baseURL: string): Promise<void> {
             `HTTP ${response.status()} ${response.url()}\n` +
             `Body snippet: ${body.replace(/\s+/g, ' ').slice(0, 500)}`
         )
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        await new Promise((resolve) => setTimeout(resolve, 2000))
       }
     }
 
     if (!loggedIn) {
       logEnvironmentDiagnostics()
-      throw new Error(
-        '[E2E Setup] Login failed: no wordpress_logged_in_* cookie after 3 attempts'
-      )
+      throw new Error('[E2E Setup] Login failed: no wordpress_logged_in_* cookie after 3 attempts')
     }
     console.log('[E2E Setup] Successfully logged in')
 
@@ -142,7 +137,7 @@ async function waitForHttpOk(
         `[E2E Setup] Waiting for ${url}: ${(error as Error).message} (attempt ${attempt}/${attempts})`
       )
     }
-    await new Promise(resolve => setTimeout(resolve, delayMs))
+    await new Promise((resolve) => setTimeout(resolve, delayMs))
   }
   logEnvironmentDiagnostics()
   throw new Error(`[E2E Setup] ${url} did not respond 200 after ${attempts} attempts`)
@@ -188,7 +183,7 @@ function verifyPluginsActive(): void {
 
   // Elementor's directory name follows the downloaded zip (elementor.latest-stable)
   const required = ['fluid-design-system-for-elementor', 'elementor']
-  const missing = required.filter(name => !activePlugins.includes(name))
+  const missing = required.filter((name) => !activePlugins.includes(name))
   if (missing.length > 0) {
     throw new Error(
       `[E2E Setup] Expected wp-env to auto-activate plugins, but missing: ${missing.join(', ')}.\n` +
@@ -197,14 +192,11 @@ function verifyPluginsActive(): void {
   }
 
   try {
-    execSync(
-      `npm run wp-env run cli -- wp transient delete elementor_activation_redirect`,
-      {
-        cwd: path.resolve(__dirname, '../..'),
-        stdio: 'ignore',
-        timeout: 60000
-      }
-    )
+    execSync(`npm run wp-env run cli -- wp transient delete elementor_activation_redirect`, {
+      cwd: path.resolve(__dirname, '../..'),
+      stdio: 'ignore',
+      timeout: 60000
+    })
   } catch {
     // Transient may simply not exist — the authenticated warmup request
     // absorbs any residual redirect either way.
@@ -220,14 +212,11 @@ async function enablePermalinks(): Promise<void> {
   console.log('[E2E Setup] Enabling pretty permalinks...')
 
   try {
-    execSync(
-      `npm run wp-env run cli -- wp rewrite structure '/%postname%/' --hard`,
-      {
-        cwd: path.resolve(__dirname, '../..'),
-        stdio: 'inherit',
-        timeout: 60000
-      }
-    )
+    execSync(`npm run wp-env run cli -- wp rewrite structure '/%postname%/' --hard`, {
+      cwd: path.resolve(__dirname, '../..'),
+      stdio: 'inherit',
+      timeout: 60000
+    })
 
     execSync(`npm run wp-env run cli -- wp rewrite flush`, {
       cwd: path.resolve(__dirname, '../..'),

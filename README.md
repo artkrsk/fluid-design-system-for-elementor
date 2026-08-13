@@ -30,10 +30,17 @@ config.wordpressPlugin.target = '/path/to/your/wordpress/plugins/fluid-design-sy
 
 ### Commands
 
-| Command         | Description                                 |
-| --------------- | ------------------------------------------- |
-| `npm run dev`   | Development mode with live reload           |
-| `npm run build` | Production build (creates distribution ZIP) |
+| Command             | Description                                             |
+| ------------------- | ------------------------------------------------------- |
+| `pnpm dev:plugin`   | Watch build, syncing into a local WP site (`DEV_TARGET`) |
+| `pnpm dev`          | Documentation site (VitePress)                           |
+| `pnpm build`        | Production build (creates the distribution ZIP)          |
+| `pnpm test`         | Unit tests (Vitest)                                      |
+| `pnpm release <spec>` | Version bump, stamp, changelog sync and tag            |
+
+Everything else runs through `pnpm exec` — `biome check .`, `tsc --noEmit`,
+`stylelint 'src/styles/**/*.scss'`, `knip`, `playwright test`, and
+`vendor/bin/phpstan` / `vendor/bin/phpcs` on the PHP side.
 
 ---
 

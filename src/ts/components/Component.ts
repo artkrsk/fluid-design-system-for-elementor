@@ -1,10 +1,10 @@
+import { COMMANDS, NAMESPACES } from '../constants'
 import {
+  HookOnKitSettingsSave,
   HookOnRepeaterAdd,
   HookOnRepeaterRemove,
-  HookOnRepeaterReorder,
-  HookOnKitSettingsSave
+  HookOnRepeaterReorder
 } from '../hooks'
-import { NAMESPACES, COMMANDS } from '../constants'
 
 const commandSystem = window.$e!
 

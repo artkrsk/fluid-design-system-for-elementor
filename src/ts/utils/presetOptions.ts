@@ -1,9 +1,9 @@
-import { createElement } from './dom'
+import { CUSTOM_FLUID_VALUE } from '../constants'
+import type { ICustomPreset, IFluidPreset, IInheritanceData } from '../interfaces'
 import { parseClampFormula } from './clamp'
+import { createElement } from './dom'
 import { ValueFormatter } from './formatters'
 import { getInheritedPresetSync } from './presetLookup'
-import { CUSTOM_FLUID_VALUE } from '../constants'
-import type { IFluidPreset, ICustomPreset, IInheritanceData } from '../interfaces'
 
 /** Sets multiple attributes on an element */
 function setElementAttributes(
@@ -222,7 +222,11 @@ function handleFluidInheritance(
 /** Handles standard unit inheritance display */
 function handleStandardInheritance(
   optionEl: HTMLOptionElement,
-  data: { inheritedSize: string | null; sourceUnit: string | null; name: string }
+  data: {
+    inheritedSize: string | null
+    sourceUnit: string | null
+    name: string
+  }
 ): HTMLOptionElement {
   const { inheritedSize, sourceUnit, name } = data
   const valueText =
@@ -289,8 +293,7 @@ export function createSimpleOption(
 
 /** Creates the "Custom value..." option for inline fluid values */
 export function createCustomValueOption(currentValue: string): HTMLOptionElement {
-  const isCustomSelected =
-    currentValue === CUSTOM_FLUID_VALUE || (currentValue && currentValue.startsWith('clamp('))
+  const isCustomSelected = currentValue === CUSTOM_FLUID_VALUE || currentValue?.startsWith('clamp(')
 
   const optionEl = createElement('option', null, {
     value: CUSTOM_FLUID_VALUE,

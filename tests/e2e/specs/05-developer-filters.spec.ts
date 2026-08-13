@@ -7,14 +7,12 @@
  * not just structurally present.
  */
 
-import { test, expect, waitForWpAdmin } from '../fixtures'
+import { expect, test, waitForWpAdmin } from '../fixtures'
 
 const ADMIN_PAGE_URL = '/wp-admin/admin.php?page=fluid-design-system'
 
 test.describe('Developer Groups Table', () => {
-  test('filter-registered group renders in the developer table', async ({
-    page
-  }) => {
+  test('filter-registered group renders in the developer table', async ({ page }) => {
     await page.goto(ADMIN_PAGE_URL)
     await waitForWpAdmin(page)
 
@@ -41,22 +39,16 @@ test.describe('Developer Groups Table', () => {
     await expect(page.locator('text=programmatically')).toBeVisible()
   })
 
-  test('developer groups table is read-only (no action buttons)', async ({
-    page
-  }) => {
+  test('developer groups table is read-only (no action buttons)', async ({ page }) => {
     await page.goto(ADMIN_PAGE_URL)
     await waitForWpAdmin(page)
 
     // Verify table structure exists
-    await expect(
-      page.locator('#fluid-developer-groups-table-list')
-    ).toBeVisible()
+    await expect(page.locator('#fluid-developer-groups-table-list')).toBeVisible()
 
     // Developer groups should not have edit/delete action buttons
     // Even if rows exist, there should be no .button elements in the table body
-    const actionButtons = page.locator(
-      '#fluid-developer-groups-table-list tbody .button'
-    )
+    const actionButtons = page.locator('#fluid-developer-groups-table-list tbody .button')
     await expect(actionButtons).toHaveCount(0)
   })
 

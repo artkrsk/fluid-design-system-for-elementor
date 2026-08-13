@@ -1,13 +1,13 @@
-import { describe, it, expect, vi } from 'vitest'
 import {
-  parseControlNameDevice,
-  getDeviceControlName,
   buildInheritanceResult,
-  getAncestorDevices,
   findInheritedValue,
+  getAncestorDevices,
+  getDeviceControlName,
   getWidescreenInheritedValue,
+  parseControlNameDevice,
   resolveInheritedValue
-} from '@/utils/deviceInheritance'
+} from '@ts/utils/deviceInheritance'
+import { describe, expect, it, vi } from 'vitest'
 
 /** Standard Elementor device order */
 const DEVICE_ORDER = ['desktop', 'laptop', 'tablet_extra', 'tablet', 'mobile_extra', 'mobile']
@@ -20,43 +20,64 @@ describe('deviceInheritance utilities', () => {
     it('returns baseName with null suffix for desktop control', () => {
       const result = parseControlNameDevice('typography_font_size', DEVICE_ORDER)
 
-      expect(result).toEqual({ baseName: 'typography_font_size', deviceSuffix: null })
+      expect(result).toEqual({
+        baseName: 'typography_font_size',
+        deviceSuffix: null
+      })
     })
 
     it('extracts tablet suffix', () => {
       const result = parseControlNameDevice('typography_font_size_tablet', DEVICE_ORDER)
 
-      expect(result).toEqual({ baseName: 'typography_font_size', deviceSuffix: 'tablet' })
+      expect(result).toEqual({
+        baseName: 'typography_font_size',
+        deviceSuffix: 'tablet'
+      })
     })
 
     it('extracts mobile suffix', () => {
       const result = parseControlNameDevice('spacing_padding_mobile', DEVICE_ORDER)
 
-      expect(result).toEqual({ baseName: 'spacing_padding', deviceSuffix: 'mobile' })
+      expect(result).toEqual({
+        baseName: 'spacing_padding',
+        deviceSuffix: 'mobile'
+      })
     })
 
     it('extracts tablet_extra suffix', () => {
       const result = parseControlNameDevice('width_tablet_extra', DEVICE_ORDER)
 
-      expect(result).toEqual({ baseName: 'width', deviceSuffix: 'tablet_extra' })
+      expect(result).toEqual({
+        baseName: 'width',
+        deviceSuffix: 'tablet_extra'
+      })
     })
 
     it('extracts widescreen suffix when in device order', () => {
       const result = parseControlNameDevice('font_size_widescreen', DEVICE_ORDER_WITH_WIDESCREEN)
 
-      expect(result).toEqual({ baseName: 'font_size', deviceSuffix: 'widescreen' })
+      expect(result).toEqual({
+        baseName: 'font_size',
+        deviceSuffix: 'widescreen'
+      })
     })
 
     it('handles control names with underscores', () => {
       const result = parseControlNameDevice('my_custom_control_name_tablet', DEVICE_ORDER)
 
-      expect(result).toEqual({ baseName: 'my_custom_control_name', deviceSuffix: 'tablet' })
+      expect(result).toEqual({
+        baseName: 'my_custom_control_name',
+        deviceSuffix: 'tablet'
+      })
     })
 
     it('returns original name when suffix not in device order', () => {
       const result = parseControlNameDevice('font_size_unknown', DEVICE_ORDER)
 
-      expect(result).toEqual({ baseName: 'font_size_unknown', deviceSuffix: null })
+      expect(result).toEqual({
+        baseName: 'font_size_unknown',
+        deviceSuffix: null
+      })
     })
   })
 
@@ -289,12 +310,7 @@ describe('deviceInheritance utilities', () => {
       })
       const isEmptyFn = vi.fn().mockReturnValue(true)
 
-      resolveInheritedValue(
-        'font_size_tablet',
-        DEVICE_ORDER,
-        getValueFn,
-        isEmptyFn
-      )
+      resolveInheritedValue('font_size_tablet', DEVICE_ORDER, getValueFn, isEmptyFn)
 
       // Should traverse up to desktop
       expect(getValueFn).toHaveBeenCalled()
@@ -310,12 +326,7 @@ describe('deviceInheritance utilities', () => {
       })
       const isEmptyFn = vi.fn().mockImplementation((v) => !v?.size)
 
-      const result = resolveInheritedValue(
-        'font_size_mobile',
-        DEVICE_ORDER,
-        getValueFn,
-        isEmptyFn
-      )
+      const result = resolveInheritedValue('font_size_mobile', DEVICE_ORDER, getValueFn, isEmptyFn)
 
       expect(result?.__inheritedFrom).toBe('tablet')
     })

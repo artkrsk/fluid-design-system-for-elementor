@@ -1,4 +1,4 @@
-import { Page, FrameLocator, expect } from '@playwright/test'
+import { expect, type FrameLocator, type Page } from '@playwright/test'
 
 export class ElementorEditorPage {
   private previewFrame: FrameLocator
@@ -12,7 +12,9 @@ export class ElementorEditorPage {
   /** Wait for Elementor editor to fully load */
   async waitForEditor() {
     // Wait for editor to be active
-    await this.page.waitForSelector('.elementor-editor-active', { timeout: 60000 })
+    await this.page.waitForSelector('.elementor-editor-active', {
+      timeout: 60000
+    })
     // Wait for panel to load
     await this.page.waitForSelector('#elementor-panel', { timeout: 30000 })
     // Wait for preview frame
@@ -26,11 +28,13 @@ export class ElementorEditorPage {
         const doc = (
           window as unknown as {
             elementor?: {
-              documents?: { getCurrent?: () => { $element?: { length: number } } }
+              documents?: {
+                getCurrent?: () => { $element?: { length: number } }
+              }
             }
           }
         ).elementor?.documents?.getCurrent?.()
-        return Boolean(doc && doc.$element && doc.$element.length)
+        return Boolean(doc?.$element?.length)
       },
       undefined,
       { timeout: 30000 }
@@ -57,9 +61,7 @@ export class ElementorEditorPage {
 
     // Click the edit button in the overlay (pen/pencil icon); fall back to
     // double-clicking the widget if the overlay never shows up
-    const editButton = widget
-      .locator('.elementor-editor-element-edit, [data-event="edit"]')
-      .first()
+    const editButton = widget.locator('.elementor-editor-element-edit, [data-event="edit"]').first()
     try {
       await editButton.waitFor({ state: 'visible', timeout: 2000 })
       await editButton.click()
@@ -68,9 +70,13 @@ export class ElementorEditorPage {
     }
 
     // Wait for editor panel page to load (appears when widget is selected)
-    await this.page.waitForSelector('#elementor-panel-page-editor', { timeout: 15000 })
+    await this.page.waitForSelector('#elementor-panel-page-editor', {
+      timeout: 15000
+    })
     // Wait for controls to render
-    await this.page.waitForSelector('#elementor-controls .elementor-control', { timeout: 10000 })
+    await this.page.waitForSelector('#elementor-controls .elementor-control', {
+      timeout: 10000
+    })
   }
 
   /**
@@ -124,12 +130,8 @@ export class ElementorEditorPage {
       .click()
 
     // Wait for the dropdown to close and the selection to render
-    await this.page
-      .locator('.select2-results')
-      .waitFor({ state: 'hidden', timeout: 5000 })
-    await expect(control.locator('.select2-selection__rendered')).toContainText(
-      presetName
-    )
+    await this.page.locator('.select2-results').waitFor({ state: 'hidden', timeout: 5000 })
+    await expect(control.locator('.select2-selection__rendered')).toContainText(presetName)
   }
 
   /**
@@ -159,7 +161,9 @@ export class ElementorEditorPage {
     await this.page.evaluate(async () => {
       const w = window as unknown as {
         elementor: { documents: { getCurrent: () => unknown } }
-        $e: { run: (cmd: string, args: Record<string, unknown>) => Promise<unknown> }
+        $e: {
+          run: (cmd: string, args: Record<string, unknown>) => Promise<unknown>
+        }
       }
       await w.$e.run('document/save/update', {
         document: w.elementor.documents.getCurrent()
@@ -170,7 +174,9 @@ export class ElementorEditorPage {
   /** Open Site Settings and wait for the Kit document + its settings model */
   async openSiteSettings() {
     await this.page.evaluate(async () => {
-      const w = window as unknown as { $e: { run: (cmd: string) => Promise<unknown> } }
+      const w = window as unknown as {
+        $e: { run: (cmd: string) => Promise<unknown> }
+      }
       await w.$e.run('panel/global/open')
     })
     await this.page.waitForFunction(
@@ -179,13 +185,15 @@ export class ElementorEditorPage {
           elementor?: {
             config?: { kit_id?: number }
             documents?: {
-              get?: (id: number) => { container?: { settings?: { get: (key: string) => unknown } } }
+              get?: (id: number) => {
+                container?: { settings?: { get: (key: string) => unknown } }
+              }
             }
           }
         }
         const kitId = w.elementor?.config?.kit_id
         const container = kitId != null ? w.elementor?.documents?.get?.(kitId)?.container : null
-        return Boolean(container && container.settings && container.settings.get('fluid_typography_presets'))
+        return Boolean(container?.settings?.get('fluid_typography_presets'))
       },
       undefined,
       { timeout: 15000 }
@@ -203,8 +211,13 @@ export class ElementorEditorPage {
   async saveSiteSettings() {
     await this.page.evaluate(async () => {
       const w = window as unknown as {
-        elementor: { config: { kit_id: number }; documents: { get: (id: number) => unknown } }
-        $e: { run: (cmd: string, args: Record<string, unknown>) => Promise<unknown> }
+        elementor: {
+          config: { kit_id: number }
+          documents: { get: (id: number) => unknown }
+        }
+        $e: {
+          run: (cmd: string, args: Record<string, unknown>) => Promise<unknown>
+        }
       }
       const kitDoc = w.elementor.documents.get(w.elementor.config.kit_id)
       await w.$e.run('document/save/update', { document: kitDoc })
@@ -257,7 +270,13 @@ export class ElementorEditorPage {
             config: { kit_id: number }
             documents: {
               get: (id: number) => {
-                container: { settings: { get: (key: string) => { models: Array<{ get: (k: string) => string }> } } }
+                container: {
+                  settings: {
+                    get: (key: string) => {
+                      models: Array<{ get: (k: string) => string }>
+                    }
+                  }
+                }
               }
             }
           }

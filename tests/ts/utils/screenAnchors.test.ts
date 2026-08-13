@@ -1,5 +1,5 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
-import { resolveAnchorWidths } from '@/utils/screenAnchors'
+import { resolveAnchorWidths } from '@ts/utils/screenAnchors'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 /** Build a <select> whose selected option carries optional screen-width override attrs */
 function makeSelect(attrs: Record<string, string> = {}): HTMLSelectElement {
@@ -32,13 +32,19 @@ describe('resolveAnchorWidths', () => {
       '--arts-fluid-max-screen-value': '1600'
     })
 
-    expect(resolveAnchorWidths(null, document)).toEqual({ min: 320, max: 1600 })
+    expect(resolveAnchorWidths(null, document)).toEqual({
+      min: 320,
+      max: 1600
+    })
   })
 
   it('falls back to 360 / 1920 when vars are empty', () => {
     stubAnchorVars({})
 
-    expect(resolveAnchorWidths(null, document)).toEqual({ min: 360, max: 1920 })
+    expect(resolveAnchorWidths(null, document)).toEqual({
+      min: 360,
+      max: 1920
+    })
   })
 
   it('falls back when vars are non-numeric', () => {
@@ -47,7 +53,10 @@ describe('resolveAnchorWidths', () => {
       '--arts-fluid-max-screen-value': ''
     })
 
-    expect(resolveAnchorWidths(null, document)).toEqual({ min: 360, max: 1920 })
+    expect(resolveAnchorWidths(null, document)).toEqual({
+      min: 360,
+      max: 1920
+    })
   })
 
   it('falls back to defaults when previewDoc is null', () => {
@@ -64,7 +73,10 @@ describe('resolveAnchorWidths', () => {
       'data-max-screen-width-size': '1440'
     })
 
-    expect(resolveAnchorWidths(select, document)).toEqual({ min: 400, max: 1440 })
+    expect(resolveAnchorWidths(select, document)).toEqual({
+      min: 400,
+      max: 1440
+    })
   })
 
   it('keeps the global value for a side without an override', () => {
@@ -74,7 +86,10 @@ describe('resolveAnchorWidths', () => {
     })
     const select = makeSelect({ 'data-min-screen-width-size': '400' })
 
-    expect(resolveAnchorWidths(select, document)).toEqual({ min: 400, max: 1600 })
+    expect(resolveAnchorWidths(select, document)).toEqual({
+      min: 400,
+      max: 1600
+    })
   })
 
   it('ignores non-numeric override attributes', () => {
@@ -87,7 +102,10 @@ describe('resolveAnchorWidths', () => {
       'data-max-screen-width-size': ''
     })
 
-    expect(resolveAnchorWidths(select, document)).toEqual({ min: 320, max: 1600 })
+    expect(resolveAnchorWidths(select, document)).toEqual({
+      min: 320,
+      max: 1600
+    })
   })
 
   it('uses globals when the select has no selected option', () => {
@@ -97,6 +115,9 @@ describe('resolveAnchorWidths', () => {
     })
     const emptySelect = document.createElement('select')
 
-    expect(resolveAnchorWidths(emptySelect, document)).toEqual({ min: 320, max: 1600 })
+    expect(resolveAnchorWidths(emptySelect, document)).toEqual({
+      min: 320,
+      max: 1600
+    })
   })
 })

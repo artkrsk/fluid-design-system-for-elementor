@@ -1,4 +1,4 @@
-import { test, expect, resetTestState } from '../fixtures'
+import { expect, resetTestState, test } from '../fixtures'
 
 /**
  * Issue #40 — a preset added to the Kit while Site Settings is open must survive
@@ -90,7 +90,7 @@ test.describe('Preset persistence across save + reload (#40)', () => {
         const w = window as any
         const kitId = w.elementor.config.kit_id
         const coll = w.elementor.documents.get(kitId).container.settings.get(name)
-        return !!(coll && coll.findWhere && coll.findWhere({ _id: id }))
+        return !!coll?.findWhere?.({ _id: id })
       },
       { name: CONTROL_ID, id: createdId }
     )
@@ -106,7 +106,11 @@ test.describe('Preset persistence across save + reload (#40)', () => {
         const coll = container.settings.get(name)
         let idx = coll.models.findIndex((m: any) => m.get('title') === title)
         while (idx >= 0) {
-          await w.$e.run('document/repeater/remove', { container, name, index: idx })
+          await w.$e.run('document/repeater/remove', {
+            container,
+            name,
+            index: idx
+          })
           idx = coll.models.findIndex((m: any) => m.get('title') === title)
         }
       },

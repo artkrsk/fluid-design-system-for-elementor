@@ -1,19 +1,18 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import {
-  createPresetOption,
-  createCustomPresetOption,
-  handleInheritOption,
-  createSimpleOption,
-  createCustomValueOption
-} from '@/utils/presetOptions'
-import type { IFluidPreset, ICustomPreset, IInheritanceData } from '@/interfaces'
-import { CUSTOM_FLUID_VALUE } from '@/constants'
-
+import { CUSTOM_FLUID_VALUE } from '@ts/constants'
+import type { ICustomPreset, IFluidPreset, IInheritanceData } from '@ts/interfaces'
 // Import the mock to control its behavior
-import { getInheritedPresetSync } from '@/utils/presetLookup'
+import { getInheritedPresetSync } from '@ts/utils/presetLookup'
+import {
+  createCustomPresetOption,
+  createCustomValueOption,
+  createPresetOption,
+  createSimpleOption,
+  handleInheritOption
+} from '@ts/utils/presetOptions'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock getInheritedPresetSync to control its behavior in tests
-vi.mock('@/utils/presetLookup', () => ({
+vi.mock('@ts/utils/presetLookup', () => ({
   getInheritedPresetSync: vi.fn().mockReturnValue(null),
   isFluidPreset: (preset: any) => 'min_size' in preset && 'max_size' in preset
 }))
@@ -452,7 +451,8 @@ describe('presetOptions utilities', () => {
         vi.mocked(getInheritedPresetSync).mockReturnValueOnce(null)
 
         const option = document.createElement('option')
-        const clampFormula = 'clamp(min(16px, 24px), calc((16px) + (24px - 16px) * (100vw - var(--arts-fluid-min-screen)) / calc(var(--arts-fluid-max-screen) - var(--arts-fluid-min-screen))), max(16px, 24px))'
+        const clampFormula =
+          'clamp(min(16px, 24px), calc((16px) + (24px - 16px) * (100vw - var(--arts-fluid-min-screen)) / calc(var(--arts-fluid-max-screen) - var(--arts-fluid-min-screen))), max(16px, 24px))'
         const inheritanceData: IInheritanceData = {
           inheritedSize: clampFormula,
           inheritedUnit: 'fluid',
@@ -623,7 +623,12 @@ describe('presetOptions utilities', () => {
     })
 
     it('sets selected when currentValue matches', () => {
-      const option = createSimpleOption('test-value', 'Test Name', 'test-value', emptyInheritanceData)
+      const option = createSimpleOption(
+        'test-value',
+        'Test Name',
+        'test-value',
+        emptyInheritanceData
+      )
 
       expect(option.hasAttribute('selected')).toBe(true)
     })

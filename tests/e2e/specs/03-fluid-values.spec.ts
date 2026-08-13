@@ -5,16 +5,16 @@
  * Uses deterministic test presets seeded during global setup.
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import {
-  TEST_PAGE_SLUG,
-  TEST_ELEMENT_IDS,
-  TEST_VIEWPORTS,
-  getExpectedValue,
   calculateExpectedValue,
+  getContainerSelector,
+  getExpectedValue,
   getHeadingTitleSelector,
   getSpacerSelector,
-  getContainerSelector
+  TEST_ELEMENT_IDS,
+  TEST_PAGE_SLUG,
+  TEST_VIEWPORTS
 } from '../fixtures/test-data'
 
 const TEST_PAGE_URL = `/${TEST_PAGE_SLUG}/`
@@ -28,30 +28,22 @@ test.describe('Fluid Typography Font Size', () => {
     await page.waitForLoadState('load')
   })
 
-  test('renders correct font-size at min viewport (360px)', async ({
-    page
-  }) => {
+  test('renders correct font-size at min viewport (360px)', async ({ page }) => {
     await page.setViewportSize(TEST_VIEWPORTS.mobile)
 
     const heading = page.locator(getHeadingTitleSelector(TEST_ELEMENT_IDS.headingXl))
     await expect(heading).toBeVisible()
 
-    const fontSize = await heading.evaluate(
-      el => parseFloat(getComputedStyle(el).fontSize)
-    )
+    const fontSize = await heading.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
 
     expect(fontSize).toBeCloseTo(getExpectedValue('e2e_heading_xl', 360), VALUE_TOLERANCE)
   })
 
-  test('renders correct font-size at max viewport (1920px)', async ({
-    page
-  }) => {
+  test('renders correct font-size at max viewport (1920px)', async ({ page }) => {
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
 
     const heading = page.locator(getHeadingTitleSelector(TEST_ELEMENT_IDS.headingXl))
-    const fontSize = await heading.evaluate(
-      el => parseFloat(getComputedStyle(el).fontSize)
-    )
+    const fontSize = await heading.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
 
     expect(fontSize).toBeCloseTo(getExpectedValue('e2e_heading_xl', 1920), VALUE_TOLERANCE)
   })
@@ -60,9 +52,7 @@ test.describe('Fluid Typography Font Size', () => {
     await page.setViewportSize(TEST_VIEWPORTS.midpoint)
 
     const heading = page.locator(getHeadingTitleSelector(TEST_ELEMENT_IDS.headingXl))
-    const fontSize = await heading.evaluate(
-      el => parseFloat(getComputedStyle(el).fontSize)
-    )
+    const fontSize = await heading.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
 
     expect(fontSize).toBeCloseTo(getExpectedValue('e2e_heading_xl', 1140), VALUE_TOLERANCE)
   })
@@ -71,9 +61,7 @@ test.describe('Fluid Typography Font Size', () => {
     await page.setViewportSize(TEST_VIEWPORTS.tablet)
 
     const heading = page.locator(getHeadingTitleSelector(TEST_ELEMENT_IDS.headingXl))
-    const fontSize = await heading.evaluate(
-      el => parseFloat(getComputedStyle(el).fontSize)
-    )
+    const fontSize = await heading.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
 
     // Calculate expected value dynamically
     const expected = calculateExpectedValue(24, 64, 768)
@@ -105,15 +93,13 @@ test.describe('Fluid Spacing', () => {
 
     // At min viewport
     await page.setViewportSize(TEST_VIEWPORTS.mobile)
-    const heightMobile = await spacer.evaluate(
-      el => parseFloat(getComputedStyle(el).height)
-    )
+    const heightMobile = await spacer.evaluate((el) => parseFloat(getComputedStyle(el).height))
     expect(heightMobile).toBeCloseTo(getExpectedValue('e2e_gap_standard', 360), VALUE_TOLERANCE)
 
     // At max viewport (poll: the resize repaint lands asynchronously)
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
     await expect
-      .poll(() => spacer.evaluate(el => parseFloat(getComputedStyle(el).height)))
+      .poll(() => spacer.evaluate((el) => parseFloat(getComputedStyle(el).height)))
       .toBeCloseTo(getExpectedValue('e2e_gap_standard', 1920), VALUE_TOLERANCE)
   })
 
@@ -122,15 +108,13 @@ test.describe('Fluid Spacing', () => {
 
     // At min viewport
     await page.setViewportSize(TEST_VIEWPORTS.mobile)
-    const gapMobile = await container.evaluate(
-      el => parseFloat(getComputedStyle(el).gap)
-    )
+    const gapMobile = await container.evaluate((el) => parseFloat(getComputedStyle(el).gap))
     expect(gapMobile).toBeCloseTo(getExpectedValue('e2e_gap_large', 360), VALUE_TOLERANCE)
 
     // At max viewport (poll: the resize repaint lands asynchronously)
     await page.setViewportSize(TEST_VIEWPORTS.desktop)
     await expect
-      .poll(() => container.evaluate(el => parseFloat(getComputedStyle(el).gap)))
+      .poll(() => container.evaluate((el) => parseFloat(getComputedStyle(el).gap)))
       .toBeCloseTo(getExpectedValue('e2e_gap_large', 1920), VALUE_TOLERANCE)
   })
 })
@@ -150,18 +134,19 @@ test.describe('Viewport Transition', () => {
       // record the settled reading for the monotonicity check below
       const expected = calculateExpectedValue(24, 64, width)
       await expect
-        .poll(() => heading.evaluate(el => parseFloat(getComputedStyle(el).fontSize)))
+        .poll(() => heading.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)))
         .toBeCloseTo(expected, VALUE_TOLERANCE)
 
-      const fontSize = await heading.evaluate(
-        el => parseFloat(getComputedStyle(el).fontSize)
-      )
+      const fontSize = await heading.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
       results.push({ width, fontSize, expected })
     }
 
     // Verify values are monotonically increasing
     for (let i = 1; i < results.length; i++) {
-      expect(results[i].fontSize).toBeGreaterThan(results[i - 1].fontSize)
+      // Loop bounds guarantee both entries exist.
+      const current = results[i]!
+      const previous = results[i - 1]!
+      expect(current.fontSize).toBeGreaterThan(previous.fontSize)
     }
   })
 })

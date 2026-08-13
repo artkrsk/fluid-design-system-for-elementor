@@ -2,13 +2,11 @@ name: Tests
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
   push:
-    branches:
-      - main
+    branches: [main]
 
-# Supersede in-flight runs for the same PR/branch so pushes don't pile up on the
+# Supersede in-flight runs for the same ref so pushes don't pile up on the
 # single self-hosted runner.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,313 +15,26 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  MAX_ZIP_SIZE_MB: 1.0
-  NODE_OPTIONS: '--dns-result-order=ipv4first --no-network-family-autoselection'
-
 jobs:
-  plugin-check:
-    name: WordPress.org Plugin Check
-    runs-on: self-hosted
-    steps:
-      - name: Disable git hooks
-        run: git config --global core.hooksPath /dev/null
-
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        if: runner.environment == 'github-hosted'
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Setup PHP
-        if: runner.environment == 'github-hosted'
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: composer
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Create vendor-prefixed directory for Strauss classmap
-        run: mkdir -p vendor-prefixed
-
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Run Strauss to prefix namespaces
-        run: composer prefix-namespaces
-
-      - name: Reinstall Composer dependencies without dev for production
-        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
-
-      - name: Build plugin
-        run: npm run build:js
-
-      - name: Validate ZIP size
-        run: |
-          ZIP_FILE="dist/fluid-design-system-for-elementor.zip"
-          SIZE_BYTES=$(stat -f%z "$ZIP_FILE" 2>/dev/null || stat -c%s "$ZIP_FILE")
-          SIZE_MB=$(echo "scale=2; $SIZE_BYTES / 1024 / 1024" | bc)
-
-          if (( $(echo "$SIZE_MB > $MAX_ZIP_SIZE_MB" | bc -l) )); then
-            echo "❌ ZIP too large: ${SIZE_MB} MB (max ${MAX_ZIP_SIZE_MB} MB)"
-            exit 1
-          fi
-
-          echo "✅ ZIP size: ${SIZE_MB} MB"
-
-      - name: Acquire cross-repo wp-env lock
-        # This host runs wp-env-based CI for several repos, each on its own
-        # self-hosted runner service, so they can execute concurrently.
-        # GitHub's `concurrency:` key only serializes within this repo -- it
-        # can't stop another repo's wp-env from colliding with this job's
-        # Docker resources. See .github/scripts/wp-env-host-lock.sh.
-        run: bash .github/scripts/wp-env-host-lock.sh acquire
-
-      - name: Clean up stale wp-env Docker resources
-        run: |
-          # The plugin-check action generates its own hashed .wp-env.json, so a prior
-          # run's containers can orphan under a hash `wp-env destroy` won't match and
-          # keep 8880/8881 bound. Remove them by project name and published port.
-          docker rm -f $(docker ps -aq --filter "name=wp-env-fluid-design-system-for-elementor") 2>/dev/null || true
-          docker rm -f $(docker ps -aq --filter "publish=8880" --filter "publish=8881") 2>/dev/null || true
-          # `|| true` only catches a non-zero exit, not a hang; wp-env destroy can wedge
-          # on Docker I/O, so bound it (TERM at 180s, KILL 30s later) to free the runner.
-          timeout --kill-after=30 180 npx wp-env destroy --force 2>/dev/null || true
-          # The action's hashed wp-env dirs are populated via Docker (root-owned), so a
-          # stale plugin-check/LICENSE from a prior run causes EACCES on re-setup and a
-          # plain rm can't remove it. Delete them from inside a container as root.
-          docker run --rm -v "$HOME/.wp-env:/wp-env" alpine \
-            sh -c 'rm -rf /wp-env/wp-env-fluid-design-system-for-elementor-*' 2>/dev/null || true
-
-      - name: Run WordPress Plugin Check
-        uses: wordpress/plugin-check-action@v1
-        with:
-          build-dir: './dist/fluid-design-system-for-elementor'
-          wp-version: 'latest'
-          # wp_function_not_compatible_with_requires_wp: the Abilities API
-          # (wp_register_ability*) is WP 6.9+, but every call sits behind a
-          # function_exists() guard so it stays inert on WP 6.0-6.8. This check
-          # ignores guards by design, so it false-positives while we keep
-          # "Requires at least: 6.0".
-          ignore-codes: |
-            WordPress.NamingConventions.PrefixAllGlobals.InvalidPrefixPassed
-            wp_function_not_compatible_with_requires_wp
-
-      - name: Release cross-repo wp-env lock
-        if: always()
-        run: bash .github/scripts/wp-env-host-lock.sh release
-
-  code-quality:
-    name: Code Quality
-    runs-on: self-hosted
-    steps:
-      - name: Disable git hooks
-        run: git config --global core.hooksPath /dev/null
-
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        if: runner.environment == 'github-hosted'
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Setup PHP
-        if: runner.environment == 'github-hosted'
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: composer
-
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Create vendor-prefixed directory for Strauss classmap
-        run: mkdir -p vendor-prefixed
-
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Run Strauss to prefix namespaces (required for PHPStan)
-        run: composer prefix-namespaces
-
-      - name: Regenerate autoloader with prefixed classes
-        run: composer dump-autoload --optimize
-
-      - name: Run PHP CodeSniffer
-        run: composer phpcs
-
-      - name: Run PHPStan
-        run: composer phpstan
-
-      - name: Run PHP unit tests
-        run: composer test:php:unit
-
-      - name: TypeScript type check
-        run: npx tsc --noEmit
-
-  unit-tests:
-    name: Unit Tests
-    runs-on: self-hosted
-    steps:
-      - name: Disable git hooks
-        run: git config --global core.hooksPath /dev/null
-
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        if: runner.environment == 'github-hosted'
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run unit tests with coverage
-        run: npm run test:unit:coverage
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        if: always()
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/coverage-final.json
-          flags: unittests
-
-  e2e-tests:
-    name: E2E Tests
-    needs: plugin-check
-    runs-on: self-hosted
-    # The host has multiple runner slots but wp-env always binds 8888/8889, so
-    # e2e jobs from different runs must never overlap. cancel-in-progress stays
-    # off — a running suite finishes; a superseded queued job may be cancelled.
-    concurrency:
-      group: wp-env-e2e-host
-      cancel-in-progress: false
-    steps:
-      - name: Disable git hooks
-        run: git config --global core.hooksPath /dev/null
-
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        if: runner.environment == 'github-hosted'
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Setup PHP
-        if: runner.environment == 'github-hosted'
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: composer
-
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Create vendor-prefixed directory for Strauss classmap
-        run: mkdir -p vendor-prefixed
-
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Run Strauss to prefix namespaces
-        run: composer prefix-namespaces
-
-      - name: Reinstall Composer dependencies without dev for production
-        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
-
-      - name: Build plugin
-        run: npm run build:js
-
-      - name: Install Playwright system dependencies
-        if: runner.environment == 'github-hosted'
-        run: npx playwright install-deps chromium
-
-      - name: Install Playwright browsers
-        run: npx playwright install chromium
-
-      - name: Acquire cross-repo wp-env lock
-        # This host runs wp-env-based CI for several repos, each on its own
-        # self-hosted runner service, so they can execute concurrently.
-        # GitHub's `concurrency:` key only serializes within this repo -- it
-        # can't stop another repo's wp-env from colliding with this job's
-        # Docker resources. See .github/scripts/wp-env-host-lock.sh.
-        run: bash .github/scripts/wp-env-host-lock.sh acquire
-
-      - name: Destroy previous wp-env
-        # Bound the teardown so a wp-env/Docker hang can't wedge the runner (||true ignores
-        # exit codes but not hangs).
-        run: timeout --kill-after=30 180 npm run wp-env destroy -- --force || true
-
-      - name: Start wp-env
-        run: npm run wp-env start
-
-      - name: Clean stale test-tooling vendor dirs
-        # wp-env's dev-vendor bind mount can leave root-owned dirs under
-        # tests/php from a prior run, which the runner user then can't overwrite
-        # (EACCES on composer install). Remove them from inside a container as
-        # root, mirroring the plugin-check job's stale wp-env cleanup.
-        run: |
-          docker run --rm -v "$PWD:/w" alpine \
-            sh -c 'rm -rf /w/tests/php/tools/vendor' 2>/dev/null || true
-
-      - name: Install isolated PHPUnit tooling for the integration suites
-        # phpunit 9.6 + Yoast polyfills live in their own Composer project so the
-        # test runner's autoloader can't collide with the plugin's bundled vendor
-        # (same ComposerAutoloaderInit hash => fatal). Mounted into wp-env via the
-        # dev-vendor mapping (tests/php/tools/vendor).
-        run: composer install --prefer-dist --no-progress --working-dir=tests/php/tools
-
-      - name: Run PHP integration tests (WordPress + Elementor tiers)
-        run: npm run test:php:wp && npm run test:php:elementor
-
-      - name: Run E2E tests
-        # Chromium gates PRs: fast, stable feedback, and one WebKit/Firefox
-        # flake can no longer abort the whole gate (maxFailures: 1 is global
-        # per invocation). Firefox + WebKit run in the weekly-e2e workflow.
-        run: npx playwright test --project=chromium
-
-      - name: Dump environment diagnostics
-        if: failure()
-        run: |
-          docker ps -a || true
-          npm run wp-env run cli -- tail -n 100 /var/www/html/wp-content/debug.log || true
-
-      - name: Stop wp-env
-        if: always()
-        run: npm run wp-env stop || true
-
-      - name: Release cross-repo wp-env lock
-        if: always()
-        run: bash .github/scripts/wp-env-host-lock.sh release
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
-
-      - name: Upload test videos
-        uses: actions/upload-artifact@v7
-        if: failure()
-        with:
-          name: playwright-videos
-          path: test-results/
-          retention-days: 7
+  test:
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/test.yml@main
+    with:
+      zip_budget_mb: '1.0'
+      coverage: true
+      wp_env_ports: '8888,8889'
+      run_e2e: true
+      # The integration tier runs PHPUnit 10.5 from an isolated Composer project
+      # (tests/php/tools) because two autoloaders with the same generated class
+      # name are fatal in one process — so it can't use the shared suite loop.
+      integration_setup_command: |
+        docker run --rm -v "$PWD:/w" alpine sh -c 'rm -rf /w/tests/php/tools/vendor' 2>/dev/null || true
+        composer install --prefer-dist --no-progress --working-dir=tests/php/tools
+      integration_command: |
+        pnpm exec wp-env run tests-cli \
+          --env-cwd=wp-content/plugins/fluid-design-system-for-elementor/tests/php \
+          -- php tools/vendor/bin/phpunit -c phpunit-wp.xml.dist
+        pnpm exec wp-env run tests-cli \
+          --env-cwd=wp-content/plugins/fluid-design-system-for-elementor/tests/php \
+          -- php tools/vendor/bin/phpunit -c phpunit-elementor.xml.dist
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

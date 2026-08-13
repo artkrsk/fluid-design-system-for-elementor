@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { withBase } from "vitepress";
+import { computed } from "vue";
 
 interface Props {
-  src: string;
-  caption?: string;
-  autoplay?: boolean;
-  loop?: boolean;
-  muted?: boolean;
+	src: string;
+	caption?: string;
+	autoplay?: boolean;
+	loop?: boolean;
+	muted?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  autoplay: false,
-  loop: false,
-  muted: false,
+	autoplay: false,
+	loop: false,
+	muted: false,
 });
 
 const videoSrc = computed(() => {
-  return withBase("/videos/" + props.src);
+	return withBase("/videos/" + props.src);
 });
 </script>
 

@@ -1,8 +1,8 @@
+import type { HookArgs, ThirdParty } from '@artemsemkin/elementor-types'
+import { COMMANDS, CONTAINER_TYPES, HOOK_IDS } from '../constants'
 import { cssManager } from '../managers'
 import { getItemId } from '../utils'
-import { COMMANDS, HOOK_IDS, CONTAINER_TYPES } from '../constants'
 import { isFluidPresetRepeater } from '../utils/controls'
-import type { HookArgs, ThirdParty } from '@artemsemkin/elementor-types'
 
 const commandSystem = window.$e!
 
@@ -29,7 +29,8 @@ export class HookOnRepeaterReorder extends commandSystem.modules.hookUI.After {
 
     // Get the collection
     const collection = container.settings.get(presetName) as
-      ThirdParty.BackboneCollection | undefined
+      | ThirdParty.BackboneCollection
+      | undefined
     if (!collection) {
       return
     }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useData } from 'vitepress'
+import { useData } from "vitepress";
 
-const { site } = useData()
+const { site } = useData();
 </script>
 
 <template>

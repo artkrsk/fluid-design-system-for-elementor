@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { sanitizeFluidCSS, applyStyleguideCompat } from '@/utils/styleguideCompat'
+import { applyStyleguideCompat, sanitizeFluidCSS } from '@ts/utils/styleguideCompat'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('sanitizeFluidCSS', () => {
   it('strips "fluid" after var() with semicolon', () => {
@@ -88,7 +88,7 @@ describe('applyStyleguideCompat', () => {
   })
 
   afterEach(() => {
-    (window as any).elementor = originalElementor
+    ;(window as any).elementor = originalElementor
   })
 
   it('does nothing when elementor is not available', () => {

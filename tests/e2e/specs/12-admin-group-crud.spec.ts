@@ -10,8 +10,8 @@
  * re-render are the plugin's code.
  */
 
-import { Page } from '@playwright/test'
-import { test, expect, waitForWpAdmin, resetTestState } from '../fixtures'
+import type { Page } from '@playwright/test'
+import { expect, resetTestState, test, waitForWpAdmin } from '../fixtures'
 
 const ADMIN_PAGE_URL = '/wp-admin/admin.php?page=fluid-design-system'
 
@@ -37,9 +37,7 @@ async function createGroupViaAdmin(page: Page, name: string) {
 
   // The AJAX response replaces the table HTML; the temp row must be gone
   await expect(page.locator('tr.temp-new-group')).toHaveCount(0)
-  await expect(
-    page.locator('tr.group-row.group-custom').filter({ hasText: name })
-  ).toBeVisible()
+  await expect(page.locator('tr.group-row.group-custom').filter({ hasText: name })).toBeVisible()
 }
 
 test.describe('Admin group CRUD', () => {
@@ -60,18 +58,14 @@ test.describe('Admin group CRUD', () => {
   test('creates a group via inline add and Save Changes', async ({ page }) => {
     await createGroupViaAdmin(page, 'E2E CRUD Group')
 
-    const row = page
-      .locator('tr.group-row.group-custom')
-      .filter({ hasText: 'E2E CRUD Group' })
+    const row = page.locator('tr.group-row.group-custom').filter({ hasText: 'E2E CRUD Group' })
     const groupId = await row.getAttribute('data-group-id')
     expect(groupId).toBeTruthy()
     expect(groupId!.startsWith('temp_')).toBe(false)
   })
 
   test('renames a group inline via immediate AJAX', async ({ page }) => {
-    const row = page
-      .locator('tr.group-row.group-custom')
-      .filter({ hasText: 'E2E Test Group' })
+    const row = page.locator('tr.group-row.group-custom').filter({ hasText: 'E2E Test Group' })
 
     await row.locator('.editable-title').click()
     const input = row.locator('.title-input')
@@ -95,9 +89,9 @@ test.describe('Admin group CRUD', () => {
   test('reorder round-trips through the server', async ({ page }) => {
     const readOrder = () =>
       page.evaluate(() =>
-        Array.from(
-          document.querySelectorAll('#fluid-groups-tbody tr.sortable-row')
-        ).map((row) => row.getAttribute('data-group-id'))
+        Array.from(document.querySelectorAll('#fluid-groups-tbody tr.sortable-row')).map((row) =>
+          row.getAttribute('data-group-id')
+        )
       )
 
     const before = await readOrder()
@@ -131,9 +125,7 @@ test.describe('Admin group CRUD', () => {
     // The seeded group holds one preset, so deletion asks for confirmation
     page.on('dialog', (dialog) => dialog.accept())
 
-    const row = page
-      .locator('tr.group-row.group-custom')
-      .filter({ hasText: 'E2E Test Group' })
+    const row = page.locator('tr.group-row.group-custom').filter({ hasText: 'E2E Test Group' })
     await row.locator('.fluid-delete-group').click()
     await expect(row).toHaveClass(/marked-for-deletion/)
 

@@ -2,126 +2,126 @@
 
 ## 2.5.3
 
-- improved: full compatibility with WordPress 7.1
+* improved: full compatibility with WordPress 7.1
 
 ## 2.5.2
 
-- fixed: the preset dialog could be closed with the Escape key while saving, hiding save errors
-- fixed: the Save button in the "Edit Preset" dialog could stay disabled on slow connections
-- fixed: preset groups created outside the editor now appear in the save dialog without reloading
-- fixed: retrying after a failed save could create duplicate presets
-- improved: preset names display consistently after saving
+* fixed: the preset dialog could be closed with the Escape key while saving, hiding save errors
+* fixed: the Save button in the "Edit Preset" dialog could stay disabled on slow connections
+* fixed: preset groups created outside the editor now appear in the save dialog without reloading
+* fixed: retrying after a failed save could create duplicate presets
+* improved: preset names display consistently after saving
 
 ## 2.5.1
 
-- fixed: presets created or edited directly in the editor could disappear after saving Site Settings
-- fixed: fatal error when Elementor is deactivated while the plugin is active (WordPress 6.9+)
-- improved: overall stability and reliability
+* fixed: presets created or edited directly in the editor could disappear after saving Site Settings
+* fixed: fatal error when Elementor is deactivated while the plugin is active (WordPress 6.9+)
+* improved: overall stability and reliability
 
 ## 2.5.0
 
-- added: preview the smallest and largest screen sizes of a fluid value while editing, without switching device mode
+* added: preview the smallest and largest screen sizes of a fluid value while editing, without switching device mode
 
 ## 2.4.1
 
-- improved: full compatibility with WordPress 7.0
+* improved: full compatibility with WordPress 7.0
 
 ## 2.4.0
 
-- fixed: fluid presets now display correctly in the "Show global settings" styleguide preview
-- fixed: plugin styles and scripts not loading on some hosting providers with symlinked directories (e.g. Hostinger)
-- improved: updated internal dependencies with latest security patches
+* fixed: fluid presets now display correctly in the "Show global settings" styleguide preview
+* fixed: plugin styles and scripts not loading on some hosting providers with symlinked directories (e.g. Hostinger)
+* improved: updated internal dependencies with latest security patches
 
 ## 2.3.0
 
-- added: AI agent integration via WordPress Abilities API and MCP server
-- added: MCP tools for programmatic preset and group management (list, create, update, delete, move)
-- fixed: background position and similar styles could render incorrectly when using fluid presets
+* added: AI agent integration via WordPress Abilities API and MCP server
+* added: MCP tools for programmatic preset and group management (list, create, update, delete, move)
+* fixed: background position and similar styles could render incorrectly when using fluid presets
 
 ## 2.2.2
 
-- fixed: prevent double widget initialization in Elementor editor when used alongside themes bundling arts/elementor-extension
+* fixed: prevent double widget initialization in Elementor editor when used alongside themes bundling arts/elementor-extension
 
 ## 2.2.1
 
-- fixed: prevent duplicate widget handler scripts when multiple plugins bundle arts/elementor-extension
+* fixed: prevent duplicate widget handler scripts when multiple plugins bundle arts/elementor-extension
 
 ## 2.2.0
 
-- fixed: resolved conflicts with themes and plugins using older shared libraries
-- improved: enhanced security with better input validation
-- improved: overall code quality and reliability
+* fixed: resolved conflicts with themes and plugins using older shared libraries
+* improved: enhanced security with better input validation
+* improved: overall code quality and reliability
 
 ## 2.1.0
 
-- added: faster workflow - adjust preset values without leaving Elementor editor
-- improved: see how changes affect your design as you type
+* added: faster workflow - adjust preset values without leaving Elementor editor
+* improved: see how changes affect your design as you type
 
 ## 2.0.1
 
-- fixed: custom fluid values now sync correctly when dimensions are linked
+* fixed: custom fluid values now sync correctly when dimensions are linked
 
 ## 2.0.0
 
-- added: set fluid values directly in controls ("20px ~ 100px") without visiting Site Settings
-- added: save inline values as reusable presets with one click
-- improved: full support for linked dimensions and gaps
+* added: set fluid values directly in controls ("20px ~ 100px") without visiting Site Settings
+* added: save inline values as reusable presets with one click
+* improved: full support for linked dimensions and gaps
 
 ## 1.2.1
 
-- fixed: preset min/max values are now preserved when switching between different units
-- improved: better validation for preset data to prevent display issues
+* fixed: preset min/max values are now preserved when switching between different units
+* improved: better validation for preset data to prevent display issues
 
 ## 1.2.0
 
-- improved: enhanced code quality and reliability for better performance
-- improved: updated to modern PHP standards for improved security
-- updated: minimum PHP requirement is now 8.0 (WordPress and Elementor fully support PHP 8.0+)
+* improved: enhanced code quality and reliability for better performance
+* improved: updated to modern PHP standards for improved security
+* updated: minimum PHP requirement is now 8.0 (WordPress and Elementor fully support PHP 8.0+)
 
 ## 1.1.2
 
-- improved: preset search now shows all presets when group name matches
+* improved: preset search now shows all presets when group name matches
 
 ## 1.1.1
 
-- improved: security fixes
+* improved: security fixes
 
 ## 1.1.0
 
-- added: Admin interface for managing preset groups (Elementor > Fluid Design System)
-- added: Cross-group preset management with drag and drop functionality
-- added: Custom preset groups creation, editing, and deletion
-- added: Developer-friendly filter-based groups with code examples
-- improved: optimize CSS generation for formulas with equal min/max values
-- improved: improve fluid preset display for equal min/max values
-- improved: add display_value support for custom presets added via hooks
+* added: Admin interface for managing preset groups (Elementor > Fluid Design System)
+* added: Cross-group preset management with drag and drop functionality
+* added: Custom preset groups creation, editing, and deletion
+* added: Developer-friendly filter-based groups with code examples
+* improved: optimize CSS generation for formulas with equal min/max values
+* improved: improve fluid preset display for equal min/max values
+* improved: add display_value support for custom presets added via hooks
 
 ## 1.0.6
 
-- added: 'em' unit support to size options in Fluid Typography and Spacing controls
-- added: full support for negative values
-- improved: proper scale when min value is larger than max value
+* added: 'em' unit support to size options in Fluid Typography and Spacing controls
+* added: full support for negative values
+* improved: proper scale when min value is larger than max value
 
 ## 1.0.5
 
-- fixed: improve performance in Elementor editor when working with "fluid" unit
+* fixed: improve performance in Elementor editor when working with "fluid" unit
 
 ## 1.0.4
 
-- fixed: "custom" units stopped to render correct values in Elementor editor when the plugin is active
+* fixed: "custom" units stopped to render correct values in Elementor editor when the plugin is active
 
 ## 1.0.3
 
-- fixed: PHP Warning "Undefined array key" when saving presets
+* fixed: PHP Warning "Undefined array key" when saving presets
 
 ## 1.0.2
 
-- fixed: plugin error when Elementor is not active
+* fixed: plugin error when Elementor is not active
 
 ## 1.0.1
 
-- added: plugin action links to WordPress admin plugins page
+* added: plugin action links to WordPress admin plugins page
 
 ## 1.0.0
 
-- Initial release
+* Initial release

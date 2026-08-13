@@ -1,5 +1,5 @@
-import type { IFluidPreset } from './IFluidPreset'
 import type { ICustomPreset } from './ICustomPreset'
+import type { IFluidPreset } from './IFluidPreset'
 
 /** Preset group containing either fluid presets, custom presets, or a simple value */
 export interface IPresetGroup {

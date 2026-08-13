@@ -102,5 +102,10 @@ export function parseClampFormula(clampFormula: string): TParsedClamp | null {
   }
 
   // Fallback: assume first is min, second is max
-  return { minSize: first.size, minUnit: first.unit, maxSize: second.size, maxUnit: second.unit }
+  return {
+    minSize: first.size,
+    minUnit: first.unit,
+    maxSize: second.size,
+    maxUnit: second.unit
+  }
 }

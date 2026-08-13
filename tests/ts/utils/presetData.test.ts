@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest'
 import {
+  buildCachedPresetRow,
   buildCreatePresetData,
-  buildUpdatePresetData,
-  buildCachedPresetRow
-} from '@/utils/presetData'
+  buildUpdatePresetData
+} from '@ts/utils/presetData'
+import { describe, expect, it } from 'vitest'
 
 describe('presetData utilities', () => {
   describe('buildCachedPresetRow', () => {

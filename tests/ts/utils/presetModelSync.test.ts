@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { insertPresetRow, updatePresetRow } from '@/utils/presetModelSync'
+import { insertPresetRow, updatePresetRow } from '@ts/utils/presetModelSync'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const ROW = {
   _id: 'preset-1',
@@ -26,7 +26,9 @@ describe('presetModelSync', () => {
       const container = { settings: { get: vi.fn() } }
       ;(window as any).elementor = {
         config: { kit_id: 82 },
-        documents: { get: (id: number) => (id === 82 ? { container } : undefined) }
+        documents: {
+          get: (id: number) => (id === 82 ? { container } : undefined)
+        }
       }
 
       insertPresetRow('fluid_typography_presets', ROW)
@@ -69,13 +71,17 @@ describe('presetModelSync', () => {
     it('sets the changed fields on the matching row model', () => {
       const model = { set: vi.fn() }
       const collection = { findWhere: vi.fn().mockReturnValue(model) }
-      const container = { settings: { get: vi.fn().mockReturnValue(collection) } }
+      const container = {
+        settings: { get: vi.fn().mockReturnValue(collection) }
+      }
       ;(window as any).elementor = {
         config: { kit_id: 82 },
         documents: { get: () => ({ container }) }
       }
 
-      updatePresetRow('fluid_typography_presets', 'preset-1', { title: 'Renamed' })
+      updatePresetRow('fluid_typography_presets', 'preset-1', {
+        title: 'Renamed'
+      })
 
       expect(collection.findWhere).toHaveBeenCalledWith({ _id: 'preset-1' })
       expect(model.set).toHaveBeenCalledWith({ title: 'Renamed' })
@@ -83,7 +89,9 @@ describe('presetModelSync', () => {
 
     it('is a no-op when the row is not found', () => {
       const collection = { findWhere: vi.fn().mockReturnValue(undefined) }
-      const container = { settings: { get: vi.fn().mockReturnValue(collection) } }
+      const container = {
+        settings: { get: vi.fn().mockReturnValue(collection) }
+      }
       ;(window as any).elementor = {
         config: { kit_id: 82 },
         documents: { get: () => ({ container }) }

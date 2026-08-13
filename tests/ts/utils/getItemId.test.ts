@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { getItemId } from '@/utils/getItemId'
+import { getItemId } from '@ts/utils/getItemId'
+import { describe, expect, it } from 'vitest'
 
 describe('getItemId utility', () => {
   describe('getItemId', () => {
@@ -100,9 +100,7 @@ describe('getItemId utility', () => {
       const model = {
         cid: 'c1',
         attributes,
-        get: function (attr: string) {
-          return attributes[attr]
-        }
+        get: (attr: string) => attributes[attr]
       }
 
       expect(getItemId(model as any)).toBe('preset_custom_123')

@@ -5,7 +5,7 @@
  * then verifies those groups sync correctly to Elementor Site Settings.
  */
 
-import { test, expect, waitForWpAdmin } from '../fixtures'
+import { expect, test, waitForWpAdmin } from '../fixtures'
 
 const ADMIN_PAGE_URL = '/wp-admin/admin.php?page=fluid-design-system'
 
@@ -15,9 +15,7 @@ test.describe('Group Management Admin Panel', () => {
     await waitForWpAdmin(page, '#fluid-main-groups-table')
 
     // Verify Typography Presets group exists
-    const typographyRow = page
-      .locator('tr')
-      .filter({ hasText: 'Typography Presets' })
+    const typographyRow = page.locator('tr').filter({ hasText: 'Typography Presets' })
     await expect(typographyRow).toBeVisible()
 
     // Verify Spacing Presets group exists
@@ -49,9 +47,7 @@ test.describe('Admin-to-Elementor Sync', () => {
     await waitForWpAdmin(page, '#fluid-main-groups-table')
 
     const adminGroups = await page.evaluate(() => {
-      const rows = Array.from(
-        document.querySelectorAll('#fluid-groups-tbody tr.sortable-row')
-      )
+      const rows = Array.from(document.querySelectorAll('#fluid-groups-tbody tr.sortable-row'))
       return rows
         .map((row) => {
           // Name is in the 2nd column (first is order number)

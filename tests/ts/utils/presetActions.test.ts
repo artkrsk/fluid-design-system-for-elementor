@@ -1,26 +1,30 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/services/presetAPI', () => ({
+vi.mock('@ts/services/presetAPI', () => ({
   PresetAPIService: {
     savePreset: vi.fn(),
     updatePreset: vi.fn()
   }
 }))
 
-vi.mock('@/utils/presetModelSync', () => ({
+vi.mock('@ts/utils/presetModelSync', () => ({
   insertPresetRow: vi.fn(),
   updatePresetRow: vi.fn()
 }))
 
-vi.mock('@/managers', () => ({
-  dataManager: { invalidate: vi.fn(), addPreset: vi.fn(), updatePreset: vi.fn() },
+vi.mock('@ts/managers', () => ({
+  dataManager: {
+    invalidate: vi.fn(),
+    addPreset: vi.fn(),
+    updatePreset: vi.fn()
+  },
   cssManager: { setCssVariable: vi.fn(), restoreCssVariable: vi.fn() }
 }))
 
-import { handleCreatePreset, handleUpdatePreset } from '@/utils/presetActions'
-import { PresetAPIService } from '@/services/presetAPI'
-import { insertPresetRow, updatePresetRow } from '@/utils/presetModelSync'
-import { cssManager, dataManager } from '@/managers'
+import { cssManager, dataManager } from '@ts/managers'
+import { PresetAPIService } from '@ts/services/presetAPI'
+import { handleCreatePreset, handleUpdatePreset } from '@ts/utils/presetActions'
+import { insertPresetRow, updatePresetRow } from '@ts/utils/presetModelSync'
 
 describe('presetActions model sync', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { generateClampFormula, isInlineClampValue, parseClampFormula } from '@/utils/clamp'
+import { generateClampFormula, isInlineClampValue, parseClampFormula } from '@ts/utils/clamp'
+import { describe, expect, it } from 'vitest'
 
 describe('clamp utilities', () => {
   describe('generateClampFormula', () => {
@@ -136,7 +136,9 @@ describe('clamp utilities', () => {
 
     it('returns null when one value in min() is invalid', () => {
       // First value valid, second invalid
-      expect(parseClampFormula('clamp(min(16px, invalid), calc((16px)), max(16px, 24px))')).toBeNull()
+      expect(
+        parseClampFormula('clamp(min(16px, invalid), calc((16px)), max(16px, 24px))')
+      ).toBeNull()
     })
 
     it('parses when calc base matches second value (inverted order)', () => {

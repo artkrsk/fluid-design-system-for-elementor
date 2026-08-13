@@ -1,10 +1,10 @@
-import { test as base, expect, Page } from '@playwright/test'
-import { WPAdminPage } from '../pages/wp-admin'
+import { test as base, expect, type Page } from '@playwright/test'
 import { ElementorEditorPage } from '../pages/elementor-editor'
+import { WPAdminPage } from '../pages/wp-admin'
 
+export { resetTestState } from './reset'
 // Re-export test data and the state-reset helper for convenience
 export * from './test-data'
-export { resetTestState } from './reset'
 
 /**
  * Wait for WordPress admin page to be ready.

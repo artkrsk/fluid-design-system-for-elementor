@@ -17,7 +17,7 @@ export class EditIconHandler {
   /** Attaches all event handlers to Select2 element */
   attach(): void {
     jQuery(this.selectEl)
-      .on('select2:selecting', e => this._handleSelecting(e as unknown as TSelect2SelectingEvent))
+      .on('select2:selecting', (e) => this._handleSelecting(e as unknown as TSelect2SelectingEvent))
       .on('select2:open', () => this._handleOpen())
       .on('select2:close', () => this._handleClose())
   }
@@ -31,7 +31,7 @@ export class EditIconHandler {
   /** Handles select2:selecting event (fires for non-selected items) */
   private _handleSelecting(e: TSelect2SelectingEvent): void {
     const clickEvent = e.params?.args?.originalEvent
-    if (!clickEvent || !clickEvent.target) {
+    if (!clickEvent?.target) {
       return
     }
 

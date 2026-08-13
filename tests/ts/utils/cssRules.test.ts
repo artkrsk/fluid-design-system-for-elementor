@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest'
 import {
-  parseRulesFromText,
-  formatRulesForStylesheet,
-  filterRulesByVariable,
+  createUnsetRule,
   createVariableRule,
-  createUnsetRule
-} from '@/utils/cssRules'
+  filterRulesByVariable,
+  formatRulesForStylesheet,
+  parseRulesFromText
+} from '@ts/utils/cssRules'
+import { describe, expect, it } from 'vitest'
 
 describe('cssRules utilities', () => {
   describe('parseRulesFromText', () => {
@@ -113,11 +113,7 @@ describe('cssRules utilities', () => {
 
   describe('filterRulesByVariable', () => {
     it('removes rules containing specified variable', () => {
-      const rules = [
-        ':root { --var-a: 10px;',
-        ':root { --var-b: 20px;',
-        ':root { --var-a: 30px;'
-      ]
+      const rules = [':root { --var-a: 10px;', ':root { --var-b: 20px;', ':root { --var-a: 30px;']
       const filtered = filterRulesByVariable(rules, '--var-a')
 
       expect(filtered).toHaveLength(1)
@@ -175,10 +171,7 @@ describe('cssRules utilities', () => {
     })
 
     it('creates variable rule with clamp value', () => {
-      const rule = createVariableRule(
-        '--fluid-size',
-        'clamp(16px, calc(1rem + 2vw), 24px)'
-      )
+      const rule = createVariableRule('--fluid-size', 'clamp(16px, calc(1rem + 2vw), 24px)')
 
       expect(rule).toBe(':root { --fluid-size: clamp(16px, calc(1rem + 2vw), 24px); }')
     })

@@ -1,24 +1,25 @@
 {
-  "name": "@arts/fluid-design-system",
-  "author": "Artem Semkin",
+  "name": "fluid-design-system-for-elementor",
   "version": "2.5.3",
-  "type": "module",
-  "license": "GPL-3.0-or-later",
-  "description": "",
   "private": true,
-  "sideEffects": false,
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "files": [
-    "dist",
-    "src"
-  ],
+  "type": "module",
+  "packageManager": "pnpm@11.17.0",
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=24"
+  },
+  "scripts": {
+    "prepare": "[ -n \"$CI\" ] || lefthook install",
+    "dev": "vitepress dev docs",
+    "dev:plugin": "arts-wp dev",
+    "build": "arts-wp build",
+    "release": "arts-wp release",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@artemsemkin/elementor-types": "^1.0.10",
-    "@eslint/js": "^10.0.1",
+    "@arts/wp-plugin-tooling": "github:artkrsk/wp-plugin-tooling",
+    "@biomejs/biome": "2.5.4",
     "@playwright/test": "^1.61.1",
     "@types/jquery": "^4.0.1",
     "@types/node": "^26.1.1",
@@ -26,74 +27,14 @@
     "@types/underscore": "^1.13.0",
     "@vitest/coverage-v8": "^4.1.10",
     "@wordpress/env": "^11.11.0",
-    "archiver": "^8.0.0",
-    "browser-sync": "^3.0.4",
-    "chalk": "^5.6.2",
-    "chokidar": "^5.0.0",
-    "debounce": "^3.0.0",
-    "esbuild": "^0.28.1",
-    "eslint": "^10.7.0",
-    "eslint-config-prettier": "^10.1.8",
-    "fs-extra": "^11.3.6",
-    "globals": "^17.7.0",
+    "fallow": "^3.15.0",
     "jsdom": "^29.1.1",
-    "lint-staged": "^17.2.0",
-    "npm-check-updates": "^22.2.9",
-    "prettier": "^3.9.6",
-    "sass": "^1.101.6",
+    "knip": "^6.32.2",
+    "lefthook": "^2.1.10",
+    "stylelint": "^17.14.1",
     "typescript": "^7.0.2",
     "vitepress": "^2.0.0-alpha.17",
     "vitepress-plugin-lightbox": "^1.0.3",
-    "vitepress-sidebar": "^1.36.1",
-    "vitest": "^4.1.10",
-    "wp-pot": "^1.10.2"
-  },
-  "scripts": {
-    "dev": "node __build__/index.js dev",
-    "build:js": "node __build__/index.js build",
-    "build": "composer install --quiet && composer prefix-namespaces && npm run build:js",
-    "version": "npm run build && node scripts/sync-changelog.js && git add src/wordpress-plugin/ CHANGELOG.md",
-    "deps:check": "npx npm-check-updates",
-    "deps:update": "npx npm-check-updates -u && npm install",
-    "format": "prettier --write 'src/ts/**/*.{ts,js,jsx,json,css}' 'docs/**/*.md' '*.md'",
-    "format:check": "prettier --check 'src/ts/**/*.{ts,js,jsx,json,css}' 'docs/**/*.md' '*.md'",
-    "test": "vitest run",
-    "test:unit": "vitest",
-    "test:unit:run": "vitest run",
-    "test:unit:coverage": "vitest run --coverage",
-    "wp-env": "wp-env",
-    "wp-env:start": "npm run build && wp-env start",
-    "wp-env:stop": "wp-env stop",
-    "wp-env:clean": "wp-env clean",
-    "test:e2e": "npm run build && playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --debug",
-    "test:e2e:headed": "playwright test --headed",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs",
-    "test:php:wp": "wp-env run tests-cli --env-cwd=wp-content/plugins/fluid-design-system-for-elementor/tests/php -- php tools/vendor/bin/phpunit -c phpunit-wp.xml.dist",
-    "test:php:elementor": "wp-env run tests-cli --env-cwd=wp-content/plugins/fluid-design-system-for-elementor/tests/php -- php tools/vendor/bin/phpunit -c phpunit-elementor.xml.dist"
-  },
-  "lint-staged": {
-    "src/ts/**/*.{ts,js,json,css}": "prettier --write",
-    "docs/**/*.md": "prettier --write",
-    "*.md": "prettier --write"
-  },
-  "dependencies": {},
-  "overrides": {
-    "qs": "^6.15.2",
-    "undici": "^7.29.0",
-    "esbuild": "^0.28.1",
-    "js-yaml": "^4.3.1",
-    "adm-zip": "^0.6.0",
-    "postcss": "^8.5.26",
-    "immutable": "^4.3.9",
-    "vitepress": {
-      "vite": "^7.3.5"
-    },
-    "vitest": {
-      "vite": "^8.0.16"
-    }
+    "vitest": "^4.1.10"
   }
 }

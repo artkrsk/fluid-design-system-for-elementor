@@ -1,6 +1,6 @@
-import { VALUE_WITH_UNIT_PATTERN, CUSTOM_FLUID_VALUE } from '../constants'
-import { isInlineClampValue } from './clamp'
+import { CUSTOM_FLUID_VALUE, VALUE_WITH_UNIT_PATTERN } from '../constants'
 import type { TParsedValue, TValidationResult } from '../types'
+import { isInlineClampValue } from './clamp'
 
 /** Check if control value object is empty */
 export function isEmptyControlValue(value: Record<string, any> | null | undefined): boolean {

@@ -1,0 +1,36 @@
+# Sequential on purpose: Biome/stylelint/phpcbf REWRITE staged files and every
+# later step has to read the fixed output. Hooks are advisory (skip with
+# LEFTHOOK=0 for a WIP commit) — CI is the authoritative gate.
+pre-commit:
+  parallel: false
+  jobs:
+    - name: format (biome)
+      glob: '*.{ts,mts,js,json,jsonc}'
+      run: pnpm exec biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
+    - name: format (stylelint)
+      glob: 'src/styles/**/*.scss'
+      run: pnpm exec stylelint --fix {staged_files}
+      stage_fixed: true
+    - name: format (phpcbf)
+      # `*` doesn't cross `/` — both patterns are needed.
+      glob:
+        - 'src/php/*.php'
+        - 'src/php/**/*.php'
+      # phpcbf exits 1 when it fixed something — that's success here.
+      run: vendor/bin/phpcbf {staged_files} || true
+      stage_fixed: true
+    - name: typecheck
+      run: pnpm exec tsc --noEmit
+
+# Proof before sharing: the whole project, under a minute. The e2e suite needs
+# Docker and stays a CI concern.
+pre-push:
+  parallel: false
+  jobs:
+    - name: test
+      run: pnpm exec vitest run
+    - name: phpstan
+      run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+    - name: phpcs
+      run: vendor/bin/phpcs

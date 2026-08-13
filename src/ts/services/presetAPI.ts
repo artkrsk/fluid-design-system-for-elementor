@@ -1,11 +1,11 @@
 import { AJAX_ACTIONS } from '../constants'
-import { elementorAjaxRequest } from '../utils/elementorAjax'
 import type {
-  ISavePresetData,
-  IUpdatePresetData,
+  IPresetGroupOption,
   IPresetResponse,
-  IPresetGroupOption
+  ISavePresetData,
+  IUpdatePresetData
 } from '../interfaces'
+import { elementorAjaxRequest } from '../utils/elementorAjax'
 
 /** Service for preset-related API calls */
 export class PresetAPIService {

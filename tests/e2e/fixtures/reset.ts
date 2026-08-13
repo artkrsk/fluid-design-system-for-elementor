@@ -1,6 +1,6 @@
-import { execSync } from 'child_process'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
+import { execSync } from 'node:child_process'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -9,8 +9,7 @@ const __dirname = path.dirname(__filename)
 const REPO_ROOT = path.resolve(__dirname, '../../..')
 
 /** Plugin path inside the wp-env container (same constant as global-setup) */
-const PLUGIN_PATH =
-  '/var/www/html/wp-content/plugins/fluid-design-system-for-elementor'
+const PLUGIN_PATH = '/var/www/html/wp-content/plugins/fluid-design-system-for-elementor'
 
 /**
  * Resets seeded presets, groups, breakpoints and the test page to the exact

@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/managers', () => ({
+vi.mock('@ts/managers', () => ({
   dataManager: { presets: null as any }
 }))
 
-import { isFluidPreset, getInheritedPresetSync } from '@/utils/presetLookup'
-import { dataManager } from '@/managers'
-import type { IFluidPreset, ICustomPreset, IPresetGroup } from '@/interfaces'
+import type { ICustomPreset, IFluidPreset, IPresetGroup } from '@ts/interfaces'
+import { dataManager } from '@ts/managers'
+import { getInheritedPresetSync, isFluidPreset } from '@ts/utils/presetLookup'
 
 describe('presetLookup utilities', () => {
   describe('isFluidPreset', () => {
@@ -173,27 +173,25 @@ describe('presetLookup utilities', () => {
     })
 
     it('returns simple result when matching string group', () => {
-      dataManager.presets = [
-        { name: 'Simple', value: 'simple-token' }
-      ] as IPresetGroup[]
+      dataManager.presets = [{ name: 'Simple', value: 'simple-token' }] as IPresetGroup[]
 
       const result = getInheritedPresetSync('simple-token')
 
-      expect(result).toEqual({ isComplex: false, id: 'simple-token', name: 'Simple' })
+      expect(result).toEqual({
+        isComplex: false,
+        id: 'simple-token',
+        name: 'Simple'
+      })
     })
 
     it('returns null when no preset matches', () => {
-      dataManager.presets = [
-        { name: 'Typography', value: [fluidPreset] }
-      ] as IPresetGroup[]
+      dataManager.presets = [{ name: 'Typography', value: [fluidPreset] }] as IPresetGroup[]
 
       expect(getInheritedPresetSync('non-existent')).toBeNull()
     })
 
     it('skips custom presets in array groups', () => {
-      dataManager.presets = [
-        { name: 'Mixed', value: [customPreset] }
-      ] as IPresetGroup[]
+      dataManager.presets = [{ name: 'Mixed', value: [customPreset] }] as IPresetGroup[]
 
       expect(getInheritedPresetSync(customPreset.value)).toBeNull()
     })
@@ -210,17 +208,13 @@ describe('presetLookup utilities', () => {
     })
 
     it('returns null for null inheritedSize', () => {
-      dataManager.presets = [
-        { name: 'Group', value: [fluidPreset] }
-      ] as IPresetGroup[]
+      dataManager.presets = [{ name: 'Group', value: [fluidPreset] }] as IPresetGroup[]
 
       expect(getInheritedPresetSync(null)).toBeNull()
     })
 
     it('does not match string group when value differs', () => {
-      dataManager.presets = [
-        { name: 'Simple', value: 'token-x' }
-      ] as IPresetGroup[]
+      dataManager.presets = [{ name: 'Simple', value: 'token-x' }] as IPresetGroup[]
 
       expect(getInheritedPresetSync('token-y')).toBeNull()
     })

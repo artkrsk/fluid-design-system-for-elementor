@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { ValueFormatter } from '@/utils/formatters'
+import { ValueFormatter } from '@ts/utils/formatters'
+import { describe, expect, it } from 'vitest'
 
 describe('ValueFormatter', () => {
   describe('formatSizeRange', () => {
@@ -20,7 +20,9 @@ describe('ValueFormatter', () => {
     })
 
     it('includes span divider when includeSpan is true', () => {
-      const result = ValueFormatter.formatSizeRange('16', 'px', '24', 'px', { includeSpan: true })
+      const result = ValueFormatter.formatSizeRange('16', 'px', '24', 'px', {
+        includeSpan: true
+      })
 
       expect(result).toBe(
         '16px<span class="select2-result-fluid-spacing-formatted__size-divider"></span>24px'
@@ -28,13 +30,17 @@ describe('ValueFormatter', () => {
     })
 
     it('returns single value even with includeSpan when values equal', () => {
-      const result = ValueFormatter.formatSizeRange('16', 'px', '16', 'px', { includeSpan: true })
+      const result = ValueFormatter.formatSizeRange('16', 'px', '16', 'px', {
+        includeSpan: true
+      })
 
       expect(result).toBe('16px')
     })
 
     it('handles mixed units with span', () => {
-      const result = ValueFormatter.formatSizeRange('1', 'rem', '24', 'px', { includeSpan: true })
+      const result = ValueFormatter.formatSizeRange('1', 'rem', '24', 'px', {
+        includeSpan: true
+      })
 
       expect(result).toBe(
         '1rem<span class="select2-result-fluid-spacing-formatted__size-divider"></span>24px'
@@ -127,10 +133,7 @@ describe('ValueFormatter', () => {
     it('handles string number comparison correctly', () => {
       // '16.0' and '16' should be equal when parsed as floats
       expect(
-        ValueFormatter.calculateSeparator(
-          { size: '16.0', unit: 'px' },
-          { size: '16', unit: 'px' }
-        )
+        ValueFormatter.calculateSeparator({ size: '16.0', unit: 'px' }, { size: '16', unit: 'px' })
       ).toBe('=')
     })
   })

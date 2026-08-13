@@ -5,7 +5,7 @@ Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
 Stable tag: 2.5.3
-license: GPLv3
+License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
 Donate link: https://buymeacoffee.com/artemsemkin

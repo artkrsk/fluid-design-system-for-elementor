@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 const props = defineProps<{
-  src: string
-  poster?: string
-  title?: string
-}>()
+	src: string;
+	poster?: string;
+	title?: string;
+}>();
 
-const videoRef = ref<HTMLVideoElement>()
+const videoRef = ref<HTMLVideoElement>();
 </script>
 
 <template>
