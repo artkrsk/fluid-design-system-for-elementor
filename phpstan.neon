@@ -11,14 +11,3 @@ parameters:
 		- vendor/arts/elementor-stubs/elementor-stubs.php
 		- stubs/mcp-adapter.php
 
-	ignoreErrors:
-		# Not fixable from this repo. arts/elementor-extension's BasePlugin
-		# declares `@template TManagers of \Arts\Base\Containers\ManagersContainer`
-		# with a leading-backslash FQN, and Strauss doesn't rewrite those inside
-		# docblocks — so in the prefixed build the constraint names a class that
-		# doesn't exist, and no annotation here can satisfy it. `arts/base`'s own
-		# BasePlugin writes the same constraint relatively, which is why every
-		# other Arts plugin is clean; this repo is the only one extending the
-		# elementor-extension variant.
-		# Upstream one-liner: import ManagersContainer and drop the leading `\`.
-		- '#is not subtype of template type TManagers of Arts\\Base\\Containers\\ManagersContainer#'

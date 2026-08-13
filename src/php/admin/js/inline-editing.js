@@ -5,548 +5,521 @@
  * @since 1.0.0
  */
 
-(($) => {
-	/**
-	 * Initialize inline editing functionality
-	 */
-	function init() {
-		initInlineEditing();
-	}
+;(function ($) {
+  'use strict'
 
-	/**
-	 * Auto-size input field based on content
-	 */
-	function autoSizeInput($input, $textElement) {
-		// Create a temporary element to measure text width
-		const $measurer = $("<span>")
-			.css({
-				position: "absolute",
-				visibility: "hidden",
-				whiteSpace: "nowrap",
-				fontSize: $textElement.css("fontSize"),
-				fontFamily: $textElement.css("fontFamily"),
-				fontWeight: $textElement.css("fontWeight"),
-				letterSpacing: $textElement.css("letterSpacing"),
-				padding: "0",
-				margin: "0",
-				border: "none",
-			})
-			.text($input.val() || $textElement.text())
-			.appendTo("body");
+  /**
+   * Initialize inline editing functionality
+   */
+  function init() {
+    initInlineEditing()
+  }
 
-		// Get the measured width
-		const textWidth = $measurer.width();
-		$measurer.remove();
+  /**
+   * Auto-size input field based on content
+   */
+  function autoSizeInput($input, $textElement) {
+    // Create a temporary element to measure text width
+    const $measurer = $('<span>')
+      .css({
+        position: 'absolute',
+        visibility: 'hidden',
+        whiteSpace: 'nowrap',
+        fontSize: $textElement.css('fontSize'),
+        fontFamily: $textElement.css('fontFamily'),
+        fontWeight: $textElement.css('fontWeight'),
+        letterSpacing: $textElement.css('letterSpacing'),
+        padding: '0',
+        margin: '0',
+        border: 'none'
+      })
+      .text($input.val() || $textElement.text())
+      .appendTo('body')
 
-		// Get container constraints
-		const $container = $input.closest("td");
-		const containerWidth = $container.width();
+    // Get the measured width
+    const textWidth = $measurer.width()
+    $measurer.remove()
 
-		// Account for input padding/border in our calculations
-		const inputPadding =
-			parseInt($input.css("padding-left")) +
-			parseInt($input.css("padding-right"));
-		const inputBorder =
-			parseInt($input.css("border-left-width")) +
-			parseInt($input.css("border-right-width"));
-		const inputExtras = inputPadding + inputBorder;
+    // Get container constraints
+    const $container = $input.closest('td')
+    const containerWidth = $container.width()
 
-		const minWidth = 120; // Minimum width in pixels (updated to match CSS)
-		const maxWidth = containerWidth * 0.95; // 95% of container width
-		const extraSpace = 20; // Extra space for comfortable editing
+    // Account for input padding/border in our calculations
+    const inputPadding =
+      parseInt($input.css('padding-left')) + parseInt($input.css('padding-right'))
+    const inputBorder =
+      parseInt($input.css('border-left-width')) + parseInt($input.css('border-right-width'))
+    const inputExtras = inputPadding + inputBorder
 
-		// Calculate optimal width including padding and borders
-		let optimalWidth = Math.max(textWidth + extraSpace + inputExtras, minWidth);
-		optimalWidth = Math.min(optimalWidth, maxWidth);
+    const minWidth = 120 // Minimum width in pixels (updated to match CSS)
+    const maxWidth = containerWidth * 0.95 // 95% of container width
+    const extraSpace = 20 // Extra space for comfortable editing
 
-		// Apply the width
-		$input.css("width", optimalWidth + "px");
-	}
+    // Calculate optimal width including padding and borders
+    let optimalWidth = Math.max(textWidth + extraSpace + inputExtras, minWidth)
+    optimalWidth = Math.min(optimalWidth, maxWidth)
 
-	/**
-	 * Initialize inline editing
-	 */
-	function initInlineEditing() {
-		// Click on editable title
-		$(document).on("click", ".editable-title", function (e) {
-			startEdit($(this), "title", e);
-		});
+    // Apply the width
+    $input.css('width', optimalWidth + 'px')
+  }
 
-		// Click on editable description
-		$(document).on("click", ".editable-description", function (e) {
-			startEdit($(this), "description", e);
-		});
-	}
+  /**
+   * Initialize inline editing
+   */
+  function initInlineEditing() {
+    // Click on editable title
+    $(document).on('click', '.editable-title', function (e) {
+      startEdit($(this), 'title', e)
+    })
 
-	/**
-	 * Start editing an element (title or description)
-	 */
-	function startEdit($element, type, e) {
-		// Skip if already editing
-		if ($element.hasClass("editing")) {
-			return;
-		}
+    // Click on editable description
+    $(document).on('click', '.editable-description', function (e) {
+      startEdit($(this), 'description', e)
+    })
+  }
 
-		// Skip if row is marked for deletion
-		const $row = $element.closest("tr");
-		if ($row.hasClass("marked-for-deletion")) {
-			return;
-		}
+  /**
+   * Start editing an element (title or description)
+   */
+  function startEdit($element, type, e) {
+    // Skip if already editing
+    if ($element.hasClass('editing')) {
+      return
+    }
 
-		const isTitle = type === "title";
-		const $textElement = $element.find(
-			isTitle ? ".title-text" : ".description-text",
-		);
-		const $inputElement = $element.find(
-			isTitle ? ".title-input" : ".description-input",
-		);
-		const originalValue = isTitle
-			? $textElement.text()
-			: $element.data("original-description") || "";
-		const groupId = $element.closest("tr").data("group-id");
+    // Skip if row is marked for deletion
+    const $row = $element.closest('tr')
+    if ($row.hasClass('marked-for-deletion')) {
+      return
+    }
 
-		// Set input value and update data attributes
-		$inputElement.val(originalValue);
-		$inputElement.attr("data-group-id", groupId);
-		$inputElement.attr("data-field", type);
+    const isTitle = type === 'title'
+    const $textElement = $element.find(isTitle ? '.title-text' : '.description-text')
+    const $inputElement = $element.find(isTitle ? '.title-input' : '.description-input')
+    const originalValue = isTitle
+      ? $textElement.text()
+      : $element.data('original-description') || ''
+    const groupId = $element.closest('tr').data('group-id')
 
-		// Store original value for comparison later
-		$element.data("editing-original-value", originalValue);
+    // Set input value and update data attributes
+    $inputElement.val(originalValue)
+    $inputElement.attr('data-group-id', groupId)
+    $inputElement.attr('data-field', type)
 
-		// Auto-size the input
-		autoSizeInput($inputElement, $textElement);
+    // Store original value for comparison later
+    $element.data('editing-original-value', originalValue)
 
-		// Switch to editing mode
-		$element.addClass("editing");
-		$textElement.hide();
-		$inputElement.show();
+    // Auto-size the input
+    autoSizeInput($inputElement, $textElement)
 
-		// Focus and select text
-		$inputElement.focus();
-		setTimeout(() => {
-			if ($inputElement.is(":focus")) {
-				$inputElement.select();
-			}
-		}, 10);
+    // Switch to editing mode
+    $element.addClass('editing')
+    $textElement.hide()
+    $inputElement.show()
 
-		// No need for editing help - it's intuitive with modern UI patterns
+    // Focus and select text
+    $inputElement.focus()
+    setTimeout(function () {
+      if ($inputElement.is(':focus')) {
+        $inputElement.select()
+      }
+    }, 10)
 
-		// Handle events
-		$inputElement
-			.off(".inline-edit")
-			.on("keydown.inline-edit", (e) => {
-				if (e.key === "Enter") {
-					saveInlineEdit($element, $inputElement);
-					e.preventDefault();
-				} else if (e.key === "Escape") {
-					cancelInlineEdit($element);
-					e.preventDefault();
-				}
-			})
-			.on("input.inline-edit", () => {
-				autoSizeInput($inputElement, $textElement);
+    // No need for editing help - it's intuitive with modern UI patterns
 
-				// For title editing, check for duplicates in real-time and highlight them
-				if (isTitle) {
-					const currentValue = $inputElement.val().trim();
-					const currentRowId = $element.closest("tr").data("group-id");
+    // Handle events
+    $inputElement
+      .off('.inline-edit')
+      .on('keydown.inline-edit', function (e) {
+        if (e.key === 'Enter') {
+          saveInlineEdit($element, $inputElement)
+          e.preventDefault()
+        } else if (e.key === 'Escape') {
+          cancelInlineEdit($element)
+          e.preventDefault()
+        }
+      })
+      .on('input.inline-edit', function () {
+        autoSizeInput($inputElement, $textElement)
 
-					if (
-						currentValue &&
-						window.FluidDesignSystemAdmin &&
-						window.FluidDesignSystemAdmin.base &&
-						window.FluidDesignSystemAdmin.base.isGroupNameTaken
-					) {
-						const isDuplicate =
-							window.FluidDesignSystemAdmin.base.isGroupNameTaken(
-								currentValue,
-								currentRowId,
-							);
+        // For title editing, check for duplicates in real-time and highlight them
+        if (isTitle) {
+          const currentValue = $inputElement.val().trim()
+          const currentRowId = $element.closest('tr').data('group-id')
 
-						if (isDuplicate) {
-							// Show duplicate warning in status area
-							if (
-								window.FluidDesignSystemAdmin.statusNotices &&
-								window.FluidDesignSystemAdmin.statusNotices
-									.showValidationFeedback
-							) {
-								window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
-									"duplicateDetected",
-									{
-										name: currentValue,
-									},
-								);
-							}
+          if (
+            currentValue &&
+            window.FluidDesignSystemAdmin &&
+            window.FluidDesignSystemAdmin.base &&
+            window.FluidDesignSystemAdmin.base.isGroupNameTaken
+          ) {
+            const isDuplicate = window.FluidDesignSystemAdmin.base.isGroupNameTaken(
+              currentValue,
+              currentRowId
+            )
 
-							// Highlight existing duplicates
-							if (window.FluidDesignSystemAdmin.base.highlightDuplicateTitles) {
-								window.FluidDesignSystemAdmin.base.highlightDuplicateTitles(
-									currentValue,
-								);
-							}
-						} else {
-							// Clear duplicate feedback and highlights
-							if (
-								window.FluidDesignSystemAdmin.statusNotices &&
-								window.FluidDesignSystemAdmin.statusNotices
-									.clearValidationFeedback
-							) {
-								window.FluidDesignSystemAdmin.statusNotices.clearValidationFeedback();
-							}
-							if (window.FluidDesignSystemAdmin.base.clearDuplicateHighlights) {
-								window.FluidDesignSystemAdmin.base.clearDuplicateHighlights();
-							}
-						}
-					} else if (currentValue === "") {
-						// Clear everything when field is empty
-						if (
-							window.FluidDesignSystemAdmin.statusNotices &&
-							window.FluidDesignSystemAdmin.statusNotices
-								.clearValidationFeedback
-						) {
-							window.FluidDesignSystemAdmin.statusNotices.clearValidationFeedback();
-						}
-						if (window.FluidDesignSystemAdmin.base.clearDuplicateHighlights) {
-							window.FluidDesignSystemAdmin.base.clearDuplicateHighlights();
-						}
-					}
-				}
-			})
-			.on("blur.inline-edit", () => {
-				saveInlineEdit($element, $inputElement);
-			});
+            if (isDuplicate) {
+              // Show duplicate warning in status area
+              if (
+                window.FluidDesignSystemAdmin.statusNotices &&
+                window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
+              ) {
+                window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
+                  'duplicateDetected',
+                  {
+                    name: currentValue
+                  }
+                )
+              }
 
-		e.stopPropagation();
-	}
+              // Highlight existing duplicates
+              if (window.FluidDesignSystemAdmin.base.highlightDuplicateTitles) {
+                window.FluidDesignSystemAdmin.base.highlightDuplicateTitles(currentValue)
+              }
+            } else {
+              // Clear duplicate feedback and highlights
+              if (
+                window.FluidDesignSystemAdmin.statusNotices &&
+                window.FluidDesignSystemAdmin.statusNotices.clearValidationFeedback
+              ) {
+                window.FluidDesignSystemAdmin.statusNotices.clearValidationFeedback()
+              }
+              if (window.FluidDesignSystemAdmin.base.clearDuplicateHighlights) {
+                window.FluidDesignSystemAdmin.base.clearDuplicateHighlights()
+              }
+            }
+          } else if (currentValue === '') {
+            // Clear everything when field is empty
+            if (
+              window.FluidDesignSystemAdmin.statusNotices &&
+              window.FluidDesignSystemAdmin.statusNotices.clearValidationFeedback
+            ) {
+              window.FluidDesignSystemAdmin.statusNotices.clearValidationFeedback()
+            }
+            if (window.FluidDesignSystemAdmin.base.clearDuplicateHighlights) {
+              window.FluidDesignSystemAdmin.base.clearDuplicateHighlights()
+            }
+          }
+        }
+      })
+      .on('blur.inline-edit', function () {
+        saveInlineEdit($element, $inputElement)
+      })
 
-	/**
-	 * Sanitize input to prevent XSS attacks
-	 */
-	function sanitizeInput(input) {
-		// Apply tag removal repeatedly until stable (prevents nested tag bypass)
-		let result = input;
-		let prev;
-		do {
-			prev = result;
-			result = result.replace(/<[^>]*>/g, "");
-		} while (result !== prev);
-		// Remove dangerous characters
-		return result.replace(/[<>"'&]/g, "").trim();
-	}
+    e.stopPropagation()
+  }
 
-	/**
-	 * Save inline edit
-	 */
-	function saveInlineEdit($element, $input) {
-		const rawValue = $input.val().trim();
-		const isTitle = $element.hasClass("editable-title");
+  /**
+   * Sanitize input to prevent XSS attacks
+   */
+  function sanitizeInput(input) {
+    // Apply tag removal repeatedly until stable (prevents nested tag bypass)
+    let result = input
+    let prev
+    do {
+      prev = result
+      result = result.replace(/<[^>]*>/g, '')
+    } while (result !== prev)
+    // Remove dangerous characters
+    return result.replace(/[<>"'&]/g, '').trim()
+  }
 
-		// Validate title input - cannot be empty
-		if (isTitle && rawValue === "") {
-			// Show error state (shake animation only)
-			$element.addClass("validation-error");
-			$input.focus().select();
+  /**
+   * Save inline edit
+   */
+  function saveInlineEdit($element, $input) {
+    const rawValue = $input.val().trim()
+    const isTitle = $element.hasClass('editable-title')
 
-			// Show helpful error message in status area
-			if (
-				window.FluidDesignSystemAdmin &&
-				window.FluidDesignSystemAdmin.statusNotices &&
-				window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
-			) {
-				window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
-					"emptyTitle",
-				);
-			}
+    // Validate title input - cannot be empty
+    if (isTitle && rawValue === '') {
+      // Show error state (shake animation only)
+      $element.addClass('validation-error')
+      $input.focus().select()
 
-			// Remove error state after a short delay
-			setTimeout(() => {
-				$element.removeClass("validation-error");
-			}, 2000);
+      // Show helpful error message in status area
+      if (
+        window.FluidDesignSystemAdmin &&
+        window.FluidDesignSystemAdmin.statusNotices &&
+        window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
+      ) {
+        window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback('emptyTitle')
+      }
 
-			return; // Don't save empty title
-		}
+      // Remove error state after a short delay
+      setTimeout(() => {
+        $element.removeClass('validation-error')
+      }, 2000)
 
-		// Sanitize input to prevent XSS attacks
-		const sanitizedValue = sanitizeInput(rawValue);
+      return // Don't save empty title
+    }
 
-		// Check if sanitization changed the input (potential XSS attempt)
-		if (sanitizedValue !== rawValue) {
-			// Show error state (shake animation only)
-			$element.addClass("validation-error");
-			$input.focus().select();
+    // Sanitize input to prevent XSS attacks
+    const sanitizedValue = sanitizeInput(rawValue)
 
-			// Show helpful error message in status area
-			if (
-				window.FluidDesignSystemAdmin &&
-				window.FluidDesignSystemAdmin.statusNotices &&
-				window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
-			) {
-				const fieldType = isTitle ? "Title" : "Description";
-				window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
-					`invalidCharacters${fieldType}`,
-				);
-			}
+    // Check if sanitization changed the input (potential XSS attempt)
+    if (sanitizedValue !== rawValue) {
+      // Show error state (shake animation only)
+      $element.addClass('validation-error')
+      $input.focus().select()
 
-			// Remove error state after a short delay
-			setTimeout(() => {
-				$element.removeClass("validation-error");
-			}, 2000);
+      // Show helpful error message in status area
+      if (
+        window.FluidDesignSystemAdmin &&
+        window.FluidDesignSystemAdmin.statusNotices &&
+        window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
+      ) {
+        const fieldType = isTitle ? 'Title' : 'Description'
+        window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
+          `invalidCharacters${fieldType}`
+        )
+      }
 
-			return; // Don't save potentially malicious input
-		}
+      // Remove error state after a short delay
+      setTimeout(() => {
+        $element.removeClass('validation-error')
+      }, 2000)
 
-		// For titles, check for duplicates (excluding the current row)
-		if (isTitle && sanitizedValue !== "") {
-			const currentRowId = $element.closest("tr").data("group-id");
-			if (
-				window.FluidDesignSystemAdmin &&
-				window.FluidDesignSystemAdmin.base &&
-				window.FluidDesignSystemAdmin.base.isGroupNameTaken
-			) {
-				// Check if another group (not this one) has the same name
-				const isDuplicate = window.FluidDesignSystemAdmin.base.isGroupNameTaken(
-					sanitizedValue,
-					currentRowId,
-				);
+      return // Don't save potentially malicious input
+    }
 
-				if (isDuplicate) {
-					// Show error state (shake animation only)
-					$element.addClass("validation-error");
-					$input.focus().select();
+    // For titles, check for duplicates (excluding the current row)
+    if (isTitle && sanitizedValue !== '') {
+      const currentRowId = $element.closest('tr').data('group-id')
+      if (
+        window.FluidDesignSystemAdmin &&
+        window.FluidDesignSystemAdmin.base &&
+        window.FluidDesignSystemAdmin.base.isGroupNameTaken
+      ) {
+        // Check if another group (not this one) has the same name
+        const isDuplicate = window.FluidDesignSystemAdmin.base.isGroupNameTaken(
+          sanitizedValue,
+          currentRowId
+        )
 
-					// Show helpful error message in status area
-					if (
-						window.FluidDesignSystemAdmin &&
-						window.FluidDesignSystemAdmin.statusNotices &&
-						window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
-					) {
-						window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
-							"duplicateTitle",
-							{
-								name: sanitizedValue,
-							},
-						);
-					}
+        if (isDuplicate) {
+          // Show error state (shake animation only)
+          $element.addClass('validation-error')
+          $input.focus().select()
 
-					// Highlight the existing duplicate title(s) if the function is available
-					if (
-						window.FluidDesignSystemAdmin &&
-						window.FluidDesignSystemAdmin.base &&
-						window.FluidDesignSystemAdmin.base.highlightDuplicateTitles
-					) {
-						window.FluidDesignSystemAdmin.base.highlightDuplicateTitles(
-							sanitizedValue,
-						);
-					}
+          // Show helpful error message in status area
+          if (
+            window.FluidDesignSystemAdmin &&
+            window.FluidDesignSystemAdmin.statusNotices &&
+            window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
+          ) {
+            window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback('duplicateTitle', {
+              name: sanitizedValue
+            })
+          }
 
-					// Remove error state and highlights after a short delay
-					setTimeout(() => {
-						$element.removeClass("validation-error");
-						if (
-							window.FluidDesignSystemAdmin &&
-							window.FluidDesignSystemAdmin.base &&
-							window.FluidDesignSystemAdmin.base.clearDuplicateHighlights
-						) {
-							window.FluidDesignSystemAdmin.base.clearDuplicateHighlights();
-						}
-					}, 3000);
+          // Highlight the existing duplicate title(s) if the function is available
+          if (
+            window.FluidDesignSystemAdmin &&
+            window.FluidDesignSystemAdmin.base &&
+            window.FluidDesignSystemAdmin.base.highlightDuplicateTitles
+          ) {
+            window.FluidDesignSystemAdmin.base.highlightDuplicateTitles(sanitizedValue)
+          }
 
-					return; // Don't save duplicate title
-				}
-			}
-		}
+          // Remove error state and highlights after a short delay
+          setTimeout(() => {
+            $element.removeClass('validation-error')
+            if (
+              window.FluidDesignSystemAdmin &&
+              window.FluidDesignSystemAdmin.base &&
+              window.FluidDesignSystemAdmin.base.clearDuplicateHighlights
+            ) {
+              window.FluidDesignSystemAdmin.base.clearDuplicateHighlights()
+            }
+          }, 3000)
 
-		const newValue = sanitizedValue;
-		const groupId = $element.closest("tr").data("group-id");
-		const originalValue = $element.data("editing-original-value") || "";
+          return // Don't save duplicate title
+        }
+      }
+    }
 
-		// Check if value actually changed
-		if (newValue === originalValue) {
-			// No change - just exit editing mode silently without sending AJAX request
-			exitEditingMode($element);
-			return;
-		}
+    const newValue = sanitizedValue
+    const groupId = $element.closest('tr').data('group-id')
+    const originalValue = $element.data('editing-original-value') || ''
 
-		if (isTitle) {
-			// Update UI optimistically
-			const $titleText = $element.find(".title-text");
-			const $hiddenInput = $element
-				.closest("tr")
-				.find('input[name*="group_titles"]');
-			const originalValue =
-				$element.data("original-title") || $titleText.text();
+    // Check if value actually changed
+    if (newValue === originalValue) {
+      // No change - just exit editing mode silently without sending AJAX request
+      exitEditingMode($element)
+      return
+    }
 
-			$titleText.text(newValue);
-			if ($hiddenInput.length) {
-				$hiddenInput.val(newValue).trigger("change");
-			}
+    if (isTitle) {
+      // Update UI optimistically
+      const $titleText = $element.find('.title-text')
+      const $hiddenInput = $element.closest('tr').find('input[name*="group_titles"]')
+      const originalValue = $element.data('original-title') || $titleText.text()
 
-			// Send AJAX request to update the title
-			if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.ajax) {
-				window.FluidDesignSystemAdmin.ajax.updateTitle(
-					groupId,
-					newValue,
-					// Success callback
-					(response) => {
-						// Apply success feedback
-						$element.addClass("success-feedback");
+      $titleText.text(newValue)
+      if ($hiddenInput.length) {
+        $hiddenInput.val(newValue).trigger('change')
+      }
 
-						// Show contextual success message
-						if (
-							window.FluidDesignSystemAdmin &&
-							window.FluidDesignSystemAdmin.statusNotices &&
-							window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
-						) {
-							window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
-								"updatingSuccess",
-								{
-									name: newValue,
-								},
-							);
-						}
+      // Send AJAX request to update the title
+      if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.ajax) {
+        window.FluidDesignSystemAdmin.ajax.updateTitle(
+          groupId,
+          newValue,
+          // Success callback
+          function (response) {
+            // Apply success feedback
+            $element.addClass('success-feedback')
 
-						setTimeout(() => {
-							$element.removeClass("success-feedback");
-						}, 1000);
-					},
-					// Error callback
-					(errorData) => {
-						// Revert to original value on error
-						$titleText.text(originalValue);
-						if ($hiddenInput.length) {
-							$hiddenInput.val(originalValue).trigger("change");
-						}
-						$element.addClass("error-feedback");
-						setTimeout(() => {
-							$element.removeClass("error-feedback");
-						}, 2000);
-					},
-				);
-			}
-		} else {
-			// Update UI optimistically
-			const $descriptionText = $element.find(".description-text");
-			const $hiddenInput = $element
-				.closest("tr")
-				.find('input[name*="group_descriptions"]');
-			const originalValue = $element.data("original-description") || "";
+            // Show contextual success message
+            if (
+              window.FluidDesignSystemAdmin &&
+              window.FluidDesignSystemAdmin.statusNotices &&
+              window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
+            ) {
+              window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
+                'updatingSuccess',
+                {
+                  name: newValue
+                }
+              )
+            }
 
-			$element.data("original-description", newValue);
-			$descriptionText.text(newValue);
-			if ($hiddenInput.length) {
-				$hiddenInput.val(newValue).trigger("change");
-			}
+            setTimeout(function () {
+              $element.removeClass('success-feedback')
+            }, 1000)
+          },
+          // Error callback
+          function (errorData) {
+            // Revert to original value on error
+            $titleText.text(originalValue)
+            if ($hiddenInput.length) {
+              $hiddenInput.val(originalValue).trigger('change')
+            }
+            $element.addClass('error-feedback')
+            setTimeout(function () {
+              $element.removeClass('error-feedback')
+            }, 2000)
+          }
+        )
+      }
+    } else {
+      // Update UI optimistically
+      const $descriptionText = $element.find('.description-text')
+      const $hiddenInput = $element.closest('tr').find('input[name*="group_descriptions"]')
+      const originalValue = $element.data('original-description') || ''
 
-			// Send AJAX request to update the description
-			if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.ajax) {
-				window.FluidDesignSystemAdmin.ajax.updateDescription(
-					groupId,
-					newValue,
-					// Success callback
-					(response) => {
-						// Apply success feedback
-						$element.addClass("success-feedback");
+      $element.data('original-description', newValue)
+      $descriptionText.text(newValue)
+      if ($hiddenInput.length) {
+        $hiddenInput.val(newValue).trigger('change')
+      }
 
-						// Show contextual success message
-						if (
-							window.FluidDesignSystemAdmin &&
-							window.FluidDesignSystemAdmin.statusNotices &&
-							window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
-						) {
-							const groupName =
-								$element.closest("tr").find(".title-text").text() || "group";
-							window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
-								"updatingSuccess",
-								{
-									name: groupName,
-								},
-							);
-						}
+      // Send AJAX request to update the description
+      if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.ajax) {
+        window.FluidDesignSystemAdmin.ajax.updateDescription(
+          groupId,
+          newValue,
+          // Success callback
+          function (response) {
+            // Apply success feedback
+            $element.addClass('success-feedback')
 
-						setTimeout(() => {
-							$element.removeClass("success-feedback");
-						}, 1000);
-					},
-					// Error callback
-					(errorData) => {
-						// Revert to original value on error
-						$element.data("original-description", originalValue);
-						$descriptionText.text(originalValue || "");
-						if ($hiddenInput.length) {
-							$hiddenInput.val(originalValue).trigger("change");
-						}
-						$element.addClass("error-feedback");
-						setTimeout(() => {
-							$element.removeClass("error-feedback");
-						}, 2000);
-					},
-				);
-			}
-		}
+            // Show contextual success message
+            if (
+              window.FluidDesignSystemAdmin &&
+              window.FluidDesignSystemAdmin.statusNotices &&
+              window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback
+            ) {
+              const groupName = $element.closest('tr').find('.title-text').text() || 'group'
+              window.FluidDesignSystemAdmin.statusNotices.showValidationFeedback(
+                'updatingSuccess',
+                {
+                  name: groupName
+                }
+              )
+            }
 
-		// Clear any duplicate highlights on successful save
-		if (
-			window.FluidDesignSystemAdmin &&
-			window.FluidDesignSystemAdmin.base &&
-			window.FluidDesignSystemAdmin.base.clearDuplicateHighlights
-		) {
-			window.FluidDesignSystemAdmin.base.clearDuplicateHighlights();
-		}
+            setTimeout(function () {
+              $element.removeClass('success-feedback')
+            }, 1000)
+          },
+          // Error callback
+          function (errorData) {
+            // Revert to original value on error
+            $element.data('original-description', originalValue)
+            $descriptionText.text(originalValue || '')
+            if ($hiddenInput.length) {
+              $hiddenInput.val(originalValue).trigger('change')
+            }
+            $element.addClass('error-feedback')
+            setTimeout(function () {
+              $element.removeClass('error-feedback')
+            }, 2000)
+          }
+        )
+      }
+    }
 
-		// Exit editing mode
-		exitEditingMode($element);
-	}
+    // Clear any duplicate highlights on successful save
+    if (
+      window.FluidDesignSystemAdmin &&
+      window.FluidDesignSystemAdmin.base &&
+      window.FluidDesignSystemAdmin.base.clearDuplicateHighlights
+    ) {
+      window.FluidDesignSystemAdmin.base.clearDuplicateHighlights()
+    }
 
-	/**
-	 * Cancel inline edit
-	 */
-	function cancelInlineEdit($element) {
-		// Remove any error state when canceling
-		$element.removeClass("validation-error");
+    // Exit editing mode
+    exitEditingMode($element)
+  }
 
-		// Clear any duplicate highlights
-		if (
-			window.FluidDesignSystemAdmin &&
-			window.FluidDesignSystemAdmin.base &&
-			window.FluidDesignSystemAdmin.base.clearDuplicateHighlights
-		) {
-			window.FluidDesignSystemAdmin.base.clearDuplicateHighlights();
-		}
+  /**
+   * Cancel inline edit
+   */
+  function cancelInlineEdit($element) {
+    // Remove any error state when canceling
+    $element.removeClass('validation-error')
 
-		exitEditingMode($element);
-	}
+    // Clear any duplicate highlights
+    if (
+      window.FluidDesignSystemAdmin &&
+      window.FluidDesignSystemAdmin.base &&
+      window.FluidDesignSystemAdmin.base.clearDuplicateHighlights
+    ) {
+      window.FluidDesignSystemAdmin.base.clearDuplicateHighlights()
+    }
 
-	/**
-	 * Exit editing mode
-	 */
-	function exitEditingMode($element) {
-		const isTitle = $element.hasClass("editable-title");
-		const $textElement = $element.find(
-			isTitle ? ".title-text" : ".description-text",
-		);
-		const $inputElement = $element.find(
-			isTitle ? ".title-input" : ".description-input",
-		);
+    exitEditingMode($element)
+  }
 
-		$element.removeClass("editing");
-		$inputElement.hide().off(".inline-edit");
-		$textElement.show();
+  /**
+   * Exit editing mode
+   */
+  function exitEditingMode($element) {
+    const isTitle = $element.hasClass('editable-title')
+    const $textElement = $element.find(isTitle ? '.title-text' : '.description-text')
+    const $inputElement = $element.find(isTitle ? '.title-input' : '.description-input')
 
-		// Clean up stored original value
-		$element.removeData("editing-original-value");
-	}
+    $element.removeClass('editing')
+    $inputElement.hide().off('.inline-edit')
+    $textElement.show()
 
-	// Public API
-	window.FluidDesignSystemAdmin = window.FluidDesignSystemAdmin || {};
-	window.FluidDesignSystemAdmin.inlineEditing = {
-		init: init,
-		startEdit: startEdit,
-		autoSizeInput: autoSizeInput,
-		sanitizeInput: sanitizeInput,
-		saveInlineEdit: saveInlineEdit,
-		cancelInlineEdit: cancelInlineEdit,
-	};
+    // Clean up stored original value
+    $element.removeData('editing-original-value')
+  }
 
-	// Initialize when DOM is ready
-	$(document).ready(init);
-})(jQuery);
+  // Public API
+  window.FluidDesignSystemAdmin = window.FluidDesignSystemAdmin || {}
+  window.FluidDesignSystemAdmin.inlineEditing = {
+    init: init,
+    startEdit: startEdit,
+    autoSizeInput: autoSizeInput,
+    sanitizeInput: sanitizeInput,
+    saveInlineEdit: saveInlineEdit,
+    cancelInlineEdit: cancelInlineEdit
+  }
+
+  // Initialize when DOM is ready
+  $(document).ready(init)
+})(jQuery)
