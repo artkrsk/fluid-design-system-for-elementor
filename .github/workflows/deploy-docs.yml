@@ -2,7 +2,7 @@ name: Deploy VitePress Documentation
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/documentation]
     paths:
       - 'docs/**'
       - '.github/workflows/deploy-docs.yml'
