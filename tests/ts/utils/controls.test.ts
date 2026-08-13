@@ -1,5 +1,10 @@
-import { describe, it, expect } from 'vitest'
-import { isFluidUnit, requiresTextInput, hasFluidInUnits, isFluidPresetRepeater } from '@/utils/controls'
+import {
+  hasFluidInUnits,
+  isFluidPresetRepeater,
+  isFluidUnit,
+  requiresTextInput
+} from '@ts/utils/controls'
+import { describe, expect, it } from 'vitest'
 
 describe('controls utilities', () => {
   describe('isFluidUnit', () => {
@@ -104,7 +109,7 @@ describe('controls utilities', () => {
             model: {
               controls: {
                 get: (_name: string) => ({
-                  get: (prop: string) => prop === 'is_fluid_preset_repeater' ? true : undefined
+                  get: (prop: string) => (prop === 'is_fluid_preset_repeater' ? true : undefined)
                 })
               }
             }
@@ -120,7 +125,7 @@ describe('controls utilities', () => {
             model: {
               controls: {
                 get: (_name: string) => ({
-                  get: (prop: string) => prop === 'is_fluid_preset_repeater' ? false : undefined
+                  get: (prop: string) => (prop === 'is_fluid_preset_repeater' ? false : undefined)
                 })
               }
             }
@@ -149,7 +154,7 @@ describe('controls utilities', () => {
       it('falls back to pattern matching when controls property is missing', () => {
         const mockContainer = {
           view: {
-            model: {}  // No controls property
+            model: {} // No controls property
           }
         }
 

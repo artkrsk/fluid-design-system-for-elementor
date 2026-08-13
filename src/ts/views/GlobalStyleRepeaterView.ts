@@ -70,11 +70,19 @@ const createGlobalStyleRepeater = () => {
             'confirm',
             {
               className: 'e-global__confirm-delete',
-              headerMessage: window.ArtsFluidDSStrings?.deleteFluidPreset,
-              message: '<i class="eicon-info-circle"></i> ' + translatedMessage,
+              ...(window.ArtsFluidDSStrings?.deleteFluidPreset !== undefined && {
+                headerMessage: window.ArtsFluidDSStrings.deleteFluidPreset
+              }),
+              message: `<i class="eicon-info-circle"></i> ${translatedMessage}`,
+              // Omitted rather than undefined — dialogs-manager supplies its own
+              // defaults, and its typings don't accept an explicit undefined.
               strings: {
-                confirm: window.ArtsFluidDSStrings?.delete,
-                cancel: window.ArtsFluidDSStrings?.cancel
+                ...(window.ArtsFluidDSStrings?.delete !== undefined && {
+                  confirm: window.ArtsFluidDSStrings.delete
+                }),
+                ...(window.ArtsFluidDSStrings?.cancel !== undefined && {
+                  cancel: window.ArtsFluidDSStrings.cancel
+                })
               },
               hide: {
                 onBackgroundClick: false

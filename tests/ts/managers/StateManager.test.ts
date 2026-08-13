@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { StateManager } from '@/managers/StateManager'
+import { StateManager } from '@ts/managers/StateManager'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('StateManager', () => {
   describe('isRemovalExpired (static)', () => {

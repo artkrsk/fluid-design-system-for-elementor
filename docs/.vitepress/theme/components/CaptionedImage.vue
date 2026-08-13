@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { withBase } from 'vitepress'
+import { withBase } from "vitepress";
+import { computed } from "vue";
 
 interface Props {
-  src: string
-  caption?: string
+	src: string;
+	caption?: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const imageSrc = computed(() => {
-  return withBase('/images/' + props.src)
-})
+	return withBase("/images/" + props.src);
+});
 </script>
 
 <template>

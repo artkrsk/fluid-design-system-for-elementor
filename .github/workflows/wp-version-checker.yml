@@ -1,0 +1,21 @@
+name: WordPress Version Checker
+
+# Files an issue when a new WordPress release means the "Tested up to" header
+# needs a bump — the chore that otherwise gets discovered by users.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  wordpress-version-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: skaut/wordpress-version-checker@v2.2.3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

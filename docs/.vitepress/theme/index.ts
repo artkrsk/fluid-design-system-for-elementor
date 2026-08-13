@@ -1,10 +1,10 @@
 import DefaultTheme from 'vitepress/theme'
-import Layout from './Layout.vue'
-import PluginName from './components/PluginName.vue'
-import VideoPlayer from './components/VideoPlayer.vue'
-import ScreenshotGallery from './components/ScreenshotGallery.vue'
-import CaptionedVideo from './components/CaptionedVideo.vue'
 import CaptionedImage from './components/CaptionedImage.vue'
+import CaptionedVideo from './components/CaptionedVideo.vue'
+import PluginName from './components/PluginName.vue'
+import ScreenshotGallery from './components/ScreenshotGallery.vue'
+import VideoPlayer from './components/VideoPlayer.vue'
+import Layout from './Layout.vue'
 import './style.css'
 
 export default {

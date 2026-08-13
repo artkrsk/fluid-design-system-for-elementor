@@ -10,49 +10,19 @@ permissions:
   pull-requests: read
 
 jobs:
-  # Extract changelog from readme.txt
-  prepare-changelog:
-    runs-on: ubuntu-latest
-    outputs:
-      changelog: ${{ steps.extract.outputs.changelog }}
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-
-      - name: Extract changelog from readme.txt
-        id: extract
-        run: |
-          CHANGELOG=$(node scripts/extract-changelog.js latest)
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-  # Create release using reusable workflow with custom changelog
   release:
-    needs: prepare-changelog
-    uses: artkrsk/wordpress-plugin-release-action/.github/workflows/release.yml@main
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/release.yml@main
     with:
-      # Build configuration
-      node_version: '23'
+      node_version: '24'
       php_version: '8.4'
-      build_command: 'mkdir -p vendor-prefixed && composer --version && npm run build'
-
-      # Changelog from readme.txt
-      custom_changelog: ${{ needs.prepare-changelog.outputs.changelog }}
-
-      # Paths
-      assets_directory: '__assets__'
-
-      # Version validation
+      build_command: 'composer install --prefer-dist --no-progress && pnpm build'
+      plugin_slug: 'fluid-design-system-for-elementor'
+      main_plugin_file: 'src/wordpress-plugin/fluid-design-system-for-elementor.php'
+      use_arts_changelog: true
+      assets_directory: '.wordpress-org'
       version_files: '["plugin_header", "readme.txt", "package.json"]'
-
-      # WordPress.org deployment
+      # Live on wp.org; SVN secrets are set.
       deploy_to_wordpress: true
-
     secrets:
       SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
       SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

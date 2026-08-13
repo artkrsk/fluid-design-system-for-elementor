@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { PreviewSizeManager } from '@/managers/PreviewSizeManager'
-import { PREVIEW } from '@/constants'
+import { PREVIEW } from '@ts/constants'
+import { PreviewSizeManager } from '@ts/managers/PreviewSizeManager'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const ACTIVE_CLASS = PREVIEW.ACTIVE_CLASS
 const VAR_WIDTH = PREVIEW.VAR_WIDTH

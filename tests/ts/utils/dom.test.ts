@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { createElement } from '@/utils/dom'
+import { createElement } from '@ts/utils/dom'
+import { describe, expect, it } from 'vitest'
 
 describe('dom utilities', () => {
   describe('createElement', () => {

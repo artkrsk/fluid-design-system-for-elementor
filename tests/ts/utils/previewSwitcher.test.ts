@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { PreviewSwitcherManager } from '@/utils/previewSwitcher'
+import { PreviewSwitcherManager } from '@ts/utils/previewSwitcher'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const q = (root: HTMLElement, selector: string) => root.querySelector(selector) as HTMLElement
 
@@ -31,7 +31,10 @@ describe('PreviewSwitcherManager.createSwitcher', () => {
   it('calls onAnchor with the clicked anchor', () => {
     const onAnchor = vi.fn()
     const onReset = vi.fn()
-    const { container } = PreviewSwitcherManager.createSwitcher({ onAnchor, onReset })
+    const { container } = PreviewSwitcherManager.createSwitcher({
+      onAnchor,
+      onReset
+    })
 
     q(container, '[data-anchor="min"]').click()
     expect(onAnchor).toHaveBeenCalledWith('min')
@@ -45,7 +48,10 @@ describe('PreviewSwitcherManager.createSwitcher', () => {
   it('calls onReset for the reset button only', () => {
     const onAnchor = vi.fn()
     const onReset = vi.fn()
-    const { container } = PreviewSwitcherManager.createSwitcher({ onAnchor, onReset })
+    const { container } = PreviewSwitcherManager.createSwitcher({
+      onAnchor,
+      onReset
+    })
 
     q(container, '[data-anchor="reset"]').click()
 
@@ -55,7 +61,10 @@ describe('PreviewSwitcherManager.createSwitcher', () => {
 
   it('resolves the anchor when a child (e.g. label span) is clicked', () => {
     const onAnchor = vi.fn()
-    const { container } = PreviewSwitcherManager.createSwitcher({ onAnchor, onReset: vi.fn() })
+    const { container } = PreviewSwitcherManager.createSwitcher({
+      onAnchor,
+      onReset: vi.fn()
+    })
 
     q(container, '[data-anchor="min"] span').click()
 
@@ -65,7 +74,10 @@ describe('PreviewSwitcherManager.createSwitcher', () => {
   it('does nothing when a non-button element is clicked', () => {
     const onAnchor = vi.fn()
     const onReset = vi.fn()
-    const { container } = PreviewSwitcherManager.createSwitcher({ onAnchor, onReset })
+    const { container } = PreviewSwitcherManager.createSwitcher({
+      onAnchor,
+      onReset
+    })
 
     q(container, '.e-fluid-preview-switcher__label').click()
 

@@ -1,0 +1,3 @@
+{
+  "extends": "@arts/wp-plugin-tooling/stylelint"
+}

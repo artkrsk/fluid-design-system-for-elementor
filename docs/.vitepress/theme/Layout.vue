@@ -1,76 +1,77 @@
 <script setup lang="ts">
-import DefaultTheme from 'vitepress/theme'
-import { onMounted, watch, nextTick, ref } from 'vue'
-import { useRoute } from 'vitepress'
-import mediumZoom from 'medium-zoom'
+import mediumZoom from "medium-zoom";
+import { useRoute } from "vitepress";
+import DefaultTheme from "vitepress/theme";
+import { nextTick, onMounted, ref, watch } from "vue";
 
-const { Layout } = DefaultTheme
-const route = useRoute()
+const { Layout } = DefaultTheme;
+const route = useRoute();
 
 // Video lightbox state
-const isVideoLightboxOpen = ref(false)
-const currentVideoSrc = ref('')
+const isVideoLightboxOpen = ref(false);
+const currentVideoSrc = ref("");
 
 const initZoom = () => {
-  // Initialize medium-zoom for all images with data-zoomable attribute
-  mediumZoom('[data-zoomable]', {
-    background: 'var(--vp-c-bg)',
-  })
-}
+	// Initialize medium-zoom for all images with data-zoomable attribute
+	mediumZoom("[data-zoomable]", {
+		background: "var(--vp-c-bg)",
+	});
+};
 
 const initVideoLightbox = () => {
-  // Find all videos with data-lightbox attribute and add click handlers
-  const videos = document.querySelectorAll('video[data-lightbox]')
-  videos.forEach((video) => {
-    const videoEl = video as HTMLVideoElement
+	// Find all videos with data-lightbox attribute and add click handlers
+	const videos = document.querySelectorAll("video[data-lightbox]");
+	videos.forEach((video) => {
+		const videoEl = video as HTMLVideoElement;
 
-    // Add pointer cursor
-    videoEl.style.cursor = 'pointer'
+		// Add pointer cursor
+		videoEl.style.cursor = "pointer";
 
-    // Remove existing listener to avoid duplicates
-    const newVideo = videoEl.cloneNode(true) as HTMLVideoElement
-    videoEl.parentNode?.replaceChild(newVideo, videoEl)
+		// Remove existing listener to avoid duplicates
+		const newVideo = videoEl.cloneNode(true) as HTMLVideoElement;
+		videoEl.parentNode?.replaceChild(newVideo, videoEl);
 
-    // Add click handler
-    newVideo.addEventListener('click', (e) => {
-      e.preventDefault()
-      currentVideoSrc.value = newVideo.src
-      isVideoLightboxOpen.value = true
-    })
-  })
-}
+		// Add click handler
+		newVideo.addEventListener("click", (e) => {
+			e.preventDefault();
+			currentVideoSrc.value = newVideo.src;
+			isVideoLightboxOpen.value = true;
+		});
+	});
+};
 
 const closeLightbox = () => {
-  isVideoLightboxOpen.value = false
-  currentVideoSrc.value = ''
-}
+	isVideoLightboxOpen.value = false;
+	currentVideoSrc.value = "";
+};
 
 const handleBackdropClick = (e: MouseEvent) => {
-  if ((e.target as HTMLElement).classList.contains('video-lightbox-backdrop')) {
-    closeLightbox()
-  }
-}
+	if ((e.target as HTMLElement).classList.contains("video-lightbox-backdrop")) {
+		closeLightbox();
+	}
+};
 
 onMounted(() => {
-  initZoom()
-  initVideoLightbox()
+	initZoom();
+	initVideoLightbox();
 
-  // Handle escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isVideoLightboxOpen.value) {
-      closeLightbox()
-    }
-  })
-})
+	// Handle escape key
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape" && isVideoLightboxOpen.value) {
+			closeLightbox();
+		}
+	});
+});
 
 // Re-initialize on route changes (for SPA navigation)
 watch(
-  () => route.path,
-  () => nextTick(() => {
-    initZoom()
-    initVideoLightbox()
-  })
-)
+	() => route.path,
+	() =>
+		nextTick(() => {
+			initZoom();
+			initVideoLightbox();
+		}),
+);
 </script>
 
 <template>

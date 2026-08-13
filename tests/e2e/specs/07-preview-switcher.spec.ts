@@ -11,8 +11,8 @@
  * the switcher sets (deterministic) rather than the rendered pixel width.
  */
 
-import { test, expect } from '../fixtures'
 import type { Page } from '@playwright/test'
+import { expect, test } from '../fixtures'
 import { TEST_ELEMENT_IDS } from '../fixtures/test-data'
 
 /** Rendered width of the editor preview wrapper (top frame), rounded */
@@ -105,7 +105,9 @@ test.describe('Preview-width switcher', () => {
     // them by text is unreliable, and setDeviceMode isn't present on this build.)
     await page.evaluate(() => {
       ;(
-        window.elementor as unknown as { changeDeviceMode: (mode: string) => void }
+        window.elementor as unknown as {
+          changeDeviceMode: (mode: string) => void
+        }
       ).changeDeviceMode('tablet')
     })
 

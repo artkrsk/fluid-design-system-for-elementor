@@ -1,10 +1,10 @@
 import { STYLES } from '../constants'
 import {
-  parseRulesFromText,
-  formatRulesForStylesheet,
-  filterRulesByVariable,
+  createUnsetRule,
   createVariableRule,
-  createUnsetRule
+  filterRulesByVariable,
+  formatRulesForStylesheet,
+  parseRulesFromText
 } from '../utils/cssRules'
 
 class CSSManager {

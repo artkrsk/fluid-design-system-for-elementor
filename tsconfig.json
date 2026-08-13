@@ -1,30 +1,27 @@
 {
+  "extends": "@arts/wp-plugin-tooling/tsconfig",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "noEmit": true,
-
-    "strict": true,
+    // Kept from this repo's own config — the shared base doesn't set them and
+    // dropping them would weaken what already passes here.
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-
     "skipLibCheck": true,
     "esModuleInterop": true,
     "types": ["jquery", "select2", "vitest/globals", "node"],
-    "paths": {
-      "@/*": ["./src/ts/*"]
-    }
+    // Test-only alias, matching the rest of the fleet. src/ts imports are all
+    // relative, so nothing in the bundle depends on path mapping.
+    "paths": { "@ts/*": ["./src/ts/*"] }
   },
   "include": [
     "src/ts/**/*.ts",
     "src/ts/**/*.d.ts",
     "tests/ts/**/*.ts",
     "tests/e2e/**/*.ts",
+    "vitest.config.ts",
     "playwright.config.ts"
   ],
   "exclude": ["node_modules", "dist"]

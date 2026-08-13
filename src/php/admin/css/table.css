@@ -231,7 +231,6 @@
 }
 
 @keyframes pulse {
-
 	0%,
 	100% {
 		transform: scale(1);
@@ -392,7 +391,6 @@
 }
 
 @keyframes shake {
-
 	0%,
 	100% {
 		transform: translateX(0);
@@ -429,7 +427,8 @@
 	opacity: 0.7;
 }
 
-.editable-add-description:not(.editing):hover .add-description-text:empty:after {
+.editable-add-description:not(.editing):hover
+	.add-description-text:empty:after {
 	color: #2271b1;
 	opacity: 1;
 }
@@ -561,8 +560,8 @@
 }
 
 /* Disable all table interactions when adding a group */
-.inline-add-row.editing~tr,
-.inline-add-row.editing+.inline-add-row.editing~* {
+.inline-add-row.editing ~ tr,
+.inline-add-row.editing + .inline-add-row.editing ~ * {
 	pointer-events: none !important;
 	opacity: 0.6;
 }
@@ -579,12 +578,12 @@
 }
 
 /* Specifically disable editable elements when adding a group */
-.inline-add-row.editing~tr .editable-title,
-.inline-add-row.editing~tr .editable-description,
-.inline-add-row.editing~tr .fluid-delete-group,
-.inline-add-row.editing~tr .undo-delete,
-.inline-add-row.editing~tr .order-draggable,
-.inline-add-row.editing~tr .sortable-row {
+.inline-add-row.editing ~ tr .editable-title,
+.inline-add-row.editing ~ tr .editable-description,
+.inline-add-row.editing ~ tr .fluid-delete-group,
+.inline-add-row.editing ~ tr .undo-delete,
+.inline-add-row.editing ~ tr .order-draggable,
+.inline-add-row.editing ~ tr .sortable-row {
 	pointer-events: none !important;
 	cursor: not-allowed !important;
 }
@@ -595,8 +594,6 @@
 	width: 18px;
 	height: 18px;
 }
-
-
 
 /* Empty state message */
 .no-groups-message td {
@@ -707,7 +704,9 @@
 	border: 1px solid #ddd;
 	border-radius: 3px;
 	cursor: move;
-	transition: background-color 0.2s ease, border-color 0.2s ease;
+	transition:
+		background-color 0.2s ease,
+		border-color 0.2s ease;
 }
 
 .preset-item:hover {

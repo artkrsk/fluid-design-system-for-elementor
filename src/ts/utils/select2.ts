@@ -1,10 +1,10 @@
-import { TemplateRenderer } from './templates'
 import type {
-  TSelect2State,
   TSelect2MatcherData,
+  TSelect2OptionData,
   TSelect2SearchOptions,
-  TSelect2OptionData
+  TSelect2State
 } from '../types'
+import { TemplateRenderer } from './templates'
 
 class Select2Utils {
   static getTemplateSelect2(

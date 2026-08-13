@@ -12,7 +12,7 @@
  * the page URL and read the freshly loaded model (never page.reload()).
  */
 
-import { test, expect, resetTestState, getCssVarName } from '../fixtures'
+import { expect, getCssVarName, resetTestState, test } from '../fixtures'
 
 const CONTROL = 'fluid_spacing_presets'
 
@@ -32,9 +32,7 @@ test.describe('Preset repeater lifecycle', () => {
     await editor.openSiteSettingsFluidTab(CONTROL)
   })
 
-  test('adding a preset row injects its CSS variable into the preview', async ({
-    editor
-  }) => {
+  test('adding a preset row injects its CSS variable into the preview', async ({ editor }) => {
     const itemId = await editor.addRepeaterRow(CONTROL, 'E2E Runtime Preset')
 
     await expect
@@ -89,9 +87,7 @@ test.describe('Preset repeater lifecycle', () => {
 
     const stillThere = await page.evaluate((name) => {
       const w = window as any
-      const coll = w.elementor.documents
-        .get(w.elementor.config.kit_id)
-        .container.settings.get(name)
+      const coll = w.elementor.documents.get(w.elementor.config.kit_id).container.settings.get(name)
       return Boolean(coll?.findWhere?.({ _id: 'e2e_gap_large' }))
     }, CONTROL)
 

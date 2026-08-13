@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import {
+  clearDialogError,
   setDialogBusy,
   showDialogError,
-  clearDialogError,
   toErrorMessage
-} from '@/utils/dialogFeedback'
+} from '@ts/utils/dialogFeedback'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 /** Mirrors the markup dialogs-manager builds around PresetDialogManager's message */
 function createDialogWidget(): HTMLElement {
@@ -41,12 +41,14 @@ describe('dialogFeedback', () => {
 
       const controls = widget.querySelectorAll<HTMLButtonElement>('button, input, select')
       expect(controls.length).toBe(5)
-      controls.forEach(control => expect(control.disabled).toBe(true))
+      controls.forEach((control) => {
+        expect(control.disabled).toBe(true)
+      })
 
       const spinners = widget.querySelectorAll('.dialog-ok .e-fluid-dialog-spinner')
       expect(spinners.length).toBe(1)
-      expect(spinners[0].classList.contains('eicon-spinner')).toBe(true)
-      expect(spinners[0].classList.contains('eicon-animation-spin')).toBe(true)
+      expect(spinners[0]!.classList.contains('eicon-spinner')).toBe(true)
+      expect(spinners[0]!.classList.contains('eicon-animation-spin')).toBe(true)
     })
 
     it('stays idempotent when called twice', () => {
@@ -61,9 +63,9 @@ describe('dialogFeedback', () => {
       setDialogBusy(widget, false)
 
       expect(widget.classList.contains('e-fluid-dialog-busy')).toBe(false)
-      widget
-        .querySelectorAll<HTMLButtonElement>('button, input, select')
-        .forEach(control => expect(control.disabled).toBe(false))
+      widget.querySelectorAll<HTMLButtonElement>('button, input, select').forEach((control) => {
+        expect(control.disabled).toBe(false)
+      })
       expect(widget.querySelector('.e-fluid-dialog-spinner')).toBeNull()
     })
 
@@ -77,9 +79,9 @@ describe('dialogFeedback', () => {
       setDialogBusy(widget, true)
 
       expect(widget.classList.contains('e-fluid-dialog-busy')).toBe(true)
-      widget
-        .querySelectorAll<HTMLButtonElement>('button, input, select')
-        .forEach(control => expect(control.disabled).toBe(true))
+      widget.querySelectorAll<HTMLButtonElement>('button, input, select').forEach((control) => {
+        expect(control.disabled).toBe(true)
+      })
       expect(widget.querySelector('.e-fluid-dialog-spinner')).toBeNull()
     })
   })
@@ -98,7 +100,7 @@ describe('dialogFeedback', () => {
 
       const errors = widget.querySelectorAll('.e-fluid-dialog-error')
       expect(errors.length).toBe(1)
-      expect(errors[0].textContent).toBe('Second')
+      expect(errors[0]!.textContent).toBe('Second')
     })
 
     it('renders the message as text, never as markup', () => {

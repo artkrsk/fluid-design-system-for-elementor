@@ -9,7 +9,9 @@ export const createElement = (
     element.className = className
   }
 
-  Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value))
+  Object.entries(attributes).forEach(([key, value]) => {
+    element.setAttribute(key, value)
+  })
 
   return element
 }

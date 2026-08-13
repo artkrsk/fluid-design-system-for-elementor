@@ -1,0 +1,24 @@
+@use 'variables';
+
+// Base fluid units styles
+.e-units-fluid {
+  // Hide original Elementor inputs but NOT our inline fluid inputs
+  input:not(.e-fluid-inline-input) {
+    display: none;
+  }
+
+  .elementor-control-fluid-selector-container {
+    display: block;
+    width: 100%;
+  }
+
+  .elementor-slider-input {
+    display: none;
+  }
+}
+
+// Base selector container styles
+.elementor-control-fluid-selector-container {
+  display: none;
+  position: relative;
+}

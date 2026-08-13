@@ -185,28 +185,31 @@ This is what makes undo/redo of preset edits restore the correct CSS variables.
 
 - **Composer:** `arts/elementor-extension`, `arts/utilities` (pull in `arts/base`). Strauss prefixes
   these into `vendor-prefixed/` under `ArtsFluidDS\` (classmap-autoloaded) so the shipped plugin can't
-  collide with other Arts plugins — run via `composer prefix-namespaces`.
-- **QA:** PHPStan `level: max` (PHP 8.0 target) over `src/php`; PHPCS (WPCS); Vitest unit tests;
-  Playwright e2e.
-- **Build:** `npm run dev` (watch — already running, don't start it) / `npm run build`
-  (composer install + prefix + JS build). The distributable plugin is assembled in
-  `src/wordpress-plugin/` (main file `fluid-design-system-for-elementor.php`) and zipped to `dist/`.
-  Never run `build` / `dev` yourself.
+  collide with other Arts plugins — it runs automatically on `composer install`/`update`
+  (`post-install-cmd`), or by hand via `composer prefix-namespaces`.
+- **QA:** PHPStan `level: max` (PHP 8.0 target) over `src/php`; PHPCS (`ArtsFramework`); Biome;
+  Vitest unit tests with coverage thresholds; Playwright e2e; knip as a hard gate, fallow advisory.
+- **Build:** the runner is shared — `@arts/wp-plugin-tooling` (`arts-wp`), not an in-repo pipeline;
+  its mechanics are documented there. `pnpm dev:plugin` (watch — already running, don't start it) /
+  `pnpm build`. The distributable plugin is assembled in `src/wordpress-plugin/` (main file
+  `fluid-design-system-for-elementor.php`) and zipped to `dist/`. Never run `build` / `dev` yourself.
+  JS/CSS compile to `src/php/libraries/fluid-design-system-for-elementor/` (slug-derived — the
+  enqueue paths in `Managers/Compatibility.php` must match).
 
 ## Release & version stamping
 
-- **Version headers are stamped, not hand-edited.** Every build (and dev startup / composer.json
-  change while watching) runs `updatePluginMeta` (`__build__/utils/wordpress/plugin-meta.js`), which
-  rewrites the plugin header and readme.txt meta fields: `Version:` / `Stable tag:` come from
-  `package.json` `version` (single source of truth); `Requires PHP` / `Requires at least` /
-  `Tested up to` from composer.json's `wordpress` object; name/description/URI/license/text domain
-  from its `plugin` object. Manual edits to these in `src/wordpress-plugin/` get overwritten.
+- **`composer.json` is the single version/meta source** (as in every Arts plugin). `arts-wp` stamps
+  the plugin header, readme.txt `Stable tag`, and package.json from it; `Requires PHP` /
+  `Requires at least` / `Tested up to` come from its `wordpress` object, and
+  name/description/URI/license/text domain from its `plugin` object. Manual edits to those fields in
+  `src/wordpress-plugin/` get overwritten.
 - **Changelog is the one manual step.** Hand-write the new entry in `src/wordpress-plugin/readme.txt`
-  under `== Changelog ==` (user-facing, non-technical tone — match existing entries).
-  `scripts/sync-changelog.js` regenerates CHANGELOG.md from readme.txt, never the reverse.
-- **Release flow:** readme.txt changelog entry first, then the user runs `npm version <x.y.z>` — its
-  `version` lifecycle script builds (stamping versions), syncs CHANGELOG.md, and stages; npm then
+  under `== Changelog ==`, in the fleet grammar — `* added:` / `* improved:` / `* fixed:` /
+  `* security:` bullets, in that order. CI validates the latest entry.
+  `pnpm exec arts-wp changelog sync` regenerates CHANGELOG.md from readme.txt, never the reverse.
+- **Release flow:** readme.txt changelog entry first, then `pnpm release <patch|minor|major|x.y.z>` —
+  it refuses a dirty tree, gates on the changelog, bumps composer.json, stamps, syncs CHANGELOG.md,
   commits and tags. Pushing the `v*` tag runs `.github/workflows/release.yml`: GitHub release + wp.org
   SVN deploy, validating plugin header / readme.txt / package.json all match the tag version.
 
-**Stack:** PHP 8.0+ · WordPress 6.0+ · Elementor 3.27+ · ES2022 / TypeScript · Sass
+**Stack:** PHP 8.0+ · WordPress 6.0+ · Elementor 3.27+ · ES2022 / TypeScript · SCSS · pnpm

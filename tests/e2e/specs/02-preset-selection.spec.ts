@@ -5,8 +5,8 @@
  * These tests interact with the editor panel, not just the frontend.
  */
 
-import { test, expect } from '../fixtures'
-import { TEST_ELEMENT_IDS, getElementSelector } from '../fixtures/test-data'
+import { expect, test } from '../fixtures'
+import { getElementSelector, TEST_ELEMENT_IDS } from '../fixtures/test-data'
 
 test.describe('Editor Basic Functionality', () => {
   test.beforeEach(async ({ editor, testPageId }) => {
@@ -25,9 +25,7 @@ test.describe('Editor Basic Functionality', () => {
     const previewFrame = editor.getPreviewFrame()
 
     // Verify our test elements exist in the preview
-    await expect(
-      previewFrame.locator(getElementSelector(TEST_ELEMENT_IDS.headingXl))
-    ).toBeVisible()
+    await expect(previewFrame.locator(getElementSelector(TEST_ELEMENT_IDS.headingXl))).toBeVisible()
     await expect(
       previewFrame.locator(getElementSelector(TEST_ELEMENT_IDS.headingInverted))
     ).toBeVisible()
@@ -42,9 +40,7 @@ test.describe('Site Settings Tab', () => {
     await editor.openPost(testPageId)
   })
 
-  test('Fluid Typography & Spacing tab exists in Site Settings', async ({
-    editor
-  }) => {
+  test('Fluid Typography & Spacing tab exists in Site Settings', async ({ editor }) => {
     // Use programmatic command to open Site Settings (more reliable than UI clicks)
     await editor.page.evaluate(() => {
       return window.$e?.run('panel/global/open')
@@ -56,15 +52,11 @@ test.describe('Site Settings Tab', () => {
     })
 
     // Find our Fluid Typography & Spacing tab
-    const fluidTab = editor.page.locator(
-      '.elementor-panel-menu-item:has-text("Fluid Typography")'
-    )
+    const fluidTab = editor.page.locator('.elementor-panel-menu-item:has-text("Fluid Typography")')
     await expect(fluidTab).toBeVisible()
   })
 
-  test('fluid tab is registered in the Site Settings component', async ({
-    editor
-  }) => {
+  test('fluid tab is registered in the Site Settings component', async ({ editor }) => {
     // Open Site Settings (switches to Kit document and loads tabs)
     await editor.page.evaluate(() => {
       return window.$e?.run('panel/global/open')
@@ -82,9 +74,7 @@ test.describe('Site Settings Tab', () => {
     })
 
     // Verify our tab is registered
-    expect(availableTabs).toContain(
-      'arts-fluid-design-system-tab-fluid-typography-spacing'
-    )
+    expect(availableTabs).toContain('arts-fluid-design-system-tab-fluid-typography-spacing')
 
     // Verify the tab appears in the menu DOM
     const fluidTabInMenu = editor.page.locator(
@@ -99,20 +89,16 @@ test.describe('CSS Variable Verification in Editor', () => {
     await editor.openPost(testPageId)
   })
 
-  test('fluid CSS variables are present in editor preview', async ({
-    editor
-  }) => {
+  test('fluid CSS variables are present in editor preview', async ({ editor }) => {
     const previewFrame = editor.getPreviewFrame()
 
     // Check for CSS variables in the preview frame
-    const cssVars = await previewFrame.locator('html').evaluate(el => {
+    const cssVars = await previewFrame.locator('html').evaluate((el) => {
       const style = getComputedStyle(el)
       return {
         headingXl: style.getPropertyValue('--arts-fluid-preset--e2e_heading_xl'),
         inverted: style.getPropertyValue('--arts-fluid-preset--e2e_inverted'),
-        gapStandard: style.getPropertyValue(
-          '--arts-fluid-preset--e2e_gap_standard'
-        )
+        gapStandard: style.getPropertyValue('--arts-fluid-preset--e2e_gap_standard')
       }
     })
 
@@ -127,7 +113,7 @@ test.describe('CSS Variable Verification in Editor', () => {
 
     // Check for Kit CSS variables instead of plugin style element
     // Plugin dynamic style element is only created when editing
-    const kitCssExists = await previewFrame.locator('html').evaluate(el => {
+    const kitCssExists = await previewFrame.locator('html').evaluate((el) => {
       const style = getComputedStyle(el)
       // Check if any --arts-fluid-min-screen variable exists
       return style.getPropertyValue('--arts-fluid-min-screen') !== ''

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 const props = defineProps<{
-  images: Array<{
-    src: string
-    alt: string
-    caption?: string
-  }>
-}>()
+	images: Array<{
+		src: string;
+		alt: string;
+		caption?: string;
+	}>;
+}>();
 </script>
 
 <template>

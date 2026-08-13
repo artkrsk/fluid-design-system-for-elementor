@@ -1,5 +1,5 @@
-import type { TParsedValue } from '../types'
 import type { IFormatSizeRangeOptions } from '../interfaces'
+import type { TParsedValue } from '../types'
 
 /** Value formatting utilities for fluid design system */
 export class ValueFormatter {

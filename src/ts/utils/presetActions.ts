@@ -1,10 +1,11 @@
-import { ValidationService } from './validation'
-import { generateClampFormula } from './clamp'
-import { PresetAPIService } from '../services/presetAPI'
-import { buildCreatePresetData, buildUpdatePresetData, buildCachedPresetRow } from './presetData'
-import { insertPresetRow, updatePresetRow } from './presetModelSync'
-import { dataManager, cssManager } from '../managers'
 import { STYLES, UI_TIMING } from '../constants'
+import type { IPresetResponse } from '../interfaces'
+import { cssManager, dataManager } from '../managers'
+import { PresetAPIService } from '../services/presetAPI'
+import { generateClampFormula } from './clamp'
+import { buildCachedPresetRow, buildCreatePresetData, buildUpdatePresetData } from './presetData'
+import { insertPresetRow, updatePresetRow } from './presetModelSync'
+import { ValidationService } from './validation'
 
 /** Defensive: the dialog already blocks confirming with unparseable values */
 const invalidValuesError = () =>
@@ -41,7 +42,7 @@ export async function handleUpdatePreset(
   cssManager.setCssVariable(presetId, clampFormula)
 
   const presetData = buildUpdatePresetData(presetId, title, minParsed, maxParsed, groupId)
-  let response
+  let response: IPresetResponse
 
   try {
     response = await PresetAPIService.updatePreset(presetData)
@@ -130,7 +131,7 @@ export async function handleCreatePreset(
 
     // Resolve only once the preset is selected, so the dialog can stay up for the
     // whole flow and the auto-select can't overwrite a value picked in the meantime.
-    await new Promise<void>(resolve => setTimeout(resolve, UI_TIMING.PRESET_AUTO_SELECT_DELAY))
+    await new Promise<void>((resolve) => setTimeout(resolve, UI_TIMING.PRESET_AUTO_SELECT_DELAY))
 
     const presetValue = `var(${STYLES.VAR_PREFIX}${response.id})`
     callbacks.selectPreset(setting, presetValue)

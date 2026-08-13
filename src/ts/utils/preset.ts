@@ -1,13 +1,13 @@
-import { createElement } from './dom'
-import { dataManager } from '../managers'
-import {
-  createPresetOption,
-  createCustomPresetOption,
-  createSimpleOption,
-  createCustomValueOption
-} from './presetOptions'
-import { getInheritedPresetSync, isFluidPreset } from './presetLookup'
 import type { IInheritanceData } from '../interfaces'
+import { dataManager } from '../managers'
+import { createElement } from './dom'
+import { getInheritedPresetSync, isFluidPreset } from './presetLookup'
+import {
+  createCustomPresetOption,
+  createCustomValueOption,
+  createPresetOption,
+  createSimpleOption
+} from './presetOptions'
 
 /** Builds select options from preset data */
 export async function buildSelectOptions(

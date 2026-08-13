@@ -1,0 +1,37 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
+  "extends": ["@arts/wp-plugin-tooling/biome"],
+  "files": {
+    "includes": [
+      "src/ts/**",
+      "tests/**/*.ts",
+      "docs/.vitepress/**/*.{ts,mts}",
+      "project.config.js",
+      "vitest.config.ts",
+      "playwright.config.ts",
+      "biome.json",
+      "knip.json"
+    ]
+  },
+  "overrides": [
+    {
+      "includes": ["src/ts/**"],
+      "linter": {
+        "rules": {
+          "suspicious": { "noExplicitAny": "off" },
+          "style": { "noNonNullAssertion": "off" },
+          "complexity": { "noStaticOnlyClass": "off", "noArguments": "off" }
+        }
+      }
+    },
+    {
+      "includes": ["tests/**"],
+      "linter": {
+        "rules": {
+          "suspicious": { "noExplicitAny": "off" },
+          "style": { "noNonNullAssertion": "off" }
+        }
+      }
+    }
+  ]
+}

@@ -1,14 +1,14 @@
-import { callSuper } from '../utils/backbone'
-import { createElement } from '../utils/dom'
-import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
-import { ValidationService } from '../utils/validation'
-import { InlineInputManager } from '../utils/inlineInputs'
-import { PresetDropdownManager } from '../utils/presetDropdown'
-import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
-import { PresetDialogManager } from '../managers/PresetDialogManager'
-import { handleUpdatePreset, handleCreatePreset } from '../utils/presetActions'
 import { CUSTOM_FLUID_VALUE } from '../constants'
 import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
+import { PresetDialogManager } from '../managers/PresetDialogManager'
+import { callSuper } from '../utils/backbone'
+import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
+import { createElement } from '../utils/dom'
+import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
+import { InlineInputManager } from '../utils/inlineInputs'
+import { handleCreatePreset, handleUpdatePreset } from '../utils/presetActions'
+import { PresetDropdownManager } from '../utils/presetDropdown'
+import { ValidationService } from '../utils/validation'
 
 /** Mixin for fluid unit support in Elementor slider controls */
 export const BaseSliderControlView: Record<string, unknown> = {
@@ -216,7 +216,12 @@ export const BaseSliderControlView: Record<string, unknown> = {
   _setSliderInlineInputValues(
     this: any,
     setting: string,
-    values: { minSize: string; minUnit: string; maxSize: string; maxUnit: string }
+    values: {
+      minSize: string
+      minUnit: string
+      maxSize: string
+      maxUnit: string
+    }
   ): void {
     const container = this._getSliderInlineContainer(setting)
     InlineInputManager.setInputValues(container, values)
@@ -388,11 +393,11 @@ export const BaseSliderControlView: Record<string, unknown> = {
     if (currentSize !== '' && currentSize !== null && currentSize !== undefined) {
       this.setValue('size', currentSize)
 
-      if (this.ui.input && this.ui.input.length) {
+      if (this.ui.input?.length) {
         this.ui.input.val(currentSize)
       }
 
-      if (this.isSliderInitialized && this.isSliderInitialized()) {
+      if (this.isSliderInitialized?.()) {
         const slider = this.ui.slider?.[0]?.noUiSlider
         if (slider) {
           slider.set(currentSize)

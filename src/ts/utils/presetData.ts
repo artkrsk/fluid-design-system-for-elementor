@@ -5,8 +5,8 @@
  */
 
 import { STYLES } from '../constants'
-import type { TParsedValue } from '../types'
 import type { IFluidPreset, ISavePresetData, IUpdatePresetData } from '../interfaces'
+import type { TParsedValue } from '../types'
 
 /** Builds data object for creating a new preset */
 export function buildCreatePresetData(

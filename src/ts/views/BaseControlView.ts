@@ -1,22 +1,22 @@
-import { callSuper } from '../utils/backbone'
-import { createElement } from '../utils/dom'
-import { buildSelectOptions } from '../utils/preset'
-import { getSelect2DefaultOptions } from '../utils/select2'
-import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
-import { ValidationService, isEmptyControlValue, isCustomFluidValue } from '../utils/validation'
-import { InlineInputManager } from '../utils/inlineInputs'
-import { PresetDropdownManager } from '../utils/presetDropdown'
-import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
-import { PresetDialogManager } from '../managers/PresetDialogManager'
-import { EditIconHandler } from '../utils/editIconHandler'
-import { PreviewSwitcherManager } from '../utils/previewSwitcher'
-import { resolveAnchorWidths } from '../utils/screenAnchors'
-import previewSizeManager from '../managers/PreviewSizeManager'
-import { resolveInheritedValue } from '../utils/deviceInheritance'
-import { handleUpdatePreset, handleCreatePreset } from '../utils/presetActions'
-import { isFluidUnit, requiresTextInput, hasFluidInUnits } from '../utils/controls'
 import { CUSTOM_FLUID_VALUE } from '../constants'
 import type { IInlineInputValues, IPresetDialogData } from '../interfaces'
+import { PresetDialogManager } from '../managers/PresetDialogManager'
+import previewSizeManager from '../managers/PreviewSizeManager'
+import { callSuper } from '../utils/backbone'
+import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../utils/clamp'
+import { hasFluidInUnits, isFluidUnit, requiresTextInput } from '../utils/controls'
+import { resolveInheritedValue } from '../utils/deviceInheritance'
+import { createElement } from '../utils/dom'
+import { EditIconHandler } from '../utils/editIconHandler'
+import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
+import { InlineInputManager } from '../utils/inlineInputs'
+import { buildSelectOptions } from '../utils/preset'
+import { handleCreatePreset, handleUpdatePreset } from '../utils/presetActions'
+import { PresetDropdownManager } from '../utils/presetDropdown'
+import { PreviewSwitcherManager } from '../utils/previewSwitcher'
+import { resolveAnchorWidths } from '../utils/screenAnchors'
+import { getSelect2DefaultOptions } from '../utils/select2'
+import { isCustomFluidValue, isEmptyControlValue, ValidationService } from '../utils/validation'
 
 /** Mixin for fluid unit support in Elementor dimension/gap controls */
 export const BaseControlView: Record<string, unknown> = {
@@ -685,7 +685,12 @@ export const BaseControlView: Record<string, unknown> = {
   setInlineInputValues(
     this: any,
     setting: string,
-    values: { minSize: string; minUnit: string; maxSize: string; maxUnit: string }
+    values: {
+      minSize: string
+      minUnit: string
+      maxSize: string
+      maxUnit: string
+    }
   ): void {
     const container = this.getInlineContainer(setting)
     InlineInputManager.setInputValues(container, values)

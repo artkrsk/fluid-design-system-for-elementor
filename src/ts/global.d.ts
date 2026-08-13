@@ -1,5 +1,5 @@
-import type { ElementorEditor, ElementorCommon, $e } from '@artemsemkin/elementor-types'
-import type { IArtsFluidDSStrings, IArtsFluidDesignSystem } from './interfaces'
+import type { $e, ElementorCommon, ElementorEditor } from '@artemsemkin/elementor-types'
+import type { IArtsFluidDesignSystem, IArtsFluidDSStrings } from './interfaces'
 
 declare global {
   interface Window {
@@ -17,5 +17,3 @@ declare global {
     artsFluidDesignSystem: IArtsFluidDesignSystem
   }
 }
-
-export {}

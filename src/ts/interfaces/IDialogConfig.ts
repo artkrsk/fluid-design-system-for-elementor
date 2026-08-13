@@ -1,8 +1,10 @@
 /** Configuration for preset dialog */
 export interface IDialogConfig {
-  headerMessage?: string
-  messageText?: string
-  confirmButton?: string
+  // Explicitly `| undefined`: these are localized strings that may legitimately
+  // be absent, and callers pass them straight through from window.ArtsFluidDSStrings.
+  headerMessage?: string | undefined
+  messageText?: string | undefined
+  confirmButton?: string | undefined
   defaultName: string
   defaultMin: string
   defaultMax: string

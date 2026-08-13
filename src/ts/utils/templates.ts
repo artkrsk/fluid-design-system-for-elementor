@@ -1,6 +1,6 @@
+import type { TSelect2State } from '../types'
 import { ValueFormatter } from './formatters'
 import { getInheritedPresetSync } from './preset'
-import type { TSelect2State } from '../types'
 
 /** HTML template generation utilities for Select2 preset options */
 export class TemplateRenderer {
@@ -89,7 +89,7 @@ export class TemplateRenderer {
   static handleFluidPresetTemplate(valueDisplay: string): JQuery<HTMLElement> {
     const inheritedPreset = getInheritedPresetSync(valueDisplay)
 
-    if (inheritedPreset && inheritedPreset.isComplex) {
+    if (inheritedPreset?.isComplex) {
       const { min_size, min_unit, max_size, max_unit, title } = inheritedPreset
       return TemplateRenderer.createComplexPresetTemplate(
         min_size,

@@ -1,6 +1,6 @@
+import type { HookArgs } from '@artemsemkin/elementor-types'
 import { COMMANDS, HOOK_IDS } from '../constants'
 import dataManager from '../managers/DataManager'
-import type { HookArgs } from '@artemsemkin/elementor-types'
 
 const commandSystem = window.$e!
 

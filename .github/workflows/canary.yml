@@ -1,0 +1,19 @@
+name: Weekly Canary
+
+on:
+  schedule:
+    # Monday 03:00 UTC — before the workweek, after the weekend's releases.
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/canary.yml@main
+    with:
+      # PHPUnit against WP trunk + an Elementor beta when one is ahead of stable.
+      # The suites run through the repo's isolated tooling — see test.yml.
+      integration_suites: '[]'
+      wp_env_ports: '8888,8889'

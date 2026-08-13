@@ -10,6 +10,8 @@ use ArtsFluidDS\Arts\ElementorExtension\Plugins\BasePlugin;
 
 /**
  * Abstract base class for Fluid Design System plugin.
+ *
+ * @extends BasePlugin<ManagersContainer>
  */
 abstract class Plugin extends BasePlugin {
 	/**

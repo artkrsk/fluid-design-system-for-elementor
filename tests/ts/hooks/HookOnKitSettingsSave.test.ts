@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // The hook resolves `window.$e.modules.hookUI.After` as its base class at import
 // time, so a constructable base must exist before the module is evaluated.
@@ -9,9 +9,9 @@ vi.hoisted(() => {
   }
 })
 
-import { HookOnKitSettingsSave } from '@/hooks/HookOnKitSettingsSave'
-import dataManager from '@/managers/DataManager'
-import { COMMANDS, HOOK_IDS } from '@/constants'
+import { COMMANDS, HOOK_IDS } from '@ts/constants'
+import { HookOnKitSettingsSave } from '@ts/hooks/HookOnKitSettingsSave'
+import dataManager from '@ts/managers/DataManager'
 
 describe('HookOnKitSettingsSave', () => {
   let hook: HookOnKitSettingsSave
@@ -36,12 +36,18 @@ describe('HookOnKitSettingsSave', () => {
     })
 
     it('skips kit autosaves', () => {
-      const args = { document: { config: { type: 'kit' } }, status: 'autosave' }
+      const args = {
+        document: { config: { type: 'kit' } },
+        status: 'autosave'
+      }
       expect(hook.getConditions(args as any)).toBe(false)
     })
 
     it('skips saves of non-kit documents', () => {
-      const args = { document: { config: { type: 'wp-page' } }, status: 'publish' }
+      const args = {
+        document: { config: { type: 'wp-page' } },
+        status: 'publish'
+      }
       expect(hook.getConditions(args as any)).toBe(false)
     })
 

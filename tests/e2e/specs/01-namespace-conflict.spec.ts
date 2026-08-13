@@ -13,7 +13,7 @@
  * After implementing Strauss, these tests should PASS.
  */
 
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8888'
 
@@ -26,7 +26,7 @@ test.describe('Namespace Conflict Handling', () => {
 
   test.beforeEach(async ({ page }) => {
     pageErrors = []
-    page.on('pageerror', error => {
+    page.on('pageerror', (error) => {
       pageErrors.push(error.message)
     })
   })
@@ -38,15 +38,12 @@ test.describe('Namespace Conflict Handling', () => {
     const response = await page.goto(`${BASE_URL}/wp-admin/plugins.php`)
 
     // Should not return 500 (PHP fatal error)
-    expect(response?.status(), 'Admin should not return 500 error').toBeLessThan(
-      500
-    )
+    expect(response?.status(), 'Admin should not return 500 error').toBeLessThan(500)
 
     // Verify we're on the plugins page (not an error page)
-    await expect(
-      page.locator('#wpbody-content'),
-      'Admin body should be visible'
-    ).toBeVisible({ timeout: 15000 })
+    await expect(page.locator('#wpbody-content'), 'Admin body should be visible').toBeVisible({
+      timeout: 15000
+    })
 
     // Verify both plugins are listed
     await expect(
@@ -82,39 +79,31 @@ test.describe('Namespace Conflict Handling', () => {
 
     // No fatal error messages should have occurred
     const fatalErrors = pageErrors.filter(
-      e =>
+      (e) =>
         e.includes('get_string_value') ||
         e.includes('get_array_value') ||
         e.includes('get_int_value') ||
         e.includes('Fatal error')
     )
-    expect(
-      fatalErrors,
-      'No TypeGuards-related fatal errors should occur'
-    ).toHaveLength(0)
+    expect(fatalErrors, 'No TypeGuards-related fatal errors should occur').toHaveLength(0)
   })
 
   test('Fluid Design System admin page loads correctly', async ({ page }) => {
     // Navigate to the FDS admin page
-    const response = await page.goto(
-      `${BASE_URL}/wp-admin/admin.php?page=fluid-design-system`,
-      { waitUntil: 'domcontentloaded' }
-    )
+    const response = await page.goto(`${BASE_URL}/wp-admin/admin.php?page=fluid-design-system`, {
+      waitUntil: 'domcontentloaded'
+    })
 
     // Should not return 500
-    expect(
-      response?.status(),
-      'FDS admin page should not return 500'
-    ).toBeLessThan(500)
+    expect(response?.status(), 'FDS admin page should not return 500').toBeLessThan(500)
 
     // Wait for page to fully load
     await page.waitForLoadState('load')
 
     // Page should have content (not error message)
-    await expect(
-      page.locator('#wpbody-content'),
-      'Admin content should be visible'
-    ).toBeVisible({ timeout: 15000 })
+    await expect(page.locator('#wpbody-content'), 'Admin content should be visible').toBeVisible({
+      timeout: 15000
+    })
 
     // Verify FDS admin content is present (Groups heading)
     await expect(
@@ -126,49 +115,40 @@ test.describe('Namespace Conflict Handling', () => {
     const pageContent = await page.content()
 
     // Should not have PHP fatal errors
-    expect(
-      pageContent.includes('Fatal error'),
-      'Page should not contain fatal error message'
-    ).toBe(false)
+    expect(pageContent.includes('Fatal error'), 'Page should not contain fatal error message').toBe(
+      false
+    )
 
     // Should not have "Call to undefined method" errors
     // (Note: The conflict plugin's admin notice mentions get_string_value,
     // but that's informational, not an error)
-    const hasFatalMethodError = pageContent.includes('Call to undefined method') &&
-                                 pageContent.includes('get_string_value')
-    expect(
-      hasFatalMethodError,
-      'Page should not show fatal method call errors'
-    ).toBe(false)
+    const hasFatalMethodError =
+      pageContent.includes('Call to undefined method') && pageContent.includes('get_string_value')
+    expect(hasFatalMethodError, 'Page should not show fatal method call errors').toBe(false)
   })
 
-  test('Elementor menu integration works without conflicts', async ({
-    page
-  }) => {
+  test('Elementor menu integration works without conflicts', async ({ page }) => {
     // Navigate to Elementor menu (simpler than opening full editor)
     await page.goto(`${BASE_URL}/wp-admin/admin.php?page=elementor`)
 
     // Verify Elementor admin page loads
-    await expect(
-      page.locator('#wpbody-content'),
-      'Elementor admin should be visible'
-    ).toBeVisible({ timeout: 15000 })
+    await expect(page.locator('#wpbody-content'), 'Elementor admin should be visible').toBeVisible({
+      timeout: 15000
+    })
 
     // Verify no fatal errors occurred during Elementor initialization
     const pageContent = await page.content()
     const hasFatalError =
       pageContent.includes('Fatal error') ||
-      (pageContent.includes('Call to undefined method') &&
-        pageContent.includes('ArtsUtilities'))
+      (pageContent.includes('Call to undefined method') && pageContent.includes('ArtsUtilities'))
 
-    expect(
-      hasFatalError,
-      'Elementor should load without namespace-related fatal errors'
-    ).toBe(false)
+    expect(hasFatalError, 'Elementor should load without namespace-related fatal errors').toBe(
+      false
+    )
 
     // No get_string_value errors in page errors
     expect(
-      pageErrors.filter(e => e.includes('get_string_value')),
+      pageErrors.filter((e) => e.includes('get_string_value')),
       'No get_string_value errors should occur'
     ).toHaveLength(0)
   })
@@ -183,9 +163,6 @@ test.describe('Conflict Plugin Verification', () => {
       '.notice-warning:has-text("Arts Utilities Conflict Test Active")'
     )
 
-    await expect(
-      warningNotice,
-      'Conflict plugin warning should be visible in admin'
-    ).toBeVisible()
+    await expect(warningNotice, 'Conflict plugin warning should be visible in admin').toBeVisible()
   })
 })

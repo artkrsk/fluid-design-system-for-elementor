@@ -5,93 +5,6 @@
  * These presets are seeded via setup-presets.php during global setup.
  */
 
-/** Preset item structure matching PHP/Kit storage format */
-export interface TestPreset {
-  _id: string
-  title: string
-  min: { size: number; unit: string }
-  max: { size: number; unit: string }
-  override_screen_width_enabled?: string
-  overriden_min_screen_width?: number
-  overriden_max_screen_width?: number
-}
-
-/** Test presets organized by control ID */
-export const TEST_PRESETS: Record<string, TestPreset[]> = {
-  fluid_typography_presets: [
-    {
-      _id: 'e2e_heading_xl',
-      title: 'E2E Heading XL',
-      min: { size: 24, unit: 'px' },
-      max: { size: 64, unit: 'px' }
-    },
-    {
-      _id: 'e2e_body_text',
-      title: 'E2E Body Text',
-      min: { size: 14, unit: 'px' },
-      max: { size: 18, unit: 'px' }
-    },
-    {
-      _id: 'e2e_negative_margin',
-      title: 'E2E Negative Margin',
-      min: { size: -20, unit: 'px' },
-      max: { size: -80, unit: 'px' }
-    },
-    {
-      _id: 'e2e_inverted',
-      title: 'E2E Inverted (min > max)',
-      min: { size: 80, unit: 'px' },
-      max: { size: 20, unit: 'px' }
-    },
-    {
-      _id: 'e2e_rem_units',
-      title: 'E2E REM Units',
-      min: { size: 1, unit: 'rem' },
-      max: { size: 3, unit: 'rem' }
-    },
-    {
-      _id: 'e2e_static_value',
-      title: 'E2E Static (min = max)',
-      min: { size: 20, unit: 'px' },
-      max: { size: 20, unit: 'px' }
-    }
-  ],
-  fluid_spacing_presets: [
-    {
-      _id: 'e2e_gap_standard',
-      title: 'E2E Gap Standard',
-      min: { size: 16, unit: 'px' },
-      max: { size: 48, unit: 'px' }
-    },
-    {
-      _id: 'e2e_gap_large',
-      title: 'E2E Gap Large',
-      min: { size: 32, unit: 'px' },
-      max: { size: 120, unit: 'px' }
-    }
-  ],
-  fluid_custom_e2e_test_group_presets: [
-    {
-      _id: 'e2e_custom_breakpoints',
-      title: 'E2E Custom Breakpoints',
-      min: { size: 10, unit: 'px' },
-      max: { size: 100, unit: 'px' },
-      override_screen_width_enabled: 'yes',
-      overriden_min_screen_width: 400,
-      overriden_max_screen_width: 1600
-    }
-  ]
-}
-
-/** Custom group definitions for wp_options */
-export const TEST_CUSTOM_GROUPS = {
-  e2e_test_group: {
-    name: 'E2E Test Group',
-    description: 'Custom group for E2E testing',
-    order: 100
-  }
-}
-
 /** Default and custom breakpoint configurations */
 export const TEST_BREAKPOINTS = {
   default: { min: 360, max: 1920 },
@@ -178,7 +91,7 @@ export const EXPECTED_VALUES: Record<string, Record<number, number>> = {
 /** Type-safe accessor for expected values - throws if key missing */
 export function getExpectedValue(presetId: keyof typeof EXPECTED_VALUES, viewport: number): number {
   const preset = EXPECTED_VALUES[presetId]
-  const value = preset[viewport]
+  const value = preset?.[viewport]
   if (value === undefined) {
     throw new Error(`No expected value for ${presetId} at ${viewport}px`)
   }

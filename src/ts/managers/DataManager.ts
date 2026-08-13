@@ -1,7 +1,7 @@
 import { AJAX_ACTIONS, AJAX_DEFAULTS } from '../constants'
-import { showControlSpinner, hideControlSpinner, elementorAjaxRequest } from '../utils'
-import { PresetAPIService } from '../services/presetAPI'
 import type { ICustomPreset, IFluidPreset, IPresetGroup, IPresetGroupOption } from '../interfaces'
+import { PresetAPIService } from '../services/presetAPI'
+import { elementorAjaxRequest, hideControlSpinner, showControlSpinner } from '../utils'
 
 export class DataManager {
   presets: IPresetGroup[] | null = null
@@ -39,7 +39,7 @@ export class DataManager {
       return
     }
 
-    const row = rows.find(row => row.id === presetId)
+    const row = rows.find((row) => row.id === presetId)
 
     if (!row) {
       this.invalidate()
@@ -61,7 +61,7 @@ export class DataManager {
       return null
     }
 
-    const group = this.presets.find(group => group.control_id === controlId)
+    const group = this.presets.find((group) => group.control_id === controlId)
 
     if (!group || !Array.isArray(group.value)) {
       this.invalidate()
@@ -96,7 +96,7 @@ export class DataManager {
       return this.presets
     }
 
-    if (el && el.closest('.elementor-control.e-units-fluid')) {
+    if (el?.closest('.elementor-control.e-units-fluid')) {
       showControlSpinner(el)
     }
 
@@ -115,7 +115,7 @@ export class DataManager {
     this.request = elementorAjaxRequest<IPresetGroup[]>(
       AJAX_ACTIONS.FETCH_PRESETS,
       AJAX_DEFAULTS.FETCH_PRESETS
-    ).then(response => {
+    ).then((response) => {
       if (generation === this.generation) {
         this.presets = response
       }

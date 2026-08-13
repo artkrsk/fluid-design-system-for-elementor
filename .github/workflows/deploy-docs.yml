@@ -1,72 +1,20 @@
 name: Deploy VitePress Documentation
 
 on:
-  # Trigger on push to main or feature/documentation branch when docs change
   push:
-    branches:
-      - main
-      - feature/documentation
+    branches: [main]
     paths:
       - 'docs/**'
       - '.github/workflows/deploy-docs.yml'
-
-  # Allow manual trigger
   workflow_dispatch:
 
-# Sets permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
-  # Build job
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0 # Fetch all history for git log (if needed)
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'npm'
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build VitePress site
-        run: npm run docs:build
-        env:
-          # Set base path for GitHub Pages
-          # Format: /repository-name/
-          DOCS_BASE_PATH: /fluid-design-system-for-elementor/
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: docs/.vitepress/dist
-
-  # Deployment job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+  docs:
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/deploy-docs.yml@main
+    with:
+      docs_base_path: /fluid-design-system-for-elementor/

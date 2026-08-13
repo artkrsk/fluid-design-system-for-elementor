@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { isEmptyControlValue, isCustomFluidValue, ValidationService } from '@/utils/validation'
-import { CUSTOM_FLUID_VALUE } from '@/constants'
+import { CUSTOM_FLUID_VALUE } from '@ts/constants'
+import { isCustomFluidValue, isEmptyControlValue, ValidationService } from '@ts/utils/validation'
+import { describe, expect, it } from 'vitest'
 
 describe('validation utilities', () => {
   describe('isEmptyControlValue', () => {
@@ -91,44 +91,74 @@ describe('validation utilities', () => {
 
     describe('parseValueWithUnit', () => {
       it('returns default 0px for empty string', () => {
-        expect(ValidationService.parseValueWithUnit('')).toEqual({ size: '0', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit('')).toEqual({
+          size: '0',
+          unit: 'px'
+        })
       })
 
       it('returns default 0px for whitespace only', () => {
-        expect(ValidationService.parseValueWithUnit('   ')).toEqual({ size: '0', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit('   ')).toEqual({
+          size: '0',
+          unit: 'px'
+        })
       })
 
       it('returns default 0px for non-string input', () => {
         // @ts-expect-error - testing runtime behavior
-        expect(ValidationService.parseValueWithUnit(null)).toEqual({ size: '0', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit(null)).toEqual({
+          size: '0',
+          unit: 'px'
+        })
       })
 
       it('parses px values', () => {
-        expect(ValidationService.parseValueWithUnit('16px')).toEqual({ size: '16', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit('16px')).toEqual({
+          size: '16',
+          unit: 'px'
+        })
       })
 
       it('parses rem values', () => {
-        expect(ValidationService.parseValueWithUnit('1.5rem')).toEqual({ size: '1.5', unit: 'rem' })
+        expect(ValidationService.parseValueWithUnit('1.5rem')).toEqual({
+          size: '1.5',
+          unit: 'rem'
+        })
       })
 
       it('parses em values', () => {
-        expect(ValidationService.parseValueWithUnit('2em')).toEqual({ size: '2', unit: 'em' })
+        expect(ValidationService.parseValueWithUnit('2em')).toEqual({
+          size: '2',
+          unit: 'em'
+        })
       })
 
       it('parses percentage values', () => {
-        expect(ValidationService.parseValueWithUnit('50%')).toEqual({ size: '50', unit: '%' })
+        expect(ValidationService.parseValueWithUnit('50%')).toEqual({
+          size: '50',
+          unit: '%'
+        })
       })
 
       it('parses vw values', () => {
-        expect(ValidationService.parseValueWithUnit('100vw')).toEqual({ size: '100', unit: 'vw' })
+        expect(ValidationService.parseValueWithUnit('100vw')).toEqual({
+          size: '100',
+          unit: 'vw'
+        })
       })
 
       it('parses vh values', () => {
-        expect(ValidationService.parseValueWithUnit('100vh')).toEqual({ size: '100', unit: 'vh' })
+        expect(ValidationService.parseValueWithUnit('100vh')).toEqual({
+          size: '100',
+          unit: 'vh'
+        })
       })
 
       it('parses negative values', () => {
-        expect(ValidationService.parseValueWithUnit('-16px')).toEqual({ size: '-16', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit('-16px')).toEqual({
+          size: '-16',
+          unit: 'px'
+        })
       })
 
       it('parses decimal values', () => {
@@ -139,15 +169,24 @@ describe('validation utilities', () => {
       })
 
       it('handles whitespace around value', () => {
-        expect(ValidationService.parseValueWithUnit('  16px  ')).toEqual({ size: '16', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit('  16px  ')).toEqual({
+          size: '16',
+          unit: 'px'
+        })
       })
 
       it('handles space between number and unit', () => {
-        expect(ValidationService.parseValueWithUnit('16 px')).toEqual({ size: '16', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit('16 px')).toEqual({
+          size: '16',
+          unit: 'px'
+        })
       })
 
       it('defaults to px when no unit provided', () => {
-        expect(ValidationService.parseValueWithUnit('16')).toEqual({ size: '16', unit: 'px' })
+        expect(ValidationService.parseValueWithUnit('16')).toEqual({
+          size: '16',
+          unit: 'px'
+        })
       })
 
       it('returns null for invalid unit', () => {
@@ -159,8 +198,14 @@ describe('validation utilities', () => {
       })
 
       it('is case insensitive for units', () => {
-        expect(ValidationService.parseValueWithUnit('16PX')).toEqual({ size: '16', unit: 'PX' })
-        expect(ValidationService.parseValueWithUnit('1.5REM')).toEqual({ size: '1.5', unit: 'REM' })
+        expect(ValidationService.parseValueWithUnit('16PX')).toEqual({
+          size: '16',
+          unit: 'PX'
+        })
+        expect(ValidationService.parseValueWithUnit('1.5REM')).toEqual({
+          size: '1.5',
+          unit: 'REM'
+        })
       })
     })
 

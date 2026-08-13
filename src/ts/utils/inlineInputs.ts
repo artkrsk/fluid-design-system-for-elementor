@@ -1,8 +1,8 @@
-import { createElement } from './dom'
-import { ValidationService } from './validation'
-import { ValueFormatter } from './formatters'
 import { UI_DEFAULTS } from '../constants'
 import type { IInlineContainerResult, IInlineInputValues } from '../interfaces'
+import { createElement } from './dom'
+import { ValueFormatter } from './formatters'
+import { ValidationService } from './validation'
 
 /** Manages inline min/max input fields for custom fluid values */
 export class InlineInputManager {
@@ -172,7 +172,7 @@ export class InlineInputManager {
       return
     }
 
-    containers.forEach(container => {
+    containers.forEach((container) => {
       if (!container) {
         return
       }
