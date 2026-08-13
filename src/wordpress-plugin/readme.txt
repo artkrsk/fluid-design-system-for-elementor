@@ -200,6 +200,9 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.5.3 =
+* improved: full compatibility with WordPress 7.1
+
 = 2.5.2 =
 * fixed: the preset dialog could be closed with the Escape key while saving, hiding save errors
 * fixed: the Save button in the "Edit Preset" dialog could stay disabled on slow connections
