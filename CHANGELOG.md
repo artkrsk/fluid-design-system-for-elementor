@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.3
+
+- improved: full compatibility with WordPress 7.1
+
 ## 2.5.2
 
 - fixed: the preset dialog could be closed with the Escape key while saving, hiding save errors
