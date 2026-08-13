@@ -47,8 +47,7 @@
 }
 
 /* Hide edit icon when there's content and not hovering */
-.editable-description:not(:hover):not(.editing) .description-text:not(:empty)
-	~ :after {
+.editable-description:not(:hover):not(.editing) .description-text:not(:empty)~ :after {
 	display: none;
 }
 
@@ -226,6 +225,7 @@
 }
 
 @keyframes shake {
+
 	0%,
 	100% {
 		transform: translateX(0);

@@ -6,322 +6,299 @@
  * @since 1.0.0
  */
 
-(($) => {
-	let saveTimeout = null;
+;(function ($) {
+  'use strict'
 
-	/**
-	 * Initialize everything
-	 */
-	function init() {
-		// Initialize accordions
-		$(document).on("click", ".group-chevron", handleChevronClick);
+  let saveTimeout = null
 
-		// Initialize all visible preset lists
-		$(".preset-sortable-list").each(function () {
-			initPresetList($(this));
-		});
+  /**
+   * Initialize everything
+   */
+  function init() {
+    // Initialize accordions
+    $(document).on('click', '.group-chevron', handleChevronClick)
 
-		// Initialize preset lists when accordions expand
-		$(document).on("accordion-expanded", (e, $presetsRow) => {
-			const $list = $presetsRow.find(".preset-sortable-list");
-			if ($list.length && !$list.hasClass("ui-sortable")) {
-				initPresetList($list);
-			}
-		});
+    // Initialize all visible preset lists
+    $('.preset-sortable-list').each(function () {
+      initPresetList($(this))
+    })
 
-		// Initialize placeholder states on page load
-		updatePresetListStates();
-	}
+    // Initialize preset lists when accordions expand
+    $(document).on('accordion-expanded', function (e, $presetsRow) {
+      const $list = $presetsRow.find('.preset-sortable-list')
+      if ($list.length && !$list.hasClass('ui-sortable')) {
+        initPresetList($list)
+      }
+    })
 
-	/**
-	 * Initialize a preset list for drag & drop
-	 */
-	function initPresetList($list) {
-		// Skip if already initialized
-		if ($list.hasClass("ui-sortable")) {
-			return;
-		}
+    // Initialize placeholder states on page load
+    updatePresetListStates()
+  }
 
-		$list.sortable({
-			connectWith: ".preset-sortable-list",
-			items: ".preset-item:not(.preset-placeholder)",
-			placeholder: "preset-sortable-placeholder",
-			tolerance: "pointer",
-			cursor: "move",
-			helper: "clone",
-			appendTo: "body", // Append helper to body to avoid z-index issues
-			zIndex: 9999,
+  /**
+   * Initialize a preset list for drag & drop
+   */
+  function initPresetList($list) {
+    // Skip if already initialized
+    if ($list.hasClass('ui-sortable')) {
+      return
+    }
 
-			start: (event, ui) => {
-				// Add dragging state to body for placeholder styling
-				$("body").addClass("ui-sortable-helper-active");
+    $list.sortable({
+      connectWith: '.preset-sortable-list',
+      items: '.preset-item:not(.preset-placeholder)',
+      placeholder: 'preset-sortable-placeholder',
+      tolerance: 'pointer',
+      cursor: 'move',
+      helper: 'clone',
+      appendTo: 'body', // Append helper to body to avoid z-index issues
+      zIndex: 9999,
 
-				// Simple visual feedback
-				ui.placeholder.height(ui.helper.outerHeight());
+      start: function (event, ui) {
+        // Add dragging state to body for placeholder styling
+        $('body').addClass('ui-sortable-helper-active')
 
-				// Placeholders remain visible as drop targets (styled via CSS)
-			},
+        // Simple visual feedback
+        ui.placeholder.height(ui.helper.outerHeight())
 
-			stop: (event, ui) => {
-				// Remove dragging state from body
-				$("body").removeClass("ui-sortable-helper-active");
+        // Placeholders remain visible as drop targets (styled via CSS)
+      },
 
-				// Update empty states and placeholder visibility
-				updatePresetListStates();
+      stop: function (event, ui) {
+        // Remove dragging state from body
+        $('body').removeClass('ui-sortable-helper-active')
 
-				// Save after any change
-				scheduleSnapshot();
-			},
-		});
-	}
+        // Update empty states and placeholder visibility
+        updatePresetListStates()
 
-	/**
-	 * Handle chevron click to expand/collapse
-	 */
-	function handleChevronClick(e) {
-		e.preventDefault();
-		e.stopPropagation();
+        // Save after any change
+        scheduleSnapshot()
+      }
+    })
+  }
 
-		const $chevron = $(this);
-		const groupId = $chevron.data("group-id");
-		const $groupRow = $chevron.closest(".group-row");
-		const $presetsRow = $(`.group-presets-row[data-group-id="${groupId}"]`);
+  /**
+   * Handle chevron click to expand/collapse
+   */
+  function handleChevronClick(e) {
+    e.preventDefault()
+    e.stopPropagation()
 
-		if ($presetsRow.length === 0) {
-			return;
-		}
+    const $chevron = $(this)
+    const groupId = $chevron.data('group-id')
+    const $groupRow = $chevron.closest('.group-row')
+    const $presetsRow = $(`.group-presets-row[data-group-id="${groupId}"]`)
 
-		const $wrapper = $presetsRow.find(".group-presets-wrapper");
+    if ($presetsRow.length === 0) {
+      return
+    }
 
-		if ($chevron.hasClass("expanded")) {
-			// Collapse
-			$chevron.removeClass("expanded");
-			$wrapper.slideUp(200);
-			$groupRow.removeClass("accordion-expanded");
-		} else {
-			// Expand
-			$chevron.addClass("expanded");
-			$wrapper.slideDown(200, () => {
-				// Initialize sortable if needed
-				const $list = $presetsRow.find(".preset-sortable-list");
-				if ($list.length && !$list.hasClass("ui-sortable")) {
-					initPresetList($list);
-				}
-			});
-			$groupRow.addClass("accordion-expanded");
-		}
+    const $wrapper = $presetsRow.find('.group-presets-wrapper')
 
-		// Toggle group table sorting based on accordion state (main table only)
-		const hasExpanded =
-			$("#fluid-groups-sortable .group-chevron.expanded").length > 0;
-		const $tbody = $("#fluid-groups-tbody");
+    if ($chevron.hasClass('expanded')) {
+      // Collapse
+      $chevron.removeClass('expanded')
+      $wrapper.slideUp(200)
+      $groupRow.removeClass('accordion-expanded')
+    } else {
+      // Expand
+      $chevron.addClass('expanded')
+      $wrapper.slideDown(200, function () {
+        // Initialize sortable if needed
+        const $list = $presetsRow.find('.preset-sortable-list')
+        if ($list.length && !$list.hasClass('ui-sortable')) {
+          initPresetList($list)
+        }
+      })
+      $groupRow.addClass('accordion-expanded')
+    }
 
-		if ($tbody.hasClass("ui-sortable")) {
-			if (hasExpanded) {
-				$tbody.sortable("disable");
-				$("#fluid-groups-sortable .group-row.sortable-row").addClass(
-					"sorting-disabled",
-				);
-			} else {
-				$tbody.sortable("enable");
-				$("#fluid-groups-sortable .group-row.sortable-row").removeClass(
-					"sorting-disabled",
-				);
-			}
-		}
-	}
+    // Toggle group table sorting based on accordion state (main table only)
+    const hasExpanded = $('#fluid-groups-sortable .group-chevron.expanded').length > 0
+    const $tbody = $('#fluid-groups-tbody')
 
-	/**
-	 * Schedule a snapshot save (debounced)
-	 */
-	function scheduleSnapshot() {
-		if (saveTimeout) {
-			clearTimeout(saveTimeout);
-		}
+    if ($tbody.hasClass('ui-sortable')) {
+      if (hasExpanded) {
+        $tbody.sortable('disable')
+        $('#fluid-groups-sortable .group-row.sortable-row').addClass('sorting-disabled')
+      } else {
+        $tbody.sortable('enable')
+        $('#fluid-groups-sortable .group-row.sortable-row').removeClass('sorting-disabled')
+      }
+    }
+  }
 
-		saveTimeout = setTimeout(() => {
-			saveSnapshot();
-		}, 300); // 300ms debounce
-	}
+  /**
+   * Schedule a snapshot save (debounced)
+   */
+  function scheduleSnapshot() {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout)
+    }
 
-	/**
-	 * Save the current preset arrangement
-	 */
-	function saveSnapshot() {
-		// Show loading state
-		$("body").addClass("ajax-operation-pending");
-		$(".preset-sortable-list").addClass("ajax-operation-pending");
+    saveTimeout = setTimeout(function () {
+      saveSnapshot()
+    }, 300) // 300ms debounce
+  }
 
-		if (
-			window.FluidDesignSystemAdmin &&
-			window.FluidDesignSystemAdmin.statusNotices
-		) {
-			window.FluidDesignSystemAdmin.statusNotices.showLoading(
-				"Saving Changes...",
-			);
-		}
+  /**
+   * Save the current preset arrangement
+   */
+  function saveSnapshot() {
+    // Show loading state
+    $('body').addClass('ajax-operation-pending')
+    $('.preset-sortable-list').addClass('ajax-operation-pending')
 
-		// Collect the snapshot
-		const snapshot = collectSnapshot();
+    if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.statusNotices) {
+      window.FluidDesignSystemAdmin.statusNotices.showLoading('Saving Changes...')
+    }
 
-		// Send to server
-		$.ajax({
-			url: window.fluidDesignSystemAdmin.ajaxUrl,
-			type: "POST",
-			data: {
-				action: "fluid_design_system_admin_action",
-				security: window.fluidDesignSystemAdmin.ajaxNonce,
-				fluid_action: "save_presets_snapshot",
-				snapshot: JSON.stringify(snapshot),
-			},
-			success: (response) => {
-				if (response.success) {
-					// Update preset counts in the table
-					updatePresetCounts();
+    // Collect the snapshot
+    const snapshot = collectSnapshot()
 
-					if (
-						window.FluidDesignSystemAdmin &&
-						window.FluidDesignSystemAdmin.statusNotices
-					) {
-						window.FluidDesignSystemAdmin.statusNotices.showSuccess(
-							"Presets updated successfully",
-						);
-					}
-				} else {
-					if (
-						window.FluidDesignSystemAdmin &&
-						window.FluidDesignSystemAdmin.statusNotices
-					) {
-						window.FluidDesignSystemAdmin.statusNotices.showError(
-							"Failed to save presets",
-						);
-					}
-				}
-			},
-			error: () => {
-				if (
-					window.FluidDesignSystemAdmin &&
-					window.FluidDesignSystemAdmin.statusNotices
-				) {
-					window.FluidDesignSystemAdmin.statusNotices.showError(
-						"Failed to save presets",
-					);
-				}
-			},
-			complete: () => {
-				// Hide loading state
-				$("body").removeClass("ajax-operation-pending");
-				$(".preset-sortable-list").removeClass("ajax-operation-pending");
-			},
-		});
-	}
+    // Send to server
+    $.ajax({
+      url: window.fluidDesignSystemAdmin.ajaxUrl,
+      type: 'POST',
+      data: {
+        action: 'fluid_design_system_admin_action',
+        security: window.fluidDesignSystemAdmin.ajaxNonce,
+        fluid_action: 'save_presets_snapshot',
+        snapshot: JSON.stringify(snapshot)
+      },
+      success: function (response) {
+        if (response.success) {
+          // Update preset counts in the table
+          updatePresetCounts()
 
-	/**
-	 * Collect snapshot of current preset arrangement
-	 */
-	function collectSnapshot() {
-		const snapshot = {};
+          if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.statusNotices) {
+            window.FluidDesignSystemAdmin.statusNotices.showSuccess('Presets updated successfully')
+          }
+        } else {
+          if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.statusNotices) {
+            window.FluidDesignSystemAdmin.statusNotices.showError('Failed to save presets')
+          }
+        }
+      },
+      error: function () {
+        if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.statusNotices) {
+          window.FluidDesignSystemAdmin.statusNotices.showError('Failed to save presets')
+        }
+      },
+      complete: function () {
+        // Hide loading state
+        $('body').removeClass('ajax-operation-pending')
+        $('.preset-sortable-list').removeClass('ajax-operation-pending')
+      }
+    })
+  }
 
-		$(".group-presets-row[data-group-id]").each(function () {
-			const $row = $(this);
-			const groupId = $row.data("group-id");
+  /**
+   * Collect snapshot of current preset arrangement
+   */
+  function collectSnapshot() {
+    const snapshot = {}
 
-			if (!groupId || groupId === "") {
-				return; // Skip invalid groups
-			}
+    $('.group-presets-row[data-group-id]').each(function () {
+      const $row = $(this)
+      const groupId = $row.data('group-id')
 
-			// Map group ID to control ID
-			const controlId = mapGroupToControl(groupId);
-			if (!controlId) {
-				return; // Skip if no mapping
-			}
+      if (!groupId || groupId === '') {
+        return // Skip invalid groups
+      }
 
-			// Collect presets in this group
-			const presets = [];
-			$row.find(".preset-item[data-preset-id]").each(function () {
-				const $preset = $(this);
-				const presetId = $preset.data("preset-id");
+      // Map group ID to control ID
+      const controlId = mapGroupToControl(groupId)
+      if (!controlId) {
+        return // Skip if no mapping
+      }
 
-				if (presetId && presetId !== "") {
-					presets.push({
-						_id: String(presetId),
-						title: $preset.find(".preset-title").text() || "Untitled",
-					});
-				}
-			});
+      // Collect presets in this group
+      const presets = []
+      $row.find('.preset-item[data-preset-id]').each(function () {
+        const $preset = $(this)
+        const presetId = $preset.data('preset-id')
 
-			snapshot[controlId] = presets;
-		});
+        if (presetId && presetId !== '') {
+          presets.push({
+            _id: String(presetId),
+            title: $preset.find('.preset-title').text() || 'Untitled'
+          })
+        }
+      })
 
-		return snapshot;
-	}
+      snapshot[controlId] = presets
+    })
 
-	/**
-	 * Simple group to control ID mapping
-	 */
-	function mapGroupToControl(groupId) {
-		// Built-in groups
-		if (groupId === "fluid_spacing_presets" || groupId === "spacing") {
-			return "fluid_spacing_presets";
-		}
-		if (groupId === "fluid_typography_presets" || groupId === "typography") {
-			return "fluid_typography_presets";
-		}
+    return snapshot
+  }
 
-		// Already formatted
-		if (groupId.includes("_presets")) {
-			return groupId;
-		}
+  /**
+   * Simple group to control ID mapping
+   */
+  function mapGroupToControl(groupId) {
+    // Built-in groups
+    if (groupId === 'fluid_spacing_presets' || groupId === 'spacing') {
+      return 'fluid_spacing_presets'
+    }
+    if (groupId === 'fluid_typography_presets' || groupId === 'typography') {
+      return 'fluid_typography_presets'
+    }
 
-		// Custom groups
-		return `fluid_custom_${groupId}_presets`;
-	}
+    // Already formatted
+    if (groupId.includes('_presets')) {
+      return groupId
+    }
 
-	/**
-	 * Update preset counts in the table
-	 */
-	function updatePresetCounts() {
-		$(".group-row[data-group-id]").each(function () {
-			const $row = $(this);
-			const groupId = $row.data("group-id");
-			const count = $(
-				`.group-presets-row[data-group-id="${groupId}"] .preset-item:not(.preset-placeholder)`,
-			).length;
-			$row.find(".column-presets").text(count);
-		});
-	}
+    // Custom groups
+    return `fluid_custom_${groupId}_presets`
+  }
 
-	/**
-	 * Update preset list states and placeholder visibility
-	 */
-	function updatePresetListStates() {
-		$(".preset-sortable-list").each(function () {
-			const $list = $(this);
-			const $realPresets = $list.find(".preset-item:not(.preset-placeholder)");
-			const $placeholder = $list.find(".preset-placeholder");
+  /**
+   * Update preset counts in the table
+   */
+  function updatePresetCounts() {
+    $('.group-row[data-group-id]').each(function () {
+      const $row = $(this)
+      const groupId = $row.data('group-id')
+      const count = $(
+        `.group-presets-row[data-group-id="${groupId}"] .preset-item:not(.preset-placeholder)`
+      ).length
+      $row.find('.column-presets').text(count)
+    })
+  }
 
-			if ($realPresets.length === 0) {
-				// No real presets - show placeholder
-				$placeholder.show();
-				$list.removeClass("has-presets");
-			} else {
-				// Has real presets - hide placeholder
-				$placeholder.hide();
-				$list.addClass("has-presets");
-			}
-		});
-	}
+  /**
+   * Update preset list states and placeholder visibility
+   */
+  function updatePresetListStates() {
+    $('.preset-sortable-list').each(function () {
+      const $list = $(this)
+      const $realPresets = $list.find('.preset-item:not(.preset-placeholder)')
+      const $placeholder = $list.find('.preset-placeholder')
 
-	// Public API
-	window.FluidDesignSystemAdmin = window.FluidDesignSystemAdmin || {};
-	window.FluidDesignSystemAdmin.accordion = {
-		init: init,
-		saveSnapshot: saveSnapshot,
-		collectSnapshot: collectSnapshot,
-		updatePresetCounts: updatePresetCounts,
-		updatePresetListStates: updatePresetListStates,
-	};
+      if ($realPresets.length === 0) {
+        // No real presets - show placeholder
+        $placeholder.show()
+        $list.removeClass('has-presets')
+      } else {
+        // Has real presets - hide placeholder
+        $placeholder.hide()
+        $list.addClass('has-presets')
+      }
+    })
+  }
 
-	// Initialize when ready
-	$(document).ready(init);
-})(jQuery);
+  // Public API
+  window.FluidDesignSystemAdmin = window.FluidDesignSystemAdmin || {}
+  window.FluidDesignSystemAdmin.accordion = {
+    init: init,
+    saveSnapshot: saveSnapshot,
+    collectSnapshot: collectSnapshot,
+    updatePresetCounts: updatePresetCounts,
+    updatePresetListStates: updatePresetListStates
+  }
+
+  // Initialize when ready
+  $(document).ready(init)
+})(jQuery)

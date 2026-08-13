@@ -5,134 +5,129 @@
  * @since 1.0.0
  */
 
-(($) => {
-	/**
-	 * Initialize sortable functionality
-	 */
-	function init() {
-		initSortable();
-	}
+;(function ($) {
+  'use strict'
 
-	/**
-	 * Initialize jQuery UI sortable
-	 */
-	function initSortable() {
-		const $tbody = $("#fluid-groups-tbody");
+  /**
+   * Initialize sortable functionality
+   */
+  function init() {
+    initSortable()
+  }
 
-		if ($tbody.length === 0) {
-			return;
-		}
+  /**
+   * Initialize jQuery UI sortable
+   */
+  function initSortable() {
+    const $tbody = $('#fluid-groups-tbody')
 
-		$tbody.sortable({
-			items: "tr.sortable-row:not(.marked-for-deletion)", // Exclude marked rows from sorting
-			axis: "y",
-			cursor: "move",
-			placeholder: "ui-sortable-placeholder",
-			helper: (e, tr) => {
-				var $originals = tr.children();
-				var $helper = tr.clone();
-				$helper.children().each(function (index) {
-					$(this).width($originals.eq(index).width());
-				});
-				return $helper;
-			},
-			start: (event, ui) => {
-				// Store the associated preset row
-				const groupId = ui.item.data("group-id");
-				const $presetRow = $(`.group-presets-row[data-group-id="${groupId}"]`);
-				ui.item.data("associated-preset-row", $presetRow);
-			},
-			stop: (event, ui) => {
-				// Move the associated preset row to follow its group row
-				const $presetRow = ui.item.data("associated-preset-row");
-				if ($presetRow && $presetRow.length) {
-					ui.item.after($presetRow);
-				}
+    if ($tbody.length === 0) {
+      return
+    }
 
-				// Update order numbers after sorting
-				updateOrderNumbers();
-			},
-			update: (event, ui) => {
-				// Update hidden inputs with new order and update order numbers
-				updateGroupOrder();
-				updateOrderNumbers();
+    $tbody.sortable({
+      items: 'tr.sortable-row:not(.marked-for-deletion)', // Exclude marked rows from sorting
+      axis: 'y',
+      cursor: 'move',
+      placeholder: 'ui-sortable-placeholder',
+      helper: function (e, tr) {
+        var $originals = tr.children()
+        var $helper = tr.clone()
+        $helper.children().each(function (index) {
+          $(this).width($originals.eq(index).width())
+        })
+        return $helper
+      },
+      start: function (event, ui) {
+        // Store the associated preset row
+        const groupId = ui.item.data('group-id')
+        const $presetRow = $(`.group-presets-row[data-group-id="${groupId}"]`)
+        ui.item.data('associated-preset-row', $presetRow)
+      },
+      stop: function (event, ui) {
+        // Move the associated preset row to follow its group row
+        const $presetRow = ui.item.data('associated-preset-row')
+        if ($presetRow && $presetRow.length) {
+          ui.item.after($presetRow)
+        }
 
-				// Update temporary group form data with new positions
-				if (
-					window.FluidDesignSystemAdmin &&
-					window.FluidDesignSystemAdmin.base &&
-					window.FluidDesignSystemAdmin.base.updateFormDataFromTempGroups
-				) {
-					window.FluidDesignSystemAdmin.base.updateFormDataFromTempGroups();
-				}
+        // Update order numbers after sorting
+        updateOrderNumbers()
+      },
+      update: function (event, ui) {
+        // Update hidden inputs with new order and update order numbers
+        updateGroupOrder()
+        updateOrderNumbers()
 
-				// Get current order of group IDs for AJAX
-				const groupOrder = [];
-				$("#fluid-groups-tbody tr.sortable-row:not(.marked-for-deletion)").each(
-					function () {
-						const groupId = $(this).data("group-id");
-						if (groupId) {
-							groupOrder.push(groupId);
-						}
-					},
-				);
+        // Update temporary group form data with new positions
+        if (
+          window.FluidDesignSystemAdmin &&
+          window.FluidDesignSystemAdmin.base &&
+          window.FluidDesignSystemAdmin.base.updateFormDataFromTempGroups
+        ) {
+          window.FluidDesignSystemAdmin.base.updateFormDataFromTempGroups()
+        }
 
-				// Immediate AJAX request to save new order
-				if (
-					window.FluidDesignSystemAdmin &&
-					window.FluidDesignSystemAdmin.ajax
-				) {
-					window.FluidDesignSystemAdmin.ajax.reorderGroups(
-						groupOrder,
-						// Success callback
-						(response) => {
-							// Success feedback handled by ajax-manager.js
-						},
-						// Error callback
-						(errorData) => {
-							// Error feedback handled by ajax-manager.js
-						},
-					);
-				}
-			},
-		});
+        // Get current order of group IDs for AJAX
+        const groupOrder = []
+        $('#fluid-groups-tbody tr.sortable-row:not(.marked-for-deletion)').each(function () {
+          const groupId = $(this).data('group-id')
+          if (groupId) {
+            groupOrder.push(groupId)
+          }
+        })
 
-		// Make the table rows look sortable
-		$tbody.disableSelection();
-	}
+        // Immediate AJAX request to save new order
+        if (window.FluidDesignSystemAdmin && window.FluidDesignSystemAdmin.ajax) {
+          window.FluidDesignSystemAdmin.ajax.reorderGroups(
+            groupOrder,
+            // Success callback
+            function (response) {
+              // Success feedback handled by ajax-manager.js
+            },
+            // Error callback
+            function (errorData) {
+              // Error feedback handled by ajax-manager.js
+            }
+          )
+        }
+      }
+    })
 
-	/**
-	 * Update group order numbers and hidden inputs
-	 */
-	function updateOrderNumbers() {
-		$("#fluid-groups-tbody tr.sortable-row:not(.marked-for-deletion)").each(
-			function (index) {
-				var $row = $(this);
-				var order = index + 1;
+    // Make the table rows look sortable
+    $tbody.disableSelection()
+  }
 
-				// Update order number display
-				$row.find(".order-number").text(order);
-			},
-		);
-	}
+  /**
+   * Update group order numbers and hidden inputs
+   */
+  function updateOrderNumbers() {
+    $('#fluid-groups-tbody tr.sortable-row:not(.marked-for-deletion)').each(function (index) {
+      var $row = $(this)
+      var order = index + 1
 
-	/**
-	 * Update group order in hidden inputs for saving
-	 */
-	function updateGroupOrder() {
-		// The group order is maintained by the order of group_order[] inputs
-		// which are already in the correct DOM order after sorting
-		// No additional updates needed since the hidden inputs move with the rows
-	}
+      // Update order number display
+      $row.find('.order-number').text(order)
+    })
+  }
 
-	// Public API
-	window.FluidDesignSystemAdmin = window.FluidDesignSystemAdmin || {};
-	window.FluidDesignSystemAdmin.sortable = {
-		init: init,
-		updateOrderNumbers: updateOrderNumbers,
-		updateGroupOrder: updateGroupOrder,
-	};
+  /**
+   * Update group order in hidden inputs for saving
+   */
+  function updateGroupOrder() {
+    // The group order is maintained by the order of group_order[] inputs
+    // which are already in the correct DOM order after sorting
+    // No additional updates needed since the hidden inputs move with the rows
+  }
 
-	// Initialize when DOM is ready
-	$(document).ready(init);
-})(jQuery);
+  // Public API
+  window.FluidDesignSystemAdmin = window.FluidDesignSystemAdmin || {}
+  window.FluidDesignSystemAdmin.sortable = {
+    init: init,
+    updateOrderNumbers: updateOrderNumbers,
+    updateGroupOrder: updateGroupOrder
+  }
+
+  // Initialize when DOM is ready
+  $(document).ready(init)
+})(jQuery)

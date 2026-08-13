@@ -9,9 +9,7 @@
 .success-feedback {
 	background-color: #edfaef !important;
 	border-color: #68de7c !important;
-	transition:
-		background-color 0.3s ease,
-		border-color 0.3s ease;
+	transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .success-feedback .title-text,
@@ -22,9 +20,7 @@
 .error-feedback {
 	background-color: #fcf0f1 !important;
 	border-color: #f56565 !important;
-	transition:
-		background-color 0.3s ease,
-		border-color 0.3s ease;
+	transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .error-feedback .title-text,
@@ -46,9 +42,7 @@
 /* Ensure transitions work smoothly */
 .editable-title,
 .editable-description {
-	transition:
-		background-color 0.3s ease,
-		border-color 0.3s ease;
+	transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Enhanced Save Changes button */

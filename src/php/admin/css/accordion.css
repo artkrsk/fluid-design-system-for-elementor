@@ -98,6 +98,7 @@ body.ui-sortable-helper-active .preset-placeholder {
 }
 
 @keyframes pulse-drop-zone {
+
 	0%,
 	100% {
 		opacity: 1;
@@ -139,8 +140,7 @@ body.ui-sortable-helper-active .preset-placeholder {
 }
 
 /* During drag operations, make placeholder more prominent as drop target */
-body.ui-sortable-helper-active .preset-sortable-list
-	.preset-item.preset-placeholder {
+body.ui-sortable-helper-active .preset-sortable-list .preset-item.preset-placeholder {
 	border-style: solid;
 	/* Show copy cursor to indicate it's a drop target */
 	/* Change from dashed to solid during drag */
