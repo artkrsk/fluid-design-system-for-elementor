@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/ts/index.ts",
+    "project.config.js",
+    "docs/.vitepress/config.mts",
+    "docs/.vitepress/theme/index.ts",
+    "tests/**/*.test.ts",
+    "tests/e2e/**/*.spec.ts"
+  ],
+  "project": ["src/ts/**/*.ts", "tests/**/*.ts", "docs/.vitepress/**/*.{ts,mts}"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    "fallow",
+    "@wordpress/env",
+    // Imported by the docs theme's .vue components, which knip has no parser
+    // for. The docs build is the gate that covers those imports: an undeclared
+    // one fails `vitepress build docs` under pnpm, which is exactly how this
+    // dependency's absence was found in the first place.
+    "medium-zoom"
+  ]
+}
