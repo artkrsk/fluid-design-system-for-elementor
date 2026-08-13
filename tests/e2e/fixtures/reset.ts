@@ -22,7 +22,7 @@ const PLUGIN_PATH = '/var/www/html/wp-content/plugins/fluid-design-system-for-el
  */
 export function resetTestState(): void {
   execSync(
-    `npm run wp-env run cli -- wp eval-file ${PLUGIN_PATH}/tests/e2e/fixtures/reset-state.php`,
+    `pnpm exec wp-env run cli -- wp eval-file ${PLUGIN_PATH}/tests/e2e/fixtures/reset-state.php`,
     { cwd: REPO_ROOT, stdio: 'pipe', timeout: 120000 }
   )
 }

@@ -23,6 +23,12 @@ jobs:
       coverage: true
       wp_env_ports: '8888,8889'
       run_e2e: true
+      # The Abilities API lands in WP 6.9 and this plugin supports 6.0+, so
+      # plugin-check flags every wp_register_ability* call. Every one of them is
+      # behind a runtime guard (the abilities hooks no-op when the API is
+      # absent), and dropping 6.0 support to satisfy a static check would be the
+      # wrong trade. Carried over from the hand-rolled workflow.
+      extra_plugin_check_ignore_codes: wp_function_not_compatible_with_requires_wp
       # The integration tier runs PHPUnit 10.5 from an isolated Composer project
       # (tests/php/tools) because two autoloaders with the same generated class
       # name are fatal in one process — so it can't use the shared suite loop.

@@ -147,8 +147,8 @@ async function waitForHttpOk(
 function logEnvironmentDiagnostics(): void {
   const commands = [
     'docker ps',
-    'npm run wp-env run cli -- wp option get siteurl',
-    'npm run wp-env run cli -- tail -n 50 /var/www/html/wp-content/debug.log'
+    'pnpm exec wp-env run cli -- wp option get siteurl',
+    'pnpm exec wp-env run cli -- tail -n 50 /var/www/html/wp-content/debug.log'
   ]
 
   for (const command of commands) {
@@ -174,7 +174,7 @@ function verifyPluginsActive(): void {
   console.log('[E2E Setup] Verifying active plugins...')
 
   const activePlugins = execSync(
-    `npm run wp-env run cli -- wp plugin list --status=active --field=name`,
+    `pnpm exec wp-env run cli -- wp plugin list --status=active --field=name`,
     {
       cwd: path.resolve(__dirname, '../..'),
       timeout: 60000
@@ -192,7 +192,7 @@ function verifyPluginsActive(): void {
   }
 
   try {
-    execSync(`npm run wp-env run cli -- wp transient delete elementor_activation_redirect`, {
+    execSync(`pnpm exec wp-env run cli -- wp transient delete elementor_activation_redirect`, {
       cwd: path.resolve(__dirname, '../..'),
       stdio: 'ignore',
       timeout: 60000
@@ -212,13 +212,13 @@ async function enablePermalinks(): Promise<void> {
   console.log('[E2E Setup] Enabling pretty permalinks...')
 
   try {
-    execSync(`npm run wp-env run cli -- wp rewrite structure '/%postname%/' --hard`, {
+    execSync(`pnpm exec wp-env run cli -- wp rewrite structure '/%postname%/' --hard`, {
       cwd: path.resolve(__dirname, '../..'),
       stdio: 'inherit',
       timeout: 60000
     })
 
-    execSync(`npm run wp-env run cli -- wp rewrite flush`, {
+    execSync(`pnpm exec wp-env run cli -- wp rewrite flush`, {
       cwd: path.resolve(__dirname, '../..'),
       stdio: 'inherit',
       timeout: 60000
@@ -240,7 +240,7 @@ async function seedTestPresets(): Promise<void> {
   try {
     const scriptPath = `${PLUGIN_PATH}/tests/e2e/fixtures/setup-presets.php`
 
-    execSync(`npm run wp-env run cli -- wp eval-file "${scriptPath}"`, {
+    execSync(`pnpm exec wp-env run cli -- wp eval-file "${scriptPath}"`, {
       cwd: path.resolve(__dirname, '../..'),
       stdio: 'inherit',
       timeout: 60000
@@ -262,7 +262,7 @@ async function createTestPage(): Promise<void> {
   try {
     const scriptPath = `${PLUGIN_PATH}/tests/e2e/fixtures/setup-page.php`
 
-    execSync(`npm run wp-env run cli -- wp eval-file "${scriptPath}"`, {
+    execSync(`pnpm exec wp-env run cli -- wp eval-file "${scriptPath}"`, {
       cwd: path.resolve(__dirname, '../..'),
       stdio: 'inherit',
       timeout: 60000
