@@ -21,6 +21,8 @@ jobs:
     with:
       zip_budget_mb: '1.0'
       coverage: true
+      # deploy-docs only runs post-merge; this catches a broken docs config on the PR.
+      build_docs: true
       wp_env_ports: '8888,8889'
       run_e2e: true
       # The Abilities API lands in WP 6.9 and this plugin supports 6.0+, so
