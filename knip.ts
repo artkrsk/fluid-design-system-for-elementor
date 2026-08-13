@@ -23,9 +23,12 @@ const config: KnipConfig = {
   // you get two Vue instances.
   ignoreDependencies: ['fallow', '@wordpress/env', 'vue'],
   compilers: {
-    // Enough to expose the imports; knip only needs the script block.
+    // Enough to expose the imports; knip only needs the script block. Case
+    // insensitive: Vue SFCs are lowercase in practice, but a tag filter that
+    // only matches one case is the kind CodeQL flags, and being right here
+    // costs a flag.
     vue: (text: string) =>
-      [...text.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('\n')
+      [...text.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]).join('\n')
   }
 }
 
