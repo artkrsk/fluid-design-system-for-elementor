@@ -61,6 +61,9 @@ importers:
       lefthook:
         specifier: ^2.1.10
         version: 2.1.10
+      medium-zoom:
+        specifier: ^1.1.0
+        version: 1.1.0
       stylelint:
         specifier: ^17.14.1
         version: 17.14.1(supports-color@10.2.2)(typescript@7.0.2)
