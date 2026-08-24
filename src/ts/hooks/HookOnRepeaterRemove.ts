@@ -51,7 +51,6 @@ export class HookOnRepeaterRemove extends commandSystem.modules.hookUI.Before {
     // Mark the item as removed for undo operations
     stateManager.markItemAsRemoved(removedItemId)
 
-    // Find and update CSS rules with the matching ID pattern
     cssManager.unsetCssVariable(removedItemId)
 
     return true // Always continue with the command

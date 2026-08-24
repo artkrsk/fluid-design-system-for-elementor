@@ -2,7 +2,8 @@
 /**
  * CSS variable naming and clamp() formula generation.
  *
- * Constants must match JavaScript: constants/STYLES.ts
+ * Constants must match JavaScript: constants/STYLES.ts (preset prefix) and utils/clamp.ts
+ * (min-screen / screen-diff var names, hardcoded there).
  *
  * @package Arts\FluidDesignSystem
  * @since 1.0.0
@@ -96,7 +97,8 @@ class CSSVariables extends BaseManager {
 	 * @param string      $min_value  Elementor control name for min value.
 	 * @param string      $max_value  Elementor control name for max value.
 	 * @param string|null $min_screen Custom min breakpoint or null for global.
-	 * @param string|null $max_screen Custom max breakpoint or null for global.
+	 * @param string|null $max_screen Screen-width *range* (max minus min) used as the scaling
+	 *                                divisor, not the max breakpoint; null for the global screen-diff var.
 	 */
 	public static function get_clamp_formula( string $min_value, string $max_value, ?string $min_screen = null, ?string $max_screen = null ): string {
 		$min_size = '{{' . $min_value . '.size}}{{' . $min_value . '.unit}}';

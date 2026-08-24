@@ -27,7 +27,6 @@ class Handlers extends BaseManager {
 	 * the user's intended order when new groups are added before saving.
 	 */
 	public function handle_save_all_changes(): void {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
 		}
@@ -239,12 +238,10 @@ class Handlers extends BaseManager {
 					continue;
 				}
 
-				// Skip if empty
 				if ( empty( $new_title ) || empty( $group_id ) || ! isset( $custom_groups[ $group_id ] ) ) {
 					continue;
 				}
 
-				// Skip if unchanged
 				if ( $custom_groups[ $group_id ]['name'] === $new_title ) {
 					continue;
 				}
@@ -270,7 +267,6 @@ class Handlers extends BaseManager {
 					continue;
 				}
 
-				// Update the title
 				$custom_groups[ $group_id ]['name'] = $new_title;
 				$updated_groups                     = true;
 			}
@@ -304,7 +300,6 @@ class Handlers extends BaseManager {
 
 				// Only update if the group exists in custom groups
 				if ( isset( $custom_groups[ $group_id ] ) ) {
-					// Update the description
 					$custom_groups[ $group_id ]['description'] = $new_description;
 					$updated_groups                            = true;
 				}
@@ -372,7 +367,6 @@ class Handlers extends BaseManager {
 
 	/** Called from Page::render_admin_page() to process POST actions before rendering. */
 	public function handle_group_actions(): void {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
 		}
@@ -415,7 +409,6 @@ class Handlers extends BaseManager {
 	}
 
 	private function handle_create_group(): void {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
 		}
@@ -445,7 +438,6 @@ class Handlers extends BaseManager {
 	}
 
 	private function handle_delete_group(): void {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return;
 		}
@@ -469,7 +461,6 @@ class Handlers extends BaseManager {
 	private function is_group_name_taken( string $name, ?string $exclude_id = null ): bool {
 		$sanitized_name = sanitize_text_field( $name );
 
-		// Check custom groups
 		if ( Data::name_exists( $sanitized_name, $exclude_id ) ) {
 			return true;
 		}

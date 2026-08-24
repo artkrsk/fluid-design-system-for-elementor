@@ -22,7 +22,6 @@ use ArtsFluidDS\Arts\Utilities\Utilities;
 class AJAX extends BaseManager {
 	/** Hooked to wp_ajax_fluid_design_system_admin_action. */
 	public function handle_ajax_requests(): void {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null ) {
 			wp_send_json_error(
 				array(
@@ -31,7 +30,6 @@ class AJAX extends BaseManager {
 			);
 		}
 
-		// Check security nonce
 		if ( ! check_ajax_referer( 'fluid_design_system_ajax_nonce', 'security', false ) ) {
 			wp_send_json_error(
 				array(
@@ -73,7 +71,6 @@ class AJAX extends BaseManager {
 				break;
 		}
 
-		// Include notices in the response
 		$result['notices'] = $this->managers->notices->get_notices_for_ajax();
 
 		// Include fresh group data for table updates
@@ -89,7 +86,6 @@ class AJAX extends BaseManager {
 
 	/** @return array<string, mixed> */
 	private function handle_ajax_update_title() {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return array( 'success' => false );
 		}
@@ -115,7 +111,6 @@ class AJAX extends BaseManager {
 			return array( 'success' => false );
 		}
 
-		// Get and update group
 		$custom_groups = Data::get_custom_groups();
 		if ( ! isset( $custom_groups[ $group_id ] ) ) {
 			$this->managers->notices->add_notice(
@@ -125,10 +120,8 @@ class AJAX extends BaseManager {
 			return array( 'success' => false );
 		}
 
-		// Check if title actually changed
 		$current_title = $custom_groups[ $group_id ]['name'] ?? '';
 		if ( $title === $current_title ) {
-			// No change - return success with appropriate message
 			return array(
 				'success' => true,
 				'message' => esc_html__( 'No changes made', 'fluid-design-system-for-elementor' ),
@@ -137,7 +130,6 @@ class AJAX extends BaseManager {
 
 		$custom_groups[ $group_id ]['name'] = $title;
 
-		// Save changes
 		if ( $this->managers->data->save_custom_groups( $custom_groups ) ) {
 			$this->managers->notices->add_notice(
 				esc_html__( 'Title updated successfully.', 'fluid-design-system-for-elementor' ),
@@ -155,7 +147,6 @@ class AJAX extends BaseManager {
 
 	/** @return array<string, mixed> */
 	private function handle_ajax_update_description() {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null || $this->managers->data === null ) {
 			return array( 'success' => false );
 		}
@@ -172,7 +163,6 @@ class AJAX extends BaseManager {
 			return array( 'success' => false );
 		}
 
-		// Get and update group
 		$custom_groups = Data::get_custom_groups();
 		if ( ! isset( $custom_groups[ $group_id ] ) ) {
 			$this->managers->notices->add_notice(
@@ -182,10 +172,8 @@ class AJAX extends BaseManager {
 			return array( 'success' => false );
 		}
 
-		// Check if description actually changed
 		$current_description = $custom_groups[ $group_id ]['description'] ?? '';
 		if ( $description === $current_description ) {
-			// No change - return success with appropriate message
 			return array(
 				'success' => true,
 				'message' => esc_html__( 'No changes made', 'fluid-design-system-for-elementor' ),
@@ -194,7 +182,6 @@ class AJAX extends BaseManager {
 
 		$custom_groups[ $group_id ]['description'] = $description;
 
-		// Save changes
 		if ( $this->managers->data->save_custom_groups( $custom_groups ) ) {
 			$this->managers->notices->add_notice(
 				esc_html__( 'Description updated successfully.', 'fluid-design-system-for-elementor' ),
@@ -212,7 +199,6 @@ class AJAX extends BaseManager {
 
 	/** @return array<string, mixed> */
 	private function handle_ajax_reorder_groups() {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null ) {
 			return array( 'success' => false );
 		}
@@ -252,18 +238,14 @@ class AJAX extends BaseManager {
 
 	/** @return array<string, mixed> */
 	private function handle_ajax_save_all_changes() {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->admin_tabs_groups_handlers === null || $this->managers->admin_tabs_groups_view === null ) {
 			return array( 'success' => false );
 		}
 
-		// Capture the starting time for performance tracking
 		$start_time = microtime( true );
 
-		// Call the existing save all changes method (reuse all logic)
 		$this->managers->admin_tabs_groups_handlers->handle_save_all_changes();
 
-		// Calculate processing time
 		$processing_time = round( ( microtime( true ) - $start_time ) * 1000 );
 
 		// Get fresh group data for table updates
@@ -283,7 +265,6 @@ class AJAX extends BaseManager {
 			}
 		}
 
-		// Build success message
 		$group_count     = count( $main_groups );
 		$success_message = __( 'Changes saved successfully.', 'fluid-design-system-for-elementor' );
 
@@ -304,9 +285,11 @@ class AJAX extends BaseManager {
 	}
 
 	/**
-	 * Saves preset organization via Kit post meta directly.
+	 * Rewrites which group each preset belongs to, from a client-side snapshot.
 	 *
-	 * Uses Page Settings Manager API to preserve metadata during cross-group moves.
+	 * Reads the raw Kit meta to recover each preset's FULL stored data (the snapshot only carries
+	 * _id/title), then writes through Elementor's page settings manager so a cross-group move
+	 * keeps min/max, breakpoint overrides and any filter-added fields.
 	 *
 	 * @return array<string, mixed>
 	 */
@@ -322,7 +305,6 @@ class AJAX extends BaseManager {
 			);
 		}
 
-		// Decode the JSON string
 		$snapshot = json_decode( $snapshot_json, true );
 
 		if ( ! is_array( $snapshot ) ) {
@@ -341,7 +323,6 @@ class AJAX extends BaseManager {
 			);
 		}
 
-		// Get the kit document
 		$kit = \Elementor\Plugin::$instance->kits_manager->get_active_kit();
 		if ( ! is_object( $kit ) || ! method_exists( $kit, 'get_main_id' ) ) {
 			return array(
@@ -405,10 +386,8 @@ class AJAX extends BaseManager {
 			}
 		}
 
-		// Get the settings manager directly
 		$page_settings_manager = \Elementor\Core\Settings\Manager::get_settings_managers( 'page' );
 
-		// Ensure we have a valid settings manager object
 		if ( ! is_object( $page_settings_manager ) || ! method_exists( $page_settings_manager, 'ajax_before_save_settings' ) || ! method_exists( $page_settings_manager, 'save_settings' ) ) {
 			return array(
 				'success' => false,
@@ -417,10 +396,8 @@ class AJAX extends BaseManager {
 			);
 		}
 
-		// Run pre-save actions
 		$page_settings_manager->ajax_before_save_settings( $kit_settings, $kit_id );
 
-		// Save settings directly
 		$page_settings_manager->save_settings( $kit_settings, $kit_id );
 
 		return array(
@@ -433,7 +410,6 @@ class AJAX extends BaseManager {
 	private function is_group_name_taken( string $name, ?string $exclude_id = null ): bool {
 		$sanitized_name = sanitize_text_field( $name );
 
-		// Check custom groups
 		if ( Data::name_exists( $sanitized_name, $exclude_id ) ) {
 			return true;
 		}

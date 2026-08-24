@@ -4,13 +4,8 @@ import { buildSelectOptions } from './preset'
 export class PresetDropdownManager {
   /** Refreshes a single dropdown with fresh preset data */
   static async refreshDropdown(selectEl: HTMLSelectElement, controlEl: HTMLElement): Promise<void> {
-    // Clear existing options
     selectEl.innerHTML = ''
-
-    // Re-populate with fresh data
     await buildSelectOptions(selectEl, controlEl)
-
-    // Refresh Select2
     jQuery(selectEl).trigger('change.select2')
   }
 

@@ -37,12 +37,10 @@ class Page extends BaseManager {
 
 	/** Page container with tab navigation and content. */
 	public function render_admin_page(): void {
-		// Check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'fluid-design-system-for-elementor' ) );
 		}
 
-		// Check if Elementor is active
 		if ( ! Utilities::is_elementor_plugin_active() ) {
 			wp_die( esc_html__( 'Elementor plugin is required for this functionality.', 'fluid-design-system-for-elementor' ) );
 		}

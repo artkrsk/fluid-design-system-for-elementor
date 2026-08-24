@@ -6,6 +6,12 @@ export class StateManager {
 
   private removedItems = new Map<string, boolean>()
   private recentRemovals = new Map<string, number>()
+  /**
+   * Reorder-vs-delete disambiguation window, in ms. HookOnRepeaterRemove timestamps every removed
+   * id; HookOnRepeaterAdd treats a re-insert of that id inside this window as a reorder and
+   * restores its CSS variable instead of leaving it unset. Nothing else distinguishes the two at
+   * the hook level, so this value is load-bearing - don't retune it casually.
+   */
   private REORDER_DETECTION_WINDOW = 200
 
   setRecentRemoval(id: string): void {
@@ -42,8 +48,5 @@ export class StateManager {
   }
 }
 
-// Create a singleton instance
 const stateManager = new StateManager()
-
-// Export the instance
 export default stateManager

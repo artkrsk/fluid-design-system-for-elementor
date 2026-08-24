@@ -68,7 +68,6 @@ class Tabs extends BaseManager {
 				'title'       => esc_html__( 'Groups', 'fluid-design-system-for-elementor' ),
 				'description' => '',
 			),
-			// Future tabs can be added here
 		);
 	}
 }

@@ -5,7 +5,7 @@ type TAnchor = 'min' | 'max'
 /**
  * Resizes the Elementor preview iframe to a fluid screen anchor width without
  * touching device mode. Sets a CSS var + body class consumed by a compiled rule
- * (see styles/_preview-switcher.sass), so no channel event fires and no control
+ * (see styles/_preview-switcher.scss), so no channel event fires and no control
  * re-renders. Tracks one active "owner" switcher so the highlight reflects which
  * control triggered the resize.
  */

@@ -14,20 +14,17 @@ export function generateClampFormula(
   const minValue = `${minSize}${minUnit}`
   const maxValue = `${maxSize}${maxUnit}`
 
-  // Calculate the difference between max and min values
   const valueDiff = `(${maxSize} - ${minSize})`
 
   // Use CSS variables for screen widths (set globally in :root)
   const minScreen = `var(${CSS_VAR_MIN_SCREEN})`
   const screenDiff = `var(${CSS_VAR_SCREEN_DIFF})`
 
-  // Viewport-relative calculation
   const viewportCalc = `(100vw - ${minScreen})`
 
   // Scaling factor: (max - min) * ((100vw - minScreen) / screenDiff)
   const scalingFactor = `(${valueDiff} * (${viewportCalc} / ${screenDiff}))`
 
-  // Preferred value: min + scaling
   const preferredValue = `calc((${minValue}) + (${scalingFactor}))`
 
   // Use CSS min()/max() to handle both normal and inverted cases

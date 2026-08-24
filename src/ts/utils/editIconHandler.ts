@@ -35,7 +35,6 @@ export class EditIconHandler {
       return
     }
 
-    // Check if click was on edit icon
     const $clicked = jQuery(clickEvent.target as Element)
     const $icon = $clicked.hasClass('e-fluid-preset-edit-icon')
       ? $clicked
@@ -48,7 +47,6 @@ export class EditIconHandler {
     // Prevent Select2 from selecting the option
     e.preventDefault()
 
-    // Extract preset ID
     const presetId = $icon.data('preset-id') as string
 
     // Close dropdown first, then open dialog after close completes
@@ -58,7 +56,6 @@ export class EditIconHandler {
       }, UI_TIMING.DIALOG_OPEN_DELAY)
     })
 
-    // Manually close dropdown
     jQuery(this.selectEl).select2('close')
   }
 

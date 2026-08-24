@@ -47,7 +47,6 @@ class Frontend extends BaseManager {
 			? constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' )
 			: false;
 
-		// Enqueue modular CSS files
 		wp_enqueue_style(
 			'fluid-design-system-admin-base',
 			$this->plugin_dir_url . 'admin/css/base.css',
@@ -76,7 +75,6 @@ class Frontend extends BaseManager {
 			$version
 		);
 
-		// Enqueue status notices CSS (before AJAX CSS)
 		wp_enqueue_style(
 			'fluid-design-system-admin-status-notices',
 			$this->plugin_dir_url . 'admin/css/status-notices.css',
@@ -84,7 +82,6 @@ class Frontend extends BaseManager {
 			$version
 		);
 
-		// Enqueue AJAX CSS (now simplified, depends on status notices)
 		wp_enqueue_style(
 			'fluid-design-system-admin-ajax',
 			$this->plugin_dir_url . 'admin/css/ajax.css',
@@ -92,7 +89,6 @@ class Frontend extends BaseManager {
 			$version
 		);
 
-		// Enqueue accordion CSS (depends on status notices)
 		wp_enqueue_style(
 			'fluid-design-system-admin-accordion',
 			$this->plugin_dir_url . 'admin/css/accordion.css',
@@ -108,7 +104,6 @@ class Frontend extends BaseManager {
 			true
 		);
 
-		// Enqueue modular JavaScript files
 		wp_enqueue_script(
 			'fluid-design-system-admin-base',
 			$this->plugin_dir_url . 'admin/js/base.js',
@@ -117,7 +112,6 @@ class Frontend extends BaseManager {
 			true
 		);
 
-		// Enqueue status notices JS (before other modules that depend on it)
 		wp_enqueue_script(
 			'fluid-design-system-admin-status-notices',
 			$this->plugin_dir_url . 'admin/js/status-notices.js',
@@ -142,7 +136,6 @@ class Frontend extends BaseManager {
 			true
 		);
 
-		// Enqueue AJAX manager (now depends on status notices)
 		wp_enqueue_script(
 			'fluid-design-system-admin-ajax-manager',
 			$this->plugin_dir_url . 'admin/js/ajax-manager.js',
@@ -160,7 +153,6 @@ class Frontend extends BaseManager {
 			true
 		);
 
-		// Localize script for AJAX
 		wp_localize_script(
 			'fluid-design-system-admin-ajax-manager',
 			'fluidDesignSystemAdmin',
@@ -234,7 +226,6 @@ class Frontend extends BaseManager {
 	private function get_control_registry_data(): array {
 		$registry_data = array();
 
-		// Add built-in control mappings (group_id => control_id)
 		$registry_data['fluid_spacing_presets']    = array(
 			'control_id' => 'fluid_spacing_presets',
 			'type'       => 'builtin',
@@ -244,7 +235,6 @@ class Frontend extends BaseManager {
 			'type'       => 'builtin',
 		);
 
-		// Add custom group control IDs
 		$custom_groups = \Arts\FluidDesignSystem\Managers\Data::get_custom_groups();
 		foreach ( $custom_groups as $group_id => $group_data ) {
 			if ( ! is_string( $group_id ) || ! is_array( $group_data ) ) {

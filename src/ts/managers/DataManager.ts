@@ -138,8 +138,5 @@ export class DataManager {
   }
 }
 
-// Create a singleton instance
 const dataManager = new DataManager()
-
-// Export the instance
 export default dataManager

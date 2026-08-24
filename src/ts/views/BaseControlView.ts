@@ -18,7 +18,7 @@ import { resolveAnchorWidths } from '../utils/screenAnchors'
 import { getSelect2DefaultOptions } from '../utils/select2'
 import { isCustomFluidValue, isEmptyControlValue, ValidationService } from '../utils/validation'
 
-/** Mixin for fluid unit support in Elementor dimension/gap controls */
+/** Mixin adding fluid-unit support to Elementor's Dimensions, Gaps and Slider control views */
 export const BaseControlView: Record<string, unknown> = {
   isDestroyed: false,
   abortControllers: new Map<string, AbortController>(),

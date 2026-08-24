@@ -1,6 +1,5 @@
 /**
  * Accordion functionality for Cross-Group Preset Management
- * SIMPLIFIED REWRITE - Clean, lean implementation
  *
  * @package Arts\FluidDesignSystem
  * @since 1.0.0

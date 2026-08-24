@@ -22,36 +22,28 @@ prop-type controls with a fixed unit list (no `size_units` to inject, no `addCon
 
 A v4 integration via the new **Variables** system was spiked and deliberately dropped (2026-07). Blockers:
 
-- A third-party variable type registers fine (`elementor/variables/register` PHP + `registerVariableType`
-  JS) and emits `:root { --…: clamp(…) }`, but it **cannot be bound to atomic size controls**: the
-  prop-type schema / `Prop_Type_Adapter` that decides which variable types a size prop accepts is a
-  hardcoded, unfilterable map, and our key isn't in it (verified — even forcing `variableType: 'size'` +
-  `isCompatible` didn't surface it in the picker).
-- The only native type that holds an arbitrary CSS `clamp()` and binds/renders is
-  `global-custom-size-variable`, which is **Elementor Pro-only** — a Pro-gated regression vs this plugin's
-  current free+Pro reach.
-- The whole v4 Variables surface is alpha/beta and undocumented (as of Elementor 4.2.0-beta1 its
-  `@elementor/http-client` boots without REST config, leaving the Variables UI non-functional without a
-  workaround).
+- A third-party type registers fine (`elementor/variables/register` + `registerVariableType`) and emits
+  `:root { --…: clamp(…) }`, but **cannot bind to atomic size controls** — the prop-type schema /
+  `Prop_Type_Adapter` deciding which types a size prop accepts is a hardcoded, unfilterable map (verified:
+  forcing `variableType: 'size'` + `isCompatible` still didn't surface it in the picker).
+- The only native type holding an arbitrary `clamp()` is `global-custom-size-variable` — **Pro-only**, so
+  a Pro-gated regression against this plugin's free+Pro reach.
+- The surface is alpha/beta and undocumented (at 4.2.0-beta1 `@elementor/http-client` boots without REST
+  config, leaving the Variables UI non-functional without a workaround).
 
-Revisit only if Elementor opens the prop-type schema to third-party variable types (which would let a
-free-compatible fluid type bind) or ships a stable, documented public API for this.
+Revisit only if Elementor opens the prop-type schema to third-party types, or ships a stable documented API.
 
 ## Research before guessing (3rd parties)
 
-Don't answer questions about external code from training memory — pull authoritative data first, then
-decide. For anything touching a 3rd party:
+Never answer questions about external code from training memory — pull authoritative data first.
 
-- **Elementor internals** (core + Pro) — `elementor-backend` (PHP) / `elementor-frontend` (JS). Never
-  grep `src/` for Elementor's own code.
-- **WordPress core** — `wordpress-internals`.
-- **Other 3rd-party plugins** — `plugin-internals`.
-- **`@arts/*` framework packages** — `arts-framework`.
-- **Library / framework / CLI / tooling docs** (CI, dev server, test runners, build, linters, and any
-  external lib — but not limited to those) — `context7` MCP. Fetch current docs even for well-known
-  tools; APIs drift.
-- **Visual verification** — `chrome-devtools` MCP, only when a change genuinely must be _seen_
-  (rendered preview, layout, editor UI). Skip it for logic that a headless test covers.
+- Elementor core/Pro → `elementor-backend` (PHP) / `elementor-frontend` (JS)
+- WordPress core → `wordpress-internals`; other 3rd-party plugins → `plugin-internals`
+- `@arts/*` framework packages → `arts-framework`
+- Any library / framework / CLI / tooling docs (CI, dev server, test runners, build, linters) →
+  `context7` MCP — fetch current docs even for well-known tools; APIs drift.
+- `chrome-devtools` MCP only when a change must be _seen_ (rendered preview, layout, editor UI); skip
+  it for logic a headless test covers.
 
 ## Layout
 
@@ -71,16 +63,19 @@ src/php/  (namespace Arts\FluidDesignSystem\, PSR-4 → src/php/)
   Elementor/
     Tabs/FluidTypographySpacing   Site Settings tab; builds fluid-preset repeater controls
     Units/Fluid/Module            editor AJAX handlers (preset data for control dropdowns)
+  admin/css|js/           plain jQuery/CSS for the admin Groups page — copied verbatim with the
+                          PHP tree, never compiled by the TS/SCSS build
 
 src/ts/  (all .ts; entry index.ts)
   index.ts                registers control views on 'elementor/init'; hook system on 'elementor/init-components'
   components/Component.ts  $e component; maps Elementor commands → hook classes
   hooks/                   HookOnRepeater{Add,Remove,Reorder}, HookOnKitSettingsSave
   views/                   Base* mixins + Dimensions/Slider/Gaps/RepeaterRow/GlobalStyleRepeater views
-  managers/                CSSManager, StateManager, DataManager, PreviewSizeManager (singletons)
+  managers/                CSSManager, StateManager, DataManager, PreviewSizeManager (singletons);
+                           PresetDialogManager (static, create/edit preset dialog)
   services/presetAPI.ts    PresetAPIService — editor AJAX wrappers
   constants/               STYLES, ELEMENTOR, API, VALUES
-  utils/ interfaces/ types/  helpers; I-prefixed interfaces, T-prefixed types, one per file
+  utils/ interfaces/ types/  helpers; one declaration per file
 ```
 
 ## Public API
@@ -91,7 +86,8 @@ src/ts/  (all .ts; entry index.ts)
 - `ControlRegistry` — `get_custom_group_control_id($id): string` → `fluid_custom_{id}_presets`;
   `parse_control_id($id): array|false` → `['type'=>'builtin'|'custom','group_id'=>…]`; builtin/custom
   group metadata.
-- `CSSVariables` — `get_clamp_formula($min,$max,$minScreen?,$maxScreen?): string`;
+- `CSSVariables` — `get_clamp_formula($min,$max,$minScreen?,$screenRange?): string` — the 4th arg is
+  the min-to-max screen **range** used as the scaling divisor, not the max breakpoint;
   `get_css_var_preset($id): string` → `--arts-fluid-preset--{id}`.
 - `Data` — custom-group CRUD over option `arts_fluid_design_system_custom_groups`; ordering in
   `arts_fluid_design_system_main_group_order`.
@@ -100,8 +96,8 @@ src/ts/  (all .ts; entry index.ts)
 - `Abilities` — registers the `fluid/*` abilities and MCP server.
 
 **PHP service** — `KitRepeaterService` (static): `get_item / update_item / delete_item /
-move_item($kit, $control_id, $item_id, …)`. Mutates Kit repeater meta **and** mirrors to the autosave
-document. The only correct path for programmatic preset writes.
+move_item($kit, $control_id, $item_id, …)`. There is deliberately **no create** — new presets go
+through Elementor's own `$kit->add_repeater_row($control_id, $item)`.
 
 **JS managers** (singletons; `window.artsFluidDesignSystem.dataManager` exposed for dialogs):
 
@@ -109,8 +105,7 @@ document. The only correct path for programmatic preset writes.
   `unset !important`) / `restoreCssVariable(id)` (drops the unset rule), on a
   `<style id="fluid-design-system-for-elementor-style">` in the preview iframe.
 - `StateManager` — undo/redo bookkeeping: `markItemAsRemoved/markItemAsRestored/hasRemovedItems`,
-  `setRecentRemoval/hasRecentRemoval/cleanupRecentRemovals` (~200ms window separates reorder from
-  delete).
+  `setRecentRemoval/hasRecentRemoval/cleanupRecentRemovals`.
 - `DataManager` — caches editor preset data; `getGroups()` fetches the group list fresh per call
   (deduping concurrent callers) since groups change outside the editor; `addPreset`/`updatePreset`
   patch the cache after a write so the dropdowns rebuild without a refetch; `invalidate()` on Kit save.
@@ -143,6 +138,7 @@ document. The only correct path for programmatic preset writes.
 ```
 remove (Before): StateManager.markItemAsRemoved + setRecentRemoval → CSSManager.unsetCssVariable
 insert (After):  if restored/reordered → CSSManager.restoreCssVariable → markItemAsRestored
+move   (After):  CSSManager.restoreCssVariable for the moved row
 save   (After):  DataManager.invalidate()
 ```
 
@@ -151,8 +147,10 @@ This is what makes undo/redo of preset edits restore the correct CSS variables.
 ## Frozen contracts (must stay identical across both layers)
 
 - **Control IDs** — builtin `fluid_spacing_presets`, `fluid_typography_presets`; custom
-  `fluid_custom_{group_id}_presets`. PHP: `ControlRegistry`. JS: `isFluidPresetRepeater()` in
-  `utils/controls.ts` (matches the two builtins + `/^fluid_custom_.+_presets$/`).
+  `fluid_custom_{group_id}_presets`. PHP: `ControlRegistry::parse_control_id()`, which also still
+  accepts the legacy `fluid_{group_id}_presets` form. JS: `isFluidPresetRepeater()` in
+  `utils/controls.ts` — it prefers the control's `is_fluid_preset_repeater` model flag (set by
+  `FluidTypographySpacing`) and only falls back to matching those ID patterns.
 - **CSS-var prefix** — `--arts-fluid-preset--`. PHP `CSSVariables::CSS_VAR_PRESET_PREFIX` **must equal**
   JS `STYLES.VAR_PREFIX`. Change one without the other and preview rendering silently breaks.
 - **Abilities / MCP** — ability category and MCP server name are both `fluid-design-system`; abilities
@@ -164,9 +162,9 @@ This is what makes undo/redo of preset edits restore the correct CSS variables.
 
 ## Gotchas / invariants
 
-- **Never bypass the Kit API.** Preset writes go through `KitRepeaterService` →
-  `$kit->add_repeater_row()` / the Kit (`page`) settings manager, and must also touch the autosave
-  document. Writing Kit meta directly desyncs the editor.
+- **Never bypass the Kit API.** Create via `$kit->add_repeater_row()`; update/delete/move via
+  `KitRepeaterService`, which saves through the Kit (`page`) settings manager **and** mirrors to the
+  autosave document. Writing Kit meta directly desyncs the open editor.
 - **AbortController cleanup is mandatory.** Control-view `onDestroy()` must `abort()` every per-setting
   `AbortController` and unregister the preview switcher, then `callSuper`. Skipping it leaks listeners
   across panel re-renders.
@@ -198,18 +196,16 @@ This is what makes undo/redo of preset edits restore the correct CSS variables.
 
 ## Release & version stamping
 
-- **`composer.json` is the single version/meta source** (as in every Arts plugin). `arts-wp` stamps
-  the plugin header, readme.txt `Stable tag`, and package.json from it; `Requires PHP` /
-  `Requires at least` / `Tested up to` come from its `wordpress` object, and
-  name/description/URI/license/text domain from its `plugin` object. Manual edits to those fields in
-  `src/wordpress-plugin/` get overwritten.
-- **Changelog is the one manual step.** Hand-write the new entry in `src/wordpress-plugin/readme.txt`
-  under `== Changelog ==`, in the fleet grammar — `* added:` / `* improved:` / `* fixed:` /
-  `* security:` bullets, in that order. CI validates the latest entry.
-  `pnpm exec arts-wp changelog sync` regenerates CHANGELOG.md from readme.txt, never the reverse.
-- **Release flow:** readme.txt changelog entry first, then `pnpm release <patch|minor|major|x.y.z>` —
-  it refuses a dirty tree, gates on the changelog, bumps composer.json, stamps, syncs CHANGELOG.md,
-  commits and tags. Pushing the `v*` tag runs `.github/workflows/release.yml`: GitHub release + wp.org
-  SVN deploy, validating plugin header / readme.txt / package.json all match the tag version.
+Fleet rules (composer.json as version/meta source, readme.txt changelog grammar) live in the parent
+`Projects/Plugins/CLAUDE.md`. Repo specifics:
+
+- `Requires PHP` / `Requires at least` / `Tested up to` come from composer.json's `wordpress` object;
+  name/description/URI/license/text domain from its `plugin` object. Hand-editing those fields in
+  `src/wordpress-plugin/` gets overwritten on the next stamp.
+- `pnpm exec arts-wp changelog sync` regenerates CHANGELOG.md from readme.txt, never the reverse.
+- **Release flow:** readme.txt changelog entry first, then `pnpm release <patch|minor|major|x.y.z>` — it
+  refuses a dirty tree, gates on the changelog, bumps composer.json, stamps, syncs CHANGELOG.md, commits
+  and tags. Pushing the `v*` tag runs `release.yml`: GitHub release + wp.org SVN deploy, validating that
+  plugin header / readme.txt / package.json all match the tag version.
 
 **Stack:** PHP 8.0+ · WordPress 6.0+ · Elementor 3.27+ · ES2022 / TypeScript · SCSS · pnpm

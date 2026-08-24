@@ -21,7 +21,6 @@ use ArtsFluidDS\Arts\Utilities\Utilities;
 class View extends BaseManager {
 	/** @param array<string, mixed> $tab_data */
 	public function render( $tab_data ): void {
-		// Check managers availability
 		if ( $this->managers === null || $this->managers->notices === null ) {
 			return;
 		}
@@ -447,13 +446,13 @@ class View extends BaseManager {
 		$order_display = '';
 		$actions       = '';
 
-		// All main groups are sortable now (built-in + custom)
+		// Both built-in and custom rows are drag-sortable; only custom ones are inline-editable.
 		$editable       = ( $group_type === 'custom' ) ? 'true' : 'false';
 		$editable_class = ( $group_type === 'custom' ) ? 'editable-title' : '';
 
 		switch ( $group_type ) {
 			case 'builtin':
-				$row_class     = 'group-builtin sortable-row'; // Built-in groups are now sortable!
+				$row_class     = 'group-builtin sortable-row';
 				$type_badge    = '<span class="group-type-badge group-type-builtin">' . esc_html__( 'Built-in', 'fluid-design-system-for-elementor' ) . '</span>';
 				$order_display = '<span class="order-number order-draggable" data-order="' . esc_attr( (string) $display_order ) . '">' . esc_html( (string) $display_order ) . '</span>';
 				$actions       = '—';

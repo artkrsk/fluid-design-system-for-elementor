@@ -27,7 +27,6 @@ export class HookOnRepeaterReorder extends commandSystem.modules.hookUI.After {
   apply(args: HookArgs): void {
     const { container, name: presetName, targetIndex } = args
 
-    // Get the collection
     const collection = container.settings.get(presetName) as
       | ThirdParty.BackboneCollection
       | undefined
@@ -35,7 +34,6 @@ export class HookOnRepeaterReorder extends commandSystem.modules.hookUI.After {
       return
     }
 
-    // Get the item that was moved
     const presetModel = collection.at(targetIndex)
     if (!presetModel) {
       return

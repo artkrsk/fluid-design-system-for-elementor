@@ -106,8 +106,5 @@ class CSSManager {
   }
 }
 
-// Create a singleton instance
 const cssManager = new CSSManager()
-
-// Export the instance
 export default cssManager

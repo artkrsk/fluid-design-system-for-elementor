@@ -34,16 +34,13 @@ export class HookOnRepeaterAdd extends commandSystem.modules.hookUI.After {
 
     // Handle undo operation first
     if (isRestored && stateManager.hasRemovedItems(addedItemId)) {
-      // Restore the CSS variable first
       cssManager.restoreCssVariable(addedItemId)
-      // Then mark the item as restored
       stateManager.markItemAsRestored(addedItemId)
       return
     }
 
     // Check if this is a reordering operation
     if (stateManager.hasRecentRemoval(addedItemId)) {
-      // Restore the CSS variable for reordered items
       cssManager.restoreCssVariable(addedItemId)
       stateManager.deleteRecentRemoval(addedItemId)
       return

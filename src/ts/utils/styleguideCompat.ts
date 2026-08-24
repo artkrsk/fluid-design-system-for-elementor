@@ -1,7 +1,8 @@
 /**
  * Patches CSSStyleSheet.prototype.insertRule in the preview iframe
  * to strip the leaked "fluid" unit from styled-components CSS.
- * Same regex logic as PHP optimize_fluid_css_post_parse().
+ * Mirrors the strip PHP does in Units::optimize_fluid_css_post_parse(), with a wider trailing
+ * set (`}` and `]` too) because rules arriving here have no trailing `;`.
  */
 
 const FLUID_UNIT_PATTERN = /(\))\s*fluid(?=[\s;}\]]|$)/g

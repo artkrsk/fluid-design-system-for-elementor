@@ -61,7 +61,9 @@ class Compatibility extends BaseManager {
 	}
 
 	/**
-	 * Keys must match constants in JS: interfaces/IArtsFluidDSStrings.ts
+	 * Every key here must exist in JS: interfaces/IArtsFluidDSStrings.ts. The reverse does not
+	 * hold - that interface also declares preview* keys which are NOT localized here and fall
+	 * back to hardcoded English in utils/previewSwitcher.ts.
 	 *
 	 * @return array<string, string>
 	 */

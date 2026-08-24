@@ -12,7 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Direct Kit meta manipulation for preset operations.
+ * Reads the Kit repeater meta directly, but never writes it directly: saves go through
+ * Elementor's `page` settings manager and are mirrored into the autosave document, so the
+ * open editor stays in sync.
  */
 class KitRepeaterService {
 
