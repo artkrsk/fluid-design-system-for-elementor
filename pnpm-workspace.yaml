@@ -25,3 +25,6 @@ allowBuilds:
   # lefthook's binary rides its optionalDependencies, not this script — all the
   # postinstall does is write .git/hooks, which package.json#prepare does explicitly.
   lefthook: false
+
+minimumReleaseAgeExclude:
+  - '@artemsemkin/elementor-types@2.0.0'

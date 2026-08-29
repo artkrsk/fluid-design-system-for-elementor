@@ -1,4 +1,3 @@
-import type { DialogOptions } from '@artemsemkin/elementor-types'
 import { UI_DEFAULTS } from '../constants'
 import type {
   IDialogConfig,
@@ -63,13 +62,12 @@ export class PresetDialogManager {
           cancel: window.ArtsFluidDSStrings.cancel
         })
       },
-      // onButtonClick is a real dialogs-manager option, just missing from the typings.
-      // It stops the dialog from closing before the save settles — and, since it covers
-      // every button, Cancel has to be closed by hand below.
+      // onButtonClick stops the dialog from closing before the save settles —
+      // and, since it covers every button, Cancel has to be closed by hand below.
       hide: {
         onBackgroundClick: false,
         onButtonClick: false
-      } as NonNullable<DialogOptions['hide']>,
+      },
       onCancel: () => {
         dialog?.hide()
       },

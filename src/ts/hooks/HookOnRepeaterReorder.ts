@@ -30,7 +30,7 @@ export class HookOnRepeaterReorder extends commandSystem.modules.hookUI.After {
     const collection = container.settings.get(presetName) as
       | ThirdParty.BackboneCollection
       | undefined
-    if (!collection) {
+    if (!collection || targetIndex === undefined) {
       return
     }
 

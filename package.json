@@ -17,7 +17,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@artemsemkin/elementor-types": "^1.0.10",
+    "@artemsemkin/elementor-types": "^2.0.0",
     "@arts/wp-plugin-tooling": "github:artkrsk/wp-plugin-tooling",
     "@biomejs/biome": "2.5.4",
     "@playwright/test": "^1.61.1",
