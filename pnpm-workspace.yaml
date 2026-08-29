@@ -9,7 +9,7 @@ overrides:
   adm-zip: ^0.6.0
   postcss: ^8.5.26
   immutable: ^4.3.9
-  vitepress>vite: ^7.3.5
+  vitepress>vite: ^8.2.0
   vitest>vite: ^8.0.16
 
 allowBuilds:
