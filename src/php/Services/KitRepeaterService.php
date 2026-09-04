@@ -76,7 +76,8 @@ class KitRepeaterService {
 			}
 
 			if ( isset( $existing_item['_id'] ) && $existing_item['_id'] === $item_id ) {
-				// array_merge preserves custom_screen_width and other metadata
+				// array_merge keeps fields the caller omitted: the per-preset screen-width
+				// overrides and anything third parties added to the repeater.
 				$document_settings[ $control_id ][ $index ] = array_merge( $existing_item, $updated_fields );
 				$found                                      = true;
 				break;

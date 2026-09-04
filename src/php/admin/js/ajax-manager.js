@@ -123,7 +123,9 @@
       ALLOW_DATA_ATTR: true, // Critical for your data attributes
       ALLOW_ARIA_ATTR: true, // For accessibility
       KEEP_CONTENT: true, // Preserve text content even if tag is removed
-      ALLOW_STYLE_ATTR: true // Allow style attribute but sanitize its content
+      // Not a DOMPurify option (see the bundled purify.min.js); 'style' is what
+      // ALLOWED_ATTR above actually permits.
+      ALLOW_STYLE_ATTR: true
     }
 
     // Use DOMPurify to sanitize

@@ -352,7 +352,8 @@ class Handlers extends BaseManager {
 			}
 		}
 
-		// Future: Handle inter-group preset rearranging here
+		// Presets moved between groups do not travel with this form: the accordion UI
+		// saves them separately through the save_presets_snapshot AJAX action.
 
 		// Final success/failure message
 		if ( $changes_saved ) {

@@ -11,7 +11,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  /* Fail fast: stop after first failure (namespace conflict = critical).
+  /* Fail fast in CI: stop after the first failure (namespace conflict = critical);
+     locally the whole suite runs.
      PLAYWRIGHT_MAX_FAILURES overrides for runs that should keep going after a
      flake, e.g. the weekly cross-browser job. */
   maxFailures: process.env.PLAYWRIGHT_MAX_FAILURES

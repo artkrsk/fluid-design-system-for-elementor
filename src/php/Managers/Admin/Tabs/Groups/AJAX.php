@@ -17,7 +17,8 @@ use Arts\FluidDesignSystem\Managers\GroupsData;
 use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
- * Handles async operations for groups admin: title/description updates, reordering, bulk saves.
+ * Handles async operations for groups admin: title/description updates, reordering, bulk saves,
+ * and the cross-group preset snapshot.
  */
 class AJAX extends BaseManager {
 	/** Hooked to wp_ajax_fluid_design_system_admin_action. */

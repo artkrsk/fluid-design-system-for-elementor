@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-Guidance for Claude Code working in the **Fluid Design System for Elementor** plugin.
-
 ## Role
 
 Adds fluid typography/spacing presets to Elementor. Each preset compiles to a CSS `clamp()` formula
@@ -20,16 +18,14 @@ This plugin targets the **classic (v3) editor only**. The `Units` manager's `'fl
 injection and the `addControlView` control views do **not** reach v4 **atomic** widgets — those are React
 prop-type controls with a fixed unit list (no `size_units` to inject, no `addControlView`).
 
-A v4 integration via the new **Variables** system was spiked and deliberately dropped (2026-07). Blockers:
-
-- A third-party type registers fine (`elementor/variables/register` + `registerVariableType`) and emits
-  `:root { --…: clamp(…) }`, but **cannot bind to atomic size controls** — the prop-type schema /
-  `Prop_Type_Adapter` deciding which types a size prop accepts is a hardcoded, unfilterable map (verified:
-  forcing `variableType: 'size'` + `isCompatible` still didn't surface it in the picker).
-- The only native type holding an arbitrary `clamp()` is `global-custom-size-variable` — **Pro-only**, so
-  a Pro-gated regression against this plugin's free+Pro reach.
-- The surface is alpha/beta and undocumented (at 4.2.0-beta1 `@elementor/http-client` boots without REST
-  config, leaving the Variables UI non-functional without a workaround).
+A v4 integration via the **Variables** system was spiked and deliberately dropped (2026-07). A third-party
+type registers fine (`elementor/variables/register` + `registerVariableType`) and emits
+`:root { --…: clamp(…) }`, but **cannot bind to atomic size controls** — the `Prop_Type_Adapter` schema
+deciding which types a size prop accepts is a hardcoded, unfilterable map (verified: forcing
+`variableType: 'size'` + `isCompatible` still didn't surface it in the picker). The only native type
+holding an arbitrary `clamp()` is `global-custom-size-variable`, **Pro-only** — a Pro-gated regression
+against this plugin's free+Pro reach. And the surface is undocumented alpha/beta (at 4.2.0-beta1
+`@elementor/http-client` boots without REST config, leaving the Variables UI non-functional).
 
 Revisit only if Elementor opens the prop-type schema to third-party types, or ships a stable documented API.
 
@@ -37,9 +33,8 @@ Revisit only if Elementor opens the prop-type schema to third-party types, or sh
 
 Never answer questions about external code from training memory — pull authoritative data first.
 
-- Elementor core/Pro → `elementor-backend` (PHP) / `elementor-frontend` (JS)
-- WordPress core → `wordpress-internals`; other 3rd-party plugins → `plugin-internals`
-- `@arts/*` framework packages → `arts-framework`
+- Elementor core/Pro → `elementor-backend` (PHP) / `elementor-frontend` (JS); WordPress core →
+  `wordpress-internals`; other 3rd-party plugins → `plugin-internals`; `@arts/*` → `arts-framework`
 - Any library / framework / CLI / tooling docs (CI, dev server, test runners, build, linters) →
   `context7` MCP — fetch current docs even for well-known tools; APIs drift.
 - `chrome-devtools` MCP only when a change must be _seen_ (rendered preview, layout, editor UI); skip
@@ -89,15 +84,13 @@ src/ts/  (all .ts; entry index.ts)
 - `CSSVariables` — `get_clamp_formula($min,$max,$minScreen?,$screenRange?): string` — the 4th arg is
   the min-to-max screen **range** used as the scaling divisor, not the max breakpoint;
   `get_css_var_preset($id): string` → `--arts-fluid-preset--{id}`.
-- `Data` — custom-group CRUD over option `arts_fluid_design_system_custom_groups`; ordering in
-  `arts_fluid_design_system_main_group_order`.
+- `Data` — custom-group CRUD over option `arts_fluid_design_system_custom_groups`, + main-group ordering.
 - `GroupsData` — merges builtin + custom + filter-injected groups for read paths.
 - `Units` — fluid-unit eligibility (`is_control_eligible_for_fluid_unit`) + Kit CSS optimization.
-- `Abilities` — registers the `fluid/*` abilities and MCP server.
 
-**PHP service** — `KitRepeaterService` (static): `get_item / update_item / delete_item /
-move_item($kit, $control_id, $item_id, …)`. There is deliberately **no create** — new presets go
-through Elementor's own `$kit->add_repeater_row($control_id, $item)`.
+**PHP service** — `KitRepeaterService` (static): `get_item / update_item / delete_item ($kit,
+$control_id, $item_id, …)`, plus `move_item($kit, $from_control_id, $to_control_id, $item_id)`. There is
+deliberately **no create** — new presets go through Elementor's own `$kit->add_repeater_row($control_id, $item)`.
 
 **JS managers** (singletons; `window.artsFluidDesignSystem.dataManager` exposed for dialogs):
 
@@ -137,12 +130,11 @@ through Elementor's own `$kit->add_repeater_row($control_id, $item)`.
 
 ```
 remove (Before): StateManager.markItemAsRemoved + setRecentRemoval → CSSManager.unsetCssVariable
-insert (After):  if restored/reordered → CSSManager.restoreCssVariable → markItemAsRestored
+insert (After):  undo    → CSSManager.restoreCssVariable + markItemAsRestored
+                 reorder → CSSManager.restoreCssVariable + deleteRecentRemoval
 move   (After):  CSSManager.restoreCssVariable for the moved row
 save   (After):  DataManager.invalidate()
 ```
-
-This is what makes undo/redo of preset edits restore the correct CSS variables.
 
 ## Frozen contracts (must stay identical across both layers)
 
@@ -164,7 +156,9 @@ This is what makes undo/redo of preset edits restore the correct CSS variables.
 
 - **Never bypass the Kit API.** Create via `$kit->add_repeater_row()`; update/delete/move via
   `KitRepeaterService`, which saves through the Kit (`page`) settings manager **and** mirrors to the
-  autosave document. Writing Kit meta directly desyncs the open editor.
+  autosave document. Writing Kit meta directly desyncs the open editor. The admin cross-group snapshot
+  (`Admin/Tabs/Groups/AJAX`) is the lone exception — it rewrites the whole settings array through the
+  `page` manager and does **not** mirror to autosave.
 - **AbortController cleanup is mandatory.** Control-view `onDestroy()` must `abort()` every per-setting
   `AbortController` and unregister the preview switcher, then `callSuper`. Skipping it leaks listeners
   across panel re-renders.
@@ -187,12 +181,12 @@ This is what makes undo/redo of preset edits restore the correct CSS variables.
   (`post-install-cmd`), or by hand via `composer prefix-namespaces`.
 - **QA:** PHPStan `level: max` (PHP 8.0 target) over `src/php`; PHPCS (`ArtsFramework`); Biome;
   Vitest unit tests with coverage thresholds; Playwright e2e; knip as a hard gate, fallow advisory.
-- **Build:** the runner is shared — `@arts/wp-plugin-tooling` (`arts-wp`), not an in-repo pipeline;
-  its mechanics are documented there. `pnpm dev:plugin` (watch — already running, don't start it) /
-  `pnpm build`. The distributable plugin is assembled in `src/wordpress-plugin/` (main file
-  `fluid-design-system-for-elementor.php`) and zipped to `dist/`. Never run `build` / `dev` yourself.
-  JS/CSS compile to `src/php/libraries/fluid-design-system-for-elementor/` (slug-derived — the
-  enqueue paths in `Managers/Compatibility.php` must match).
+- **Build:** the runner is shared — `@arts/wp-plugin-tooling` (`arts-wp`), not an in-repo pipeline; its
+  mechanics are documented there. `pnpm dev:plugin` (watch) / `pnpm build` — the watch is already running;
+  never start either yourself. The distributable is assembled in `src/wordpress-plugin/` (main file
+  `fluid-design-system-for-elementor.php`) and zipped to `dist/`; JS/CSS compile to
+  `src/php/libraries/fluid-design-system-for-elementor/` (slug-derived — the enqueue paths in
+  `Managers/Compatibility.php` must match).
 
 ## Release & version stamping
 

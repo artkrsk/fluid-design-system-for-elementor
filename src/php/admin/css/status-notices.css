@@ -292,7 +292,7 @@
 	}
 }
 
-/* Dark mode support (if needed in future) */
+/* Dark mode support */
 @media (prefers-color-scheme: dark) {
 	.fluid-status-area.loading {
 		background-color: #2c2c2c;

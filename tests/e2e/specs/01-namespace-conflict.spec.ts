@@ -9,8 +9,8 @@
  * - It registers a stub Arts\Utilities\Utilities class missing TypeGuards methods
  * - Fluid Design System loads SECOND and should use its own prefixed version
  *
- * IMPORTANT: Without Strauss namespace isolation, these tests will FAIL.
- * After implementing Strauss, these tests should PASS.
+ * These are the regression guard for Strauss prefixing: they fail the moment
+ * the plugin resolves Arts\Utilities\Utilities instead of its own ArtsFluidDS\ copy.
  */
 
 import { expect, test } from '@playwright/test'

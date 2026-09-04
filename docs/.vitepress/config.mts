@@ -24,7 +24,7 @@ export default defineConfig({
   // Clean URLs (remove .html extensions)
   cleanUrls: true,
 
-  // Ignore dead links during build (can enable later)
+  // Dead links fail the docs build
   ignoreDeadLinks: false,
 
   // Theme configuration

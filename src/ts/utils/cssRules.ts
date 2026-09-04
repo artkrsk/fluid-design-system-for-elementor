@@ -17,7 +17,7 @@ export function formatRulesForStylesheet(rules: string[]): string {
   return rules.map((rule) => (rule.endsWith('}') ? rule : `${rule}}`)).join('')
 }
 
-/** Filters rules that contain a specific CSS variable */
+/** Drops every rule that mentions a specific CSS variable */
 export function filterRulesByVariable(rules: string[], cssVarName: string): string[] {
   return rules.filter((rule) => !rule.includes(cssVarName))
 }
