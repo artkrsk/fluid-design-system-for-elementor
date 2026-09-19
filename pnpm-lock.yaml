@@ -24,7 +24,7 @@ importers:
         version: 2.0.0(swiper@14.2.0)
       '@arts/wp-plugin-tooling':
         specifier: github:artkrsk/wp-plugin-tooling
-        version: https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/95da08ac8317ac5458a57a09def703d077960c63(postcss@8.5.26)(stylelint@17.14.1(supports-color@10.2.2)(typescript@7.0.2))
+        version: https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/f5d242c7b969a3a20180e5c320bcfd8c0586023a(postcss@8.5.26)(stylelint@17.14.1(supports-color@10.2.2)(typescript@7.0.2))
       '@biomejs/biome':
         specifier: 2.5.4
         version: 2.5.4
@@ -87,8 +87,8 @@ packages:
     peerDependencies:
       swiper: '>=12.0.0'
 
-  '@arts/wp-plugin-tooling@https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/95da08ac8317ac5458a57a09def703d077960c63':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/95da08ac8317ac5458a57a09def703d077960c63}
+  '@arts/wp-plugin-tooling@https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/f5d242c7b969a3a20180e5c320bcfd8c0586023a':
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/f5d242c7b969a3a20180e5c320bcfd8c0586023a}
     version: 1.0.0
     engines: {node: '>=24'}
     hasBin: true
@@ -3861,7 +3861,7 @@ snapshots:
       '@types/select2': 4.0.63
       swiper: 14.2.0
 
-  '@arts/wp-plugin-tooling@https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/95da08ac8317ac5458a57a09def703d077960c63(postcss@8.5.26)(stylelint@17.14.1(supports-color@10.2.2)(typescript@7.0.2))':
+  '@arts/wp-plugin-tooling@https://codeload.github.com/artkrsk/wp-plugin-tooling/tar.gz/f5d242c7b969a3a20180e5c320bcfd8c0586023a(postcss@8.5.26)(stylelint@17.14.1(supports-color@10.2.2)(typescript@7.0.2))':
     dependencies:
       archiver: 8.0.0
       chokidar: 5.0.0
