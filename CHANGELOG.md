@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.4
+
+* improved: smaller plugin package and more reliable installation and update process
+* improved: updated internal build tools and dependencies for improved stability and security
+
 ## 2.5.3
 
 * improved: full compatibility with WordPress 7.1
