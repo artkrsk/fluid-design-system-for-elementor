@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   release:
-    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/release.yml@main
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/release.yml@e6a2fdf517588bf09377a052a59709f152316244 # main
     with:
       node_version: '24'
       php_version: '8.4'

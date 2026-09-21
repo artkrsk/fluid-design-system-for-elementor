@@ -15,6 +15,6 @@ permissions:
 
 jobs:
   docs:
-    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/deploy-docs.yml@main
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/deploy-docs.yml@e6a2fdf517588bf09377a052a59709f152316244 # main
     with:
       docs_base_path: /fluid-design-system-for-elementor/
