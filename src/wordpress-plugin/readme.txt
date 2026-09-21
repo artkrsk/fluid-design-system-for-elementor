@@ -200,6 +200,9 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.5.5 =
+* fixed: the number field stayed visible next to the preset dropdown when a control used the fluid unit
+
 = 2.5.4 =
 * improved: smaller plugin package and more reliable installation and update process
 * improved: updated internal build tools and dependencies for improved stability and security
