@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   cross-browser:
-    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/test.yml@main
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/test.yml@e6a2fdf517588bf09377a052a59709f152316244 # main
     with:
       zip_budget_mb: '1.0'
       # Unit tests and the PHP suites already run on every PR; this job exists
