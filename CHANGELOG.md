@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.5
+
+* fixed: the number field stayed visible next to the preset dropdown when a control used the fluid unit
+
 ## 2.5.4
 
 * improved: smaller plugin package and more reliable installation and update process

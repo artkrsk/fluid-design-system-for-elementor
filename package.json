@@ -1,6 +1,6 @@
 {
   "name": "fluid-design-system-for-elementor",
-  "version": "2.5.4",
+  "version": "2.5.5",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.17.0",
