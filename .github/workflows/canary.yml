@@ -3,7 +3,7 @@ name: Weekly Canary
 on:
   schedule:
     # Monday 03:00 UTC — before the workweek, after the weekend's releases.
-    - cron: '0 3 * * 1'
+    - cron: '0 3 * * 0'
   workflow_dispatch:
 
 permissions:
