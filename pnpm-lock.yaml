@@ -11,7 +11,7 @@ overrides:
   js-yaml: ^4.3.1
   adm-zip: ^0.6.0
   postcss: ^8.5.26
-  immutable: ^4.3.9
+  immutable: ^5.0.0
   vitepress>vite: ^8.2.0
   vitest>vite: ^8.0.16
 
@@ -2477,8 +2477,8 @@ packages:
     resolution: {integrity: sha512-BAg6QkE8W+TuQLrrw0Ugr7HegXduRuuj8/ti2kSOc+jz1dmx8/WNcjr6XGnq5YpDWxFwwaavqD0+jIUOKelTsw==}
     engines: {node: '>= 4'}
 
-  immutable@4.3.9:
-    resolution: {integrity: sha512-ObHy4YN7ycwZOUCLI1/6svfyAFu7vL8RhAvVu/bh/RZW9EPlOyDaQ9jDQWCtdqzaXUjgXZCW1migtHE7YI7UGQ==}
+  immutable@5.1.9:
+    resolution: {integrity: sha512-m8nVez3rwrgmWxtLMt1ZYXB2Lv7OKYn/disyxAlSDYAlKSlFoPPfIAmAM/M5xqL4m4C/wAPw7S2/CNaUii1Hxg==}
 
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
@@ -6095,7 +6095,7 @@ snapshots:
 
   ignore@7.0.6: {}
 
-  immutable@4.3.9: {}
+  immutable@5.1.9: {}
 
   import-fresh@3.3.1:
     dependencies:
@@ -6842,7 +6842,7 @@ snapshots:
   sass@1.103.1:
     dependencies:
       chokidar: 5.0.0
-      immutable: 4.3.9
+      immutable: 5.1.9
       source-map-js: 1.2.1
     optionalDependencies:
       '@parcel/watcher': 2.6.0
