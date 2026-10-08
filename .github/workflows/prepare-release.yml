@@ -1,0 +1,44 @@
+# .github/workflows/prepare-release.yml in a plugin repo — thin caller of the reusable release-PR pipeline.
+#
+# dispatch-only until the output has earned trust; then uncomment the schedule.
+# `workflow_dispatch` only works once this file is on the default branch.
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Force x.y.z (empty = Claude decides; replaces an open release PR)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Print the entry and diff to the job summary; push and open nothing'
+        required: false
+        type: boolean
+        default: true
+  # schedule:
+  #   - cron: '17 6 * * 1-5' # weekdays; off the hour (GitHub delays :00 runs). Scheduled runs are real (dry_run off).
+
+# Never two at once, never cancel a run that may be mid-push.
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+# Read-only here: the release GitHub App token does the pushing, so the PR's CI runs.
+permissions:
+  contents: read
+  pull-requests: read
+  id-token: write
+
+jobs:
+  prepare:
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/prepare-release.yml@main
+    with:
+      client_id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+      version: ${{ inputs.version }}
+      dry_run: ${{ inputs.dry_run == true }}
+      # shipped_paths: 'src/'                              # changes here make a release worthwhile
+      # readme_path: 'src/wordpress-plugin/readme.txt'
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      RELEASE_BOT_PRIVATE_KEY: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
