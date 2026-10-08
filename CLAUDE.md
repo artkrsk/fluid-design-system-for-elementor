@@ -182,8 +182,9 @@ save   (After):  DataManager.invalidate()
 - **QA:** PHPStan `level: max` (PHP 8.0 target) over `src/php`; PHPCS (`ArtsFramework`); Biome;
   Vitest unit tests with coverage thresholds; Playwright e2e; knip as a hard gate, fallow advisory.
 - **Build:** the runner is shared — `@arts/wp-plugin-tooling` (`arts-wp`), not an in-repo pipeline; its
-  mechanics are documented there. `pnpm dev:plugin` (watch) / `pnpm build` — the watch is already running;
-  never start either yourself. The distributable is assembled in `src/wordpress-plugin/` (main file
+  mechanics are documented there. `pnpm dev:plugin` (watch) / `pnpm build` are allowed after checking
+  matching process commands, working directories, and shared outputs. Reuse a suitable watcher or
+  perform a coordinated targeted restart; serialize conflicting writers. The distributable is assembled in `src/wordpress-plugin/` (main file
   `fluid-design-system-for-elementor.php`) and zipped to `dist/`; JS/CSS compile to
   `src/php/libraries/fluid-design-system-for-elementor/` (slug-derived — the enqueue paths in
   `Managers/Compatibility.php` must match).
