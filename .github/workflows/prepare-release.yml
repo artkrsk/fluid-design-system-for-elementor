@@ -1,10 +1,14 @@
 # .github/workflows/prepare-release.yml in a plugin repo — thin caller of the reusable release-PR pipeline.
 #
-# dispatch-only until the output has earned trust; then uncomment the schedule.
+# Runs every Tuesday at 06:07 Manila time, and on demand.
 # `workflow_dispatch` only works once this file is on the default branch.
 name: Prepare Release
 
 on:
+  schedule:
+    # Tuesday 06:07 Manila (UTC+8, no DST) = Monday 22:07 UTC; cron is UTC. Off the hour on
+    # purpose: GitHub delays runs scheduled at :00.
+    - cron: '7 22 * * 1'
   workflow_dispatch:
     inputs:
       version:
@@ -16,8 +20,6 @@ on:
         required: false
         type: boolean
         default: true
-  # schedule:
-  #   - cron: '17 6 * * 1-5' # weekdays; off the hour (GitHub delays :00 runs). Scheduled runs are real (dry_run off).
 
 # Never two at once, never cancel a run that may be mid-push.
 concurrency:
@@ -37,6 +39,7 @@ jobs:
       client_id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
       version: ${{ inputs.version }}
       dry_run: ${{ inputs.dry_run == true }}
+      reviewers: artkrsk # request your review on each release PR, so GitHub always notifies you
       # shipped_paths: 'src/'                              # changes here make a release worthwhile
       # readme_path: 'src/wordpress-plugin/readme.txt'
     secrets:
