@@ -19,7 +19,7 @@
   },
   "require-dev": {
     "arts/elementor-stubs": "^4.0",
-    "brianhenryie/strauss": "^0.30",
+    "brianhenryie/strauss": "^0.31",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "doctrine/instantiator": "^2.0",
     "ergebnis/composer-normalize": "^2.48",
