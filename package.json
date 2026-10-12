@@ -28,7 +28,7 @@
     "@vitest/coverage-v8": "^4.1.10",
     "@wordpress/env": "^11.11.0",
     "fallow": "^3.15.0",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.0",
     "knip": "^6.32.2",
     "lefthook": "^2.1.10",
     "medium-zoom": "^1.1.0",
