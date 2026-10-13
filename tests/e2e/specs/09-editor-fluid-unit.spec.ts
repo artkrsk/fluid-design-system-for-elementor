@@ -88,6 +88,35 @@ test.describe('Editor fluid unit loop', () => {
     ).toBeVisible()
   })
 
+  test('undo and redo resync the preset dropdown with the model', async ({ editor, page }) => {
+    const rendered = page.locator('.elementor-control-space .select2-selection__rendered')
+    const historyLength = () =>
+      page.evaluate(() => {
+        const w = window as any
+        return w.elementor.documents.getCurrent().history.getItems().length as number
+      })
+
+    const before = await historyLength()
+    await editor.selectFluidPreset('space', 'E2E Gap Large')
+    // Elementor commits the settings history item after a debounce
+    await expect.poll(historyLength).toBeGreaterThan(before)
+
+    await page.evaluate(() => {
+      const w = window as any
+      w.$e.run('document/history/undo')
+    })
+    expect(String((await getSpacerSpaceSetting(page)).size)).toContain('e2e_gap_standard')
+    await expect(rendered, 'Undo should revert the visible preset').toContainText(
+      'E2E Gap Standard'
+    )
+
+    await page.evaluate(() => {
+      const w = window as any
+      w.$e.run('document/history/redo')
+    })
+    await expect(rendered, 'Redo should reapply the visible preset').toContainText('E2E Gap Large')
+  })
+
   test('selecting a preset applies it to the widget and survives save + reopen', async ({
     editor,
     page,

@@ -70,6 +70,33 @@ export const BaseControlView: Record<string, unknown> = {
     callSuper(this, 'onDestroy')
   },
 
+  /** Resyncs the fluid UI after undo/redo: Elementor's applySavedValue() only sets input values silently */
+  onAfterExternalChange(this: any): void {
+    callSuper(this, 'onAfterExternalChange', arguments)
+
+    if (!this.hasRenderedFluidSelector()) {
+      return
+    }
+
+    for (const selectEl of this.ui.selectControls) {
+      const setting = selectEl.getAttribute('data-setting')
+      const value = this.getControlValue(setting) ?? ''
+
+      this.toggleInlineInputs(setting, false)
+
+      if (isAwaitingPresets(selectEl)) {
+        // buildSelectOptions() selects from data-value once the presets arrive
+        selectEl.setAttribute('data-value', value)
+      } else {
+        PresetDropdownManager.updateSelectValue(selectEl, value)
+      }
+    }
+
+    // Re-shows inline inputs for clamp() values, then syncs unit classes and the preview switcher
+    this.initializeInlineInputsState()
+    this.updateUnitChoices()
+  },
+
   hasRenderedFluidSelector(this: any): boolean {
     return this.ui.selectControls && this.ui.selectControls.length > 0
   },
