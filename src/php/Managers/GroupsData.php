@@ -215,6 +215,7 @@ class GroupsData extends BaseManager {
 				'value'       => $presets,
 				'id'          => $group_id,
 				'order'       => isset( $group_array['order'] ) ? Utilities::get_int_value( $group_array['order'], 999 ) : 999,
+				'registered'  => ! empty( $group_array['registered'] ),
 			);
 		}
 

@@ -132,4 +132,34 @@ class AbilitiesGroupCallbacksTest extends WP_UnitTestCase {
 		$this->assertWPError( $missing );
 		$this->assertSame( 'group_not_found', $missing->get_error_code() );
 	}
+
+	public function test_registered_group_is_flagged_and_refuses_rename_and_delete(): void {
+		add_filter(
+			'arts/fluid_design_system/registered_groups',
+			function ( $groups ) {
+				$groups['theme_layout'] = array( 'name' => 'Layout' );
+				return $groups;
+			}
+		);
+		$abilities = $this->abilities();
+
+		$registered = array_column( $abilities->execute_list_preset_groups()['groups'], 'registered', 'id' );
+		$this->assertTrue( $registered['theme_layout'] );
+		$this->assertFalse( $registered['fluid_spacing_presets'] );
+
+		$rename = $abilities->execute_rename_preset_group(
+			array(
+				'group_id' => 'theme_layout',
+				'name'     => 'Renamed',
+			)
+		);
+		$this->assertWPError( $rename );
+		$this->assertSame( 'registered_group', $rename->get_error_code() );
+
+		$delete = $abilities->execute_delete_preset_group( array( 'group_id' => 'theme_layout' ) );
+		$this->assertWPError( $delete );
+		$this->assertSame( 'registered_group', $delete->get_error_code() );
+
+		$this->assertSame( 'Layout', ( new Data() )->get_group( 'theme_layout' )['name'] );
+	}
 }

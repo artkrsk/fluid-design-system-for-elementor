@@ -46,12 +46,56 @@ class Data extends BaseManager {
 		}
 
 		/** @var array<string, array<string, mixed>> $groups */
+		return array_replace( $groups, self::get_registered_groups() );
+	}
+
+	/**
+	 * Groups a theme or plugin registers in code. They are never stored, so they survive a Kit
+	 * Import, and they can't be renamed or deleted.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	public static function get_registered_groups(): array {
+		/**
+		 * Registers preset groups in code, keyed by a `sanitize_key()`-clean group id.
+		 *
+		 * @param array<string, array<string, mixed>> $groups Each with `name`, optional `description` and `order`.
+		 */
+		$registered = apply_filters( 'arts/fluid_design_system/registered_groups', array() );
+		$groups     = array();
+
+		foreach ( Utilities::get_array_value( $registered ) as $id => $group ) {
+			// Admin requests run group ids through sanitize_key(), so any other id could never match.
+			if ( ! is_string( $id ) || $id === '' || sanitize_key( $id ) !== $id || ! is_array( $group ) ) {
+				continue;
+			}
+
+			if ( ! isset( $group['name'] ) || ! is_string( $group['name'] ) || $group['name'] === '' ) {
+				continue;
+			}
+
+			$groups[ $id ] = array(
+				'name'        => $group['name'],
+				'description' => isset( $group['description'] ) && is_string( $group['description'] ) ? $group['description'] : '',
+				'order'       => isset( $group['order'] ) ? Utilities::get_int_value( $group['order'], 999 ) : 999,
+				'registered'  => true,
+			);
+		}
+
 		return $groups;
 	}
 
-	/** @param array<string, array<string, mixed>> $groups */
+	public static function is_registered_group( string $id ): bool {
+		return isset( self::get_registered_groups()[ $id ] );
+	}
+
+	/**
+	 * Registered groups are stripped: they live in code, never in the option.
+	 *
+	 * @param array<string, array<string, mixed>> $groups
+	 */
 	public function save_custom_groups( array $groups ): bool {
-		return update_option( self::OPTION_NAME, $groups );
+		return update_option( self::OPTION_NAME, array_diff_key( $groups, self::get_registered_groups() ) );
 	}
 
 	/**
@@ -95,7 +139,7 @@ class Data extends BaseManager {
 	public function delete_group( string $id ): bool {
 		$groups = $this->get_custom_groups();
 
-		if ( ! isset( $groups[ $id ] ) ) {
+		if ( ! isset( $groups[ $id ] ) || self::is_registered_group( $id ) ) {
 			return false;
 		}
 

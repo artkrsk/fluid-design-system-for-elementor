@@ -121,6 +121,14 @@ class AJAX extends BaseManager {
 			return array( 'success' => false );
 		}
 
+		if ( Data::is_registered_group( $group_id ) ) {
+			$this->managers->notices->add_notice(
+				esc_html__( 'This group is registered by the theme or a plugin and cannot be edited.', 'fluid-design-system-for-elementor' ),
+				'error'
+			);
+			return array( 'success' => false );
+		}
+
 		$current_title = $custom_groups[ $group_id ]['name'] ?? '';
 		if ( $title === $current_title ) {
 			return array(
@@ -168,6 +176,14 @@ class AJAX extends BaseManager {
 		if ( ! isset( $custom_groups[ $group_id ] ) ) {
 			$this->managers->notices->add_notice(
 				esc_html__( 'Group not found.', 'fluid-design-system-for-elementor' ),
+				'error'
+			);
+			return array( 'success' => false );
+		}
+
+		if ( Data::is_registered_group( $group_id ) ) {
+			$this->managers->notices->add_notice(
+				esc_html__( 'This group is registered by the theme or a plugin and cannot be edited.', 'fluid-design-system-for-elementor' ),
 				'error'
 			);
 			return array( 'success' => false );

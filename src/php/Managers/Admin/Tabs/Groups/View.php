@@ -446,11 +446,14 @@ class View extends BaseManager {
 		$order_display = '';
 		$actions       = '';
 
-		// Both built-in and custom rows are drag-sortable; only custom ones are inline-editable.
-		$editable       = ( $group_type === 'custom' ) ? 'true' : 'false';
-		$editable_class = ( $group_type === 'custom' ) ? 'editable-title' : '';
+		// Registered groups are custom groups underneath but read-only, so they render as built-in.
+		$presentation_type = ! empty( $group['registered'] ) ? 'builtin' : $group_type;
 
-		switch ( $group_type ) {
+		// Both built-in and custom rows are drag-sortable; only custom ones are inline-editable.
+		$editable       = ( $presentation_type === 'custom' ) ? 'true' : 'false';
+		$editable_class = ( $presentation_type === 'custom' ) ? 'editable-title' : '';
+
+		switch ( $presentation_type ) {
 			case 'builtin':
 				$row_class     = 'group-builtin sortable-row';
 				$type_badge    = '<span class="group-type-badge group-type-builtin">' . esc_html__( 'Built-in', 'fluid-design-system-for-elementor' ) . '</span>';
@@ -484,12 +487,12 @@ class View extends BaseManager {
 						<input type="text" class="title-input" value="<?php echo esc_attr( $group_name ); ?>" style="display: none;" />
 					</div>
 				</div>
-				<?php if ( $group_type === 'custom' && ! empty( $group_id ) ) : ?>
+				<?php if ( $presentation_type === 'custom' && ! empty( $group_id ) ) : ?>
 					<input type="hidden" name="group_titles[<?php echo esc_attr( $group_id ); ?>]" value="<?php echo esc_attr( $group_name ); ?>" />
 				<?php endif; ?>
 			</td>
 			<td class="column-description">
-				<?php if ( $group_type === 'custom' ) : ?>
+				<?php if ( $presentation_type === 'custom' ) : ?>
 					<div class="editable-description" data-editable="true" data-original-description="<?php echo esc_attr( $group_description ); ?>">
 						<span class="description-text"><?php echo ! empty( $group_description ) ? $group_description : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						<input type="text" class="description-input" value="<?php echo esc_attr( $group_description ); ?>" style="display: none;" />

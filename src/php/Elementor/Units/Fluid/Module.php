@@ -17,6 +17,7 @@ use Elementor\Core\Base\Module as Module_Base;
 use ArtsFluidDS\Arts\Utilities\Utilities;
 use Arts\FluidDesignSystem\Managers\CSSVariables;
 use Arts\FluidDesignSystem\Managers\ControlRegistry;
+use Arts\FluidDesignSystem\Managers\Data;
 use Arts\FluidDesignSystem\Services\KitRepeaterService;
 
 /**
@@ -203,28 +204,24 @@ class Module extends Module_Base {
 			),
 		);
 
-		$custom_groups = get_option( 'arts_fluid_design_system_custom_groups', array() );
-
-		if ( is_array( $custom_groups ) ) {
-			foreach ( $custom_groups as $group_id => $group_data ) {
-				if ( ! is_array( $group_data ) || ! isset( $group_data['name'] ) || ! is_string( $group_data['name'] ) ) {
-					continue;
-				}
-
-				$control_id    = ControlRegistry::get_custom_group_control_id( $group_id );
-				$group_presets = Utilities::get_kit_settings( $control_id, array(), false );
-
-				if ( ! is_array( $group_presets ) ) {
-					$group_presets = array();
-				}
-
-				/** @var array<int, array<string, mixed>> $group_presets */
-				$collections[ $control_id ] = array(
-					'title'      => $group_data['name'],
-					'control_id' => $control_id,
-					'presets'    => $group_presets,
-				);
+		foreach ( Data::get_custom_groups() as $group_id => $group_data ) {
+			if ( ! isset( $group_data['name'] ) || ! is_string( $group_data['name'] ) ) {
+				continue;
 			}
+
+			$control_id    = ControlRegistry::get_custom_group_control_id( $group_id );
+			$group_presets = Utilities::get_kit_settings( $control_id, array(), false );
+
+			if ( ! is_array( $group_presets ) ) {
+				$group_presets = array();
+			}
+
+			/** @var array<int, array<string, mixed>> $group_presets */
+			$collections[ $control_id ] = array(
+				'title'      => $group_data['name'],
+				'control_id' => $control_id,
+				'presets'    => $group_presets,
+			);
 		}
 
 		return $collections;

@@ -64,12 +64,12 @@ class ControlRegistry extends BaseManager {
 	}
 
 	/**
-	 * Loads custom groups from wp_options, sorted by order field.
+	 * Loads stored and registered custom groups, sorted by order field.
 	 *
 	 * @return array<string, array<string, mixed>>
 	 */
 	public static function get_custom_groups_metadata(): array {
-		$custom_groups = Utilities::get_array_value( get_option( 'arts_fluid_design_system_custom_groups', array() ) );
+		$custom_groups = Data::get_custom_groups();
 		$metadata      = array();
 
 		foreach ( $custom_groups as $group_id => $group_data ) {

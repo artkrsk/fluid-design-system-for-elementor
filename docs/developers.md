@@ -31,6 +31,23 @@ add_filter('arts/fluid_design_system/custom_presets', function($groups) {
 });
 ```
 
+### `arts/fluid_design_system/registered_groups`
+
+Register editable preset groups in code. Each group gets its own section in Site Settings, and its presets are stored in the Kit under `fluid_custom_{id}_presets`, so they travel with a Kit export/import while the group itself comes from your code on every install.
+
+```php
+add_filter('arts/fluid_design_system/registered_groups', function($groups) {
+    $groups['mytheme_layout'] = [
+        'name' => 'Layout',
+        'description' => '', // Optional
+        'order' => 1,        // Optional: position among custom groups
+    ];
+    return $groups;
+});
+```
+
+Keys must be `sanitize_key()`-clean (lowercase letters, digits, `_`, `-`). Registered groups can be reordered and their presets edited like any other, but they can't be renamed or deleted in the admin or through the MCP tools.
+
 ## Control Eligibility
 
 ### `arts/fluid_design_system/controls/is_eligible_for_fluid_unit`

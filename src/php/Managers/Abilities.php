@@ -327,7 +327,7 @@ class Abilities extends BaseManager {
 			'fluid/rename-preset-group',
 			array(
 				'label'               => __( 'Rename Preset Group', 'fluid-design-system-for-elementor' ),
-				'description'         => __( 'Renames a custom group. Built-in groups (Spacing, Typography) cannot be renamed.', 'fluid-design-system-for-elementor' ),
+				'description'         => __( 'Renames a custom group. Built-in groups (Spacing, Typography) and groups registered by the theme or a plugin cannot be renamed.', 'fluid-design-system-for-elementor' ),
 				'category'            => self::CATEGORY,
 				'permission_callback' => array( $this, 'can_manage' ),
 				'execute_callback'    => array( $this, 'execute_rename_preset_group' ),
@@ -379,6 +379,15 @@ class Abilities extends BaseManager {
 			);
 		}
 
+		if ( Data::is_registered_group( $group_id ) ) {
+			return new WP_Error(
+				'registered_group',
+				/* translators: %s: Group ID */
+				sprintf( __( 'Group "%s" is registered by the theme or a plugin and cannot be renamed.', 'fluid-design-system-for-elementor' ), $group_id ),
+				array( 'status' => 409 )
+			);
+		}
+
 		if ( GroupsData::is_group_name_taken( $new_name, $group_id ) ) {
 			return new WP_Error(
 				'name_taken',
@@ -416,7 +425,7 @@ class Abilities extends BaseManager {
 			'fluid/delete-preset-group',
 			array(
 				'label'               => __( 'Delete Preset Group', 'fluid-design-system-for-elementor' ),
-				'description'         => __( 'Deletes a custom group and its presets. Built-in groups cannot be deleted.', 'fluid-design-system-for-elementor' ),
+				'description'         => __( 'Deletes a custom group and its presets. Built-in groups and groups registered by the theme or a plugin cannot be deleted.', 'fluid-design-system-for-elementor' ),
 				'category'            => self::CATEGORY,
 				'permission_callback' => array( $this, 'can_manage' ),
 				'execute_callback'    => array( $this, 'execute_delete_preset_group' ),
@@ -457,6 +466,15 @@ class Abilities extends BaseManager {
 				/* translators: %s: Group ID that was not found */
 				sprintf( __( 'Group "%s" not found. Call list-preset-groups to see available groups.', 'fluid-design-system-for-elementor' ), $group_id ),
 				array( 'status' => 404 )
+			);
+		}
+
+		if ( Data::is_registered_group( $group_id ) ) {
+			return new WP_Error(
+				'registered_group',
+				/* translators: %s: Group ID */
+				sprintf( __( 'Group "%s" is registered by the theme or a plugin and cannot be deleted.', 'fluid-design-system-for-elementor' ), $group_id ),
+				array( 'status' => 409 )
 			);
 		}
 
@@ -1114,6 +1132,7 @@ class Abilities extends BaseManager {
 			'description' => $group['description'] ?? '',
 			'type'        => $type,
 			'control_id'  => self::resolve_control_id_from_group( $group ),
+			'registered'  => ! empty( $group['registered'] ),
 		);
 	}
 
@@ -1179,6 +1198,7 @@ class Abilities extends BaseManager {
 					'enum' => array( 'builtin', 'custom', 'filter' ),
 				),
 				'control_id'  => array( 'type' => 'string' ),
+				'registered'  => array( 'type' => 'boolean' ),
 			),
 		);
 	}

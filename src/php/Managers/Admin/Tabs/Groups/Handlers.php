@@ -238,7 +238,7 @@ class Handlers extends BaseManager {
 					continue;
 				}
 
-				if ( empty( $new_title ) || empty( $group_id ) || ! isset( $custom_groups[ $group_id ] ) ) {
+				if ( empty( $new_title ) || empty( $group_id ) || ! isset( $custom_groups[ $group_id ] ) || Data::is_registered_group( $group_id ) ) {
 					continue;
 				}
 
@@ -299,7 +299,7 @@ class Handlers extends BaseManager {
 				}
 
 				// Only update if the group exists in custom groups
-				if ( isset( $custom_groups[ $group_id ] ) ) {
+				if ( isset( $custom_groups[ $group_id ] ) && ! Data::is_registered_group( $group_id ) ) {
 					$custom_groups[ $group_id ]['description'] = $new_description;
 					$updated_groups                            = true;
 				}

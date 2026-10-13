@@ -84,4 +84,21 @@ class GroupsDataTest extends WP_UnitTestCase {
 		$this->assertSame( 'fluid_typography_presets', $ordered[0]['id'] );
 		$this->assertSame( 'fluid_spacing_presets', $ordered[1]['id'] );
 	}
+
+	public function test_registered_group_is_appended_to_a_saved_order_that_lacks_it(): void {
+		add_filter(
+			'arts/fluid_design_system/registered_groups',
+			function ( $groups ) {
+				$groups['theme_layout'] = array( 'name' => 'Layout' );
+				return $groups;
+			}
+		);
+
+		Data::save_main_group_order( array( 'fluid_typography_presets', 'fluid_spacing_presets' ) );
+
+		$main = GroupsData::get_main_groups();
+		$this->assertSame( array( 'fluid_typography_presets', 'fluid_spacing_presets', 'theme_layout' ), array_column( $main, 'id' ) );
+		$this->assertSame( 'custom', $main[2]['type'] );
+		$this->assertTrue( $main[2]['registered'] );
+	}
 }
