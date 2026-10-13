@@ -1,4 +1,4 @@
-import { CUSTOM_FLUID_VALUE, VALUE_WITH_UNIT_PATTERN } from '../constants'
+import { CUSTOM_FLUID_VALUE, STYLES, VALUE_WITH_UNIT_PATTERN } from '../constants'
 import type { TParsedValue, TValidationResult } from '../types'
 import { isInlineClampValue } from './clamp'
 
@@ -13,6 +13,14 @@ export function isCustomFluidValue(value: string | null | undefined): boolean {
     return false
   }
   return value === CUSTOM_FLUID_VALUE || isInlineClampValue(value)
+}
+
+/** Check if a stored value resolves to a selectable option: 0px, a preset reference or a custom value */
+export function isConcreteFluidValue(value: string | null | undefined): boolean {
+  if (!value) {
+    return false
+  }
+  return value === '0' || value.startsWith(`var(${STYLES.VAR_PREFIX}`) || isCustomFluidValue(value)
 }
 
 /** Input validation utilities for fluid design system */

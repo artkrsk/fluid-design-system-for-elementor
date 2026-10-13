@@ -10,13 +10,18 @@ import { createElement } from '../utils/dom'
 import { EditIconHandler } from '../utils/editIconHandler'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
 import { InlineInputManager } from '../utils/inlineInputs'
-import { buildSelectOptions } from '../utils/preset'
+import { buildSelectOptions, isAwaitingPresets } from '../utils/preset'
 import { handleCreatePreset, handleUpdatePreset } from '../utils/presetActions'
 import { PresetDropdownManager } from '../utils/presetDropdown'
 import { PreviewSwitcherManager } from '../utils/previewSwitcher'
 import { resolveAnchorWidths } from '../utils/screenAnchors'
 import { getSelect2DefaultOptions } from '../utils/select2'
-import { isCustomFluidValue, isEmptyControlValue, ValidationService } from '../utils/validation'
+import {
+  isConcreteFluidValue,
+  isCustomFluidValue,
+  isEmptyControlValue,
+  ValidationService
+} from '../utils/validation'
 
 /** Mixin adding fluid-unit support to Elementor's Dimensions, Gaps and Slider control views */
 export const BaseControlView: Record<string, unknown> = {
@@ -94,10 +99,15 @@ export const BaseControlView: Record<string, unknown> = {
     this.renderFluidSelectElements()
     this.addLoadingOptions()
     this.createSelect2()
+    // Lay out the rows that don't depend on presets before awaiting them, so the
+    // control keeps its height when the options arrive
+    this.initializeInlineInputsState()
+    this.renderPreviewSwitcher()
+    this.updatePreviewSwitcherVisibility()
     await this.populateSelectElements()
     this.attachSelectElementsListeners()
     this.initializeInlineInputsState()
-    this.renderPreviewSwitcher()
+    this.previewSwitcherEl?.classList.remove('e-fluid-loading')
     this.updatePreviewSwitcherVisibility()
   },
 
@@ -119,6 +129,9 @@ export const BaseControlView: Record<string, unknown> = {
       onAnchor: (anchor: 'min' | 'max') => this.onPreviewAnchor(anchor),
       onReset: () => previewSizeManager.reset()
     })
+
+    // Anchors read per-preset screen widths from the selected option, so stay inert until presets load
+    container.classList.add('e-fluid-loading')
 
     this.abortControllers.set('__preview_switcher__', abortController)
     this.previewSwitcherEl = container
@@ -160,7 +173,12 @@ export const BaseControlView: Record<string, unknown> = {
     let hasConcreteValue = false
     if (this.isFluidUnit()) {
       for (const selectEl of this.ui.selectControls || []) {
-        if (selectEl.value && selectEl.value !== '') {
+        // No options to select yet, so predict from the stored value
+        const isConcrete = isAwaitingPresets(selectEl)
+          ? isConcreteFluidValue(selectEl.getAttribute('data-value'))
+          : selectEl.value !== ''
+
+        if (isConcrete) {
           hasConcreteValue = true
           break
         }
@@ -206,7 +224,8 @@ export const BaseControlView: Record<string, unknown> = {
           }
         }
 
-        if (hasInlineClamp) {
+        // Selecting before the Custom option exists would blank the "Loading..." select2
+        if (hasInlineClamp && !isAwaitingPresets(selectEl)) {
           selectEl.value = CUSTOM_FLUID_VALUE
           selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
           jQuery(selectEl).trigger('change.select2')
@@ -222,9 +241,12 @@ export const BaseControlView: Record<string, unknown> = {
           if (container) {
             this.toggleInlineInputs(setting, true)
             this.setInlineInputValues(setting, linkedClampValues)
-            selectEl.value = CUSTOM_FLUID_VALUE
-            selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
-            jQuery(selectEl).trigger('change.select2')
+
+            if (!isAwaitingPresets(selectEl)) {
+              selectEl.value = CUSTOM_FLUID_VALUE
+              selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
+              jQuery(selectEl).trigger('change.select2')
+            }
           }
         }
       }

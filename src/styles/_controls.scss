@@ -83,3 +83,10 @@
     height: initial;
   }
 }
+
+// Elementor's 13px spinner is taller than the 12px control title, so showing it
+// while presets load grew the header row by 1px. A zero-height flex box keeps the
+// icon centered on the row without taking part in its height.
+.elementor-control.e-units-fluid .elementor-control-field > .elementor-control-spinner {
+  height: 0;
+}

@@ -35,7 +35,7 @@ class SpinnerUtils {
     }
 
     if (spinnerEl) {
-      spinnerEl.style.display = 'block'
+      spinnerEl.style.display = 'flex'
     }
 
     return spinnerEl

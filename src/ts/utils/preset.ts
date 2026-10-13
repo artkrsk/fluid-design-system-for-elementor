@@ -80,4 +80,9 @@ export async function buildSelectOptions(
   return selectEl
 }
 
+/** Whether the select still shows its loading option and has no preset options yet */
+export function isAwaitingPresets(selectEl: HTMLSelectElement): boolean {
+  return selectEl.classList.contains('is-loading')
+}
+
 export { getInheritedPresetSync }

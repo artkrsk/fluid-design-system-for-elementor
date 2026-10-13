@@ -6,6 +6,7 @@ import { generateClampFormula, isInlineClampValue, parseClampFormula } from '../
 import { createElement } from '../utils/dom'
 import { InheritanceAttributeManager } from '../utils/inheritanceAttributes'
 import { InlineInputManager } from '../utils/inlineInputs'
+import { isAwaitingPresets } from '../utils/preset'
 import { handleCreatePreset, handleUpdatePreset } from '../utils/presetActions'
 import { PresetDropdownManager } from '../utils/presetDropdown'
 import { ValidationService } from '../utils/validation'
@@ -253,9 +254,12 @@ export const BaseSliderControlView: Record<string, unknown> = {
             this._setSliderInlineInputValues(setting, parsed)
           }
 
-          selectEl.value = CUSTOM_FLUID_VALUE
-          selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
-          jQuery(selectEl).trigger('change.select2')
+          // Selecting before the Custom option exists would blank the "Loading..." select2
+          if (!isAwaitingPresets(selectEl)) {
+            selectEl.value = CUSTOM_FLUID_VALUE
+            selectEl.setAttribute('data-value', CUSTOM_FLUID_VALUE)
+            jQuery(selectEl).trigger('change.select2')
+          }
         }
       }
     }

@@ -1,5 +1,10 @@
 import { CUSTOM_FLUID_VALUE } from '@ts/constants'
-import { isCustomFluidValue, isEmptyControlValue, ValidationService } from '@ts/utils/validation'
+import {
+  isConcreteFluidValue,
+  isCustomFluidValue,
+  isEmptyControlValue,
+  ValidationService
+} from '@ts/utils/validation'
 import { describe, expect, it } from 'vitest'
 
 describe('validation utilities', () => {
@@ -53,6 +58,32 @@ describe('validation utilities', () => {
 
     it('returns false for regular value', () => {
       expect(isCustomFluidValue('16px')).toBe(false)
+    })
+  })
+
+  describe('isConcreteFluidValue', () => {
+    it('returns false for empty values', () => {
+      expect(isConcreteFluidValue(null)).toBe(false)
+      expect(isConcreteFluidValue(undefined)).toBe(false)
+      expect(isConcreteFluidValue('')).toBe(false)
+    })
+
+    it('returns true for the 0px default option', () => {
+      expect(isConcreteFluidValue('0')).toBe(true)
+    })
+
+    it('returns true for a preset reference', () => {
+      expect(isConcreteFluidValue('var(--arts-fluid-preset--abc123)')).toBe(true)
+    })
+
+    it('returns true for custom values', () => {
+      expect(isConcreteFluidValue(CUSTOM_FLUID_VALUE)).toBe(true)
+      expect(isConcreteFluidValue('clamp(16px, calc(...), 24px)')).toBe(true)
+    })
+
+    it('returns false for values no option resolves to', () => {
+      expect(isConcreteFluidValue('50')).toBe(false)
+      expect(isConcreteFluidValue('var(--other-var)')).toBe(false)
     })
   })
 

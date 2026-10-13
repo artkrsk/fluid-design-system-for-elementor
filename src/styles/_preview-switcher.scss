@@ -11,6 +11,11 @@
   &.e-hidden {
     display: none;
   }
+
+  &.e-fluid-loading {
+    pointer-events: none;
+    opacity: 0.6;
+  }
 }
 
 .e-fluid-preview-switcher__label {
