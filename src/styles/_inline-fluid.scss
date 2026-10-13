@@ -161,6 +161,12 @@
     min-width: 0;
   }
 
+  // Matches the italic, muted "Loading..." the controls show while their presets load
+  .e-fluid-group-select.is-loading + .select2-container .select2-selection__rendered {
+    color: variables.$color-txt-muted;
+    font-style: italic;
+  }
+
   // Select2 draws its own UI and ignores the disabled prop on the native select
   &.e-fluid-dialog-busy {
     .e-global__confirm-message {

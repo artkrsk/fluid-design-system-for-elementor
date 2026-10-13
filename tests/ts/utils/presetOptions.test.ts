@@ -5,6 +5,7 @@ import { getInheritedPresetSync } from '@ts/utils/presetLookup'
 import {
   createCustomPresetOption,
   createCustomValueOption,
+  createLoadingOption,
   createPresetOption,
   createSimpleOption,
   handleInheritOption
@@ -29,6 +30,18 @@ describe('presetOptions utilities', () => {
 
   afterEach(() => {
     ;(window as any).ArtsFluidDSStrings = originalArtsFluidDSStrings
+  })
+
+  describe('createLoadingOption', () => {
+    it('creates a disabled, selected placeholder option that select2 shows while data loads', () => {
+      const option = createLoadingOption()
+
+      expect(option.classList.contains('elementor-loading-option')).toBe(true)
+      expect(option.value).toBe('')
+      expect(option.disabled).toBe(true)
+      expect(option.hasAttribute('selected')).toBe(true)
+      expect(option.textContent).toBe('Loading...')
+    })
   })
 
   describe('createPresetOption', () => {

@@ -1,5 +1,6 @@
 import { SELECT2_CONFIG } from '../constants'
 import type { IPresetGroupOption } from '../interfaces'
+import { createLoadingOption } from './presetOptions'
 
 /** Preset dialog UI builders */
 export class DialogBuilder {
@@ -27,12 +28,12 @@ export class DialogBuilder {
     })
   }
 
-  /** Creates group selector dropdown */
+  /** Creates group selector dropdown, showing "Loading..." until populateGroupSelector() fills it */
   static createGroupSelector(): JQuery {
     return jQuery('<select>', {
       name: 'preset-group',
-      class: 'e-fluid-group-select'
-    })
+      class: 'e-fluid-group-select is-loading'
+    }).append(createLoadingOption())
   }
 
   /** Populates group selector with available groups */
@@ -41,6 +42,8 @@ export class DialogBuilder {
     groups: IPresetGroupOption[],
     defaultGroup: string | null = null
   ): void {
+    $select.removeClass('is-loading').find('.elementor-loading-option').remove()
+
     if (!Array.isArray(groups) || groups.length === 0) {
       // Fallback to default groups
       $select.append(

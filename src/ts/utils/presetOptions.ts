@@ -307,3 +307,15 @@ export function createCustomValueOption(currentValue: string): HTMLOptionElement
   optionEl.textContent = window.ArtsFluidDSStrings?.customValue ?? ''
   return optionEl
 }
+
+/** Creates the placeholder option a select shows while its options load */
+export function createLoadingOption(): HTMLOptionElement {
+  const optionEl = createElement('option', 'elementor-loading-option', {
+    value: '',
+    disabled: 'disabled',
+    selected: 'selected'
+  }) as HTMLOptionElement
+
+  optionEl.textContent = 'Loading...'
+  return optionEl
+}

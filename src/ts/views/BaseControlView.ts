@@ -13,6 +13,7 @@ import { InlineInputManager } from '../utils/inlineInputs'
 import { buildSelectOptions, isAwaitingPresets } from '../utils/preset'
 import { handleCreatePreset, handleUpdatePreset } from '../utils/presetActions'
 import { PresetDropdownManager } from '../utils/presetDropdown'
+import { createLoadingOption } from '../utils/presetOptions'
 import { PreviewSwitcherManager } from '../utils/previewSwitcher'
 import { resolveAnchorWidths } from '../utils/screenAnchors'
 import { getSelect2DefaultOptions } from '../utils/select2'
@@ -290,15 +291,7 @@ export const BaseControlView: Record<string, unknown> = {
         return
       }
 
-      const loadingOption = createElement('option', 'elementor-loading-option', {
-        value: '',
-        disabled: 'disabled',
-        selected: 'selected'
-      })
-
-      loadingOption.textContent = 'Loading...'
-
-      selectEl.appendChild(loadingOption)
+      selectEl.appendChild(createLoadingOption())
       selectEl.classList.add('is-loading')
     }
   },

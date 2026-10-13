@@ -263,10 +263,13 @@ export class PresetDialogManager {
 
     /** Only create mode renders the group selector — edit mode's Save must not wait on the fetch */
     if (mode === 'create') {
+      /** Select2 renders its "Loading..." box before the fetch, so filling it in place doesn't shift the dialog */
+      DialogBuilder.initializeSelect2($groupSelect)
+
       const groups = await dataManager.getGroups()
 
       DialogBuilder.populateGroupSelector($groupSelect, groups, data.groupId)
-      DialogBuilder.initializeSelect2($groupSelect)
+      $groupSelect.trigger('change.select2')
     }
 
     DialogBuilder.attachEnterKeyHandler($input, $confirmButton)
