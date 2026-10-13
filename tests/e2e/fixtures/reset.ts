@@ -21,8 +21,22 @@ const PLUGIN_PATH = '/var/www/html/wp-content/plugins/fluid-design-system-for-el
  * not per test.
  */
 export function resetTestState(): void {
-  execSync(
-    `pnpm exec wp-env run cli -- wp eval-file ${PLUGIN_PATH}/tests/e2e/fixtures/reset-state.php`,
-    { cwd: REPO_ROOT, stdio: 'pipe', timeout: 120000 }
-  )
+  evalFixture('reset-state.php')
+}
+
+/**
+ * Empties every preset repeater in the Kit (breakpoints kept) and drops the
+ * cached Kit CSS. Pair with resetTestState() in afterAll.
+ */
+export function emptyKitPresets(): void {
+  evalFixture('empty-presets.php')
+}
+
+/** Run a fixtures/ PHP script inside the wp-env CLI container */
+function evalFixture(file: string): void {
+  execSync(`pnpm exec wp-env run cli -- wp eval-file ${PLUGIN_PATH}/tests/e2e/fixtures/${file}`, {
+    cwd: REPO_ROOT,
+    stdio: 'pipe',
+    timeout: 120000
+  })
 }

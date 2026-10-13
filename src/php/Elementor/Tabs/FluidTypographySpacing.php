@@ -67,9 +67,6 @@ class FluidTypographySpacing extends BaseTab {
 			'fields'                   => $repeater->get_controls(),
 			'prevent_empty'            => false,
 			'is_fluid_preset_repeater' => true,
-			'selectors'                => array(
-				':root' => CSSVariables::get_css_var_screen_diff() . ': calc(var(' . CSSVariables::get_css_var_max_screen_value() . ') - var(' . CSSVariables::get_css_var_min_screen_value() . '));',
-			),
 			'frontend_available'       => true,
 			'render_type'              => 'template',
 		);
@@ -236,8 +233,10 @@ class FluidTypographySpacing extends BaseTab {
 				'max'         => 3840,
 				'step'        => 1,
 				'description' => esc_html__( 'The screen width in pixels where the maximum fluid values will be applied.', 'fluid-design-system-for-elementor' ),
+				// Screen diff lives here, not on the preset repeaters: Elementor skips a repeater
+				// with no rows, and inline fluid values need the var even when no preset exists.
 				'selectors'   => array(
-					':root' => CSSVariables::get_css_var_max_screen() . ': {{VALUE}}px; ' . CSSVariables::get_css_var_max_screen_value() . ': {{VALUE}};',
+					':root' => CSSVariables::get_css_var_max_screen() . ': {{VALUE}}px; ' . CSSVariables::get_css_var_max_screen_value() . ': {{VALUE}}; ' . CSSVariables::get_css_var_screen_diff() . ': calc(var(' . CSSVariables::get_css_var_max_screen_value() . ') - var(' . CSSVariables::get_css_var_min_screen_value() . '));',
 				),
 			)
 		);

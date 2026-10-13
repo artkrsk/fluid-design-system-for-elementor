@@ -41,4 +41,15 @@ class KitCssTest extends ElementorKitTestCase {
 		$this->assertStringContainsString( '--arts-fluid-preset--css_smoke', $content );
 		$this->assertStringContainsString( 'clamp(', $content );
 	}
+
+	/** Inline fluid values divide by the screen-diff var, so it must print even when no preset exists. */
+	public function test_kit_css_declares_screen_diff_without_presets(): void {
+		$css_file = Post_CSS::create( $this->kit->get_id() );
+		$css_file->delete();
+		$css_file->update();
+		$content = $css_file->get_content();
+
+		$this->assertStringNotContainsString( '--arts-fluid-preset--', $content );
+		$this->assertStringContainsString( '--arts-fluid-screen-diff:', $content );
+	}
 }

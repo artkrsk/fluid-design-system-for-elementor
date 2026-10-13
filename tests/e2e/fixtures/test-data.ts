@@ -115,6 +115,7 @@ export const TEST_ELEMENT_IDS = {
   headingInverted: 'e2e-heading-inverted',
   containerNegative: 'e2e-container-negative', // Separate container for negative margin (not in flex)
   spacerStandard: 'e2e-spacer-standard',
+  spacerInline: 'e2e-spacer-inline', // Inline (custom) fluid value, no preset (Issue #75)
   containerGap: 'e2e-container-gap',
   buttonDimensions: 'e2e-button-dimensions',
   customBreakpoint: 'e2e-custom-breakpoint',

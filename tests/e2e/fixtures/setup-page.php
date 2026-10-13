@@ -8,6 +8,7 @@
  * - Heading using e2e_heading_xl preset (typography font-size)
  * - Heading using e2e_inverted preset (edge case)
  * - Spacer using e2e_gap_standard preset
+ * - Spacer using an inline (custom) fluid value, no preset
  * - Container with gap using e2e_gap_large preset
  * - Button with padding (dimensions control)
  * - Element using custom breakpoint preset
@@ -32,6 +33,7 @@ $element_ids = array(
 	'headingInverted'   => 'e2e-heading-inverted',
 	'containerNegative' => 'e2e-container-negative', // Separate container for negative margin (not in flex)
 	'spacerStandard'    => 'e2e-spacer-standard',
+	'spacerInline'      => 'e2e-spacer-inline',
 	'containerGap'      => 'e2e-container-gap',
 	'buttonDimensions'  => 'e2e-button-dimensions',
 	'customBreakpoint'  => 'e2e-custom-breakpoint',
@@ -62,6 +64,7 @@ $heading_inverted_id    = e2e_generate_id();
 $negative_container_id  = e2e_generate_id(); // Separate top-level container for negative margin
 $negative_inner_text_id = e2e_generate_id();
 $spacer_id              = e2e_generate_id();
+$spacer_inline_id       = e2e_generate_id();
 $gap_container_id       = e2e_generate_id();
 $gap_child1_id          = e2e_generate_id();
 $gap_child2_id          = e2e_generate_id();
@@ -131,6 +134,19 @@ $elements = array(
 					'space'       => array(
 						'unit' => 'fluid',
 						'size' => e2e_get_preset_var( 'e2e_gap_standard' ),
+					),
+				),
+			),
+			// Spacer with an inline 40px ~ 180px value, as generateClampFormula() stores it
+			array(
+				'id'         => $spacer_inline_id,
+				'elType'     => 'widget',
+				'widgetType' => 'spacer',
+				'settings'   => array(
+					'_element_id' => $element_ids['spacerInline'],
+					'space'       => array(
+						'unit' => 'fluid',
+						'size' => 'clamp(min(40px, 180px), calc((40px) + (((180 - 40) * ((100vw - var(--arts-fluid-min-screen)) / var(--arts-fluid-screen-diff))))), max(40px, 180px))',
 					),
 				),
 			),
