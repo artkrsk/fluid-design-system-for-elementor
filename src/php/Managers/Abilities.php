@@ -709,7 +709,7 @@ class Abilities extends BaseManager {
 			),
 		);
 
-		$kit->add_repeater_row( $control_id, $preset_item );
+		KitRepeaterService::add_item( $kit, $control_id, $preset_item );
 
 		return array( 'preset' => self::normalize_preset( $preset_item ) );
 	}

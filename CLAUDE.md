@@ -89,8 +89,10 @@ src/ts/  (all .ts; entry index.ts)
 - `Units` — fluid-unit eligibility (`is_control_eligible_for_fluid_unit`) + Kit CSS optimization.
 
 **PHP service** — `KitRepeaterService` (static): `get_item / update_item / delete_item ($kit,
-$control_id, $item_id, …)`, plus `move_item($kit, $from_control_id, $to_control_id, $item_id)`. There is
-deliberately **no create** — new presets go through Elementor's own `$kit->add_repeater_row($control_id, $item)`.
+$control_id, $item_id, …)`, plus `move_item($kit, $from_control_id, $to_control_id, $item_id)`.
+`add_item($kit, $control_id, $item)` is only a buffered pass-through to Elementor's own
+`$kit->add_repeater_row()`: under Internal Embedding that call prints the Kit `<style>` into admin-ajax / WP-CLI
+output (elementor/elementor#37468), so never call `add_repeater_row()` directly and never write the row yourself.
 
 **JS managers** (singletons; `window.artsFluidDesignSystem.dataManager` exposed for dialogs):
 
@@ -154,7 +156,7 @@ save   (After):  DataManager.invalidate()
 
 ## Gotchas / invariants
 
-- **Never bypass the Kit API.** Create via `$kit->add_repeater_row()`; update/delete/move via
+- **Never bypass the Kit API.** Create via `KitRepeaterService::add_item()`; update/delete/move via
   `KitRepeaterService`, which saves through the Kit (`page`) settings manager **and** mirrors to the
   autosave document. Writing Kit meta directly desyncs the open editor. The admin cross-group snapshot
   (`Admin/Tabs/Groups/AJAX`) is the lone exception — it rewrites the whole settings array through the

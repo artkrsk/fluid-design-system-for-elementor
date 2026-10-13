@@ -19,6 +19,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 class KitRepeaterService {
 
 	/**
+	 * Adds a repeater item through Elementor's own Kit::add_repeater_row(), discarding its output.
+	 *
+	 * Under Internal Embedding, add_repeater_row() prints the Kit <style> when called outside a
+	 * page render (admin-ajax, WP-CLI), which corrupts JSON and MCP responses. The CSS is already
+	 * saved by then, so nothing is lost. Remove once the minimum supported Elementor no longer
+	 * prints there (elementor/elementor#37468).
+	 *
+	 * @param \Elementor\Core\Kits\Documents\Kit $kit
+	 * @param string                              $control_id
+	 * @param array<string, mixed>                $item       Item data including its _id.
+	 */
+	public static function add_item( $kit, $control_id, $item ): void {
+		$level = ob_get_level();
+		ob_start();
+
+		try {
+			$kit->add_repeater_row( $control_id, $item );
+		} finally {
+			while ( ob_get_level() > $level ) {
+				ob_end_clean();
+			}
+		}
+	}
+
+	/**
 	 * Finds a repeater item by _id and returns its data.
 	 *
 	 * @param \Elementor\Core\Kits\Documents\Kit $kit

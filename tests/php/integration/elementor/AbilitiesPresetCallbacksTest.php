@@ -57,6 +57,13 @@ class AbilitiesPresetCallbacksTest extends ElementorKitTestCase {
 		$this->assertSame( 10.0, $item['min']['size'] );
 	}
 
+	public function test_create_preset_prints_nothing_under_internal_css_embedding(): void {
+		$this->use_internal_css_embedding();
+		$this->expectOutputString( '' );
+
+		$this->create_preset( $this->abilities(), 'Quiet Preset' );
+	}
+
 	public function test_get_preset_errors_for_missing_id(): void {
 		$missing = $this->abilities()->execute_get_preset(
 			array(

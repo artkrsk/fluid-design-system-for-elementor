@@ -165,4 +165,52 @@ class KitRepeaterServiceTest extends ElementorKitTestCase {
 		);
 		$this->assertSame( 'After Mirror', $autosave_item['title'] );
 	}
+
+	public function test_add_item_saves_the_row_and_discards_the_kit_style_elementor_prints(): void {
+		$this->use_internal_css_embedding();
+		$this->expectOutputString( '' );
+
+		KitRepeaterService::add_item(
+			$this->kit,
+			'fluid_spacing_presets',
+			array(
+				'_id'   => 'quiet_preset',
+				'title' => 'Quiet Preset',
+				'min'   => array(
+					'size' => 16,
+					'unit' => 'px',
+				),
+				'max'   => array(
+					'size' => 48,
+					'unit' => 'px',
+				),
+			)
+		);
+
+		$item = KitRepeaterService::get_item( $this->kit, 'fluid_spacing_presets', 'quiet_preset' );
+		$this->assertSame( 'Quiet Preset', $item['title'] );
+	}
+
+	public function test_add_item_restores_the_output_buffer_level_when_the_kit_throws(): void {
+		$kit = $this->createMock( \Elementor\Core\Kits\Documents\Kit::class );
+		$kit->method( 'add_repeater_row' )->willReturnCallback(
+			static function (): void {
+				ob_start();
+				echo 'leaked';
+				throw new \RuntimeException( 'kit failed' );
+			}
+		);
+
+		$level = ob_get_level();
+		$this->expectOutputString( '' );
+
+		try {
+			KitRepeaterService::add_item( $kit, 'fluid_spacing_presets', array() );
+			$this->fail( 'Expected the Kit exception to propagate' );
+		} catch ( \RuntimeException $e ) {
+			$this->assertSame( 'kit failed', $e->getMessage() );
+		}
+
+		$this->assertSame( $level, ob_get_level() );
+	}
 }

@@ -330,7 +330,7 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * Creates preset in Kit via add_repeater_row. Uses isset() for validation since '0' is valid.
+	 * Creates preset in Kit via KitRepeaterService::add_item(). Uses isset() for validation since '0' is valid.
 	 *
 	 * @param array<string, mixed> $data title, min_size, min_unit, max_size, max_unit, group.
 	 * @return array<string, mixed> success, id, title, control_id.
@@ -371,7 +371,7 @@ class Module extends Module_Base {
 
 		$control_id = ! empty( $data['group'] ) && is_string( $data['group'] ) ? sanitize_key( $data['group'] ) : 'fluid_spacing_presets';
 
-		$kit->add_repeater_row( $control_id, $preset_item );
+		KitRepeaterService::add_item( $kit, $control_id, $preset_item );
 
 		return array(
 			'success'    => true,
