@@ -200,6 +200,13 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.6.0 =
+* added: themes and plugins can register preset groups in code (`arts/fluid_design_system/registered_groups` filter); these groups survive an Elementor Kit import and can't be renamed or deleted by mistake
+* fixed: inline fluid values like "20px ~ 100px" didn't scale when the site had no presets in any group
+* fixed: "Save as Preset" in the editor showed an error although the preset was saved, and the MCP create-preset tool returned an unreadable reply, when Elementor's CSS Print Method was set to Internal Embedding
+* fixed: after undo or redo, a fluid control kept showing the old preset until the panel was reopened
+* fixed: fluid controls and the "Save as Preset" dialog jumped in size while presets and groups were loading
+
 = 2.5.5 =
 * fixed: the number field stayed visible next to the preset dropdown when a control used the fluid unit
 
