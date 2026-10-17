@@ -23,4 +23,4 @@ jobs:
       run_e2e: true
       playwright_browsers: 'firefox webkit'
       e2e_command: pnpm exec playwright test --project=firefox --project=webkit
-      wp_env_ports: '8888,8889'
+      wp_env_ports: '8882,8883'

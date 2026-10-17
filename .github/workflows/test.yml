@@ -23,7 +23,7 @@ jobs:
       coverage: true
       # deploy-docs only runs post-merge; this catches a broken docs config on the PR.
       build_docs: true
-      wp_env_ports: '8888,8889'
+      wp_env_ports: '8882,8883'
       run_e2e: true
       # The Abilities API lands in WP 6.9 and this plugin supports 6.0+, so
       # plugin-check flags every wp_register_ability* call. Every one of them is

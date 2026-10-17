@@ -15,7 +15,7 @@
 
 import { expect, test } from '@playwright/test'
 
-const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8888'
+const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8882'
 
 test.describe('Namespace Conflict Handling', () => {
   /**

@@ -16,4 +16,4 @@ jobs:
       # PHPUnit against WP trunk + an Elementor beta when one is ahead of stable.
       # The suites run through the repo's isolated tooling — see test.yml.
       integration_suites: '[]'
-      wp_env_ports: '8888,8889'
+      wp_env_ports: '8882,8883'

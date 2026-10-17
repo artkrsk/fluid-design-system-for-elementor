@@ -23,7 +23,7 @@ export default defineConfig({
   reporter: [['html', { outputFolder: 'playwright-report' }], ['list']],
   outputDir: 'test-results',
   use: {
-    baseURL: process.env.WP_BASE_URL || 'http://localhost:8888',
+    baseURL: process.env.WP_BASE_URL || 'http://localhost:8882',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
