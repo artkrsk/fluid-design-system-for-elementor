@@ -25,7 +25,7 @@
     "ergebnis/composer-normalize": "^2.48",
     "php-stubs/woocommerce-stubs": "^11.0",
     "phpstan/phpstan": "^2.0",
-    "phpunit/phpunit": "^9.6",
+    "phpunit/phpunit": "^10.0",
     "squizlabs/php_codesniffer": "^3.13.4",
     "szepeviktor/phpstan-wordpress": "^2.0",
     "wp-coding-standards/wpcs": "^3.0",
