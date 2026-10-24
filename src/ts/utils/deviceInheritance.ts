@@ -6,6 +6,7 @@
 
 import type { IInheritedControlValue } from '../interfaces'
 import type { TParsedControlName } from '../types'
+import { generateClampFormula } from './clamp'
 
 /** Parse control name to extract base name and device suffix */
 export function parseControlNameDevice(
@@ -95,6 +96,23 @@ export function findInheritedValue(
   }
 
   return null
+}
+
+/** Fluid-unit value for one inherited side: plain sizes become a fixed clamp(), '0' when nothing is inherited */
+export function getInheritedSideValue(
+  inherited: IInheritedControlValue | null,
+  side: string
+): string {
+  const rawSize = inherited?.[side]
+  if (rawSize === undefined || rawSize === '') {
+    return '0'
+  }
+
+  const size = String(rawSize)
+  const unit = inherited?.__sourceUnit
+  const isSelfContained = !unit || unit === 'fluid' || unit === 'custom'
+
+  return isSelfContained ? size : generateClampFormula(size, unit, size, unit)
 }
 
 /** Handle widescreen inheritance (inherits from desktop) */

@@ -3,6 +3,7 @@ import {
   findInheritedValue,
   getAncestorDevices,
   getDeviceControlName,
+  getInheritedSideValue,
   getWidescreenInheritedValue,
   parseControlNameDevice,
   resolveInheritedValue
@@ -329,6 +330,27 @@ describe('deviceInheritance utilities', () => {
       const result = resolveInheritedValue('font_size_mobile', DEVICE_ORDER, getValueFn, isEmptyFn)
 
       expect(result?.__inheritedFrom).toBe('tablet')
+    })
+  })
+
+  describe('getInheritedSideValue', () => {
+    it('returns 0 when nothing is inherited', () => {
+      expect(getInheritedSideValue(null, 'top')).toBe('0')
+      expect(getInheritedSideValue({ top: '', unit: 'fluid', __sourceUnit: 'fluid' }, 'top')).toBe(
+        '0'
+      )
+    })
+
+    it('returns fluid and custom values as stored', () => {
+      const clamp = 'clamp(20px, 5vw, 80px)'
+      expect(getInheritedSideValue({ top: clamp, __sourceUnit: 'fluid' }, 'top')).toBe(clamp)
+      expect(getInheritedSideValue({ top: '2em', __sourceUnit: 'custom' }, 'top')).toBe('2em')
+    })
+
+    it('turns plain numeric values into a fixed clamp() the selects can show', () => {
+      const result = getInheritedSideValue({ top: '20', __sourceUnit: 'px' }, 'top')
+
+      expect(result).toMatch(/^clamp\(min\(20px, 20px\)/)
     })
   })
 })

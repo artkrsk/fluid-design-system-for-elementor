@@ -74,13 +74,21 @@ export const BaseControlView: Record<string, unknown> = {
   /** Resyncs the fluid UI after undo/redo: Elementor's applySavedValue() only sets input values silently */
   onAfterExternalChange(this: any): void {
     callSuper(this, 'onAfterExternalChange', arguments)
+    this.syncFluidSelectsFromModel()
+  },
 
+  /** Re-reads select values from the model; limited to `settings` when given */
+  syncFluidSelectsFromModel(this: any, settings?: string[]): void {
     if (!this.hasRenderedFluidSelector()) {
       return
     }
 
     for (const selectEl of this.ui.selectControls) {
       const setting = selectEl.getAttribute('data-setting')
+      if (settings && !settings.includes(setting)) {
+        continue
+      }
+
       const value = this.getControlValue(setting) ?? ''
 
       this.toggleInlineInputs(setting, false)
