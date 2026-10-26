@@ -3,7 +3,7 @@
   "version": "2.6.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.28.6",
+  "packageManager": "pnpm@11.28.8",
   "engines": {
     "node": ">=24"
   },
@@ -19,7 +19,7 @@
   "devDependencies": {
     "@artemsemkin/elementor-types": "^2.0.0",
     "@arts/wp-plugin-tooling": "github:artkrsk/wp-plugin-tooling",
-    "@biomejs/biome": "2.5.15",
+    "@biomejs/biome": "2.6.3",
     "@playwright/test": "^1.61.1",
     "@types/jquery": "^4.0.1",
     "@types/node": "^26.1.1",
