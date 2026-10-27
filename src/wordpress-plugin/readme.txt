@@ -4,7 +4,7 @@ Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.6.0
+Stable tag: 2.6.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -199,6 +199,9 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 5. Applying fluid unit for "gaps" control
 
 == Changelog ==
+
+= 2.6.1 – October 27, 2026 =
+* fixed: unlinking the Tablet or Mobile padding, margin or gap values with a fluid unit no longer resets the inherited values to 0.
 
 = 2.6.0 – October 13, 2026 =
 * added: themes and plugins can register preset groups in code (`arts/fluid_design_system/registered_groups` filter); these groups survive an Elementor Kit import and can't be renamed or deleted by mistake
