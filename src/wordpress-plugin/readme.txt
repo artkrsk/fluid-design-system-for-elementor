@@ -200,6 +200,9 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.6.1 =
+* fixed: unlinking the Tablet or Mobile padding, margin or gap values with a fluid unit no longer resets the inherited values to 0.
+
 = 2.6.0 – October 13, 2026 =
 * added: themes and plugins can register preset groups in code (`arts/fluid_design_system/registered_groups` filter); these groups survive an Elementor Kit import and can't be renamed or deleted by mistake
 * fixed: inline fluid values like "20px ~ 100px" didn't scale when the site had no presets in any group
