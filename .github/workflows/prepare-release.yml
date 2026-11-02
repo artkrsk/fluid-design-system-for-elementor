@@ -39,7 +39,7 @@ jobs:
       client_id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
       version: ${{ inputs.version }}
       dry_run: ${{ inputs.dry_run == true }}
-      reviewers: artkrsk # request your review on each release PR, so GitHub always notifies you
+      notify: artkrsk # @mention in the release PR body: always notifies you, with one email
       # shipped_paths: 'src/'                              # changes here make a release worthwhile
       # readme_path: 'src/wordpress-plugin/readme.txt'
     secrets:
