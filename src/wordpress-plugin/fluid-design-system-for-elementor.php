@@ -9,7 +9,6 @@
  * License URI: https://www.gnu.org/licenses/gpl-3.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
- * Tested up to: 7.1
  * Plugin URI: https://artemsemkin.com/
  * Text Domain: fluid-design-system-for-elementor
  */
