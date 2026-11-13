@@ -6,8 +6,7 @@ on:
   push:
     branches: [main]
 
-# Supersede in-flight runs for the same ref so pushes don't pile up on the
-# single self-hosted runner.
+# Supersede in-flight runs for the same ref: only the newest push's result matters.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
