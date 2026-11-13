@@ -19,6 +19,7 @@ jobs:
   test:
     uses: artkrsk/wordpress-plugin-workflows/.github/workflows/test.yml@main
     with:
+      runner: ubuntu-latest
       zip_budget_mb: '1.0'
       coverage: true
       # deploy-docs only runs post-merge; this catches a broken docs config on the PR.
