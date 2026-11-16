@@ -9,6 +9,8 @@
  * - Heading using e2e_inverted preset (edge case)
  * - Spacer using e2e_gap_standard preset
  * - Spacer using an inline (custom) fluid value, no preset
+ * - Unit-aware cases: mixed-unit and em presets, a rem custom-breakpoint preset,
+ *   an inline rem value, and one saved in the formula shape shipped before that
  * - Container with gap using e2e_gap_large preset
  * - Button with padding (dimensions control)
  * - Element using custom breakpoint preset
@@ -29,15 +31,20 @@ $test_page_slug = 'e2e-fluid-test';
 
 // Element IDs matching test-data.ts TEST_ELEMENT_IDS
 $element_ids = array(
-	'headingXl'         => 'e2e-heading-xl',
-	'headingInverted'   => 'e2e-heading-inverted',
-	'containerNegative' => 'e2e-container-negative', // Separate container for negative margin (not in flex)
-	'spacerStandard'    => 'e2e-spacer-standard',
-	'spacerInline'      => 'e2e-spacer-inline',
-	'containerGap'      => 'e2e-container-gap',
-	'buttonDimensions'  => 'e2e-button-dimensions',
-	'customBreakpoint'  => 'e2e-custom-breakpoint',
-	'bgPosition'        => 'e2e-bg-position',
+	'headingXl'            => 'e2e-heading-xl',
+	'headingInverted'      => 'e2e-heading-inverted',
+	'containerNegative'    => 'e2e-container-negative', // Separate container for negative margin (not in flex)
+	'spacerStandard'       => 'e2e-spacer-standard',
+	'spacerInline'         => 'e2e-spacer-inline',
+	'containerGap'         => 'e2e-container-gap',
+	'buttonDimensions'     => 'e2e-button-dimensions',
+	'customBreakpoint'     => 'e2e-custom-breakpoint',
+	'bgPosition'           => 'e2e-bg-position',
+	'headingUnits'         => 'e2e-heading-units',
+	'headingMixedInverted' => 'e2e-heading-mixed-inverted',
+	'customBreakpointRem'  => 'e2e-custom-breakpoint-rem',
+	'spacerInlineRem'      => 'e2e-spacer-inline-rem',
+	'spacerInlineLegacy'   => 'e2e-spacer-inline-legacy',
 );
 
 /**
@@ -55,6 +62,25 @@ function e2e_generate_id() {
  */
 function e2e_get_preset_var( string $preset_id ): string {
 	return 'var(--arts-fluid-preset--' . $preset_id . ')';
+}
+
+/**
+ * Inline (custom) fluid value as the editor stores it: the plugin's clamp() template with
+ * Elementor's placeholders filled in. tests/fixtures/clamp-formulas.json pins that template
+ * to generateClampFormula(), which is what the editor actually calls.
+ *
+ * @param string $min_size Min size.
+ * @param string $min_unit Min unit.
+ * @param string $max_size Max size.
+ * @param string $max_unit Max unit.
+ * @return string clamp() formula.
+ */
+function e2e_inline_fluid_value( string $min_size, string $min_unit, string $max_size, string $max_unit ): string {
+	return str_replace(
+		array( '{{min.size}}', '{{min.unit}}', '{{max.size}}', '{{max.unit}}' ),
+		array( $min_size, $min_unit, $max_size, $max_unit ),
+		\Arts\FluidDesignSystem\Managers\CSSVariables::get_clamp_formula( 'min', 'max' )
+	);
 }
 
 // Build Elementor elements structure
@@ -75,6 +101,11 @@ $inner_text2_id         = e2e_generate_id();
 $custom_bp_heading_id   = e2e_generate_id();
 $bg_position_id         = e2e_generate_id();
 $bg_position_text_id    = e2e_generate_id();
+$heading_units_id       = e2e_generate_id();
+$heading_mixed_inv_id   = e2e_generate_id();
+$custom_bp_rem_id       = e2e_generate_id();
+$spacer_inline_rem_id   = e2e_generate_id();
+$spacer_inline_old_id   = e2e_generate_id();
 
 $elements = array(
 	// Main container
@@ -137,7 +168,7 @@ $elements = array(
 					),
 				),
 			),
-			// Spacer with an inline 40px ~ 180px value, as generateClampFormula() stores it
+			// Spacer with an inline 40px ~ 180px value
 			array(
 				'id'         => $spacer_inline_id,
 				'elType'     => 'widget',
@@ -146,7 +177,7 @@ $elements = array(
 					'_element_id' => $element_ids['spacerInline'],
 					'space'       => array(
 						'unit' => 'fluid',
-						'size' => 'clamp(min(40px, 180px), calc((40px) + (((180 - 40) * ((100vw - var(--arts-fluid-min-screen)) / var(--arts-fluid-screen-diff))))), max(40px, 180px))',
+						'size' => e2e_inline_fluid_value( '40', 'px', '180', 'px' ),
 					),
 				),
 			),
@@ -223,6 +254,85 @@ $elements = array(
 					'typography_font_size'  => array(
 						'unit' => 'fluid',
 						'size' => e2e_get_preset_var( 'e2e_custom_breakpoints' ),
+					),
+				),
+			),
+			// Mixed-unit font size (16px ~ 3rem) with an em line height (1em ~ 0.9em)
+			array(
+				'id'         => $heading_units_id,
+				'elType'     => 'widget',
+				'widgetType' => 'heading',
+				'settings'   => array(
+					'title'                  => 'Mixed Units (px to rem, em line height)',
+					'_element_id'            => $element_ids['headingUnits'],
+					'header_size'            => 'h2',
+					'typography_typography'  => 'custom',
+					'typography_font_size'   => array(
+						'unit' => 'fluid',
+						'size' => e2e_get_preset_var( 'e2e_mixed_units' ),
+					),
+					'typography_line_height' => array(
+						'unit' => 'fluid',
+						'size' => e2e_get_preset_var( 'e2e_em_line_height' ),
+					),
+				),
+			),
+			// Mixed-unit inverted font size (3rem ~ 16px)
+			array(
+				'id'         => $heading_mixed_inv_id,
+				'elType'     => 'widget',
+				'widgetType' => 'heading',
+				'settings'   => array(
+					'title'                 => 'Mixed Inverted (rem to px)',
+					'_element_id'           => $element_ids['headingMixedInverted'],
+					'header_size'           => 'h2',
+					'typography_typography' => 'custom',
+					'typography_font_size'  => array(
+						'unit' => 'fluid',
+						'size' => e2e_get_preset_var( 'e2e_mixed_inverted' ),
+					),
+				),
+			),
+			// rem preset with custom breakpoints (400-1600)
+			array(
+				'id'         => $custom_bp_rem_id,
+				'elType'     => 'widget',
+				'widgetType' => 'heading',
+				'settings'   => array(
+					'title'                 => 'Custom Breakpoints REM (400-1600)',
+					'_element_id'           => $element_ids['customBreakpointRem'],
+					'header_size'           => 'h2',
+					'typography_typography' => 'custom',
+					'typography_font_size'  => array(
+						'unit' => 'fluid',
+						'size' => e2e_get_preset_var( 'e2e_custom_breakpoints_rem' ),
+					),
+				),
+			),
+			// Spacer with an inline 2rem ~ 10rem value
+			array(
+				'id'         => $spacer_inline_rem_id,
+				'elType'     => 'widget',
+				'widgetType' => 'spacer',
+				'settings'   => array(
+					'_element_id' => $element_ids['spacerInlineRem'],
+					'space'       => array(
+						'unit' => 'fluid',
+						'size' => e2e_inline_fluid_value( '2', 'rem', '10', 'rem' ),
+					),
+				),
+			),
+			// The same inline value saved by a version before the unit-aware formula:
+			// it must keep rendering exactly as it did (the px-only result)
+			array(
+				'id'         => $spacer_inline_old_id,
+				'elType'     => 'widget',
+				'widgetType' => 'spacer',
+				'settings'   => array(
+					'_element_id' => $element_ids['spacerInlineLegacy'],
+					'space'       => array(
+						'unit' => 'fluid',
+						'size' => 'clamp(min(2rem, 10rem), calc((2rem) + (((10 - 2) * ((100vw - var(--arts-fluid-min-screen)) / var(--arts-fluid-screen-diff))))), max(2rem, 10rem))',
 					),
 				),
 			),
@@ -353,3 +463,4 @@ echo "  - e2e_negative_margin (negative values)\n";
 echo "  - e2e_gap_standard (spacer height)\n";
 echo "  - e2e_gap_large (container gap)\n";
 echo "  - e2e_custom_breakpoints (custom screen width)\n";
+echo "  - e2e_mixed_units, e2e_em_line_height, e2e_mixed_inverted, e2e_custom_breakpoints_rem (unit-aware)\n";

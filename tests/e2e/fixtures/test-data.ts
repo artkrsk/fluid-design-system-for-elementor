@@ -43,6 +43,80 @@ export function calculateExpectedValue(
   return Math.max(lowerBound, Math.min(upperBound, interpolated))
 }
 
+/** Condition of the plugin's @supports block (CSSVariables::get_typed_arithmetic_css()) */
+export const TYPED_ARITHMETIC_QUERY = 'calc(1px * (1px / 1px))'
+
+/**
+ * Expected computed value of a fluid clamp() at a viewport width, on either path.
+ *
+ * Typed (engines with CSS typed arithmetic): linear between the resolved bounds.
+ * Legacy (older engines, and formulas saved before the unit-aware one): the unitless
+ * diff (maxSize - minSize) is scaled by a px progress, so it moves 1px per unit whatever
+ * the units are. Both are clamped to [min, max] of the resolved bounds.
+ *
+ * @param minPx - min bound resolved to px
+ * @param maxPx - max bound resolved to px
+ * @param minSize - min size as stored (unitless)
+ * @param maxSize - max size as stored (unitless)
+ */
+export function calculateFluidValue(
+  minPx: number,
+  maxPx: number,
+  minSize: number,
+  maxSize: number,
+  viewport: number,
+  typed: boolean,
+  minScreen: number = TEST_BREAKPOINTS.default.min,
+  maxScreen: number = TEST_BREAKPOINTS.default.max
+): number {
+  const progress = (viewport - minScreen) / (maxScreen - minScreen)
+  const value = typed ? minPx + (maxPx - minPx) * progress : minPx + (maxSize - minSize) * progress
+
+  return Math.min(Math.max(value, Math.min(minPx, maxPx)), Math.max(minPx, maxPx))
+}
+
+/** Unit-aware presets as stored: [size, unit] per end (KEEP IN SYNC with setup-presets.php) */
+export const UNIT_AWARE_PRESETS = {
+  e2e_rem_units: { min: [1, 'rem'], max: [3, 'rem'], screens: TEST_BREAKPOINTS.default },
+  e2e_mixed_units: { min: [16, 'px'], max: [3, 'rem'], screens: TEST_BREAKPOINTS.default },
+  e2e_mixed_inverted: { min: [3, 'rem'], max: [16, 'px'], screens: TEST_BREAKPOINTS.default },
+  e2e_em_line_height: { min: [1, 'em'], max: [0.9, 'em'], screens: TEST_BREAKPOINTS.default },
+  e2e_custom_breakpoints_rem: { min: [1, 'rem'], max: [3, 'rem'], screens: TEST_BREAKPOINTS.custom }
+} as const
+
+/** Px value of a stored px/rem/em size; em resolves against `emBase` */
+function storedSizeToPx(size: number, unit: string, rootFontSize: number, emBase: number): number {
+  if (unit === 'rem') {
+    return size * rootFontSize
+  }
+  if (unit === 'em') {
+    return size * emBase
+  }
+  return size
+}
+
+/** Expected computed px of a unit-aware preset at a viewport width */
+export function calculatePresetValue(
+  presetId: keyof typeof UNIT_AWARE_PRESETS,
+  viewport: number,
+  typed: boolean,
+  rootFontSize: number,
+  emBase: number = rootFontSize
+): number {
+  const { min, max, screens } = UNIT_AWARE_PRESETS[presetId]
+
+  return calculateFluidValue(
+    storedSizeToPx(min[0], min[1], rootFontSize, emBase),
+    storedSizeToPx(max[0], max[1], rootFontSize, emBase),
+    min[0],
+    max[0],
+    viewport,
+    typed,
+    screens.min,
+    screens.max
+  )
+}
+
 /** Pre-calculated expected values for common viewports */
 export const EXPECTED_VALUES: Record<string, Record<number, number>> = {
   e2e_heading_xl: {
@@ -119,7 +193,12 @@ export const TEST_ELEMENT_IDS = {
   containerGap: 'e2e-container-gap',
   buttonDimensions: 'e2e-button-dimensions',
   customBreakpoint: 'e2e-custom-breakpoint',
-  bgPosition: 'e2e-bg-position' // Container with fluid background-position (Issue #23)
+  bgPosition: 'e2e-bg-position', // Container with fluid background-position (Issue #23)
+  headingUnits: 'e2e-heading-units', // e2e_mixed_units font size + e2e_em_line_height line height
+  headingMixedInverted: 'e2e-heading-mixed-inverted',
+  customBreakpointRem: 'e2e-custom-breakpoint-rem',
+  spacerInlineRem: 'e2e-spacer-inline-rem', // Inline 2rem ~ 10rem value
+  spacerInlineLegacy: 'e2e-spacer-inline-legacy' // Same value saved in the pre-unit-aware formula shape
 }
 
 /** Get CSS selector for element ID */

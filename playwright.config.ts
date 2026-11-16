@@ -32,9 +32,12 @@ export default defineConfig({
     // waitForLoadState (e.g. the heavy Elementor editor and wp-admin pages).
     navigationTimeout: 60000
   },
+  /* metadata.typedArithmetic pins which clamp() term a project must render (see the
+     typedArithmetic fixture): a browser bump can't silently move a project to the other path. */
   projects: [
     {
       name: 'chromium',
+      metadata: { typedArithmetic: true },
       use: {
         ...devices['Desktop Chrome'],
         storageState: './tests/e2e/.auth/admin.json'
@@ -42,6 +45,7 @@ export default defineConfig({
     },
     {
       name: 'firefox',
+      metadata: { typedArithmetic: true },
       use: {
         ...devices['Desktop Firefox'],
         storageState: './tests/e2e/.auth/admin.json'
@@ -49,9 +53,24 @@ export default defineConfig({
     },
     {
       name: 'webkit',
+      metadata: { typedArithmetic: true },
       use: {
         ...devices['Desktop Safari'],
         storageState: './tests/e2e/.auth/admin.json'
+      }
+    },
+    {
+      /* Engines without CSS typed arithmetic (iOS 18 and older, Firefox ESR, Firefox before 158)
+         get the legacy px-only term. Turning the feature off in current Firefox reproduces them. */
+      name: 'firefox-legacy',
+      testMatch: /(03-fluid-values|06-edge-cases|13-inline-values-without-presets)\.spec\.ts/,
+      metadata: { typedArithmetic: false },
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: './tests/e2e/.auth/admin.json',
+        launchOptions: {
+          firefoxUserPrefs: { 'layout.css.calc-typed-arithmetic.enabled': false }
+        }
       }
     }
   ],

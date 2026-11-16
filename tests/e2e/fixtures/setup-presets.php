@@ -100,6 +100,54 @@ $test_presets = array(
 				'unit' => 'px',
 			),
 		),
+		array(
+			'_id'   => 'e2e_static_rem',
+			'title' => 'E2E Static REM (min = max)',
+			'min'   => array(
+				'size' => 1,
+				'unit' => 'rem',
+			),
+			'max'   => array(
+				'size' => 1,
+				'unit' => 'rem',
+			),
+		),
+		array(
+			'_id'   => 'e2e_mixed_units',
+			'title' => 'E2E Mixed Units (px to rem)',
+			'min'   => array(
+				'size' => 16,
+				'unit' => 'px',
+			),
+			'max'   => array(
+				'size' => 3,
+				'unit' => 'rem',
+			),
+		),
+		array(
+			'_id'   => 'e2e_mixed_inverted',
+			'title' => 'E2E Mixed Inverted (rem to px)',
+			'min'   => array(
+				'size' => 3,
+				'unit' => 'rem',
+			),
+			'max'   => array(
+				'size' => 16,
+				'unit' => 'px',
+			),
+		),
+		array(
+			'_id'   => 'e2e_em_line_height',
+			'title' => 'E2E EM Line Height',
+			'min'   => array(
+				'size' => 1,
+				'unit' => 'em',
+			),
+			'max'   => array(
+				'size' => 0.9,
+				'unit' => 'em',
+			),
+		),
 	),
 	'fluid_spacing_presets'               => array(
 		array(
@@ -138,6 +186,21 @@ $test_presets = array(
 			'max'                           => array(
 				'size' => 100,
 				'unit' => 'px',
+			),
+			'override_screen_width_enabled' => 'yes',
+			'overriden_min_screen_width'    => 400,
+			'overriden_max_screen_width'    => 1600,
+		),
+		array(
+			'_id'                           => 'e2e_custom_breakpoints_rem',
+			'title'                         => 'E2E Custom Breakpoints REM',
+			'min'                           => array(
+				'size' => 1,
+				'unit' => 'rem',
+			),
+			'max'                           => array(
+				'size' => 3,
+				'unit' => 'rem',
 			),
 			'override_screen_width_enabled' => 'yes',
 			'overriden_min_screen_width'    => 400,

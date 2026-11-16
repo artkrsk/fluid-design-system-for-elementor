@@ -22,5 +22,5 @@ jobs:
       run_js_tests: false
       run_e2e: true
       playwright_browsers: 'firefox webkit'
-      e2e_command: pnpm exec playwright test --project=firefox --project=webkit
+      e2e_command: pnpm exec playwright test --project=firefox --project=firefox-legacy --project=webkit
       wp_env_ports: '8882,8883'

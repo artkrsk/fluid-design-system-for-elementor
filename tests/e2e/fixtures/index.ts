@@ -1,6 +1,7 @@
 import { test as base, expect, type Page } from '@playwright/test'
 import { ElementorEditorPage } from '../pages/elementor-editor'
 import { WPAdminPage } from '../pages/wp-admin'
+import { TYPED_ARITHMETIC_QUERY } from './test-data'
 
 export { emptyKitPresets, resetTestState } from './reset'
 // Re-export test data and the state-reset helper for convenience
@@ -29,6 +30,7 @@ type Fixtures = {
   wpAdmin: WPAdminPage
   editor: ElementorEditorPage
   testPageId: number
+  typedArithmetic: boolean
 }
 
 export const test = base.extend<Fixtures>({
@@ -51,6 +53,28 @@ export const test = base.extend<Fixtures>({
       throw new Error('Test page not found. Run global setup first.')
     }
     await use(pageId)
+  },
+
+  /**
+   * Whether the engine has CSS typed arithmetic, i.e. which formula term it renders.
+   * A project that pins `metadata.typedArithmetic` fails here when the engine disagrees, so
+   * firefox-legacy can't quietly turn into a second typed run once Firefox drops its pref.
+   */
+  typedArithmetic: async ({ page }, use, testInfo) => {
+    const supported = await page.evaluate(
+      (query) => CSS.supports('width', query),
+      TYPED_ARITHMETIC_QUERY
+    )
+    const pinned: unknown = testInfo.project.metadata.typedArithmetic
+
+    if (typeof pinned === 'boolean') {
+      expect(
+        supported,
+        `${testInfo.project.name} must ${pinned ? '' : 'not '}support CSS typed arithmetic`
+      ).toBe(pinned)
+    }
+
+    await use(supported)
   }
 })
 

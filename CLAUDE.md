@@ -159,6 +159,8 @@ save   (After):  DataManager.invalidate()
   `min(A, B)` and `calc((A)`, so formulas saved by older versions still parse. Changing the formula:
   regenerate the fixture and bump `CSSVariables::FORMULA_VERSION` (clears Elementor's CSS once so
   cached Kit CSS picks it up). Never put `;` in it: Elementor splits selector values on `;`.
+  e2e: every Playwright project pins the term it must render (`metadata.typedArithmetic`, checked by
+  the `typedArithmetic` fixture); `firefox-legacy` (weekly) turns the feature off to cover the legacy term.
 - **Abilities / MCP** — ability category and MCP server name are both `fluid-design-system`; abilities
   are namespaced `fluid/*` (list/get/create/rename/delete groups; list/get/create/update/delete/move
   presets). Reads gate on `edit_posts`, writes on `manage_options`.

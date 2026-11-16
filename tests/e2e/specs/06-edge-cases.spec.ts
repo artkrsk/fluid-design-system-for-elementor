@@ -8,15 +8,17 @@
  * - Values outside breakpoint range
  */
 
-import { expect, test } from '@playwright/test'
 import {
+  calculatePresetValue,
+  expect,
   getElementSelector,
   getExpectedValue,
   getHeadingTitleSelector,
   TEST_ELEMENT_IDS,
   TEST_PAGE_SLUG,
-  TEST_VIEWPORTS
-} from '../fixtures/test-data'
+  TEST_VIEWPORTS,
+  test
+} from '../fixtures'
 
 const TEST_PAGE_URL = `/${TEST_PAGE_SLUG}/`
 
@@ -305,6 +307,35 @@ test.describe('CSS Formula Structure', () => {
     // REM units are preserved in the formula (not converted to px)
   })
 
+  test('e2e_rem_units interpolates in rem, not px', async ({ page, typedArithmetic }) => {
+    for (const width of [360, 1140, 1920]) {
+      await page.setViewportSize({ width, height: 800 })
+
+      const readFontSizes = () =>
+        page.evaluate(() => {
+          const probe = document.createElement('div')
+          probe.style.fontSize = 'var(--arts-fluid-preset--e2e_rem_units)'
+          document.body.appendChild(probe)
+          const sizes = {
+            preset: parseFloat(getComputedStyle(probe).fontSize),
+            root: parseFloat(getComputedStyle(document.documentElement).fontSize)
+          }
+          probe.remove()
+          return sizes
+        })
+
+      await expect
+        .poll(
+          async () => {
+            const { preset, root } = await readFontSizes()
+            return preset - calculatePresetValue('e2e_rem_units', width, typedArithmetic, root)
+          },
+          { message: `e2e_rem_units at ${width}px` }
+        )
+        .toBeCloseTo(0, 0)
+    }
+  })
+
   test('e2e_static_value formula simplifies when min equals max', async ({ page }) => {
     const cssVar = await page.evaluate(() => {
       return getComputedStyle(document.documentElement).getPropertyValue(
@@ -315,6 +346,16 @@ test.describe('CSS Formula Structure', () => {
     // When min = max (20px), the plugin optimizes the formula to just "20px"
     // instead of the full clamp(20px, calc(...), 20px)
     expect(cssVar.trim()).toBe('20px')
+  })
+
+  test('e2e_static_rem formula simplifies to the bare rem value', async ({ page }) => {
+    const cssVar = await page.evaluate(() => {
+      return getComputedStyle(document.documentElement).getPropertyValue(
+        '--arts-fluid-preset--e2e_static_rem'
+      )
+    })
+
+    expect(cssVar.trim()).toBe('1rem')
   })
 
   test('all formulas use clamp with three arguments', async ({ page }) => {
