@@ -1,21 +1,29 @@
 name: WordPress Version Checker
 
 # Files an issue when a new WordPress release means the "Tested up to" header
-# needs a bump — the chore that otherwise gets discovered by users.
+# needs a bump — the chore that otherwise gets discovered by users. The check
+# lives in artkrsk/wordpress-plugin-workflows (wp-version-check.yml).
 
 on:
   schedule:
     - cron: '0 6 * * 1-5'
   workflow_dispatch:
+    inputs:
+      channel:
+        description: Which WordPress versions count
+        type: choice
+        options: [rc, stable, beta]
+        default: rc
 
 permissions:
   contents: read
-  issues: write
 
 jobs:
   wordpress-version-checker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: skaut/wordpress-version-checker@9d247334f5b30202cb9c1f4aee74c52f37399f69 # v2.2.3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/wp-version-check.yml@main
+    # The check opens, updates and closes its own issue
+    permissions:
+      contents: read
+      issues: write
+    with:
+      channel: ${{ inputs.channel || 'rc' }}
