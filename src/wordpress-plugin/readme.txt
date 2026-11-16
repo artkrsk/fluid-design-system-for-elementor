@@ -200,6 +200,10 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.6.2 =
+* improved: fluid values in rem, em and other units now scale smoothly between screen sizes in browsers that support it, while older browsers keep the previous behavior.
+* fixed: fluid values in rem or em, such as "1rem ~ 3rem", grew by only a few pixels instead of scaling across the full range.
+
 = 2.6.1 – October 27, 2026 =
 * fixed: unlinking the Tablet or Mobile padding, margin or gap values with a fluid unit no longer resets the inherited values to 0.
 
