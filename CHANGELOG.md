@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0 – November 16, 2026
+
+* improved: fluid values in rem, em, % and other units now scale across the full range, not only px values.
+* improved: fluid values can mix units, such as "16px ~ 3rem".
+* improved: browsers without the needed CSS support (iOS 18 and older, Firefox ESR) keep the previous px-based scaling.
+* improved: custom values entered before this update switch to the new scaling once you edit them.
+* fixed: presets with equal min and max values in rem or em now output the plain value instead of a full formula.
+
 ## 2.6.1 – October 27, 2026
 
 * fixed: unlinking the Tablet or Mobile padding, margin or gap values with a fluid unit no longer resets the inherited values to 0.

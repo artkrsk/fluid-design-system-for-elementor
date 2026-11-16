@@ -4,7 +4,7 @@ Tags: typography, spacing, responsive, fluid, elementor
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.6.1
+Stable tag: 2.7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0
 Text Domain: fluid-design-system-for-elementor
@@ -200,7 +200,7 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
-= 2.7.0 =
+= 2.7.0 – November 16, 2026 =
 * improved: fluid values in rem, em, % and other units now scale across the full range, not only px values.
 * improved: fluid values can mix units, such as "16px ~ 3rem".
 * improved: browsers without the needed CSS support (iOS 18 and older, Firefox ESR) keep the previous px-based scaling.
