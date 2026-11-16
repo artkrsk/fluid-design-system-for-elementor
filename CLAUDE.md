@@ -69,7 +69,7 @@ src/ts/  (all .ts; entry index.ts)
   managers/                CSSManager, StateManager, DataManager, PreviewSizeManager (singletons);
                            PresetDialogManager (static, create/edit preset dialog)
   services/presetAPI.ts    PresetAPIService — editor AJAX wrappers
-  constants/               STYLES, ELEMENTOR, API, VALUES
+  constants/               STYLES (+ FORMULA var names), ELEMENTOR, API, VALUES
   utils/ interfaces/ types/  helpers; one declaration per file
 ```
 
@@ -81,8 +81,9 @@ src/ts/  (all .ts; entry index.ts)
 - `ControlRegistry` — `get_custom_group_control_id($id): string` → `fluid_custom_{id}_presets`;
   `parse_control_id($id): array|false` → `['type'=>'builtin'|'custom','group_id'=>…]`; builtin/custom
   group metadata.
-- `CSSVariables` — `get_clamp_formula($min,$max,$minScreen?,$screenRange?): string` — the 4th arg is
-  the min-to-max screen **range** used as the scaling divisor, not the max breakpoint;
+- `CSSVariables` — `get_clamp_formula($min,$max,$minScreen?,$screenRange?): string` — both screen args
+  are **unitless**; the 4th is the min-to-max screen **range** used as the scaling divisor, not the max
+  breakpoint; `get_typed_arithmetic_css()` → the `@supports` block that switches the formula's term;
   `get_css_var_preset($id): string` → `--arts-fluid-preset--{id}`.
 - `Data` — custom-group CRUD over option `arts_fluid_design_system_custom_groups`, + main-group ordering.
 - `GroupsData` — merges builtin + custom + filter-injected groups for read paths.
@@ -116,7 +117,9 @@ output (elementor/elementor#37468), so never call `add_repeater_row()` directly 
 - `elementor/init` (register control views), `elementor/init-components` (register hook system),
   `elementor/element/after_section_end` (inject fluid unit), `elementor/ajax/register_actions`
   (editor AJAX), `elementor/editor/*_enqueue_*` (assets), `elementor/css-file/post/parse` +
-  `elementor/files/css/selectors` (Kit CSS cleanup).
+  `elementor/files/css/selectors` (Kit CSS cleanup), `elementor/frontend/after_register_styles`
+  (typed-arithmetic `@supports` block as inline style on `elementor-frontend`; not `after_enqueue_styles`,
+  which can run after the handle already printed), `wp_loaded` (one-time Elementor CSS clear).
 - `admin_menu`, `admin_enqueue_scripts`, `wp_ajax_fluid_design_system_admin_action` (admin UI; nonce
   `fluid_design_system_ajax_nonce`).
 - `wp_abilities_api_init`, `wp_abilities_api_categories_init`, `wp_after_execute_ability`,
@@ -147,12 +150,22 @@ save   (After):  DataManager.invalidate()
   `FluidTypographySpacing`) and only falls back to matching those ID patterns.
 - **CSS-var prefix** — `--arts-fluid-preset--`. PHP `CSSVariables::CSS_VAR_PRESET_PREFIX` **must equal**
   JS `STYLES.VAR_PREFIX`. Change one without the other and preview rendering silently breaks.
+- **clamp() formula** — PHP `CSSVariables::get_clamp_formula()` and JS `generateClampFormula()` emit the
+  same string, pinned by `tests/fixtures/clamp-formulas.json` (both test suites read it). It carries two
+  terms: the legacy px-only term for engines without CSS typed arithmetic and the unit-aware term,
+  picked by `--arts-fluid-typed` / `--arts-fluid-vw` / `--arts-fluid-px`, which only the
+  `@supports (width: calc(1px * (1px / 1px)))` block sets (JS `FORMULA` in `constants/STYLES.ts`).
+  Missing block = the legacy result, never a broken value. `parseClampFormula()` reads only
+  `min(A, B)` and `calc((A)`, so formulas saved by older versions still parse. Changing the formula:
+  regenerate the fixture and bump `CSSVariables::FORMULA_VERSION` (clears Elementor's CSS once so
+  cached Kit CSS picks it up). Never put `;` in it: Elementor splits selector values on `;`.
 - **Abilities / MCP** — ability category and MCP server name are both `fluid-design-system`; abilities
   are namespaced `fluid/*` (list/get/create/rename/delete groups; list/get/create/update/delete/move
   presets). Reads gate on `edit_posts`, writes on `manage_options`.
 - **Kit settings keys** — preset repeaters live under their control IDs in Kit meta; global screen
   bounds `min_screen_width` / `max_screen_width` (defaults 360 / 1920).
-- **WP options** — `arts_fluid_design_system_custom_groups`, `arts_fluid_design_system_main_group_order`.
+- **WP options** — `arts_fluid_design_system_custom_groups`, `arts_fluid_design_system_main_group_order`,
+  `arts_fluid_design_system_formula_version`.
 
 ## Gotchas / invariants
 

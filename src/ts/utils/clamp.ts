@@ -1,10 +1,7 @@
+import { FORMULA } from '../constants'
 import type { TParsedClamp } from '../types'
 
-/** CSS variable names (must match PHP CSSVariables.php) */
-const CSS_VAR_MIN_SCREEN = '--arts-fluid-min-screen'
-const CSS_VAR_SCREEN_DIFF = '--arts-fluid-screen-diff'
-
-/** Generates clamp() formula for fluid values */
+/** Generates clamp() formula for fluid values (same string as PHP CSSVariables::get_clamp_formula()) */
 export function generateClampFormula(
   minSize: number | string,
   minUnit: string,
@@ -14,18 +11,20 @@ export function generateClampFormula(
   const minValue = `${minSize}${minUnit}`
   const maxValue = `${maxSize}${maxUnit}`
 
-  const valueDiff = `(${maxSize} - ${minSize})`
+  // Unitless screen widths (set globally in :root)
+  const minScreen = `var(${FORMULA.VAR_MIN_SCREEN_VALUE})`
+  const screenDiff = `var(${FORMULA.VAR_SCREEN_DIFF})`
 
-  // Use CSS variables for screen widths (set globally in :root)
-  const minScreen = `var(${CSS_VAR_MIN_SCREEN})`
-  const screenDiff = `var(${CSS_VAR_SCREEN_DIFF})`
+  const typed = `var(${FORMULA.VAR_TYPED}, 0)`
+  const vw = `var(${FORMULA.VAR_VW}, 0)`
+  const px = `var(${FORMULA.VAR_PX}, 1)`
 
-  const viewportCalc = `(100vw - ${minScreen})`
+  // Legacy term: unitless diff × px progress (engines without typed arithmetic, right for px only).
+  // Typed term: unit-carrying diff × unitless progress. The switch vars pick one; see CSSVariables.php.
+  const legacyTerm = `((${maxSize} - ${minSize}) * ((100vw - ${minScreen} * 1px) / ${screenDiff}) * (1 - ${typed}))`
+  const typedTerm = `((${maxValue} - ${minValue}) * ((${vw} - ${minScreen} * ${px}) / (${screenDiff} * ${px})) * ${typed})`
 
-  // Scaling factor: (max - min) * ((100vw - minScreen) / screenDiff)
-  const scalingFactor = `(${valueDiff} * (${viewportCalc} / ${screenDiff}))`
-
-  const preferredValue = `calc((${minValue}) + (${scalingFactor}))`
+  const preferredValue = `calc((${minValue}) + ${legacyTerm} + ${typedTerm})`
 
   // Use CSS min()/max() to handle both normal and inverted cases
   const lowerBound = `min(${minValue}, ${maxValue})`

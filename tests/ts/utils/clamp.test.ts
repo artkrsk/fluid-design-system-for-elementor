@@ -1,5 +1,11 @@
 import { generateClampFormula, isInlineClampValue, parseClampFormula } from '@ts/utils/clamp'
 import { describe, expect, it } from 'vitest'
+// Shared with tests/php/unit/CSSVariablesTest.php: PHP and TS must emit the same formula
+import SHARED_FORMULAS from '../../fixtures/clamp-formulas.json'
+
+/** Shape shipped before the typed-arithmetic formula; saved inline values still hold it */
+const LEGACY_FORMULA =
+  'clamp(min(40px, 2rem), calc((40px) + (((2 - 40) * ((100vw - var(--arts-fluid-min-screen)) / var(--arts-fluid-screen-diff))))), max(40px, 2rem))'
 
 describe('clamp utilities', () => {
   describe('generateClampFormula', () => {
@@ -51,8 +57,35 @@ describe('clamp utilities', () => {
     it('uses CSS variables for screen widths', () => {
       const result = generateClampFormula(16, 'px', 24, 'px')
 
-      expect(result).toContain('var(--arts-fluid-min-screen)')
+      expect(result).toContain('var(--arts-fluid-min-screen-value)')
       expect(result).toContain('var(--arts-fluid-screen-diff)')
+    })
+
+    it('gates the legacy and typed terms on the switch vars, with fallbacks for engines without them', () => {
+      const result = generateClampFormula(16, 'px', 24, 'px')
+
+      expect(result).toContain('(1 - var(--arts-fluid-typed, 0))')
+      expect(result).toContain('* var(--arts-fluid-typed, 0))')
+      expect(result).toContain('var(--arts-fluid-vw, 0)')
+      expect(result).toContain('var(--arts-fluid-px, 1)')
+    })
+
+    it('keeps the units in the typed diff and drops them in the legacy diff', () => {
+      const result = generateClampFormula(16, 'px', 3, 'rem')
+
+      expect(result).toContain('((3rem - 16px) * ')
+      expect(result).toContain('((3 - 16) * ')
+    })
+
+    it('handles negative values', () => {
+      const result = generateClampFormula(-20, 'px', -120, 'px')
+
+      expect(result).toContain('min(-20px, -120px)')
+      expect(result).toContain('((-120px - -20px) * ')
+    })
+
+    it.each(SHARED_FORMULAS)('matches the PHP formula: $label', (tc) => {
+      expect(generateClampFormula(tc.minSize, tc.minUnit, tc.maxSize, tc.maxUnit)).toBe(tc.formula)
     })
   })
 
@@ -168,7 +201,15 @@ describe('clamp utilities', () => {
         { min: 16, minUnit: 'px', max: 24, maxUnit: 'px' },
         { min: 1, minUnit: 'rem', max: 2, maxUnit: 'rem' },
         { min: 0.875, minUnit: 'em', max: 1.25, maxUnit: 'em' },
-        { min: 14, minUnit: 'px', max: 18, maxUnit: 'px' }
+        { min: 14, minUnit: 'px', max: 18, maxUnit: 'px' },
+        { min: 16, minUnit: 'px', max: 3, maxUnit: 'rem' },
+        { min: 3, minUnit: 'rem', max: 16, maxUnit: 'px' },
+        { min: 10, minUnit: '%', max: 50, maxUnit: 'vw' },
+        { min: -20, minUnit: 'px', max: 20, maxUnit: 'px' },
+        { min: -2, minUnit: 'rem', max: -5, maxUnit: 'rem' },
+        { min: 0, minUnit: 'px', max: 2, maxUnit: 'rem' },
+        { min: 24, minUnit: 'px', max: 16, maxUnit: 'px' },
+        { min: 20, minUnit: 'px', max: 20, maxUnit: 'px' }
       ]
 
       for (const tc of testCases) {
@@ -181,6 +222,15 @@ describe('clamp utilities', () => {
         expect(parsed?.maxSize).toBe(String(tc.max))
         expect(parsed?.maxUnit).toBe(tc.maxUnit)
       }
+    })
+
+    it('parses the previously shipped formula, so saved inline values still open', () => {
+      expect(parseClampFormula(LEGACY_FORMULA)).toEqual({
+        minSize: '40',
+        minUnit: 'px',
+        maxSize: '2',
+        maxUnit: 'rem'
+      })
     })
   })
 })

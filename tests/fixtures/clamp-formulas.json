@@ -1,0 +1,106 @@
+[
+  {
+    "label": "px",
+    "minSize": "16",
+    "minUnit": "px",
+    "maxSize": "24",
+    "maxUnit": "px",
+    "formula": "clamp(min(16px, 24px), calc((16px) + ((24 - 16) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((24px - 16px) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(16px, 24px))"
+  },
+  {
+    "label": "rem",
+    "minSize": "1",
+    "minUnit": "rem",
+    "maxSize": "3",
+    "maxUnit": "rem",
+    "formula": "clamp(min(1rem, 3rem), calc((1rem) + ((3 - 1) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((3rem - 1rem) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(1rem, 3rem))"
+  },
+  {
+    "label": "em line-height",
+    "minSize": "1.0",
+    "minUnit": "em",
+    "maxSize": "0.9",
+    "maxUnit": "em",
+    "formula": "clamp(min(1.0em, 0.9em), calc((1.0em) + ((0.9 - 1.0) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((0.9em - 1.0em) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(1.0em, 0.9em))"
+  },
+  {
+    "label": "mixed px to rem",
+    "minSize": "16",
+    "minUnit": "px",
+    "maxSize": "3",
+    "maxUnit": "rem",
+    "formula": "clamp(min(16px, 3rem), calc((16px) + ((3 - 16) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((3rem - 16px) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(16px, 3rem))"
+  },
+  {
+    "label": "mixed rem to px",
+    "minSize": "3",
+    "minUnit": "rem",
+    "maxSize": "16",
+    "maxUnit": "px",
+    "formula": "clamp(min(3rem, 16px), calc((3rem) + ((16 - 3) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((16px - 3rem) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(3rem, 16px))"
+  },
+  {
+    "label": "mixed em to px",
+    "minSize": "2",
+    "minUnit": "em",
+    "maxSize": "120",
+    "maxUnit": "px",
+    "formula": "clamp(min(2em, 120px), calc((2em) + ((120 - 2) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((120px - 2em) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(2em, 120px))"
+  },
+  {
+    "label": "mixed % to vw",
+    "minSize": "10",
+    "minUnit": "%",
+    "maxSize": "50",
+    "maxUnit": "vw",
+    "formula": "clamp(min(10%, 50vw), calc((10%) + ((50 - 10) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((50vw - 10%) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(10%, 50vw))"
+  },
+  {
+    "label": "inverted",
+    "minSize": "24",
+    "minUnit": "px",
+    "maxSize": "16",
+    "maxUnit": "px",
+    "formula": "clamp(min(24px, 16px), calc((24px) + ((16 - 24) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((16px - 24px) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(24px, 16px))"
+  },
+  {
+    "label": "negative",
+    "minSize": "-20",
+    "minUnit": "px",
+    "maxSize": "-120",
+    "maxUnit": "px",
+    "formula": "clamp(min(-20px, -120px), calc((-20px) + ((-120 - -20) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((-120px - -20px) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(-20px, -120px))"
+  },
+  {
+    "label": "zero crossing",
+    "minSize": "-20",
+    "minUnit": "px",
+    "maxSize": "20",
+    "maxUnit": "px",
+    "formula": "clamp(min(-20px, 20px), calc((-20px) + ((20 - -20) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((20px - -20px) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(-20px, 20px))"
+  },
+  {
+    "label": "no leading zero",
+    "minSize": ".5",
+    "minUnit": "rem",
+    "maxSize": "1.5",
+    "maxUnit": "rem",
+    "formula": "clamp(min(.5rem, 1.5rem), calc((.5rem) + ((1.5 - .5) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((1.5rem - .5rem) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(.5rem, 1.5rem))"
+  },
+  {
+    "label": "decimals",
+    "minSize": "0.875",
+    "minUnit": "rem",
+    "maxSize": "1.3125",
+    "maxUnit": "rem",
+    "formula": "clamp(min(0.875rem, 1.3125rem), calc((0.875rem) + ((1.3125 - 0.875) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((1.3125rem - 0.875rem) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(0.875rem, 1.3125rem))"
+  },
+  {
+    "label": "equal",
+    "minSize": "20",
+    "minUnit": "px",
+    "maxSize": "20",
+    "maxUnit": "px",
+    "formula": "clamp(min(20px, 20px), calc((20px) + ((20 - 20) * ((100vw - var(--arts-fluid-min-screen-value) * 1px) / var(--arts-fluid-screen-diff)) * (1 - var(--arts-fluid-typed, 0))) + ((20px - 20px) * ((var(--arts-fluid-vw, 0) - var(--arts-fluid-min-screen-value) * var(--arts-fluid-px, 1)) / (var(--arts-fluid-screen-diff) * var(--arts-fluid-px, 1))) * var(--arts-fluid-typed, 0))), max(20px, 20px))"
+  }
+]

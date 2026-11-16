@@ -237,16 +237,19 @@ class Units extends BaseManager {
 		}
 	}
 
-	/** Extracts clamp() bounds and returns static value if identical. */
+	/**
+	 * Returns the static value when both clamp() bounds, min(X, X) and max(X, X), hold one value:
+	 * the clamp then resolves to X whatever its preferred value is.
+	 */
 	private function simplify_clamp_formula( string $css_value ): string {
-		if ( preg_match( '/^clamp\s*\(\s*min\s*\(\s*([^,]+?)\s*,\s*([^,]+?)\s*\)/', $css_value, $matches ) ) {
-			$min_value = trim( $matches[1] );
-			$max_value = trim( $matches[2] );
+		if (
+			preg_match( '/^clamp\s*\(\s*min\s*\(\s*([^,()]+?)\s*,\s*([^,()]+?)\s*\)/', $css_value, $lower )
+			&& preg_match( '/,\s*max\s*\(\s*([^,()]+?)\s*,\s*([^,()]+?)\s*\)\s*\)$/', $css_value, $upper )
+		) {
+			$bounds = array_unique( array( $lower[1], $lower[2], $upper[1], $upper[2] ) );
 
-			if ( $min_value === $max_value ) {
-				if ( strpos( $css_value, ' - ' . preg_quote( str_replace( 'px', '', $min_value ) ) . ')' ) !== false ) {
-					return $min_value;
-				}
+			if ( count( $bounds ) === 1 ) {
+				return $lower[1];
 			}
 		}
 

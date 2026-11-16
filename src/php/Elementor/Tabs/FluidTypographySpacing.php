@@ -378,7 +378,7 @@ class FluidTypographySpacing extends BaseTab {
 					CSSVariables::get_clamp_formula(
 						'min',
 						'max',
-						'{{overriden_min_screen_width.size}}px',
+						'{{overriden_min_screen_width.size}}',
 						'({{overriden_max_screen_width.size}} - {{overriden_min_screen_width.size}})'
 					),
 				),
