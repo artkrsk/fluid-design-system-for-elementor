@@ -1,0 +1,5 @@
+scripts:
+  setup: |
+    trap 'orca worktree set --worktree "path:$ORCA_WORKTREE_PATH" --unread > /dev/null' ERR
+    pnpm install --prefer-offline --frozen-lockfile
+    composer install --no-interaction
