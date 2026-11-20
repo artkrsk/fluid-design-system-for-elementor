@@ -200,6 +200,9 @@ The plugin uses the CSS `clamp()` function, which is supported by all modern bro
 
 == Changelog ==
 
+= 2.7.1 =
+* improved: full compatibility with WordPress 7.2
+
 = 2.7.0 – November 16, 2026 =
 * improved: fluid values in rem, em, % and other units now scale across the full range, not only px values.
 * improved: fluid values can mix units, such as "16px ~ 3rem".
