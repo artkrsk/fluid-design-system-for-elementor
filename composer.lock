@@ -4,26 +4,27 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ee1836e11e21e28e5adbe0abf5f8bc5",
+    "content-hash": "c5d8b2faa3d3223ae32632fe1063115e",
     "packages": [
         {
             "name": "arts/base",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/artkrsk/arts-base.git",
-                "reference": "0cdaad947736243ba815f590e7505f05ede8675f"
+                "reference": "c9374197a4c41129c25ac20f750cf3563c58c2e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/artkrsk/arts-base/zipball/0cdaad947736243ba815f590e7505f05ede8675f",
-                "reference": "0cdaad947736243ba815f590e7505f05ede8675f",
+                "url": "https://api.github.com/repos/artkrsk/arts-base/zipball/c9374197a4c41129c25ac20f750cf3563c58c2e8",
+                "reference": "c9374197a4c41129c25ac20f750cf3563c58c2e8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.0"
             },
             "require-dev": {
+                "arts/elementor-stubs": "^4.3",
                 "captainhook/captainhook": "^5.27",
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
                 "ergebnis/composer-normalize": "^2.48",
@@ -51,9 +52,10 @@
             "description": "Framework-agnostic base classes for Arts WordPress plugins",
             "support": {
                 "issues": "https://github.com/artkrsk/arts-base/issues",
-                "source": "https://github.com/artkrsk/arts-base/tree/v1.1.0"
+                "source": "https://github.com/artkrsk/arts-base/tree/v1.2.0"
             },
-            "time": "2026-04-07T08:05:36+00:00"
+            "time": "2026-11-23T12:26:22+00:00",
+            "published-time": "2026-11-23T12:26:38+00:00"
         },
         {
             "name": "arts/elementor-extension",
