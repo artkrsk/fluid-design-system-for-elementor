@@ -157,8 +157,8 @@ save   (After):  DataManager.invalidate()
   `@supports (width: calc(1px * (1px / 1px)))` block sets (JS `FORMULA` in `constants/STYLES.ts`).
   Missing block = the legacy result, never a broken value. `parseClampFormula()` reads only
   `min(A, B)` and `calc((A)`, so formulas saved by older versions still parse. Changing the formula:
-  regenerate the fixture and bump `CSSVariables::FORMULA_VERSION` (clears Elementor's CSS once so
-  cached Kit CSS picks it up). Never put `;` in it: Elementor splits selector values on `;`.
+  regenerate the fixture; the release's version bump clears Elementor's CSS once (arts/base
+  `CacheClear::on_version()` in `Plugin::add_actions()`) so cached Kit CSS picks it up. Never put `;` in it: Elementor splits selector values on `;`.
   e2e: every Playwright project pins the term it must render (`metadata.typedArithmetic`, checked by
   the `typedArithmetic` fixture); `firefox-legacy` (weekly) turns the feature off to cover the legacy term.
 - **Abilities / MCP** — ability category and MCP server name are both `fluid-design-system`; abilities
@@ -167,7 +167,7 @@ save   (After):  DataManager.invalidate()
 - **Kit settings keys** — preset repeaters live under their control IDs in Kit meta; global screen
   bounds `min_screen_width` / `max_screen_width` (defaults 360 / 1920).
 - **WP options** — `arts_fluid_design_system_custom_groups`, `arts_fluid_design_system_main_group_order`,
-  `arts_fluid_design_system_formula_version`.
+  `arts_elementor_cache_fluid-design-system` (written by arts/base `CacheClear`).
 
 ## Gotchas / invariants
 

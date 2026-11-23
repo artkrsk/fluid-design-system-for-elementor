@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Arts\FluidDesignSystem\Base\Plugin as BasePlugin;
+use ArtsFluidDS\Arts\Base\Elementor\CacheClear;
 
 /**
  * Main plugin class - managers, actions, and filters.
@@ -71,7 +72,11 @@ class Plugin extends BasePlugin {
 		add_action( 'elementor/editor/after_enqueue_styles', array( $this->managers->compatibility, 'elementor_enqueue_editor_styles' ) );
 		add_action( 'elementor/css-file/post/parse', array( $this->managers->units, 'optimize_fluid_css_post_parse' ) );
 		add_action( 'elementor/frontend/after_register_styles', array( $this->managers->css_variables, 'add_typed_arithmetic_css' ) );
-		add_action( 'wp_loaded', array( $this->managers->css_variables, 'maybe_clear_elementor_css' ) );
+		// Bundled as a library, the host product's own key covers the clear.
+		$version = defined( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) ? constant( 'ARTS_FLUID_DS_PLUGIN_VERSION' ) : null;
+		if ( is_string( $version ) ) {
+			CacheClear::on_version( 'fluid-design-system', $version );
+		}
 		add_action( 'admin_menu', array( $this->managers->admin_page, 'add_admin_menu' ), 80 );
 		add_action( 'admin_enqueue_scripts', array( $this->managers->admin_frontend, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_fluid_design_system_admin_action', array( $this->managers->admin_tabs_groups_ajax, 'handle_ajax_requests' ) );

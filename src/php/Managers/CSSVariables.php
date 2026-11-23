@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Arts\FluidDesignSystem\Base\Manager as BaseManager;
-use ArtsFluidDS\Arts\Utilities\Utilities;
 
 /**
  * CSS variable constants and clamp() formula builder.
@@ -35,10 +34,6 @@ class CSSVariables extends BaseManager {
 	const CSS_VAR_TYPED            = '--' . self::CSS_VAR_PREFIX . '-typed';
 	const CSS_VAR_VW               = '--' . self::CSS_VAR_PREFIX . '-vw';
 	const CSS_VAR_PX               = '--' . self::CSS_VAR_PREFIX . '-px';
-
-	/** Bump whenever the formula changes, so the Elementor CSS cache is cleared once. */
-	const FORMULA_VERSION        = 2;
-	const FORMULA_VERSION_OPTION = 'arts_fluid_design_system_formula_version';
 
 	/** @param string $id Preset ID (Elementor _id). */
 	public static function get_css_var_preset( string $id ): string {
@@ -168,22 +163,5 @@ class CSSVariables extends BaseManager {
 	 */
 	public function add_typed_arithmetic_css(): void {
 		wp_add_inline_style( 'elementor-frontend', self::get_typed_arithmetic_css() );
-	}
-
-	/**
-	 * Hooked to wp_loaded. Elementor doesn't regenerate cached Kit CSS when this plugin updates,
-	 * so presets would keep the previous formula until the next Kit save.
-	 */
-	public function maybe_clear_elementor_css(): void {
-		if ( Utilities::get_int_value( get_option( self::FORMULA_VERSION_OPTION ) ) === self::FORMULA_VERSION ) {
-			return;
-		}
-
-		if ( ! class_exists( '\Elementor\Plugin' ) ) {
-			return;
-		}
-
-		\Elementor\Plugin::$instance->files_manager->clear_cache();
-		update_option( self::FORMULA_VERSION_OPTION, self::FORMULA_VERSION );
 	}
 }
