@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.1 – November 24, 2026
+
+* improved: full compatibility with WordPress 7.2
+
 ## 2.7.0 – November 16, 2026
 
 * improved: fluid values in rem, em, % and other units now scale across the full range, not only px values.
