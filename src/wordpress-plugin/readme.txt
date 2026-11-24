@@ -31,6 +31,10 @@ With just a few clicks, you can:
 
 Say goodbye to manually tweaking every breakpoint. Say hello to automatic, intelligent design scaling with organized preset management.
 
+= ✅ Used in Velum and Trigger themes =
+
+My portfolio themes [Velum](https://artemsemkin.com/themes/velum/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=fluid-design-system-for-elementor) and [Trigger](https://artemsemkin.com/themes/trigger/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=fluid-design-system-for-elementor) both require Fluid Design System: their type and spacing come from its presets.
+
 == How It Works ==
 
 ❓ **What Does "Fluid" Mean?**
