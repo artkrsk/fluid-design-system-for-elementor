@@ -1,0 +1,22 @@
+name: Deploy listing to WordPress.org
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Print the changes without committing
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-assets:
+    uses: artkrsk/wordpress-plugin-workflows/.github/workflows/deploy-assets.yml@main
+    with:
+      plugin_slug: 'fluid-design-system-for-elementor'
+      dry_run: ${{ inputs.dry_run }}
+    secrets:
+      SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+      SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
