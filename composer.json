@@ -92,10 +92,10 @@
       "@php -r \"is_dir('vendor-prefixed') || mkdir('vendor-prefixed');\""
     ],
     "post-install-cmd": [
-      "@php -r \"if (file_exists('vendor/bin/strauss')) { passthru(PHP_BINARY . ' vendor/bin/strauss'); passthru('composer dump-autoload'); }\""
+      "@php -r \"if (file_exists('vendor/bin/strauss')) { passthru(PHP_BINARY . ' vendor/bin/strauss', \\$code); if (\\$code) { exit(\\$code); } passthru('composer dump-autoload', \\$code); exit(\\$code); }\""
     ],
     "post-update-cmd": [
-      "@php -r \"if (file_exists('vendor/bin/strauss')) { passthru(PHP_BINARY . ' vendor/bin/strauss'); passthru('composer dump-autoload'); }\""
+      "@php -r \"if (file_exists('vendor/bin/strauss')) { passthru(PHP_BINARY . ' vendor/bin/strauss', \\$code); if (\\$code) { exit(\\$code); } passthru('composer dump-autoload', \\$code); exit(\\$code); }\""
     ],
     "prefix-namespaces": [
       "@php vendor/bin/strauss",
