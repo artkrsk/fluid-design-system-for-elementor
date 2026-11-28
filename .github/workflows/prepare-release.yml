@@ -44,4 +44,5 @@ jobs:
       # readme_path: 'src/wordpress-plugin/readme.txt'
     secrets:
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      CLAUDE_CODE_OAUTH_TOKEN_BACKUP: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN_BACKUP }}
       RELEASE_BOT_PRIVATE_KEY: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
